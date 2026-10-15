@@ -29,7 +29,6 @@
   function stopPings(){clearInterval(pingTimer);pingTimer=null;}
   function closeModal(){
     stopPings();modal.querySelector('video')?.pause();modal.close();modal.classList.remove('message-modal');
-    if(document.fullscreenElement===modal)document.exitFullscreen?.().catch(()=>{});
     if(messageReturn){messageReturn=false;render();goTop();}
   }
   function showDialog(html){modal.classList.remove('message-modal');modal.innerHTML=`<button class="dialog-close" data-action="close" aria-label="Zavrieť">×</button>${html}`;if(!modal.open) modal.showModal();}
@@ -85,7 +84,7 @@
   function start(){
     view='player';state().started=true;save();
     if(!state().callDone)openCall();
-    else{if(state().stage===0)state().stage=state().completed.length===8?9:state().completed.length+1;save();render();goTop();}
+    else{requestGameFullscreen();if(state().stage===0)state().stage=state().completed.length===8?9:state().completed.length+1;save();render();goTop();}
   }
   function ping(){
     if(!soundContext||soundContext.state!=='running'||document.hidden||!modal.open||!modal.querySelector('.message-incoming'))return;
@@ -105,21 +104,27 @@
       soundContext.resume().then(()=>{ping();const b=modal.querySelector('[data-action="message-sound"]');if(b){b.textContent='♪ Zvuk zapnutý';b.setAttribute('aria-pressed','true');}}).catch(()=>{});
     }catch(_){} // The visual notification remains usable when audio is unavailable.
   }
+  function requestGameFullscreen(){
+    // Dialogs cannot enter fullscreen. Use the document so the entire game stays fullscreen.
+    const root=document.documentElement;
+    if(document.fullscreenElement||!document.fullscreenEnabled||!root.requestFullscreen)return;
+    root.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
+  }
   function openCall(replay=false,withGesture=true){
     messageReturn=replay;
     showMessage(replay||state().messageOpened);
     if(withGesture){
       if(!replay&&!state().messageOpened)enableSound();
-      if(modal.requestFullscreen&&!document.fullscreenElement)modal.requestFullscreen().catch(()=>{});
+      requestGameFullscreen();
     }
   }
   function showMessage(opened=false){
     stopPings();modal.querySelector('video')?.pause();
     modal.classList.add('message-modal');
     modal.innerHTML=`<section class="message-screen ${opened?'message-opened':'message-incoming'}" aria-labelledby="message-title">
-      <header class="message-status"><span><i class="status-dot"></i> PIXEL / MESSENGER</span><button class="text-link" data-action="close">${messageReturn?'← Späť do hry':preview?'← Späť do storyboardu':'Pozastaviť'}</button></header>
+      <header class="message-status"><span><i class="status-dot"></i> PIXEL / MESSENGER</span><div class="message-status-actions">${document.fullscreenEnabled&&document.documentElement.requestFullscreen?'<button class="text-link game-fullscreen" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶ Celá obrazovka</button>':''}<button class="text-link" data-action="close">${messageReturn?'← Späť do hry':preview?'← Späť do storyboardu':'Pozastaviť'}</button></div></header>
       ${opened?`<div class="message-thread"><div class="message-sender">${sprite('piko')}<div><span class="section-kicker">PRIJATÁ SPRÁVA</span><h1 id="message-title">Piko</h1></div><span class="message-badge">VIDEO</span></div>
-        <div class="message-video-wrap"><video id="piko-video" controls playsinline preload="metadata" aria-label="Videospráva od Pika"></video><p id="message-video-status" role="status" hidden></p></div>
+        <div class="message-video-wrap"><div class="message-video-surface"><video id="piko-video" controls playsinline preload="metadata" aria-label="Videospráva od Pika"></video><button class="message-video-replay" data-action="replay-message" aria-label="Prehrať správu od Pika znova" hidden><span class="message-play-circle" aria-hidden="true">▶</span><span>Prehrať znova</span></button></div><p id="message-video-status" role="status" hidden></p></div>
         <p class="message-caption">Správa od Pika</p>
         <div class="message-actions"><button class="btn" data-action="replay-message">▷ Prehrať znova</button><button class="btn secondary" data-action="finish-call" ${state().messageWatched||messageReturn?'':'hidden'}>${messageReturn?'Späť do hry →':'Máme obálku →'}</button></div>
         <p class="message-help">Počúvajte pozorne. Správu si môžete prehrať, koľkokrát potrebujete.</p></div>`:
@@ -130,14 +135,17 @@
     if(!modal.open)modal.showModal();
     if(opened){
       const video=modal.querySelector('video'),status=modal.querySelector('#message-video-status');
-      video.addEventListener('ended',()=>{state().messageWatched=true;save();modal.querySelector('[data-action="finish-call"]').hidden=false;});
+      const replay=modal.querySelector('.message-video-replay');
+      video.addEventListener('loadedmetadata',()=>{video.closest('.message-video-wrap').style.setProperty('--video-ratio',video.videoWidth/video.videoHeight);});
+      video.addEventListener('play',()=>{replay.hidden=true;video.controls=true;});
+      video.addEventListener('ended',()=>{state().messageWatched=true;save();video.controls=false;replay.hidden=false;modal.querySelector('[data-action="finish-call"]').hidden=false;});
       video.addEventListener('error',()=>{status.hidden=false;status.textContent='Správu sa nepodarilo načítať. Skúste ju prehrať znova alebo požiadajte dospelého pomocníka.';});
       video.src=GAME.video;
       video.play().catch(()=>{});
     }else{
       pingTimer=setInterval(ping,4800);
     }
-    modal.querySelector(opened?'[data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
+    modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function verify(raw){const t=GAME.stages[state().stage];const valid=t.digital?raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
     if(valid){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();success=true;sequence=[];render();goTop();}
@@ -167,10 +175,17 @@
     if(a==='test'){const n=Number(b.dataset.stage);preview={started:true,callDone:n!==0,stage:n,completed:Array.from({length:Math.max(0,n-1)},(_,i)=>i+1),hints:{}};view='player';success=false;sequence=[];if(n===0)openCall();else{render();goTop();}}
     if(a==='exit-test'){preview=null;navigate('designer');}
     if(a==='close'){const wasIntro=modal.classList.contains('message-modal')&&!messageReturn;closeModal();if(wasIntro){if(preview){preview=null;navigate('designer');}else{app.innerHTML=landing();goTop();}}}
-    if(a==='accept-call'){state().messageOpened=true;save();showMessage(true);}
+    if(a==='game-fullscreen')requestGameFullscreen();
+    if(a==='accept-call'){requestGameFullscreen();state().messageOpened=true;save();showMessage(true);}
     if(a==='message-sound')enableSound();
     if(a==='replay-message'){
-      const video=modal.querySelector('video');if(video){const status=modal.querySelector('#message-video-status');status.hidden=true;if(video.error)video.load();video.currentTime=0;video.play().catch(()=>{});}
+      requestGameFullscreen();
+      const video=modal.querySelector('video');
+      if(video){
+        const status=modal.querySelector('#message-video-status'),replay=modal.querySelector('.message-video-replay');
+        status.hidden=true;if(video.error)video.load();video.currentTime=0;video.controls=true;replay.hidden=true;
+        video.play().catch(()=>{replay.hidden=false;});
+      }
     }
     if(a==='reopen-message')openCall(true);
     if(a==='finish-call'){

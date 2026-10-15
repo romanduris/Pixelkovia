@@ -39,6 +39,11 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await p.locator('video').evaluate(v=>{v.playbackRate=16;v.play().catch(()=>{});});
    await p.locator('[data-action="finish-call"]').waitFor({state:'visible'});
  }
+ async function resizePlayerViewport(viewport){
+   // Browser window resizing requires leaving real fullscreen first.
+   await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
+   await page.setViewportSize(viewport);
+ }
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const noAtlas=async()=>assert.equal(await page.locator('a[href="atlas.html"]').count(),0,'no player atlas link before finale');
  const noOverflow=async(p,label)=>assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label);
@@ -77,7 +82,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('#hints p').count(),1,'continue preserves hints');
  await page.locator('[data-action="home"]').click();
  await page.evaluate(()=>localStorage.setItem('zahada-prep-0','1'));
- for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:1100});await noOverflow(page,`home with restart ${width}`);}
+ for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:1100});await noOverflow(page,`home with restart ${width}`);}
  await page.locator('[data-action="restart-adventure"]').click();
  assert.equal(await page.locator('.message-incoming').count(),1);
  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress'))),{started:true,callDone:false,stage:0,completed:[],hints:{},scenePages:{}});
@@ -107,6 +112,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.message-incoming').count(),1);
  assert.ok(!(await page.locator('.message-screen').textContent()).includes('kúpeľ'));
  assert.ok(await page.locator('[data-action="message-sound"]').getAttribute('aria-pressed')==='true');
+ await page.waitForFunction(()=>document.fullscreenElement===document.documentElement);
  const firstNotes=await page.evaluate(()=>window.notificationNotes);
  await page.waitForFunction(n=>window.notificationNotes>=n+3,firstNotes);
  const bounds=await page.locator('.message-modal').boundingBox();
@@ -121,7 +127,12 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.ok(!(await page.locator('.message-screen').textContent()).includes('kúpeľ'));
  await finishVideo(page);
  assert.equal(await page.locator('.message-caption').textContent(),'Správa od Pika');
- await page.locator('[data-action="replay-message"]').click();
+ assert.ok(await page.locator('.message-video-replay').isVisible(),'replay arrow remains on the video after it ends');
+ await page.locator('video').evaluate(v=>{v.playbackRate=1;});
+ await page.locator('.message-video-replay').click({position:{x:12,y:12}});
+ await page.waitForFunction(()=>{const v=document.querySelector('video');return v&&!v.paused&&v.currentTime<v.duration;});
+ await page.locator('.message-video-replay').waitFor({state:'hidden'});
+ await page.locator('.message-actions [data-action="replay-message"]').click();
  assert.equal(await page.locator('.message-opened').count(),1,'replay stays on message screen');
  await page.reload();
  assert.equal(await page.locator('.message-opened').count(),1,'opened message restores after reload');
@@ -166,8 +177,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.locator('[data-action="reset"]').click();await page.locator('.dialog-close').click();assert.equal(await page.locator('.finale').count(),1);
  await page.locator('[data-action="reset"]').click();await page.locator('[data-action="confirm-reset"]').click();await noAtlas();
  // Narrow phone, phone, tablet and desktop layouts.
- for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:844});await noOverflow(page,`home ${width}`);}
- await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/tmp/mystery-home-mobile.png',fullPage:true});
+ for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:844});await noOverflow(page,`home ${width}`);}
+ await resizePlayerViewport({width:390,height:844});await page.screenshot({path:'/tmp/mystery-home-mobile.png',fullPage:true});
  await page.locator('.site-header [data-view="prep"]').click();await noOverflow(page,'mobile prep');await noAtlas();
  await page.locator('[data-check="0"]').check();await page.reload();await page.locator('.site-header [data-view="prep"]').click();assert.ok(await page.locator('[data-check="0"]').isChecked());
  await page.locator('.site-header [data-view="designer"]').click();await noOverflow(page,'mobile GM');
@@ -194,7 +205,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  // Corrupt or missing local storage does not stop the game, and direct offline HTML works.
  await page.goto(BASE);await page.evaluate(()=>localStorage.setItem('zahada-v1-progress','{broken'));await page.reload();assert.equal(await page.locator('.hero').count(),1);
  const offline=await browser.newContext({offline:true});const local=await offline.newPage();await local.goto('file://'+require('node:path').resolve('index.html'));await local.locator('[data-action="start"]').click();assert.equal(await local.locator('.message-incoming').count(),1);await local.goto('file://'+require('node:path').resolve('atlas.html'));assert.equal(await local.locator('.atlas-profile').count(),7);await offline.close();
- const restricted=await browser.newContext();await restricted.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new Error('Storage disabled');}}));const guest=await restricted.newPage();await guest.route('**/assets/PicoVideo.mp4',route=>route.fulfill({status:404,body:'Missing video'}));const guestErrors=[];guest.on('pageerror',e=>guestErrors.push(e.message));await guest.goto(BASE);await guest.locator('[data-action="start"]').click();await guest.locator('[data-action="accept-call"]').click();
+ const restricted=await browser.newContext();await restricted.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new Error('Storage disabled');}});Object.defineProperty(document,'fullscreenEnabled',{get(){return false;}});});const guest=await restricted.newPage();await guest.route('**/assets/PicoVideo.mp4',route=>route.fulfill({status:404,body:'Missing video'}));const guestErrors=[];guest.on('pageerror',e=>guestErrors.push(e.message));await guest.goto(BASE);await guest.locator('[data-action="start"]').click();await guest.locator('[data-action="accept-call"]').click();
+ assert.equal(await guest.locator('[data-action="game-fullscreen"]').count(),0,'unsupported fullscreen keeps the page playable');
  await guest.locator('#message-video-status').waitFor({state:'visible'});
  assert.ok(!(await guest.locator('.message-screen').textContent()).includes('kúpeľ'));
  assert.ok(!(await guest.locator('[data-action="finish-call"]').isVisible()),'failed media does not reveal next task');
@@ -203,7 +215,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  // Incoming and opened messages fill small phones and landscape without horizontal overflow.
  await page.goto(BASE);await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
-   await page.setViewportSize({width,height});await page.locator('[data-action="start"]').click();
+   await resizePlayerViewport({width,height});await page.locator('[data-action="start"]').click();
    await noOverflow(page,`message ${width}`);
    const box=await page.locator('.message-modal').boundingBox();assert.equal(box.width,width);assert.equal(box.height,height);
    await page.screenshot({path:`/tmp/piko-incoming-${width}.png`});
