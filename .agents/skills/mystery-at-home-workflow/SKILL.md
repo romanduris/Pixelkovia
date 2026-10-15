@@ -7,6 +7,7 @@ description: Complete repository changes in MysteryAtHome with a commit and push
 
 Apply only to the MysteryAtHome repository. Follow its [AGENTS.md](../../../AGENTS.md), including Slovak communication and the existing Site publishing workflow.
 
+- Before starting each new user task, briefly summarize your understanding in Slovak and ask whether it may proceed (for example, "Môže to tak byť?"). Wait for the user's explicit confirmation before implementing that task. If the user corrects the summary, confirm the revised understanding first. Once confirmed, complete the agreed scope, including its required commit, push, and publication, without requesting the same approval again.
 - Work only on `main`. Do not create feature branches or push changes to another branch.
 - After each completed task that changes repository files, commit the task's changes with a descriptive message and push to `origin/main`. The user has explicitly authorized this workflow; do not ask again for routine commits and pushes.
 - If the Sites source helper creates commits, reuse them and push them to `origin/main` too. A push to the Sites source repository does not replace the GitHub push.
