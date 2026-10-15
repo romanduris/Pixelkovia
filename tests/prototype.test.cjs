@@ -69,6 +69,23 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('#hints p').count(),1);
  const cursor=await page.locator('.reader-count').textContent();
  await page.reload();assert.equal(await page.locator('.reader-count').textContent(),cursor);
+ // The home restart clears the entire saved journey and immediately opens a fresh incoming message.
+ await page.locator('[data-action="home"]').click();
+ assert.equal(await page.getByRole('button',{name:'Začať dobrodružstvo od začiatku',exact:false}).count(),1);
+ await page.locator('[data-action="start"]').click();
+ assert.equal(await page.locator('.reader-count').textContent(),cursor,'continue preserves the current scene');
+ assert.equal(await page.locator('#hints p').count(),1,'continue preserves hints');
+ await page.locator('[data-action="home"]').click();
+ await page.evaluate(()=>localStorage.setItem('zahada-prep-0','1'));
+ for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:1100});await noOverflow(page,`home with restart ${width}`);}
+ await page.locator('[data-action="restart-adventure"]').click();
+ assert.equal(await page.locator('.message-incoming').count(),1);
+ assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress'))),{started:true,callDone:false,stage:0,completed:[],hints:{},scenePages:{}});
+ assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-prep-0')),'1','restart keeps parent preparation');
+ await page.reload();assert.equal(await page.locator('.message-incoming').count(),1,'reloading retains the restarted game');
+ await page.locator('.message-status [data-action="close"]').click();
+ assert.equal(await page.locator('.chapter-card:disabled').count(),8);
+
  await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));
  await page.reload();
  await page.locator('.site-header [data-view="designer"]').click();
