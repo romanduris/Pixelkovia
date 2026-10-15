@@ -19,3 +19,8 @@ dialog{background:#151d34;color:#e8e7fb;border:1px solid #57668b;box-shadow:0 25
 /* Keep the full party visible in the narrow hero crop. */
 .signal-wave{white-space:nowrap;letter-spacing:3px}
 @media(max-width:700px){.hero-background{left:auto;right:0;width:150%;height:350px;object-position:right bottom}}
+/* The secret world behind everyday screens. */
+.hidden-world{display:grid;grid-template-columns:1fr 1.25fr;gap:55px;align-items:center;margin:36px 0 12px;padding:36px 38px;border:1px solid #364365;border-radius:9px;background:radial-gradient(ellipse at 0 100%,#2a32634d,transparent 65%),#111a2d}.hidden-world-heading h2{font-size:34px;line-height:1.18;color:#e8e6fd;margin:14px 0 22px}.hidden-world .section-kicker{color:#89d9df;font-size:8px;line-height:1.7;letter-spacing:.13em}.hidden-world-copy p{font-size:14px;line-height:1.9;color:#b0bdd5;margin:0 0 15px}.hidden-world-copy p:last-child{margin-bottom:0}.hidden-world-copy strong{font-weight:600;color:#e0d8ff}.device-list{display:flex;flex-wrap:wrap;gap:7px}.device-list span{font-size:10px;color:#bcd8e7;border:1px solid #3c536f;border-radius:4px;padding:5px 10px;background:#1a293d}
+@media(max-width:1000px){.hidden-world{gap:30px;padding:30px}.hidden-world-heading h2{font-size:29px}.hidden-world-copy p{font-size:13px}}
+@media(max-width:700px){.hidden-world{grid-template-columns:1fr;gap:24px;margin:25px 0 0;padding:24px 20px}.hidden-world-heading h2{font-size:29px;margin:12px 0 18px}.hidden-world-copy p{font-size:13px;line-height:1.9}.device-list span{font-size:10px}.hidden-world .section-kicker{font-size:7px}}
+@media print{.hidden-world{background:white;border-color:#aaa}.hidden-world-heading h2,.hidden-world-copy p,.hidden-world-copy strong{color:#222}}

@@ -54,7 +54,7 @@ Test overí celý priechod, nesprávne odpovede, nápovedy, diakritiku, obnoveni
 
 ## Príbeh a vizuálny smer
 
-Piko, modrý Pixelko, po výpadku svetelného priechodu hľadá šiestich kamarátov. Úlohy 1–6 obnovia kontakty s Kvakom, Iskrou, Šutkom, Lístkom, Kubom a Ryškom; každý odovzdá jedno písmeno. Siedma úloha odhalí SPOLU a poradie písmen. Ôsma otvorí heslom SVETLO cestu domov. Celá partia sa vráti vo finále.
+Pixelkovia potajomky žijú v každej domácnosti s mobilom, tabletom, počítačom či televízorom. Ich svet medzi svetelnými bodkami obrazoviek ukrýva Tichý závoj. Veľké bliknutie ho naruší a rozdelí partiu, preto Piko prvý raz osloví ľudský tím. Úlohy 1–6 obnovia kontakty a sprístupnia schopnosti: Kvak rozpozná signál, Iskra rozsvieti značky, Šutko spevní priechod, Lístok preloží pokyny, Kubo postaví cestu a Ryško obnoví ukrytie. Každý odovzdá písmeno. Úloha 7 odhalí SPOLU a poradie, úloha 8 heslom SVETLO spojí schopnosti. Vo finále sa celá partia vráti a ich svet bude znovu ukrytý pred ostatnými ľuďmi.
 
 `adventure.css` pridáva tmavomodrú, fialovú a tyrkysovú paletu, ilustrovaný domov a kontakty Pixelkov. Nové rastrové ilustrácie sú v `assets/pixelkovia-room.png` a `assets/pixelkovia-atlas.png`; prompty a pôvod sú v `assets/IMAGE-SOURCES.md`. Atlas má 4 × 2 políčka a zobrazuje sa cez CSS bez kopírovania jednotlivých portrétov. Pôvodné fotografie ostávajú archivované, rozhranie ich už nepoužíva.
 
