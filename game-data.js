@@ -3,12 +3,13 @@ window.GAME = {
   "title": "Pixelkovia: Stratený signál",
   "version": 2,
   "audio": null,
+  "video": "assets/PicoVideo.mp4",
   "stages": [
     {
       "id": "intro",
-      "title": "Telefonát, ktorý nemal prísť",
+      "title": "Správa, ktorá nemala prísť",
       "label": "Úvod",
-      "icon": "☎",
+      "icon": "✉",
       "time": [
         4,
         0,
@@ -66,21 +67,21 @@ window.GAME = {
           "„Kúpeľňa… obálka jedna… prosím, rýchlo…“"
         ]
       ],
-      "action": "Spoločne prijmite simulovaný hovor od Pika. Po prerušení spojenia vezmite suchú obálku 1 v kúpeľni.",
-      "task": "Prečítajte celý telefonát. Zapamätajte si prvé miesto: kúpeľňa. Skutočné telefónne číslo nepotrebujete.",
+      "action": "Otvorte Pikovu videosprávu. Z jej horšie zrozumiteľného zvuku zistite, kde máte hľadať obálku 1.",
+      "task": "Rozlúštite Pikovu videosprávu. Môžete si ju púšťať opakovane, až kým nezistíte, kde je obálka.",
       "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
-      "mobile": "Prijať hovor → textový rozhovor po častiach → prerušené spojenie → prvá úloha.",
-      "solution": "Kúpeľňa. Úvod nepotrebuje kód.",
+      "mobile": "Celoobrazovkový displej → tri cinknutia každých pár sekúnd → otvorenie videa ťuknutím → opakované prehrávanie → Máme obálku.",
+      "solution": "Kde je obálka? V kúpeľni. Odpoveď prezradí iba zvuk videosprávy; hráčsky displej ju nevypisuje.",
       "hints": [
         "Piko pomenoval miestnosť s umývadlom."
       ],
-      "parent": "Hovor spustite až po rozmiestnení papierových materiálov. Ide o simuláciu ovládanú čítaním; čas netiká a žiadne skutočné volanie neprebieha.",
+      "parent": "Obálku 1 ukryte v kúpeľni. Video spustite až po rozmiestnení materiálov. Prvý hlavolam je porozumieť Pikovi; nepomáhajte hneď. Pomôcka: Kde je obálka? Odpoveď: v kúpeľni.",
       "transition": "Pikov signál zoslabol. Nájdite Kvaka — bez jeho sluchu ostatné linky nespojíte.",
       "dramaturgy": [
         "Úvod musí okamžite vzbudiť otázky. Piko ešte nevie, či sa Ochranné pole pokazilo, či sú jeho priatelia v nebezpečenstve ani čo presne spôsobilo veľké bliknutie.",
         "Názov Ochranné pole možno prvýkrát predstaviť až neskôr. Nie je potrebné ho vysvetľovať počas úvodného telefonátu.",
         "Piko pôsobí sympaticky, trochu nervózne, ale nie vystrašene. Deti majú cítiť, že ich pomoc je dôležitá.",
-        "Hráči dostanú jasný pokyn na prvé fyzické hľadanie. Scéna sa skončí skutočným prerušením simulovaného hovoru."
+        "Prvé fyzické hľadanie začína rozlúštením videa. Bez automatického prechodu: správa ostáva na displeji a možno ju prehrávať opakovane až do nájdenia obálky."
       ],
       "incoming": [
         "Obrazovka telefónu na okamih zhasne.",

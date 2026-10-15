@@ -14,14 +14,18 @@ Pixelkovia potajomky žijú v každej domácnosti s mobilom, tabletom, počíta�
 
 SPOLU je sľub celej partie. SVETLO je spoločný potvrdzovací signál šiestich pripravených schopností, nie násilné otvorenie ochrany. Piko drží spojenie s ľuďmi a vracia sa ako posledný. Vo finále je všetkých sedem doma a Ochranné pole sa vráti do bežného režimu.
 
-Najprv v Príprave hry rozmiestnite tri obálky a kartu symbolov. Potom hráči prijmú simulovaný telefonát a riešia osem úloh. Príbeh sa číta po krátkych dialógových paneloch s tlačidlami Späť / Čítať ďalej. Po prečítaní scény sa zobrazí existujúca úloha; odhalenia a dialógy po vyriešení zostávajú skryté do správnej odpovede. Čas nie je limitovaný. Návrhových 60 minút ostáva pracovným odhadom, dlhší literárny text môže hranie predĺžiť.
+Najprv v Príprave hry rozmiestnite tri obálky a kartu symbolov. Potom hráči otvoria prichádzajúcu videosprávu od Pika a riešia osem úloh. Príbeh sa číta po krátkych dialógových paneloch s tlačidlami Späť / Čítať ďalej. Po prečítaní scény sa zobrazí existujúca úloha; odhalenia a dialógy po vyriešení zostávajú skryté do správnej odpovede. Čas nie je limitovaný. Návrhových 60 minút ostáva pracovným odhadom, dlhší literárny text môže hranie predĺžiť.
 
-Telefonát je textový. Žiadne audio nebolo vytvorené ani nie je potrebné. Existujúca voliteľná hodnota `GAME.audio` a jej textová záloha zostávajú kompatibilné.
+Úvod sa po spustení hry otvorí cez celý displej. Každých 4,8 sekundy zaznejú tri jemné cinknutia vytvorené Web Audio API; pri otvorení správy alebo jej zavretí sa zastavia. Zvuk sa nespúšťa na pozadí. Po obnovení stránky môže byť potrebné ťuknúť na „Zapnúť zvuk“. Fullscreen API sa používa tam, kde ho prehliadač podporuje; ostatné zariadenia dostanú dialóg cez celú plochu stránky.
+
+Dodané Pikovo video je v **`assets/PicoVideo.mp4`**; cestu určuje `GAME.video`. Po doplnení súboru treba znovu pripraviť a publikovať statický web. Ťuknutím na notifikáciu sa prehrá video so zvukom, bez prepisu či titulkov prezrádzajúcich úkryt. Prvý hlavolam je porozumieť správe: **Kde je obálka? V kúpeľni.** Túto odpoveď obsahuje len rodičovský návod a Game Master. Po prehratí ostane video na displeji s označením „Správa od Pika“ a možnosťou prehrať ho znova. Pokračuje sa ručne tlačidlom „Máme obálku“. Počas úloh možno video znova otvoriť cez „Pikova správa“ bez straty postupu. Chýbajúce alebo neprehrateľné video zobrazí chybu bez odhalenia odpovede; pred hrou overte obraz aj zvuk dodaného videa.
+
+Pôvodný úplný autorský scenár úvodného hovoru ostáva v Game Masterovi ako podklad, v hráčskom úvode sa nečíta.
 
 ## Príbehový model a súbory
 
 - `game-data.js`: jediný zdroj scén. `stages[].story` sú panely pred úlohou, `resolution` sú panely po správnej odpovedi. Panel je pole autorských riadkov, ktoré rozhranie rozlíši na rozprávača, dialóg a svetelný odkaz. `GAME.call` odkazuje na tie isté panely úvodu, neduplikuje samostatný skrátený telefonát. `dramaturgy` je viditeľná iba v Game Masterovi. Finále má samostatnú Pikovu `invitation`.
-- `app.js`: úvod, čítačka scén, validácia ôsmich úloh, zápisník, mapa, lokálny postup, príprava a kompletný Game Master.
+- `app.js`: displej s videosprávou, čítačka scén, validácia ôsmich úloh, zápisník, mapa, lokálny postup, príprava a kompletný Game Master.
 - `atlas.html` + `atlas.css`: samostatná miniknižka. Všetkých 143 odsekov kapitoly Tajný svet Pixelkov a dva úplné literárne odseky každého zo siedmich profilov sú priamo v HTML; na čítanie netreba JavaScript ani uložený postup. Názvoslovie a súvisiaca gramatika boli prispôsobené schválenému názvu Ochranné pole.
 - `printables.html`: pôvodné P1–P6 a diplom. Polohy, číselné záznamy, papierové pásiky, rovnice, šifrovacie kruhy, bludisko a akrostich zostávajú hrateľné; sprievodné texty už neprezrádzajú starú príčinu.
 - `styles.css` + `adventure.css`: základné rozloženie a existujúci pixel-art vzhľad vrátane V2 čítačky.
@@ -31,11 +35,11 @@ Telefonát je textový. Žiadne audio nebolo vytvorené ani nie je potrebné. Ex
 
 Hráč dostane CTA **OBJAVIŤ TAJNÝ SVET PIXELKOV** až na úspešnej obrazovke finále. Úvod, hráčska navigácia ani bežné úlohy atlas neodkazujú. Game Master má odkaz kedykoľvek ako zámernú rodičovskú výnimku. Samotné `atlas.html` nie je uzamknuté hrou a dá sa priamo otvoriť alebo zdieľať bez hrania.
 
-Game Master obsahuje úplné autorské scény pred aj po úlohách, úvodný hovor, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, bezpečnostné pokyny a prechody. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
+Game Master obsahuje úplné autorské scény pred aj po úlohách, úvodnú videosprávu aj pôvodný scenár hovoru, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, bezpečnostné pokyny a prechody. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
 
 ## Kompatibilita postupu
 
-ID etáp, osem odpovedí, odmeny S–V–E–T–L–O, SPOLU, SVETLO a kľúč `zahada-v1-progress` zostali zachované. Existujúci postup sa obnoví bez migrácie alebo vymazania. Voliteľné `scenePages` si pamätá aktuálny panel; staré uloženia bez tohto poľa začnú aktuálnu scénu od prvého panela. Splnená úloha po obnovení stránky znovu zobrazí svoj dialóg po vyriešení. Zaškrtnutá príprava zostáva uložená samostatne. Bez localStorage hra funguje v pamäti.
+ID etáp, osem odpovedí, odmeny S–V–E–T–L–O, SPOLU, SVETLO a kľúč `zahada-v1-progress` zostali zachované. Existujúci postup sa obnoví bez migrácie alebo vymazania. Voliteľné `messageOpened` a `messageWatched` obnovujú úvodnú správu po načítaní stránky; staré uloženia ostávajú použiteľné. Voliteľné `scenePages` si pamätá aktuálny panel; staré uloženia bez tohto poľa začnú aktuálnu scénu od prvého panela. Splnená úloha po obnovení stránky znovu zobrazí svoj dialóg po vyriešení. Zaškrtnutá príprava zostáva uložená samostatne. Bez localStorage hra funguje v pamäti.
 
 ## Overenie
 
@@ -48,7 +52,7 @@ npm install --prefix /tmp/pixelkovia-qa playwright
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/prototype.test.cjs
 ```
 
-Testujú úplný priechod dialógmi aj ôsmimi úlohami, načasovanie zvratu, zlé odpovede, nápovedy, obnovu V1 postupu aj stránkovania, izoláciu GM testov, reset, mobil/desktop, tlačoviny, offline otvorenie a nedostupné úložisko. Atlas sa testuje priamym otvorením bez postupu, aj bez JavaScriptu, vrátane úplnosti textu, siedmich výrezov a dostupnosti CTA až vo finále alebo v GM. Screenshoty a skúšobná tlač smerujú do `/tmp`.
+Testujú celoobrazovkovú prichádzajúcu správu, opakovanie a zastavenie cinkania, dodané video, jeho opakované prehrávanie aj obnovu úvodu, úplný priechod dialógmi aj ôsmimi úlohami, načasovanie zvratu, zlé odpovede, nápovedy, obnovu V1 postupu aj stránkovania, izoláciu GM testov, reset, mobil/desktop, tlačoviny, offline otvorenie a nedostupné úložisko. Atlas sa testuje priamym otvorením bez postupu, aj bez JavaScriptu, vrátane úplnosti textu, siedmich výrezov a dostupnosti CTA až vo finále alebo v GM. Screenshoty a skúšobná tlač smerujú do `/tmp`.
 
 ## Publikovanie
 

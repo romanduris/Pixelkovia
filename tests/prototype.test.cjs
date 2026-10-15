@@ -29,6 +29,16 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  const browser=await chromium.launch({headless:true});
  try{
  const page=await browser.newPage({viewport:{width:1440,height:1100}});
+ page.setDefaultTimeout(15000);
+ await page.addInitScript(()=>{
+   window.notificationNotes=0;
+   const original=AudioContext.prototype.createOscillator;
+   AudioContext.prototype.createOscillator=function(...args){window.notificationNotes++;return original.apply(this,args);};
+ });
+ async function finishVideo(p){
+   await p.locator('video').evaluate(v=>{v.playbackRate=16;v.play().catch(()=>{});});
+   await p.locator('[data-action="finish-call"]').waitFor({state:'visible'});
+ }
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const noAtlas=async()=>assert.equal(await page.locator('a[href="atlas.html"]').count(),0,'no player atlas link before finale');
  const noOverflow=async(p,label)=>assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label);
@@ -72,21 +82,41 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.success-card').count(),1);
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.locator('[data-action="exit-test"]').click();
- await page.locator('[data-action="test"][data-stage="0"]').click();await page.locator('.dialog-close').click();
+ await page.locator('[data-action="test"][data-stage="0"]').click();await page.locator('.message-status [data-action="close"]').click();
+ assert.equal(await page.locator('.storyboard').count(),10,'intro preview returns to GM');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.locator('.site-header [data-view="player"]').click();
  await page.locator('[data-action="start"]').click();
- assert.ok((await page.locator('.call').textContent()).includes('NEZNÁME SPOJENIE'));
+ assert.equal(await page.locator('.message-incoming').count(),1);
+ assert.ok(!(await page.locator('.message-screen').textContent()).includes('kúpeľ'));
+ assert.ok(await page.locator('[data-action="message-sound"]').getAttribute('aria-pressed')==='true');
+ const firstNotes=await page.evaluate(()=>window.notificationNotes);
+ await page.waitForFunction(n=>window.notificationNotes>=n+3,firstNotes);
+ const bounds=await page.locator('.message-modal').boundingBox();
+ assert.equal(bounds.width,1440);assert.equal(bounds.height,1100);
  await page.locator('[data-action="accept-call"]').click();
- let callText='';
- for(let i=0;i<game.call.length;i++){callText+=await page.locator('.call-line').textContent();await page.locator('[data-action="call-next"]').click();}
- assert.ok(callText.includes('A ja neviem, čo sa s nimi stalo.'));
- assert.ok(!callText.includes('Ochranné pole'));
+ assert.equal(await page.locator('video[playsinline]').count(),1);
+ const notesAtOpen=await page.evaluate(()=>window.notificationNotes);
+ await page.waitForTimeout(5000);
+ assert.equal(await page.evaluate(()=>window.notificationNotes),notesAtOpen,'opening video stops recurring notification sounds');
+ await page.locator('video').evaluate(v=>v.pause());
+ await page.screenshot({path:'/tmp/piko-video-playing.png'});
+ assert.ok(!(await page.locator('.message-screen').textContent()).includes('kúpeľ'));
+ await finishVideo(page);
+ assert.equal(await page.locator('.message-caption').textContent(),'Správa od Pika');
+ await page.locator('[data-action="replay-message"]').click();
+ assert.equal(await page.locator('.message-opened').count(),1,'replay stays on message screen');
+ await page.reload();
+ assert.equal(await page.locator('.message-opened').count(),1,'opened message restores after reload');
  await page.locator('[data-action="finish-call"]').click();await readScene(page);
+ await page.locator('[data-action="reopen-message"]').click();
+ await page.locator('[data-action="finish-call"]').click();
+ assert.equal(await page.locator('#answer').count(),1,'reopening message preserves current stage');
  await page.locator('#answer').fill('000');await page.locator('.answer-form button').click();
  assert.ok((await page.locator('#feedback').textContent()).includes('ešte nesedí'));
  await page.locator('[data-action="hint"]').click();assert.equal(await page.locator('#answer').inputValue(),'000');
  await page.reload();assert.equal(await page.locator('#hints p').count(),1);
- let entireJourney=callText;
+ let entireJourney='';
  for(let i=1;i<=8;i++){
   await noAtlas();entireJourney+=await readScene(page);
   if(i===6){
@@ -146,9 +176,27 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await book.setViewportSize({width:390,height:844});await book.goto(BASE+'/atlas.html');await book.screenshot({path:'/tmp/pixelkovia-atlas-mobile.png'});await bookContext.close();
  // Corrupt or missing local storage does not stop the game, and direct offline HTML works.
  await page.goto(BASE);await page.evaluate(()=>localStorage.setItem('zahada-v1-progress','{broken'));await page.reload();assert.equal(await page.locator('.hero').count(),1);
- const offline=await browser.newContext({offline:true});const local=await offline.newPage();await local.goto('file://'+require('node:path').resolve('index.html'));await local.locator('[data-action="start"]').click();await local.locator('[data-action="accept-call"]').click();assert.ok((await local.locator('.call-line').textContent()).includes('Haló'));await local.goto('file://'+require('node:path').resolve('atlas.html'));assert.equal(await local.locator('.atlas-profile').count(),7);await offline.close();
- const restricted=await browser.newContext();await restricted.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new Error('Storage disabled');}}));const guest=await restricted.newPage();const guestErrors=[];guest.on('pageerror',e=>guestErrors.push(e.message));await guest.goto(BASE);await guest.evaluate(()=>{GAME.audio='assets/not-recorded.mp3';});await guest.locator('[data-action="start"]').click();await guest.locator('[data-action="accept-call"]').click();await guest.locator('#audio-slot').getByText('Zvuk sa nepodarilo načítať.',{exact:false}).waitFor();for(let i=0;i<game.call.length;i++)await guest.locator('[data-action="call-next"]').click();await guest.locator('[data-action="finish-call"]').click();await readScene(guest);assert.equal(await guest.locator('#answer').count(),1);assert.deepEqual(guestErrors,[]);await restricted.close();
+ const offline=await browser.newContext({offline:true});const local=await offline.newPage();await local.goto('file://'+require('node:path').resolve('index.html'));await local.locator('[data-action="start"]').click();assert.equal(await local.locator('.message-incoming').count(),1);await local.goto('file://'+require('node:path').resolve('atlas.html'));assert.equal(await local.locator('.atlas-profile').count(),7);await offline.close();
+ const restricted=await browser.newContext();await restricted.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new Error('Storage disabled');}}));const guest=await restricted.newPage();await guest.route('**/assets/PicoVideo.mp4',route=>route.fulfill({status:404,body:'Missing video'}));const guestErrors=[];guest.on('pageerror',e=>guestErrors.push(e.message));await guest.goto(BASE);await guest.locator('[data-action="start"]').click();await guest.locator('[data-action="accept-call"]').click();
+ await guest.locator('#message-video-status').waitFor({state:'visible'});
+ assert.ok(!(await guest.locator('.message-screen').textContent()).includes('kúpeľ'));
+ assert.ok(!(await guest.locator('[data-action="finish-call"]').isVisible()),'failed media does not reveal next task');
+ await guest.locator('.message-status [data-action="close"]').click();
+ assert.equal(await guest.locator('.hero').count(),1);assert.deepEqual(guestErrors,[]);await restricted.close();
+ // Incoming and opened messages fill small phones and landscape without horizontal overflow.
+ await page.goto(BASE);await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
+ for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
+   await page.setViewportSize({width,height});await page.locator('[data-action="start"]').click();
+   await noOverflow(page,`message ${width}`);
+   const box=await page.locator('.message-modal').boundingBox();assert.equal(box.width,width);assert.equal(box.height,height);
+   await page.screenshot({path:`/tmp/piko-incoming-${width}.png`});
+   await page.locator('[data-action="accept-call"]').click();await noOverflow(page,`video ${width}`);
+   await finishVideo(page);
+   await page.screenshot({path:`/tmp/piko-video-${width}.png`});
+   await page.locator('.message-status [data-action="close"]').click();
+   await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
+ }
  assert.deepEqual(errors,[]);
- console.log('PASS: complete V2 dialogue journey, twist timing, seven safe returns, V1 saves, reader persistence, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/audio.');
+ console.log('PASS: complete V2 dialogue journey, twist timing, seven safe returns, V1 saves, reader persistence, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
