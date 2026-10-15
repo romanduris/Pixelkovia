@@ -1,4 +1,4 @@
-# Záhada u vás doma — Viktorov posledný signál
+# Záhada u vás doma — Pixelkovia: Stratený signál
 
 Kompletný lokálny HTML prototyp rodinnej hry v slovenčine. Bez backendu, účtov a zostavovania.
 
@@ -18,7 +18,7 @@ Potom otvorte http://localhost:8080. Pre hranie na mobile použite rovnakú lok�
 - `styles.css` — responzívny vzhľad, mobilné rozloženie a tlač storyboardu.
 - `game-data.js` — všetkých 10 etáp, plný príbeh, odpovede, dve nápovedy, materiály a časovanie. Sem smerujú budúce obsahové úpravy.
 - `app.js` — simulovaný telefonát, overovanie, digitálna sekvencia, mapa, zápisník, lokálny postup, príprava a Game master.
-- `assets/invention.svg` — vlastná vektorová ilustrácia.
+- `assets/pixelkovia-*.png` — pixelová ilustrácia domova a atlas siedmich postáv.
 - `printables.html` — pracovné tlačiteľné listy P1–P6, funkčné šifrovacie kotúče a voliteľný diplom. Tlačiť jednostranne pri 100 % mierke.
 - `tests/prototype.test.cjs` — obsahové a prehliadačové regresné overenie.
 
@@ -32,7 +32,7 @@ Postup a využité nápovedy sa ukladajú v localStorage aktuálneho prehliadač
 
 ## Otvorené časti V2
 
-- Profesionálne PDF a ilustrácie; aktuálne HTML listy sú hrateľné pracovné podklady.
+- Finálne PDF; ilustrované HTML listy sú hrateľné pracovné podklady.
 - Náročnejšie ilustrované bludisko; teraz je použitý funkčný jednoduchý potrubný plán.
 - MP3 telefonát. Cestu nastavte v `GAME.audio`; text je vždy dostupný. Pri nedostupnom súbore sa zobrazí textová alternatíva.
 - Testovanie s rodinami a vekmi 7–13 rokov. Časy sú odhady. Súčet návrhových časov podľa zadania je 60 minút.
@@ -52,11 +52,13 @@ PLAYWRIGHT_MODULE=/tmp/mystery-qa/node_modules/playwright node tests/prototype.t
 
 Test overí celý priechod, nesprávne odpovede, nápovedy, diakritiku, obnovenie postupu, izolované testy etáp, reštart, mobilné rozloženie a tlačové podklady. Náhľady a skúšobný PDF výstup zapisuje do `/tmp`, nie do repozitára.
 
-## Vizuálny smer podľa referencie
+## Príbeh a vizuálny smer
 
-`adventure.css` dopĺňa pôvodné rozloženie o tmavú paletu, teplé svetlo, ručne písaný názov, fotografickú scénu a papierové herné dokumenty. Úvod obsahuje štyri obrazové kroky a Viktorov portrét sa používa aj počas simulovaného telefonátu. Herný obsah a uložený postup ostávajú kompatibilné s V1. Tlačové listy zostávajú svetlé.
+Piko, modrý Pixelko, po výpadku svetelného priechodu hľadá šiestich kamarátov. Úlohy 1–6 obnovia kontakty s Kvakom, Iskrou, Šutkom, Lístkom, Kubom a Ryškom; každý odovzdá jedno písmeno. Siedma úloha odhalí SPOLU a poradie písmen. Ôsma otvorí heslom SVETLO cestu domov. Celá partia sa vráti vo finále.
 
-Nové fotografie sú uložené priamo v `assets/`; pôvod a presné prompty sú v `assets/IMAGE-SOURCES.md`. Font Caveat je pribalený lokálne vrátane licencie.
+`adventure.css` pridáva tmavomodrú, fialovú a tyrkysovú paletu, ilustrovaný domov a kontakty Pixelkov. Nové rastrové ilustrácie sú v `assets/pixelkovia-room.png` a `assets/pixelkovia-atlas.png`; prompty a pôvod sú v `assets/IMAGE-SOURCES.md`. Atlas má 4 × 2 políčka a zobrazuje sa cez CSS bez kopírovania jednotlivých portrétov. Pôvodné fotografie ostávajú archivované, rozhranie ich už nepoužíva.
+
+ID etáp, odpovede, odmeny, časovanie a kľúč `zahada-v1-progress` ostávajú kompatibilné s V1. Šesť obnovených kontaktov sa odvodzuje z existujúcich splnených úloh, bez migrácie alebo vymazania uloženého postupu. Príprava, storyboard aj všetky tlačové listy používajú nový príbeh.
 
 ## Trvalý online náhľad
 

@@ -1,25 +1,17 @@
-# Vizuálny smer: domáca záhada pri svetle lampy
+# Pixelkovia — ilustračné podklady
 
-Nové rastrové obrázky vznikli cez vstavaný nástroj image_gen, bez CLI/API fallbacku. Používateľova priložená referencia určila atmosféru a rozloženie; nejde o obrázok používateľského rozhrania vložený namiesto aplikácie. Nad fotografiami je skutočný HTML text, samostatné ovládanie a responzívne rozloženie.
+Vytvorené vstavaným nástrojom image_gen podľa používateľovej obrazovej referencie. Prihlasovací panel referencie nie je súčasťou ilustrácií ani aplikácie. Obrázky slúžia ako samostatné podklady pod skutočným HTML rozhraním. Pôvodné fotografie z prvej verzie sú ponechané v repozitári, aktuálne rozhranie ich nepoužíva.
 
-## Súbory a konečné prompty
+## assets/pixelkovia-room.png
 
-### `assets/mystery-room.png`
+Use case: illustration-story. Asset type: cinematic pixel art landscape background for a Slovak family mystery adventure game website. Input image is character and style reference only; IGNORE the login overlay entirely. Create a NEW wide 3:2 illustration in the same richly textured high-quality pixel art. Ordinary cozy family living room at blue twilight transformed by a mysterious glowing violet pixel doorway at RIGHT. Seven adorable companions matching reference: a small blue cloud-headed robot with dark face screen, cyan >_ eyes, dark suit and teal tie is the guide nearest right foreground, holding a small glowing communicator; beside him six tiny companions: white duck with teal bowtie, smiling amber flame, rounded gray rock, green sprout with two leaves, stack of purple cubes with little face, orange red panda with teal scarf. All friendly, expressive, chunky coherent sprites. Characters gathered along lower RIGHT two thirds of image near a wooden table with paper envelopes and a cipher wheel, portal glow, little cyan signal particles. LEFT HALF very dark and uncluttered negative space for real HTML headline, no prominent objects there. Dark ink navy, violet, cyan, warm amber lamp. Detailed charming indie mystery adventure art, crisp pixel edges and subtle dithering. No text, no letters, no UI, no login, no logos, no children, no humans, no horror. The image is artwork only, never a website screenshot.
 
-Use case: photorealistic-natural. Asset type: wide cinematic website hero background, landscape 3:2. A mysterious but welcoming ordinary family living room at dusk, wooden dining table in foreground strewn with aged cream inventor documents, hand-drawn floor plan, small brass cipher wheel, sealed kraft envelope with dark red wax seal, a brass flashlight pointing across the table, warm amber desk lamp and hanging kitchen lights in soft background, dark blue rain-dappled window. Composition: the right half contains the envelope, flashlight and intriguing papers; the left third is very dark quiet negative space for a website heading. Rich realistic photography, tactile paper, cinematic warm amber and deep petrol blue shadows, shallow depth of field, premium family mystery board game campaign. No people, no phones, no readable words, no UI, no typography, no collage, no borders, no horror.
+## assets/pixelkovia-atlas.png
 
-### `assets/viktor-portrait.png`
+Use case: illustration-story. Asset type: character portrait sprite atlas for family pixel-art mystery game. Reference image is visual reference of the SEVEN characters only, ignore its login interface. Produce a perfectly regular 4 column by 2 row GRID of 8 equal SQUARE tiles, overall 2:1 landscape image. Each tile has flat very dark ink navy #10152b background, no borders. Each character centered FULL BODY with clear padding, charming richly shaded crisp pixel art matching reference. Tiles in reading order: TOP LEFT blue cloud-headed robot guide Piko, cyan >_ screen face, black suit white shirt teal tie and tiny communicator. TOP 2: white little duck with orange bill and teal bow tie. TOP 3: cute orange amber flame with black dot eyes smiling, tiny feet. TOP 4: friendly rounded gray stone with little smile and feet. BOTTOM LEFT: green sprout creature round head with two leaves, happy face and little body. BOTTOM 2: three stacked purple voxel cubes with expressive small dark face and feet. BOTTOM 3: cute orange red panda, pale cheeks, pointed ears, striped tail and teal scarf. BOTTOM 4: small glowing cyan and violet pixel portal ring with golden star in center, no character. Each character large but WITHIN its own tile. Consistent scale, same eye height around tile center, dark purple/blue ambient light warm outlines, limited palette, no typography, no labels, no UI, no sheet header, no watermark. The atlas will be consumed through CSS background-size 400% 200%, so exact equal tile positions are critical.
 
-Use case: photorealistic-natural. Asset type: character portrait for fictional inventor on a phone call. Close-up vertical portrait photograph of Viktor, a kind but concerned 38-year-old central European male inventor with wavy brown hair, short stubble, a navy jacket over a worn denim shirt, looking directly at camera. Ordinary dim home workshop, warm amber practical lamp on one side of face and cool blue window light on the other, cinematic photorealistic natural face and eyes. Intelligent, approachable, urgently asking for help, family adventure not horror. Head and shoulders centered, enough room above head, no text, no UI, no watermark.
+Atlas: 4 stĺpce × 2 riadky. Piko, Kvak, Iskra, Šutko / Lístok, Kubo, Ryško, dekoratívny priechod. Zobrazuje sa cez CSS background-position, bez úprav zdrojovej bitmapy.
 
-### `assets/paper-cipher.png`
+## Fonty
 
-Use case: photorealistic-natural. Asset type: landscape 3:2 website chapter photo. Close-up of two children's hands holding a homemade round paper cipher wheel, two layered cream paper circles with hand-drawn radial letter markings, on a warm wooden family dining table with scattered clue papers, pencil, soft out of focus ordinary home in background. Warm amber desk-lamp lighting and deep cool shadows, cinematic realistic photography, tactile paper, premium mystery adventure atmosphere, no readable sentences, no digital screens, no text overlays, no watermark. Non-scary, non-fantasy.
-
-## Ostatné podklady
-
-- `assets/adventure-map.svg`: vlastná dekoratívna vektorová mapa pre úvodnú sekciu; nejde o tlačový plán P5.
-- `assets/fonts/Caveat.ttf`: Caveat z google/fonts, variabilný rukopisný font s podporou slovenčiny. Pribalená licencia v `assets/fonts/OFL-Caveat.txt`. Font je lokálny, funguje aj bez siete.
-- `assets/invention.svg`: pôvodný nákres z V1, ponechaný pre ďalšie použitie.
-
-Generované značky a písmená na fotografických papieroch sú dekoratívne. Skutočné herné úlohy používajú čitateľné HTML podklady v `printables.html`.
+Caveat je lokálne pribalený v assets/fonts/Caveat.ttf s licenciou OFL-Caveat.txt. Ostatné webové fonty majú systémovú zálohu. Herné mechaniky aj materiály fungujú bez siete.
