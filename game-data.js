@@ -1,19 +1,12 @@
-/* Príbeh Pixelkov. ID etáp, odpovede a odmeny zachovávajú postup V1. */
+/* GAME STUDIO V2. Príbehové panely sú jediný zdroj scén; mechaniky a uložený postup V1 ostávajú kompatibilné. */
 window.GAME = {
   "title": "Pixelkovia: Stratený signál",
-  "version": 1,
+  "version": 2,
   "audio": null,
-  "call": [
-    "Haló? Haló! Vidíte ma? Som Piko. Áno, tá modrá postavička na displeji! Som Pixelko. Doteraz ste o nás nevedeli. Dnes potrebujeme váš tím.",
-    "Pixelkovia žijú v každej domácnosti, kde je mobil, tablet, počítač alebo televízor. Aj u vás! Máme svoj malý svet medzi svetelnými bodkami obrazoviek. Tichý závoj ho ukrýva, preto nás pri bežnom používaní zariadení nikto nevidí.",
-    "Dnes prišlo veľké bliknutie. Tichý závoj prestal fungovať a moji šiesti kamaráti uviazli v chodbičkách medzi signálmi. Sú v bezpečí, ale bez ich schopností náš svet znovu neschováme. Potrebujeme pomoc každého z nich — aj vás.",
-    "Kvak pozná signály, Iskra rozsvieti značky, Šutko spevní priechod, Lístok preloží jeho reč, Kubo poskladá cestu a Ryško zapne závoj. Každý má aj jedno písmeno hesla. Papierové stopy som poslal vášmu dospelému pomocníkovi. Začnite v kúpeľni, v suchej obálke 1. Ničoho elektrického sa nedotýkajte.",
-    "Počkajte… zachytil som Kvakovo pípnutie! Kód má tri čísla. Spojenie slabne. Nájdite celú partiu a pomôžte nám vrátiť sa do úkrytu. Náš svet sa môže znova schovať, iba keď budeme spo—"
-  ],
   "stages": [
     {
       "id": "intro",
-      "title": "Volá vám Piko",
+      "title": "Telefonát, ktorý nemal prísť",
       "label": "Úvod",
       "icon": "☎",
       "time": [
@@ -21,7 +14,58 @@ window.GAME = {
         0,
         0
       ],
-      "story": "Na displeji zabliká modrá tvár. „Som Piko, jeden z Pixelkov. Žijeme v každej domácnosti s mobilom, tabletom, počítačom či televízorom. Aj v tej vašej. Len ste o nás nevedeli… až do dnes.“ Ich svet medzi svetelnými bodkami obrazoviek ukrýva Tichý závoj. Pri veľkom bliknutí sa pokazil a šiesti kamaráti uviazli v chodbičkách medzi signálmi. Každý ovláda inú schopnosť, bez ktorej závoj neobnovia. Piko sa preto po prvý raz ukáže ľudskému tímu. Dospelý pomocník už rozmiestnil jeho papierové stopy. Spojenie zapraská. Zostane správa: „Kúpeľňa. Obálka 1. Nájdite Kvaka.“",
+      "story": [
+        [
+          "Po prijatí hovoru sa v strede obrazovky rozsvietia dve malé modré oči.",
+          "„Haló? Počujete ma?“",
+          "Ozve sa zašušťanie.",
+          "„Halóóó! Ak ma počujete, skúste…“",
+          "Modrá postavička sa nakloní bližšie.",
+          "„Počkajte! Vy ma naozaj vidíte?“",
+          "Na chvíľu zostane úplne ticho.",
+          "„To je neuveriteľné. Ono to funguje!“",
+          "Postavička sa rýchlo poobzerá, akoby kontrolovala, či ju niekto nesleduje.",
+          "„Volám sa Piko. A… no… asi vám práve musím povedať jedno dosť veľké tajomstvo.“",
+          "Nervózne sa usmeje."
+        ],
+        [
+          "„Nie som človek. Som Pixelko.“",
+          "„My Pixelkovia sme veľmi maličkí. Takí maličkí, že by ste nás nevideli ani na špičke ceruzky. Bývame v skrytých svetelných zákutiach obrazoviek. V mobiloch, počítačoch, tabletoch aj televízoroch.“",
+          "Piko si povzdychne.",
+          "„Áno. To znamená, že aj u vás doma.“",
+          "Vtom obrazovka silno zapraská.",
+          "Pikova tvár sa rozpadne na farebné štvorčeky a znovu poskladá.",
+          "„Jaj! Nemáme veľa času.“",
+          "Jeho hlas zrazu zvážnie."
+        ],
+        [
+          "„Dnes ráno sa stalo niečo veľmi zvláštne. Všetko na okamih zablikalo. Naše cesty sa roztriasli a potom… zmizli.“",
+          "„Pokúšal som sa zavolať svojim kamarátom, ale nikto neodpovedá.“",
+          "Na okamih sklopí oči.",
+          "„A ja neviem, čo sa s nimi stalo.“",
+          "Niekde v pozadí zaznie slabé pípnutie.",
+          "Piko sa prudko otočí.",
+          "„Počkajte. To ste počuli?“",
+          "Ďalšie pípnutie.",
+          "„To by mohol byť Kvak! On dokáže rozoznať aj ten najslabší signál.“",
+          "Piko sa priblíži k obrazovke."
+        ],
+        [
+          "„Počúvajte ma pozorne. Váš dospelý pomocník pripravil niekoľko papierových stôp podľa našich záložných plánov. Možno nám pomôžu obnoviť spojenie.“",
+          "„Prvú nájdete v kúpeľni. V suchej obálke s číslom jeden. Nič nerozoberajte ani sa nedotýkajte elektrických zariadení. Potrebujeme len papierové stopy.“",
+          "Obrazovka začne blikať.",
+          "„Prosím, nájdite Kvaka. On možno vie, čo sa stalo.“",
+          "„A ešte jedna vec…“",
+          "Piko sa odmlčí.",
+          "„Pixelkovia sa ľuďom nikdy neukazujú. Nikdy.“"
+        ],
+        [
+          "Pozrie sa priamo na hráčov.",
+          "„Ale ja už neviem, koho iného požiadať o pomoc.“",
+          "Spojenie zapraská.",
+          "„Kúpeľňa… obálka jedna… prosím, rýchlo…“"
+        ]
+      ],
       "action": "Spoločne prijmite simulovaný hovor od Pika. Po prerušení spojenia vezmite suchú obálku 1 v kúpeľni.",
       "task": "Prečítajte celý telefonát. Zapamätajte si prvé miesto: kúpeľňa. Skutočné telefónne číslo nepotrebujete.",
       "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
@@ -30,8 +74,28 @@ window.GAME = {
       "hints": [
         "Piko pomenoval miestnosť s umývadlom."
       ],
-      "parent": "Hovor spustite až po rozmiestnení materiálov. Zobrazí sa len simulácia; nikto skutočne nevolá. Audio je voliteľné a zatiaľ nie je dodané.",
-      "transition": "Pikov signál zoslabol. Nájdite Kvaka — bez jeho sluchu ostatné linky nespojíte."
+      "parent": "Hovor spustite až po rozmiestnení papierových materiálov. Ide o simuláciu ovládanú čítaním; čas netiká a žiadne skutočné volanie neprebieha.",
+      "transition": "Pikov signál zoslabol. Nájdite Kvaka — bez jeho sluchu ostatné linky nespojíte.",
+      "dramaturgy": [
+        "Úvod musí okamžite vzbudiť otázky. Piko ešte nevie, či sa Ochranné pole pokazilo, či sú jeho priatelia v nebezpečenstve ani čo presne spôsobilo veľké bliknutie.",
+        "Názov Ochranné pole možno prvýkrát predstaviť až neskôr. Nie je potrebné ho vysvetľovať počas úvodného telefonátu.",
+        "Piko pôsobí sympaticky, trochu nervózne, ale nie vystrašene. Deti majú cítiť, že ich pomoc je dôležitá.",
+        "Hráči dostanú jasný pokyn na prvé fyzické hľadanie. Scéna sa skončí skutočným prerušením simulovaného hovoru."
+      ],
+      "incoming": [
+        "Obrazovka telefónu na okamih zhasne.",
+        "Ozve sa zvláštne pípnutie.",
+        "Potom druhé.",
+        "A tretie.",
+        "Na displeji sa objaví nápis:",
+        "NEZNÁME SPOJENIE"
+      ],
+      "resolution": [
+        [
+          "SPOJENIE PRERUŠENÉ",
+          "Na displeji zostane jediný symbol malej modrej bodky."
+        ]
+      ]
     },
     {
       "id": "envelope",
@@ -48,7 +112,13 @@ window.GAME = {
         "314"
       ],
       "placeholder": "Trojmiestny kód",
-      "story": "Na obálke je malá pixelová hviezda. Vnútri je Pikov list: „Za vašimi obrazovkami býva naša partia už dávno. Kvak rozozná správny signál aj v najväčšom šume. Bez neho nedokážeme spojiť ostatných.“ Tri jeho pípnutia sa pri veľkom bliknutí premiešali. Zoraďte ich podľa času a obnovíte prvý kontakt. Pod listom sú štyri pásiky odkazu; odložte si ich. Kvak čaká na správny signál.",
+      "story": [
+        [
+          "V obálke nájdete zvláštne záznamy a krátky Pikov odkaz.",
+          "„Ak čítate tieto riadky, naše spojenie stále funguje aspoň trochu. Kvak necháva za sebou zvukové stopy. Dokáže nájsť správny signál aj tam, kde ostatní počujú iba šum.“",
+          "„Pokúste sa obnoviť poradie jeho posledných pípnutí. Možno sa nám ozve.“"
+        ]
+      ],
       "action": "Vezmite obálku 1 v kúpeľni. Vyberte tri záznamy pípnutí a štyri pásiky; tie budete potrebovať v ďalšej úlohe.",
       "task": "Usporiadajte tri záznamy podľa času od najskoršieho. Číslice pri nich vytvoria trojmiestny kód Kvakovho kontaktu.",
       "materials": "P1: Pikov list a záznamy „09:20 → 4“, „09:00 → 3“, „09:10 → 1“. P2: štyri vopred rozstrihané pásiky.",
@@ -60,11 +130,60 @@ window.GAME = {
       ],
       "parent": "Obálku položte na suchú dostupnú poličku. Neumiestňujte ju pri liekoch, čistiacich prostriedkoch ani vode.",
       "transition": "Píp! „Som tu! Moje písmeno je S,“ ozve sa Kvak. „Zachytil som Iskru. Jej adresu nájdete na pásikoch!“",
-      "character": "kvak"
+      "character": "kvak",
+      "dramaturgy": [
+        "Obnovuje sa prvý kontakt. Kvak je veselý a jeho humor uvoľní napätie po dramatickom úvode.",
+        "Príbehový objav: signál nie je náhodný. Niekto alebo niečo ho vysiela opakovane.",
+        "Kvak ešte nerozumie jeho významu.",
+        "Schopnosť: rozpoznávanie signálov. Hráči získavajú písmeno S.",
+        "Nasledujúca aktivita: skladanie papierového odkazu a pátranie po Iskre."
+      ],
+      "resolution": [
+        [
+          "Po správnom vyriešení sa na displeji objaví žltá bodka.",
+          "Raz blikne.",
+          "Dvakrát.",
+          "A potom…",
+          "„KVAK!“",
+          "Na obrazovke vyskočí malá kačacia postavička so žltým zobáčikom.",
+          "„Kvak! Kvak! Kto mi lezie do signálu?“",
+          "V pozadí sa ozve Pikov hlas.",
+          "„Kvak! Ty žiješ!“",
+          "„Samozrejme, že žijem. Len som sa nemohol nikam dovolať.“",
+          "Kvak sa rozhliadne.",
+          "„Počkaj. Kto sú tí obrovskí ľudia?“",
+          "„Pomáhajú nám,“ vysvetlí Piko.",
+          "Kvak sa na hráčov zahľadí.",
+          "„Ľudia? Naozajstní ľudia?“",
+          "Na okamih otvorí zobák."
+        ],
+        [
+          "„No teda. Mama mi vždy hovorila, že raz budem počuť niečo neuveriteľné. Ale toto je naozaj dosť hlasné prekvapenie.“",
+          "Piko sa zasmeje.",
+          "„Kvak, čo sa stalo?“",
+          "Kvak stíchne.",
+          "„Neviem. Ale pred veľkým bliknutím som zachytil zvláštny signál.“",
+          "„Aký?“",
+          "„Opakoval sa. Stále rovnako. To nie je obyčajný šum.“",
+          "Piko sa zamyslí.",
+          "„Dokážeš ho rozpoznať?“",
+          "„Zatiaľ nie. Je príliš slabý.“",
+          "Kvak sa otočí k hráčom.",
+          "„Ale vďaka vám aspoň viem, že nie som sám!“"
+        ],
+        [
+          "Na displeji sa objaví malé žiariace písmeno S.",
+          "„Toto je moja značka zo záložného plánu. Odložte si ju. Možno sa ešte zíde.“",
+          "„A ešte niečo!“ dodá Kvak.",
+          "„Zachytil som časť správy od Iskry. Len sa roztrhala na kúsky.“",
+          "Piko sa usmeje.",
+          "„Tak to vyzerá, že máme ďalšiu stopu.“"
+        ]
+      ]
     },
     {
       "id": "document",
-      "title": "Iskrin roztrhaný odkaz",
+      "title": "Iskrin odkaz",
       "label": "Úloha 2",
       "icon": "▤",
       "time": [
@@ -78,7 +197,16 @@ window.GAME = {
         "POD OKNOM"
       ],
       "placeholder": "Miesto z dokumentu",
-      "story": "V prvom okienku sa ozve Kvak. „Počujem Iskru! Keď sa v našich skrytých chodbičkách stratí svetlo, vie rozsvietiť orientačné značky. Teraz ich budeme potrebovať všetky.“ Jej adresu zachytil na štyroch papierových pásikoch. Papier totiž veľké bliknutie nepomieša. Čísla v rohoch určujú poradie. Keď odkaz zložíte, Kvak pošle vaše volanie na správne miesto a Iskra môže rozžiariť prvý úsek cesty.",
+      "story": [
+        [
+          "Na displeji sa objaví Kvak.",
+          "„Zachytil som časti Iskrinho odkazu. Lenže signál nimi tak zatriasol, že neviem, v akom poradí majú byť.“",
+          "Vedľa neho sa objaví Piko.",
+          "„Iskra je naša najlepšia hľadačka skrytých značiek. Keď niekde zhasne svetlo, ona vždy nájde spôsob, ako ukázať ostatným cestu.“",
+          "Kvak si povzdychne.",
+          "„Len keby sme vedeli, kde ju hľadať.“"
+        ]
+      ],
       "action": "Na stole poskladajte štyri pásiky z obálky 1 podľa čísiel v ich rohoch. Môžete ich spojiť papierovou páskou.",
       "task": "Prečítajte zloženú vetu „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJTE NÍZKO.“ Zadajte hlavné miesto, ku ktorému vás veta posiela.",
       "materials": "P2: pásiky 1–4, pripravené rodičom. P3: karta symbolov prilepená zvnútra pod parapetom.",
@@ -90,11 +218,58 @@ window.GAME = {
       ],
       "parent": "Kartu dajte nízko a na dosah. Okno sa neotvára a na parapet sa nelezie. Ak je miesto nevhodné, kartu položte na podlahu pod okno.",
       "transition": "„Moje písmeno je V!“ Iskra rozsvieti značky na ceste. „Pod oknom čakajú Šutkove symboly.“",
-      "character": "iskra"
+      "character": "iskra",
+      "dramaturgy": [
+        "Iskra prináša optimizmus. Deti prvýkrát začínajú pochybovať, či sa cesty skutočne zničili.",
+        "Schopnosť: odhaľovanie skrytých značiek.",
+        "Písmeno: V.",
+        "Príbehová indícia: svetelné značky sú skryté, nie zničené.",
+        "Nasledujúca aktivita: symboly, logické vzťahy a získanie kontaktu na Šutka."
+      ],
+      "resolution": [
+        [
+          "Po potvrdení miesta OKNO vezmite kartu symbolov spod okna. Práve cez túto stopu sa Iskra ozve:",
+          "Po objavení miesta a nájdení ďalšej fyzickej indície sa mobil rozžiari.",
+          "„Haló? Haló!“",
+          "Tentoraz sa ozve živý, radostný hlas.",
+          "„Vidím vás! Konečne vás vidím!“",
+          "Na obrazovku vyskočí malý oranžovo-zlatý plamienok.",
+          "„Ja som Iskra!“",
+          "„Iskra!“ vykríkne Piko.",
+          "„Piko! Kvak! Kto sú tí ďalší?“",
+          "„Naši noví kamaráti,“ odpovie Kvak.",
+          "Iskra sa nadšene rozžiari.",
+          "„Vážne? Ľudskí kamaráti? To je fantastické!“",
+          "Zasvieti tak jasne, že displej na okamih zbledne.",
+          "„Ups.“",
+          "Zmenší svoj plamienok."
+        ],
+        [
+          "„Prepáčte. Keď mám radosť, trochu sa mi nedarí zostať nenápadná.“",
+          "Piko sa zasmial.",
+          "„Iskra, vieš nám povedať, prečo zmizli naše cesty?“",
+          "Iskra na chvíľu zvážnie.",
+          "„Nie celkom. Ale všimla som si niečo zvláštne.“",
+          "„Čo?“",
+          "„Na jednej chodbe prestali svietiť značky. Myslela som, že sú zničené. Lenže keď som sa na ne pozrela z iného uhla, stále tam boli.“",
+          "„Takže nezmizli?“ spýta sa Kvak.",
+          "„Presne tak. Akoby ich niečo schovalo.“",
+          "Piko stíchne.",
+          "„Schovalo?“",
+          "Iskra prikývne."
+        ],
+        [
+          "„A ešte niečo. Na konci chodby som videla Šutkovu značku. Myslím, že sa pokúšal niečo podoprieť.“",
+          "Na obrazovke sa objaví písmeno V.",
+          "„Toto je moja značka zo záložného plánu. Nezabudnite na ňu!“",
+          "Iskra žmurkne.",
+          "„Poďme nájsť Šutka. Ten sa len tak niečoho nezľakne.“"
+        ]
+      ]
     },
     {
       "id": "symbols",
-      "title": "Šutkove kamenné symboly",
+      "title": "Šutkov uzavretý priechod",
       "label": "Úloha 3",
       "icon": "△",
       "time": [
@@ -107,7 +282,22 @@ window.GAME = {
         "9"
       ],
       "placeholder": "Výsledné číslo",
-      "story": "Pod oknom čaká karta s tromi tvarmi. Iskra na ne posvieti cez obnovenú linku. „Šutko značkami označuje pevné body priechodu,“ vysvetľuje Piko. „Namiesto čísiel používa tvary. Každý má vždy rovnakú hodnotu.“ Šutko dokáže udržať priechod pevný, aby po ňom mohla prejsť celá partia. Jeho kontakt však odomkne iba správny súčet. Na spodku karty je aj poznámka o papierovom prekladači a nastavení D → A. Tú budete potrebovať ďalej.",
+      "story": [
+        [
+          "Na nájdenej karte sú zvláštne znaky.",
+          "Iskra sa pozorne zahľadí na jeden z nich.",
+          "„Toto poznám!“",
+          "Piko sa nakloní k obrazovke.",
+          "„Šutkove značky?“",
+          "„Áno. Označuje nimi miesta, kde je cesta bezpečná.“",
+          "Kvak si priloží krídlo k uchu.",
+          "„Zachytávam niečo veľmi slabé. Znie to ako…“",
+          "Ozve sa hlboké, pokojné:",
+          "„Hmmmm.“",
+          "Kvak sa rozžiari.",
+          "„To je on!“"
+        ]
+      ],
       "action": "Vezmite kartu symbolov spod okna. Ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na karte platí △ + △ = 6, ○ + △ = 5 a □ + ○ = 6. Koľko je △ + ○ + □?",
       "materials": "P3: tri rovnice a otázka. P4: dva šifrovacie kruhy a zakódovaný odkaz, pripravené na stole v obálke 2.",
@@ -118,12 +308,65 @@ window.GAME = {
         "Kruh má hodnotu 2 a štvorec 4. Sčítajte 3 + 2 + 4."
       ],
       "parent": "Dovoľte deťom kresliť si tvary alebo nahradiť ich predmetmi. Obálka 2 na stole obsahuje P4 a P5, bludisko zatiaľ nechajte otočené.",
-      "transition": "„Moje písmeno je E.“ Šutko spevní priechod. „Teraz potrebujeme Lístka a jeho preklad signálov.“",
-      "character": "sutko"
+      "transition": "Šutko čaká pri priechode uzavretom zvnútra. Vezmite obálku 2 zo stola; Lístkov prekladač môže vysvetliť jeho značky.",
+      "character": "sutko",
+      "dramaturgy": [
+        "Šutko prináša prvú výraznejšiu pochybnosť.",
+        "Priechod sa nespráva ako poškodená konštrukcia. Vyzerá ako zámerne uzavreté miesto.",
+        "Schopnosť: spevňovanie priechodov.",
+        "Písmeno: E.",
+        "Atmosféra má byť pokojne tajomná. V tejto chvíli ešte nie je známe, prečo sa priechod uzavrel.",
+        "Nasledujúca aktivita: zostavenie papierového šifrovacieho stroja, kontakt s Lístkom."
+      ],
+      "resolution": [
+        [
+          "Na displeji sa pomaly objaví sivá postavička pripomínajúca malý kamienok.",
+          "„Dobrý deň,“ povie veľmi pokojne.",
+          "„Šutko!“ zavolá Piko.",
+          "„Ahoj, Piko.“",
+          "„Čo sa tam deje? Si v poriadku?“",
+          "„Som.“",
+          "Šutko sa zamyslí.",
+          "„Len je tu trochu tesno.“",
+          "„Tesno?“",
+          "„Priechod sa uzavrel. Skúšal som ho podoprieť, ale drží pevnejšie, než som čakal.“",
+          "Kvak sa nakloní k obrazovke.",
+          "„A nedá sa rozbiť?“",
+          "Šutko naňho pomaly pozrie.",
+          "„Kvak, ty by si najradšej rozbil všetko, čo sa nedá otvoriť.“"
+        ],
+        [
+          "„Nie všetko,“ ohradí sa Kvak. „Len niektoré veci.“",
+          "Iskra sa usmeje.",
+          "„Šutko, myslíš, že je priechod poškodený?“",
+          "Šutko pokrúti hlavou.",
+          "„To je práve zvláštne. Keby bol zlomený, cítil by som praskliny.“",
+          "„Ale necítim ich.“",
+          "Piko zbystrí pozornosť.",
+          "„Čo teda cítiš?“",
+          "Šutko položí ruku na stenu chodby.",
+          "„Je zatvorená.“",
+          "„Zatvorená?“",
+          "„Áno.“",
+          "Odmlčí sa.",
+          "„A zdá sa mi, že z našej strany.“",
+          "Všetci na chvíľu stíchnu.",
+          "Potom Šutko vytiahne malú značku s písmenom E."
+        ],
+        [
+          "„Toto som našiel na našej strane uzáveru. Patrí k záložnému plánu.“",
+          "Piko prikývne.",
+          "„Ďakujeme. Drž tam všetko pokope. Skúsime zistiť, čo to znamená.“",
+          "Šutko sa pohodlne oprie.",
+          "„Ja počkám.“",
+          "„A ako dlho?“ spýta sa Kvak.",
+          "„Koľko bude treba.“"
+        ]
+      ]
     },
     {
       "id": "cipher",
-      "title": "Lístkov šifrovací kruh",
+      "title": "Lístkovo varovanie",
       "label": "Úloha 4",
       "icon": "◉",
       "time": [
@@ -137,7 +380,19 @@ window.GAME = {
         "STÔL"
       ],
       "placeholder": "Rozlúštené slovo",
-      "story": "Šutko už drží spojenie pevne. V obálke 2 na stole sú dva papierové kruhy. „Lístok rozumie reči signálov,“ povie Piko. „Bez jeho prekladu by sme nevedeli, čo od nás Tichý závoj žiada. Teraz vysiela v posunutej abecede.“ Na vonkajšom kruhu je správa, na vnútornom jej význam. Nastavte vonkajšie D oproti vnútornému A a prečítajte VWRO. Ktoré miesto ukrýva ďalšie spojenie?",
+      "story": [
+        [
+          "„Potrebujeme Lístka,“ povie Piko.",
+          "„On rozumie starým značkám nášho sveta. Ak niekto vie vysvetliť, čo sa stalo, je to práve on.“",
+          "Na stole čakajú dva papierové kruhy.",
+          "Kvak sa na ne zahľadí.",
+          "„Vyzerá to ako dve koláče.“",
+          "„Kvak,“ povzdychne si Iskra.",
+          "„Čo? Veď som ešte nejedol.“",
+          "Piko sa usmeje.",
+          "„Nie sú to koláče. Je to prekladač tajných správ.“"
+        ]
+      ],
       "action": "Vystrihnite oba kruhy P4. Položte menší na väčší a nastavte D nad A. Otáčajte ich okolo spoločného stredu; stačí ich pridržať prstom.",
       "task": "Použite abecedu A–Z bez diakritiky. Každé vonkajšie písmeno VWRO prečítajte ako zodpovedajúce vnútorné písmeno. Kam vás odkaz posiela?",
       "materials": "P4: kruhy s 26 písmenami A–Z, značka D → A a odkaz VWRO. Detské nožnice; spinka je voliteľná.",
@@ -148,12 +403,84 @@ window.GAME = {
         "V sa prečíta ako S, W ako T. Pokračujte rovnako."
       ],
       "parent": "Vystrihujú deti pod dohľadom. Nie je nutné prepichovať papier. Tlačené kruhy majú rovnaké uhly, aby sa dali skutočne použiť.",
-      "transition": "„Moje písmeno je T!“ Lístok preloží pokyn k jadru. „Na stole otočte Kubov plán. Bez staviteľa sa ďalej nedostaneme.“",
-      "character": "listok"
+      "transition": "STÔL ukázal miesto ďalšej stopy. Lístok varuje: nič neotvárajte nasilu. Na stole otočte Kubov plán P5 a nájdite bezpečnú cestu.",
+      "character": "listok",
+      "dramaturgy": [
+        "Toto je bod, kde sa mení cieľ hráčov.",
+        "Doteraz verili, že opravujú pokazený systém. Teraz zistia, že jeho automatické otvorenie by mohlo byť nebezpečné.",
+        "Veľmi dôležité: zvrat nesmie pôsobiť ako náhodné nové pravidlo. Predchádzajúce indície od Kvaka, Iskry a Šutka k nemu postupne smerovali.",
+        "Lístok prekladá význam varovania. Hráči ho nemusia samostatne rozlúštiť ako ďalšiu šifru.",
+        "Schopnosť: prekladanie správ a starých pravidiel.",
+        "Písmeno: T.",
+        "Nasledujúca aktivita: Kubova mapa bezpečných ciest."
+      ],
+      "resolution": [
+        [
+          "Rozlúštené slovo STÔL označuje miesto s Kubovým plánom. Skôr než ho otočíte, spojenie zachytí Lístka:",
+          "Po úspešnom rozlúštení odkazu sa na obrazovke objaví zelená postavička.",
+          "V ruke drží drobný zápisník.",
+          "„Á, výborne,“ povie pokojne.",
+          "„Už som si myslel, že niekto zabudol, ako sa tieto kruhy používajú.“",
+          "„Lístok!“ vykríkne Piko.",
+          "„Som rád, že ťa vidím.“",
+          "„Aj ja vás. A najmä som rád, že ste našli môj prekladač.“",
+          "Lístok sa zadíva na hráčov.",
+          "„Vidím, že máme návštevu.“",
+          "„Pomáhajú nám!“ vysvetlí Iskra.",
+          "„Pozoruhodné,“ usmeje sa Lístok.",
+          "Potom sa jeho výraz zmení."
+        ],
+        [
+          "„Priatelia, musím vám niečo povedať.“",
+          "Otvorí zápisník.",
+          "„Keď sa naše cesty uzavreli, zachytil som správu z Ochranného poľa.“",
+          "Piko sa narovná.",
+          "„Takže vieme, kde je porucha?“",
+          "Lístok pokrúti hlavou.",
+          "„To je práve problém.“",
+          "„Prečo?“",
+          "Lístok otočí zápisník k ostatným.",
+          "Na jeho stránke žiari krátka správa:",
+          "OCHRANA AKTÍVNA.",
+          "NEOTVÁRAŤ PRED NÁVRATOM VŠETKÝCH.",
+          "Nastane ticho.",
+          "„Počkať,“ ozve sa Piko.",
+          "„Akože neotvárať? Veď sa celý čas snažíme cesty obnoviť.“",
+          "Lístok prikývne.",
+          "„Ja viem.“"
+        ],
+        [
+          "Kvak sa zamračí.",
+          "„Tak kto ich zatvoril?“",
+          "Lístok chvíľu hľadí na správu.",
+          "„Ochranné pole.“",
+          "„Ale veď to nás malo chrániť!“ vykríkne Iskra.",
+          "„Presne tak,“ odpovie Lístok.",
+          "Piko pomaly pochopí.",
+          "„Ty chceš povedať…“",
+          "Lístok prikývne.",
+          "„Že Ochranné pole možno vôbec nie je pokazené.“",
+          "„Možno robí presne to, čo má.“",
+          "Kvakovi na okamih padne zobák.",
+          "„Takže my sa snažíme opraviť niečo, čo funguje?“",
+          "„Možno,“ povie Lístok.",
+          "„Len ešte nevieme, pred čím nás chráni.“"
+        ],
+        [
+          "Na displeji sa objaví písmeno T.",
+          "„Odložte si aj túto značku,“ povie Lístok.",
+          "„A hlavne nič neotvárajte nasilu.“",
+          "Piko sa obráti na hráčov.",
+          "„Takže máme nový plán.“",
+          "Nadýchne sa.",
+          "„Nebudeme zatiaľ otvárať Ochranné pole.“",
+          "„Najskôr nájdeme ostatných. A zistíme pravdu.“"
+        ]
+      ]
     },
     {
       "id": "maze",
-      "title": "Kubova cesta signálom",
+      "title": "Kubova cesta domov",
       "label": "Úloha 5",
       "icon": "⌁",
       "time": [
@@ -166,7 +493,17 @@ window.GAME = {
         "246"
       ],
       "placeholder": "Tri číslice z cesty",
-      "story": "Lístok preložil prvý pokyn: „Spojte cestu k jadru.“ Tú vie postaviť iba Kubo. Na liste P5 zanechal plán siete, ktorou putujú Pixelkovia medzi obrazovkami vašej domácnosti. Niektoré odbočky sú slepé, jedna vedie k jadru spojenia. „Nič netreba rozoberať,“ uistí vás Piko. „Choďte len prstom po papieri.“ Kubo po obnovení kontaktu podľa plánu poskladá návratovú cestu. Pod ním je aj odkaz pre Ryška: „Nočný pokoj. Denné svetlo. Večerná hviezda.“",
+      "story": [
+        [
+          "„Ak je Ochranné pole zatvorené, musíme zistiť, kadiaľ sa dá bezpečne prejsť,“ povie Piko.",
+          "„Poznám niekoho, kto dokáže postaviť cestu aj tam, kde žiadna nie je.“",
+          "Kvak sa usmeje.",
+          "„Kubo!“",
+          "Na displeji sa objaví náčrt svetelných chodbičiek. Papierový plán čaká v obálke 2 na stole.",
+          "„Toto je jeho mapa,“ vysvetlí Piko.",
+          "„Ak nájdeme cestu k jadru, možno sa mu dovoláme.“"
+        ]
+      ],
       "action": "Otočte P5 z obálky 2. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
       "task": "Sledujte spojité potrubie až k jadru. Odbočky končia bez výstupu. Prečítajte tri čísla na úspešnej ceste v poradí od vstupu.",
       "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; poznámka o noci, dni a hviezde.",
@@ -178,11 +515,67 @@ window.GAME = {
       ],
       "parent": "Ide o jednoduchý pracovný potrubný plán, nie finálne ilustrované bludisko. Mechanika aj tlač sú funkčné; obtiažnosť treba otestovať.",
       "transition": "„Moje písmeno je L!“ Kubo poskladá návratovú cestu. „Zostáva Ryško. Jeho pozdrav nájdete pod plánom.“",
-      "character": "kubo"
+      "character": "kubo",
+      "dramaturgy": [
+        "Po zvrate potrebujeme chvíľu úľavy. Deti zistia, že stratení Pixelkovia nie sú v bezprostrednom nebezpečenstve.",
+        "Nové napätie: existuje bezpečná cesta, ale treba ju správne obnoviť.",
+        "Schopnosť: stavanie a skladanie ciest.",
+        "Písmeno: L.",
+        "Nasledujúca aktivita: digitálna interakcia, nadviazanie spojenia s Ryškom."
+      ],
+      "resolution": [
+        [
+          "Na obrazovke sa ozve búchanie.",
+          "„Tuk! Tuk! Tuk!“",
+          "Potom sa objaví kockatá postavička s malým nástrojom v ruke.",
+          "„Konečne!“",
+          "Kubo sa rozhliadne.",
+          "„Kto mi poskladal tú cestu?“",
+          "Piko sa usmeje.",
+          "„Naši noví kamaráti.“",
+          "Kubo sa pozrie priamo na hráčov.",
+          "„Vy?“",
+          "„No teda!“",
+          "Pokrúti hlavou.",
+          "„Na ľudí máte celkom šikovné prsty.“",
+          "„Kubo,“ preruší ho Piko. „Vieš, čo sa stalo s našimi chodbičkami?“",
+          "Kubo pokrúti hlavou.",
+          "„Nie sú zničené. Aspoň nie všetky.“",
+          "Vytiahne plán.",
+          "„Pozrite sa sem.“"
+        ],
+        [
+          "Na mape sa rozsvieti niekoľko malých bodiek.",
+          "„Toto sú bezpečné úkryty. Keď sa Ochranné pole zatvorilo, naše cesty sa rozdelili na krátke úseky.“",
+          "„Takže nikto nezostal uprostred nebezpečnej cesty?“ spýta sa Iskra.",
+          "„Nie. Ochranné pole nás presunulo do najbližších bezpečných miest.“",
+          "Piko si úľavne vydýchne.",
+          "„Takže ostatní môžu byť v bezpečí.“",
+          "Kubo prikývne.",
+          "„Áno. Len sa bez správnej cesty nedostaneme všetci späť.“",
+          "Kvak nakloní hlavu.",
+          "„A dokážeš ju postaviť?“",
+          "„Dokážem.“"
+        ],
+        [
+          "Kubo sa na chvíľu odmlčí.",
+          "„Ak budem vedieť, ktorú.“",
+          "Piko sa pozrie na hráčov.",
+          "„A práve s tým nám pomôžete.“",
+          "Kubo zdvihne malú kockatú značku s písmenom L.",
+          "„Toto je moja časť záložného plánu.“",
+          "„A ešte niečo,“ dodá.",
+          "„Na konci cesty som našiel Ryškov znak.“",
+          "Všetci spozornejú.",
+          "„Ryško?“ spýta sa Piko.",
+          "Kubo prikývne.",
+          "„Ak niekto vie, prečo sa Ochranné pole zatvorilo, bude to on.“"
+        ]
+      ]
     },
     {
       "id": "digital",
-      "title": "Ryškove tri svetielka",
+      "title": "Ryškovo tajomstvo",
       "label": "Úloha 6",
       "icon": "☾",
       "time": [
@@ -195,24 +588,113 @@ window.GAME = {
         "moon,sun,star"
       ],
       "digital": true,
-      "story": "Kubo postavil cestu a na telefóne sa rozsvietia tri symboly. Za nimi prebleskne oranžový chvost. „Ryško stráži Tichý závoj,“ vysvetlí Piko. „Vie ho znovu zapnúť, aby sme sa mohli ukryť medzi svetelnými bodkami a ostatní ľudia nás nevideli. Musíme mu však poslať správny pozdrav.“ Použite poznámku z Kubovho plánu. Celá partia čaká na posledný kontakt.",
+      "story": [
+        [
+          "Na mobile sa rozsvietia tri zvláštne svetelné symboly.",
+          "Piko sa na ne zahľadí.",
+          "„Ryškove značky.“",
+          "Kvak prikývne.",
+          "„Už ho počujem. Ale jeho signál je veľmi slabý.“",
+          "Piko sa obráti na hráčov.",
+          "„Pokúsme sa ho znovu spojiť.“"
+        ]
+      ],
       "action": "Položte pred seba poznámku z plánu P5. Teraz rieši celý tím spolu na telefóne.",
       "task": "Stlačte symboly v poradí podľa poznámky: „Nočný pokoj. Denné svetlo. Večerná hviezda.“ Potom overte sekvenciu. Výber sa dá vymazať.",
       "materials": "Poznámka na P5; nové materiály netreba.",
       "mobile": "Tri tlačidlá mesiac, slnko a hviezda; viditeľná sekvencia, vymazanie a overenie.",
-      "solution": "Mesiac → slnko → hviezda. Ryško odhalí ochranný režim: na návrat a obnovu Tichého závoja potrebujú celú partiu.",
+      "solution": "Mesiac → slnko → hviezda. Pole sa preventívne uzavrelo, aby nikto neprezradil svet Pixelkov; treba obnoviť bezpečnú cestu pre všetkých.",
       "hints": [
         "Nočný pokoj predstavuje mesiac. Čo svieti cez deň?",
         "Poradie je mesiac, slnko, hviezda."
       ],
-      "parent": "Po úspechu prečítajte Ryškovo odhalenie. Všetci kamaráti sú v bezpečí; na cestu domov čakajú až do finále.",
-      "transition": "Ryško odovzdáva O. Všetky schopnosti sú pripravené. Obnovte ich úkryt spoločne.",
+      "parent": "Odhalenie príčiny sa zobrazí až po správnej sekvencii. Zdôraznite, že Ochranné pole všetkých chránilo a nikto nie je zranený.",
+      "transition": "Ryško pozná príčinu uzavretia Ochranného poľa. Posledný odkaz čaká v obálke 3 pod stoličkou pri stole.",
       "character": "rysko",
-      "reveal": "Ryško sa objaví na paneli. „Moje písmeno je O! Už tomu rozumiem. Pri veľkom bliknutí sa priechod prepol do ochranného režimu. Cesta nás pustí späť, až keď budú pripravení všetci. Potom zapnem Tichý závoj a ostatní ľudia náš svet znovu neuvidia.“ Piko prikývne. „Kvak našiel signál, Iskra rozsvietila značky, Šutko drží priechod, Lístok preložil pokyny a Kubo postavil cestu. Ryško nás ukryje. Zostáva náš spoločný sľub a heslo. Posledná obálka je pod stoličkou pri stole.“"
+      "dramaturgy": [
+        "Toto je druhé veľké odhalenie, tentoraz úplné vysvetlenie príčiny.",
+        "Ochranné pole sa uzavrelo, aby ochránilo svet Pixelkov pred prezradením ľuďom. Nikoho nezranilo; iba ich oddelilo do bezpečných miest.",
+        "Ryško sa nemusí stať vinníkom celej situácie. Je strážcom, ktorý počas nehody urobil, čo bolo v jeho silách.",
+        "Jeho emocionálnym momentom je úľava, že ostatní sú v poriadku.",
+        "Schopnosť: ochrana a obnovenie Ochranného poľa.",
+        "Písmeno: O.",
+        "Nasledujúca aktivita: objavenie spoločného sľubu."
+      ],
+      "resolution": [
+        [
+          "Obrazovka zhasne.",
+          "Na niekoľko sekúnd je celkom čierna.",
+          "Potom sa objavia dve oranžové oči.",
+          "„Piko?“",
+          "„Ryško!“",
+          "Na obrazovke sa ukáže malá červená panda.",
+          "„Ste v poriadku?“",
+          "„Áno!“ odpovie Piko.",
+          "„Našli sme Kvaka, Iskru, Šutka, Lístka aj Kuba.“",
+          "Ryško na chvíľu zatvorí oči.",
+          "„Tak dobre.“",
+          "Jeho hlas znie trochu unavene.",
+          "„Bál som sa, že zostanete oddelení dlhšie.“",
+          "Piko sa k nemu nakloní.",
+          "„Ryško, povedz nám pravdu.“",
+          "„Čo sa stalo s Ochranným poľom?“",
+          "Ryško sa odmlčí."
+        ],
+        [
+          "„Pamätáte si na veľké bliknutie?“",
+          "Všetci prikývnu.",
+          "„V tej chvíli sa dve obrazovky rozžiarili v úplne rovnakom okamihu. Svetelný priechod medzi nimi sa otvoril tak široko, že by ho človek mohol zazrieť.“",
+          "Iskra zadržala dych.",
+          "„Celý náš svet?“",
+          "„Nie celý,“ odpovie Ryško.",
+          "„Ale dosť na to, aby niekto uvidel jednu z našich ciest.“",
+          "Piko sa zamyslí.",
+          "„A preto sa Ochranné pole uzavrelo?“",
+          "Ryško prikývne.",
+          "„Áno.“"
+        ],
+        [
+          "„Pokúsil som sa chodby udržať, ale Ochranné pole už spustilo svoj najstarší ochranný režim.“",
+          "„Uzavrelo otvorený priechod, rozdelilo nás do bezpečných úkrytov a čakalo.“",
+          "„Na čo?“ spýta sa Kvak.",
+          "„Na to, kým budeme všetci pripravení vrátiť sa domov.“",
+          "Piko na chvíľu stíchne.",
+          "„Takže to nebola porucha.“",
+          "„Nie.“",
+          "Ryško sklopí pohľad.",
+          "„Len som vám to nestihol povedať.“",
+          "„Myslel som, že som vás stratil.“",
+          "Piko sa usmeje.",
+          "„Ale nestratil.“",
+          "„Pozri, sme tu.“"
+        ],
+        [
+          "Na obrazovke sa postupne objavia Kvak, Iskra, Šutko, Lístok a Kubo.",
+          "Šutko prikývne.",
+          "„Čakali sme.“",
+          "Iskra sa usmeje.",
+          "„A teraz sme zase spolu.“",
+          "Ryško si utrie oči.",
+          "„Ešte nie celkom.“",
+          "„Musíme sa dostať späť cez bezpečný priechod. Až potom môžem Ochranné pole znovu nastaviť do jeho bežného režimu.“",
+          "Na obrazovke sa objaví posledné písmeno O.",
+          "„Toto je moja značka záložného plánu,“ vysvetlí Ryško.",
+          "Piko pozrie na šesť nazbieraných symbolov.",
+          "„Máme všetky.“",
+          "Kvak sa poteší."
+        ],
+        [
+          "„Tak poďme domov!“",
+          "Ryško však zdvihne labku.",
+          "„Ešte nie.“",
+          "„Stará ochrana má jedno pravidlo.“",
+          "„Domov sa musí vrátiť každý.“"
+        ]
+      ]
     },
     {
       "id": "search",
-      "title": "Správa pre celú partiu",
+      "title": "Sľub Pixelkov",
       "label": "Úloha 7",
       "icon": "⌕",
       "time": [
@@ -225,7 +707,31 @@ window.GAME = {
         "SPOLU"
       ],
       "placeholder": "Slovo z piatich riadkov",
-      "story": "Všetkých šesť tvárí je už na displeji. Kvak počúva, Iskra svieti na značky, Šutko drží priechod, Lístok prekladá, Kubo stavia a Ryško chystá závoj. Ešte im chýba spoločný pokyn. „Náš domov zostane skrytý iba vtedy, keď nikto neostane na druhej strane,“ povie Piko. „Pod sedadlom jednej zo stoličiek pri stole je obálka 3 s naším sľubom. Začiatky riadkov vám prezradia, ako sa vraciame do úkrytu.“ Kartu so šípkou si nechajte na finále.",
+      "story": [
+        [
+          "Na displeji stojí všetkých sedem Pixelkov.",
+          "Kubo má pripravený plán.",
+          "Iskra rozsvietila značky.",
+          "Šutko pevne drží oporný bod priechodu.",
+          "Kvak načúva bezpečnému signálu.",
+          "Lístok kontroluje staré pravidlá.",
+          "Ryško sleduje Ochranné pole.",
+          "A Piko drží spojenie s vami.",
+          "„Sme pripravení?“ spýta sa Piko.",
+          "„Takmer,“ odpovie Ryško.",
+          "„Ešte nám chýba jeden odkaz.“",
+          "Lístok sa usmeje.",
+          "„Starý pixelkovský sľub.“",
+          "„Poznám ho!“ vykríkne Iskra."
+        ],
+        [
+          "„Samozrejme, že ho poznáš,“ povie Kvak. „Ty ho opakuješ pred každou cestou.“",
+          "„Pre istotu!“",
+          "Piko sa obráti k hráčom.",
+          "„Poslednú obálku nájdete pod jednou zo stoličiek pri stole.“",
+          "„Je tam odkaz, ktorý nám pripomenie, čo musíme urobiť.“"
+        ]
+      ],
       "action": "Nájdite obálku 3 pod sedadlom dostupnej stoličky pri stole. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
       "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; obálka 3.",
@@ -236,11 +742,48 @@ window.GAME = {
         "Písmená sú S, P, O, L, U."
       ],
       "parent": "Obálku prilepte papierovou páskou na dosah. Dieťa nemá liezť pod ťažký nábytok ani ho presúvať. Pomôžte so zložením obálky.",
-      "transition": "SPOLU. Len tak sa všetci vrátia a Tichý závoj môže znovu ukryť ich svet."
+      "transition": "SPOLU. Domov sa vráti každý, aj Piko. Karta P6 určuje poradie písmen z úloh 1 až 6.",
+      "dramaturgy": [
+        "Táto scéna má byť krátkym emocionálnym vrcholom ešte pred akčným finále.",
+        "Sľub SPOLU nie je len odpoveď v hlavolame. Je to najdôležitejšie pravidlo celej partie.",
+        "Dôležitý detail: Piko je stále na spojení s hráčmi. Je siedmym Pixelkom a nesmie zostať zabudnutý mimo obnoveného Ochranného poľa.",
+        "Nasleduje finálna metaúloha, v ktorej sa spoja nazbierané písmená."
+      ],
+      "resolution": [
+        [
+          "Po vyriešení sa na displeji rozžiari slovo:",
+          "SPOLU",
+          "Na chvíľu zostane úplné ticho.",
+          "Potom sa ozve Šutko.",
+          "„Tak je to správne.“",
+          "Kvak prikývne.",
+          "„Nikto nezostane sám.“",
+          "Iskra sa usmeje.",
+          "„A nikto nezostane vzadu.“",
+          "Kubo zdvihne plán.",
+          "„Cestu postavím tak, aby po nej prešiel aj posledný.“",
+          "Ryško sa pozrie na Pika.",
+          "„Aj ty.“",
+          "Piko sa prekvapene obzrie.",
+          "„Ja?“",
+          "„Samozrejme,“ odpovie Ryško.",
+          "„Ty predsa držíš spojenie s ľuďmi. Bez teba by sme ich nikdy nepočuli.“",
+          "Piko pozrie na hráčov."
+        ],
+        [
+          "Potom na svojich kamarátov.",
+          "„Máte pravdu.“",
+          "Ticho sa usmeje.",
+          "„Najskôr pomôžeme všetkým dostať sa domov.“",
+          "„A potom prídem aj ja.“",
+          "Lístok ukáže na šesť nazbieraných písmen.",
+          "„Zostáva nám ešte zostaviť spoločné heslo. To spojí naše pripravené schopnosti do jedného bezpečného návratu.“"
+        ]
+      ]
     },
     {
       "id": "code",
-      "title": "Heslo k návratu domov",
+      "title": "Heslo, ktoré spája",
       "label": "Úloha 8",
       "icon": "⚡",
       "time": [
@@ -253,18 +796,100 @@ window.GAME = {
         "SVETLO"
       ],
       "placeholder": "Šesťpísmenové heslo",
-      "story": "Svetelný priechod aj Tichý závoj čakajú na spoločné heslo. „Teraz potrebuje partia každého z nás,“ povie Piko. Kvak odovzdá S, Iskra V, Šutko E, Lístok T, Kubo L a Ryško O. Karta z poslednej obálky určuje poradie. Vaše heslo spojí ich schopnosti: otvorí cestu domov a umožní Ryškovi za posledným kamarátom znovu ukryť ich svet. Šesť písmen, šesť nenahraditeľných pomocníkov. Ktoré slovo rozžiari priechod?",
+      "story": [
+        [
+          "Na obrazovke sa objaví šesť žiariacich znakov.",
+          "Kvak pristúpi dopredu.",
+          "„Môj signál je pripravený.“",
+          "Iskra zdvihne malú svetelnú iskru.",
+          "„Moje značky svietia.“",
+          "Šutko položí obe ruky na oporný bod mosta.",
+          "„Priechod drží.“",
+          "Lístok otvorí svoj zápisník.",
+          "„Pokyny sú preložené.“",
+          "Kubo sa pozrie na plán.",
+          "„Cesta je pripravená.“",
+          "Ryško zdvihne hlavu.",
+          "„Ochranné pole čaká.“",
+          "Piko sa obráti na hráčov.",
+          "„Každý z nás má jednu časť.“",
+          "„Ale až vy ich dokážete spojiť.“"
+        ],
+        [
+          "„Pamätáte si šesť znakov, ktoré ste počas nášho pátrania získali?“",
+          "Na displeji sa objavia všetky nazbierané písmená.",
+          "„Použite kartu poradia zo záložného plánu.“",
+          "„Keď zostavíte správne heslo, odošlete spoločný signál.“"
+        ]
+      ],
       "action": "Rozložte kartu poradia. Každý člen tímu môže prečítať jednu zo získaných indícií. Nájdete ich aj v hernom zápisníku.",
-      "task": "Usporiadajte šesť písmen podľa úloh 1 až 6. Odošlite návratové heslo, ktoré spojí schopnosti celej partie a obnoví ich úkryt.",
+      "task": "Usporiadajte šesť získaných písmen podľa úloh 1 až 6. Odošlite spoločný návratový signál, ktorý zosúladí pripravené schopnosti Pixelkov.",
       "materials": "Karta poradia P6 a šesť písmen v digitálnom zápisníku; voliteľne papier a ceruzka.",
-      "mobile": "Heslo SVETLO spojí schopnosti Pixelkov, otvorí cestu domov a spustí obnovu Tichého závoja vo finále.",
+      "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
       "solution": "Úlohy 1–6 dali S, V, E, T, L, O → SVETLO.",
       "hints": [
         "Použite len šesť písmen. Šípka a fajka nie sú súčasťou hesla.",
         "V poradí úloh čítajte S – V – E – T – L – O."
       ],
       "parent": "Nechajte heslo vysloviť celý tím. Nie je tu skutočný časový limit ani riziko straty hry.",
-      "transition": "SVETLO! Každý Pixelko sa púšťa do svojej časti úlohy. Priechod sa otvára a ich úkryt sa obnovuje."
+      "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
+      "dramaturgy": [
+        "Toto je akčná kulminácia celej hry.",
+        "Heslo SVETLO samo osebe nie je kúzelným slovom, ktoré opraví všetko. Je to spoločný potvrdzovací signál, ktorý zosúladí šesť pripravených schopností.",
+        "Piko je siedmym členom tímu: udržiaval spojenie s ľuďmi a môže sa vrátiť až po tom, čo je cesta bezpečná.",
+        "Pri finálnom prechode odporúčam použiť krátku animáciu jednotlivých Pixelkov, nie dlhý textový blok. Literárna verzia opisuje celú udalosť, jej mobilné spracovanie môže byť omnoho úspornejšie."
+      ],
+      "resolution": [
+        [
+          "Hráči odošlú správne slovo.",
+          "SVETLO",
+          "Na displeji sa objaví jasná svetelná čiara.",
+          "Piko sa nadšene usmeje.",
+          "„Funguje to!“",
+          "„Kvak!“",
+          "„Signál čistý!“",
+          "„Iskra!“",
+          "„Značky pripravené!“",
+          "„Šutko!“",
+          "„Most drží!“",
+          "„Lístok!“",
+          "„Bezpečný návrat potvrdený!“",
+          "„Kubo!“",
+          "„Cesta vedie domov!“",
+          "„Ryško!“",
+          "„Ochrana pripravená!“",
+          "Na obrazovke sa rozsvieti spojenie všetkých šiestich symbolov.",
+          "„Tak poďme!“ vykríkne Iskra.",
+          "Jeden po druhom sa Pixelkovia vydávajú na cestu.",
+          "Kvak sa najskôr započúva a vykročí."
+        ],
+        [
+          "Iskra osvetlí ďalší úsek.",
+          "Šutko pridŕža most, kým cez neho prejdú ostatní.",
+          "Lístok vysvetlí posledné znamenie na ceste.",
+          "Kubo dokončí spojovací diel.",
+          "Ryško prechádza ako predposledný.",
+          "Potom sa otočí.",
+          "„Piko?“",
+          "Na displeji stále stojí malá modrá postavička.",
+          "„Ja ešte chvíľu zostanem,“ povie Piko.",
+          "„Musím predsa ukončiť naše spojenie.“",
+          "Ryško pokrúti hlavou.",
+          "„A čo náš sľub?“",
+          "Piko sa na chvíľu odmlčí."
+        ],
+        [
+          "Na obrazovke sa objaví svetelná nitka, ktorá ešte stále spája jeho miesto s otvoreným priechodom.",
+          "Iskra podá ruku.",
+          "„Piko. Poď.“",
+          "Piko sa obráti k hráčom.",
+          "„Ďakujem, že ste nám pomohli.“",
+          "„Už len posledný krok.“",
+          "Modrá bodka sa pomaly pohne po svetelnej nitke.",
+          "Na chvíľu zmizne.",
+          "A potom…"
+        ]
+      ]
     },
     {
       "id": "finale",
@@ -276,7 +901,94 @@ window.GAME = {
         0,
         0
       ],
-      "story": "Kvak v šume rozozná domáci signál. Iskra rozsvieti značky, Šutko spevní priechod, Lístok prečíta jeho pokyny a Kubo poskladá posledný diel cesty. Jeden po druhom prejdú späť. Ryško počká na posledného kamaráta a zapne Tichý závoj. Piko spojí všetky linky. Hotovo! Na displeji zostane obyčajná obrazovka. „Bez jediného z nás by to nešlo. A bez vás tiež nie,“ ozve sa ešte Piko. „Žili sme u vás už pred dneškom. A budeme tu aj zajtra — schovaní medzi svetelnými bodkami, tak ako Pixelkovia v každej domácnosti s mobilom, tabletom, počítačom či televízorom.“ Šesť kamarátov zamáva a posledné svetielko zhasne. Ich svet je opäť ukrytý pred ostatnými. Váš tím teraz pozná jeho tajomstvo: aj ten najmenší Pixelko má schopnosť, ktorú nikto iný nenahradí.",
+      "story": [
+        [
+          "Obrazovka na okamih zhasne.",
+          "Všetko stíchne.",
+          "Potom sa v jej strede rozsvieti sedem maličkých bodiek.",
+          "Jedna modrá.",
+          "Jedna žltá.",
+          "Jedna zlatá.",
+          "Jedna sivá.",
+          "Jedna zelená.",
+          "Jedna kockatá.",
+          "A jedna oranžová.",
+          "Bodky sa pomaly priblížia k sebe.",
+          "Znovu sa objavia všetci Pixelkovia.",
+          "„Sme doma!“ vykríkne Iskra.",
+          "Kvak radostne zakvaká tak hlasno, až si Lístok zakryje uši.",
+          "Kubo sa zatočí okolo vlastnej osi.",
+          "„Všetky mosty držia!“",
+          "Šutko si spokojne sadne.",
+          "„To je dobré.“"
+        ],
+        [
+          "Ryško sa rozhliadne po priateľoch.",
+          "Jeden.",
+          "Dva.",
+          "Tri.",
+          "Štyri.",
+          "Päť.",
+          "Šesť.",
+          "Sedem.",
+          "Všetci.",
+          "„Ochranné pole obnovené,“ povie ticho.",
+          "Okolo partie sa rozžiari jemná priesvitná žiara.",
+          "Postupne pohasne.",
+          "Piko pristúpi bližšie k obrazovke.",
+          "„Tak.“",
+          "Na okamih sa usmeje.",
+          "„Teraz už poznáte naše tajomstvo.“",
+          "Pozrie na svojich kamarátov.",
+          "„Viete, celý čas som si myslel, že musím zachrániť všetkých sám.“",
+          "Kvak sa zasmeje.",
+          "„No, to by ti veľmi nešlo.“",
+          "„Ďakujem, Kvak.“",
+          "„Nemáš za čo.“"
+        ],
+        [
+          "Piko sa znovu pozrie na hráčov.",
+          "„Ale potom som našiel vás.“",
+          "„A vy ste mi pripomenuli niečo, na čo som skoro zabudol.“",
+          "„Že nikto nemusí zvládnuť všetko sám.“",
+          "Iskra sa usmeje.",
+          "„Ja viem rozsvietiť značky.“",
+          "Šutko prikývne.",
+          "„Ja dokážem podržať cestu.“",
+          "„Ja ju postavím!“ pridá sa Kubo.",
+          "„A ja ju viem prečítať,“ povie Lístok.",
+          "Kvak zdvihne krídlo.",
+          "„A ja ju počujem ešte skôr, než ju ostatní uvidia!“",
+          "Ryško pokojne doplní:",
+          "„A ja sa postarám, aby sa všetci bezpečne vrátili.“"
+        ],
+        [
+          "Piko sa usmeje.",
+          "„A ja nás spojím.“",
+          "Na displeji sa objaví jemne žiariaci nápis:",
+          "ĎAKUJEME, ZÁCHRANCOVIA PIXELKOV!",
+          "Sedem kamarátov zamáva.",
+          "Potom Piko ešte raz pristúpi k obrazovke.",
+          "„A teraz vám prezradím posledné tajomstvo.“",
+          "Nakloní sa bližšie.",
+          "„My Pixelkovia sme tu žili už dávno pred dnešným dňom.“",
+          "„A budeme tu aj zajtra.“",
+          "„Možno sa práve teraz niektorý z nás pozerá z malého okienka na vašu obývačku.“",
+          "„Možno sa Kvak čuduje, prečo váš budík tak hlasno zvoní.“"
+        ],
+        [
+          "„Alebo Iskra obdivuje svetlá na vašom televízore.“",
+          "„A možno…“",
+          "Piko sa potichu usmeje.",
+          "„Možno si niekedy spomenieme, že na druhej strane obrazovky máme priateľov.“",
+          "Všetci zamávajú naposledy.",
+          "Potom sa obrazovka zmení na obyčajný obraz.",
+          "Žiadne tajné chodby.",
+          "Žiadne malé postavičky.",
+          "Len váš mobil.",
+          "Presne taký ako predtým."
+        ]
+      ],
       "action": "Dajte si tímové plácnutie. Každý môže povedať, ktorá schopnosť Pixelkov pomohla partii a čím prispel on sám.",
       "task": "Všetkých osem úloh je splnených. Pixelkovia sú spolu a ich svet je znovu ukrytý. Pomenujte svoj tím a povedzte si, čím pomohol každý z vás.",
       "materials": "Voliteľný diplom záchrancov Pixelkov na tlačovej stránke. Žiadne ďalšie pomôcky netreba.",
@@ -285,8 +997,29 @@ window.GAME = {
       "hints": [
         "Každý z vás pomohol iným spôsobom."
       ],
-      "parent": "Nechajte každého pomenovať svoj prínos. Tajomstvo sa týka rozprávkového sveta Pixelkov; hra sa končí spoločne s dospelým pomocníkom.",
-      "transition": "Obrazovky vyzerajú ako vždy. Vy už však viete, kto sa za ich svetielkami ukrýva."
+      "parent": "Oslávte pomoc každého člena tímu. Piko sa bezpečne vrátil ako posledný. Atlas je dobrovoľný darček na spoločné čítanie, nie ďalšia úloha.",
+      "transition": "Všetkých sedem Pixelkov je doma. Ochranné pole je v bežnom režime a ich svet je opäť ukrytý.",
+      "dramaturgy": [
+        "Finále musí priniesť úľavu, radosť a emocionálne uzavretie. Nie je potrebné pridávať ďalšieho nepriateľa, nečakané zlyhanie ani nový hlavolam.",
+        "Každý Pixelko dostáva jasný moment v záverečnej sekvencii.",
+        "Detský tím je oslovovaný ako nevyhnutná súčasť úspechu, nie ako pasívny divák.",
+        "Záverečný Atlas Pixelkov je bonusový materiál, nie pokračovanie hlavného príbehu. Jeho odkaz bude prístupný po dokončení hry, samotná stránka však zostane verejná a bez prihlásenia.",
+        "Záverečné bliknutie modrej bodky má zanechať príjemnú neistotu: čo ak je svet Pixelkov skutočne ukrytý niekde v našej domácnosti?"
+      ],
+      "invitation": [
+        "O niekoľko sekúnd sa v rohu obrazovky objaví maličká modrá bodka.",
+        "A krátky odkaz:",
+        "„Psst! Ešte niečo som vám zabudol dať.“",
+        "„Ak chcete vedieť, ako vyzerá náš domov, čo robíme celý deň a prečo si Kvak nikdy nevie nájsť obe papuče, pripravil som pre vás náš Tajný atlas.“",
+        "„Je to darček za pomoc. Môžete si ho prečítať dnes, zajtra alebo kedykoľvek sa k nám budete chcieť vrátiť.“",
+        "[OBJAVIŤ TAJNÝ SVET PIXELKOV]",
+        "Pod odkazom ešte raz blikne modré svetielko.",
+        "A potom už naozaj zmizne.",
+        "Alebo možno nie.",
+        "Veď to najdôležitejšie tajomstvo už poznáte.",
+        "Pixelkovia sú možno bližšie, než si myslíte."
+      ],
+      "resolution": []
     }
   ],
   "characters": [
@@ -336,8 +1069,12 @@ window.GAME = {
       "id": "rysko",
       "name": "Ryško",
       "role": "Odvážna červená panda",
-      "description": "Stráži Tichý závoj. Keď sa vrátia všetci, znovu ukryje ich svet pred ľuďmi.",
+      "description": "Strážca skrytých ciest. Pozná staré pravidlá a vždy čaká, kým sa vráti aj posledný kamarát.",
       "tile": 6
     }
-  ]
+  ],
+  "source": "GAME STUDIO — kompletný herný scenár V2, dodaný používateľom; schválené názvoslovie Ochranné pole.",
+  "atlasInvitation": "Psst! Ešte niečo som vám zabudol dať."
 };
+// Telefonát používa tie isté panely ako úvodný storyboard.
+window.GAME.call = window.GAME.stages[0].story;

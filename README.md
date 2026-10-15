@@ -1,67 +1,61 @@
-# Záhada u vás doma — Pixelkovia: Stratený signál
+# Pixelkovia: Stratený signál V2 + Tajný atlas
 
-Kompletný lokálny HTML prototyp rodinnej hry v slovenčine. Bez backendu, účtov a zostavovania.
+Slovenská rodinná hra v domácnosti a samostatná ilustrovaná miniknižka. Statické HTML/CSS/JS, bez frameworku a aplikačných účtov. Literárnym zdrojom je úplný autorský dokument GAME STUDIO V2 dodaný používateľom.
 
-## Spustenie
+## Spustenie a build
 
-Otvorte `index.html` priamo v prehliadači. Alebo z koreňa repozitára spustite:
+Otvorte `index.html` alebo `atlas.html` priamo v prehliadači. Obe stránky fungujú aj bez siete. Pre HTTP náhľad spustite `python3 -m http.server 8080` v koreňovom priečinku.
 
-```sh
-python3 -m http.server 8080
-```
+Nasadzovaný výstup pripraví `node scripts/prepare-static.mjs`. Kopíruje hlavnú stránku, atlas, tlačoviny, CSS, JavaScript aj `assets/` do ignorovaného `dist/`. Upravujte koreňové zdroje, nie `dist/`.
 
-Potom otvorte http://localhost:8080. Pre hranie na mobile použite rovnakú lokálnu sieť a IP adresu počítača namiesto localhost (port musí byť dostupný).
+## Príbeh a hranie
 
-## Súbory
+Pixelkovia potajomky žijú v každej domácnosti s mobilom, tabletom, počítačom či televízorom. Piko po veľkom bliknutí stratí spojenie s kamarátmi. Úvod nevysvetľuje príčinu. Kvak zachytí opakujúci sa signál, Iskra objaví skryté značky a Šutko rozpozná priechod uzavretý zvnútra. Lístok po úlohe 4 prečíta varovanie: Ochranné pole nie je pokazené. Kubo nájde bezpečnú návratovú cestu a Ryško po úlohe 6 vysvetlí, že sa pole automaticky preventívne uzavrelo, aby zabránilo prezradeniu ich sveta.
 
-- `index.html` — vstup, navigácia a dialóg.
-- `styles.css` — responzívny vzhľad, mobilné rozloženie a tlač storyboardu.
-- `game-data.js` — všetkých 10 etáp, plný príbeh, odpovede, dve nápovedy, materiály a časovanie. Sem smerujú budúce obsahové úpravy.
-- `app.js` — simulovaný telefonát, overovanie, digitálna sekvencia, mapa, zápisník, lokálny postup, príprava a Game master.
-- `assets/pixelkovia-*.png` — pixelová ilustrácia domova a atlas siedmich postáv.
-- `printables.html` — pracovné tlačiteľné listy P1–P6, funkčné šifrovacie kotúče a voliteľný diplom. Tlačiť jednostranne pri 100 % mierke.
-- `tests/prototype.test.cjs` — obsahové a prehliadačové regresné overenie.
+SPOLU je sľub celej partie. SVETLO je spoločný potvrdzovací signál šiestich pripravených schopností, nie násilné otvorenie ochrany. Piko drží spojenie s ľuďmi a vracia sa ako posledný. Vo finále je všetkých sedem doma a Ochranné pole sa vráti do bežného režimu.
 
-## Hranie a kontrola
+Najprv v Príprave hry rozmiestnite tri obálky a kartu symbolov. Potom hráči prijmú simulovaný telefonát a riešia osem úloh. Príbeh sa číta po krátkych dialógových paneloch s tlačidlami Späť / Čítať ďalej. Po prečítaní scény sa zobrazí existujúca úloha; odhalenia a dialógy po vyriešení zostávajú skryté do správnej odpovede. Čas nie je limitovaný. Návrhových 60 minút ostáva pracovným odhadom, dlhší literárny text môže hranie predĺžiť.
 
-Najprv otvorte **Príprava hry**, vytlačte pracovné listy a rozmiestnite tri obálky a kartu symbolov. V hráčskom režime prijmite hovor, prečítajte päť častí rozhovoru a prejdite osem úloh až po finále. Pri úlohách je aj odkaz na pracovný list, takže možno hru skúsiť bez tlače (hľadanie sa vtedy iba simuluje).
+Telefonát je textový. Žiadne audio nebolo vytvorené ani nie je potrebné. Existujúca voliteľná hodnota `GAME.audio` a jej textová záloha zostávajú kompatibilné.
 
-**Game master** zobrazuje celý storyboard naraz, vrátane odpovedí, nápovied, pokynov a rozdelenia času. Otestovanie konkrétnej etapy beží v dočasnom režime a nemení uložený rodinný postup. Tento režim je interný, bez zabezpečenia. Pri reštarte sa zobrazuje potvrdenie pred vymazaním postupu.
+## Príbehový model a súbory
 
-Postup a využité nápovedy sa ukladajú v localStorage aktuálneho prehliadača. Na inom zariadení sa nesynchronizujú. Ak je úložisko nedostupné, hra ďalej funguje v pamäti. Zaškrtnutá príprava zostáva uložená samostatne. Po obnovení stránky sa možno vrátiť k aktuálnej etape.
+- `game-data.js`: jediný zdroj scén. `stages[].story` sú panely pred úlohou, `resolution` sú panely po správnej odpovedi. Panel je pole autorských riadkov, ktoré rozhranie rozlíši na rozprávača, dialóg a svetelný odkaz. `GAME.call` odkazuje na tie isté panely úvodu, neduplikuje samostatný skrátený telefonát. `dramaturgy` je viditeľná iba v Game Masterovi. Finále má samostatnú Pikovu `invitation`.
+- `app.js`: úvod, čítačka scén, validácia ôsmich úloh, zápisník, mapa, lokálny postup, príprava a kompletný Game Master.
+- `atlas.html` + `atlas.css`: samostatná miniknižka. Všetkých 143 odsekov kapitoly Tajný svet Pixelkov a dva úplné literárne odseky každého zo siedmich profilov sú priamo v HTML; na čítanie netreba JavaScript ani uložený postup. Názvoslovie a súvisiaca gramatika boli prispôsobené schválenému názvu Ochranné pole.
+- `printables.html`: pôvodné P1–P6 a diplom. Polohy, číselné záznamy, papierové pásiky, rovnice, šifrovacie kruhy, bludisko a akrostich zostávajú hrateľné; sprievodné texty už neprezrádzajú starú príčinu.
+- `styles.css` + `adventure.css`: základné rozloženie a existujúci pixel-art vzhľad vrátane V2 čítačky.
+- `assets/pixelkovia-atlas.png`: oficiálny obrazový atlas 4 × 2 políčka, Piko / Kvak / Iskra / Šutko, Lístok / Kubo / Ryško / priechod. Rovnaké CSS výrezy slúžia hre aj literárnym profilom. `assets/pixelkovia-room.png` tvorí titulnú ilustráciu. Nové postavy ani externé referenčné obrázky nepribudli. Podrobnosti sú v `assets/IMAGE-SOURCES.md`.
 
-## Otvorené časti V2
+## Bonusový atlas a Game Master
 
-- Finálne PDF; ilustrované HTML listy sú hrateľné pracovné podklady.
-- Náročnejšie ilustrované bludisko; teraz je použitý funkčný jednoduchý potrubný plán.
-- MP3 telefonát. Cestu nastavte v `GAME.audio`; text je vždy dostupný. Pri nedostupnom súbore sa zobrazí textová alternatíva.
-- Testovanie s rodinami a vekmi 7–13 rokov. Časy sú odhady. Súčet návrhových časov podľa zadania je 60 minút.
+Hráč dostane CTA **OBJAVIŤ TAJNÝ SVET PIXELKOV** až na úspešnej obrazovke finále. Úvod, hráčska navigácia ani bežné úlohy atlas neodkazujú. Game Master má odkaz kedykoľvek ako zámernú rodičovskú výnimku. Samotné `atlas.html` nie je uzamknuté hrou a dá sa priamo otvoriť alebo zdieľať bez hrania.
 
-Rozhranie má systémový font ako zálohu. Google Fonts sú voliteľné a pri offline hraní sa použije lokálna záloha. Všetko herné funguje bez siete.
+Game Master obsahuje úplné autorské scény pred aj po úlohách, úvodný hovor, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, bezpečnostné pokyny a prechody. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
 
-## Overenie pre vývojára
+## Kompatibilita postupu
 
-Hra nemá závislosti. Voliteľné prehliadačové testy používajú Playwright; jeho inštaláciu môžete ponechať mimo projektu:
+ID etáp, osem odpovedí, odmeny S–V–E–T–L–O, SPOLU, SVETLO a kľúč `zahada-v1-progress` zostali zachované. Existujúci postup sa obnoví bez migrácie alebo vymazania. Voliteľné `scenePages` si pamätá aktuálny panel; staré uloženia bez tohto poľa začnú aktuálnu scénu od prvého panela. Splnená úloha po obnovení stránky znovu zobrazí svoj dialóg po vyriešení. Zaškrtnutá príprava zostáva uložená samostatne. Bez localStorage hra funguje v pamäti.
+
+## Overenie
+
+Voliteľné testy používajú Playwright mimo projektu:
 
 ```sh
-npm install --prefix /tmp/mystery-qa playwright
-/tmp/mystery-qa/node_modules/.bin/playwright install --with-deps chromium
-# V inom termináli spustite python3 -m http.server 8080
-PLAYWRIGHT_MODULE=/tmp/mystery-qa/node_modules/playwright node tests/prototype.test.cjs
+npm install --prefix /tmp/pixelkovia-qa playwright
+/tmp/pixelkovia-qa/node_modules/.bin/playwright install --with-deps chromium
+# V inom termináli: python3 -m http.server 8080
+PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/prototype.test.cjs
 ```
 
-Test overí celý priechod, nesprávne odpovede, nápovedy, diakritiku, obnovenie postupu, izolované testy etáp, reštart, mobilné rozloženie a tlačové podklady. Náhľady a skúšobný PDF výstup zapisuje do `/tmp`, nie do repozitára.
+Testujú úplný priechod dialógmi aj ôsmimi úlohami, načasovanie zvratu, zlé odpovede, nápovedy, obnovu V1 postupu aj stránkovania, izoláciu GM testov, reset, mobil/desktop, tlačoviny, offline otvorenie a nedostupné úložisko. Atlas sa testuje priamym otvorením bez postupu, aj bez JavaScriptu, vrátane úplnosti textu, siedmich výrezov a dostupnosti CTA až vo finále alebo v GM. Screenshoty a skúšobná tlač smerujú do `/tmp`.
 
-## Príbeh a vizuálny smer
+## Publikovanie
 
-Pixelkovia potajomky žijú v každej domácnosti s mobilom, tabletom, počítačom či televízorom. Ich svet medzi svetelnými bodkami obrazoviek ukrýva Tichý závoj. Veľké bliknutie ho naruší a rozdelí partiu, preto Piko prvý raz osloví ľudský tím. Úlohy 1–6 obnovia kontakty a sprístupnia schopnosti: Kvak rozpozná signál, Iskra rozsvieti značky, Šutko spevní priechod, Lístok preloží pokyny, Kubo postaví cestu a Ryško obnoví ukrytie. Každý odovzdá písmeno. Úloha 7 odhalí SPOLU a poradie, úloha 8 heslom SVETLO spojí schopnosti. Vo finále sa celá partia vráti a ich svet bude znovu ukrytý pred ostatnými ľuďmi.
+Existujúci Site: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site
 
-`adventure.css` pridáva tmavomodrú, fialovú a tyrkysovú paletu, ilustrovaný domov a kontakty Pixelkov. Nové rastrové ilustrácie sú v `assets/pixelkovia-room.png` a `assets/pixelkovia-atlas.png`; prompty a pôvod sú v `assets/IMAGE-SOURCES.md`. Atlas má 4 × 2 políčka a zobrazuje sa cez CSS bez kopírovania jednotlivých portrétov. Pôvodné fotografie ostávajú archivované, rozhranie ich už nepoužíva.
+Atlas: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/atlas.html
 
-ID etáp, odpovede, odmeny, časovanie a kľúč `zahada-v1-progress` ostávajú kompatibilné s V1. Šesť obnovených kontaktov sa odvodzuje z existujúcich splnených úloh, bez migrácie alebo vymazania uloženého postupu. Príprava, storyboard aj všetky tlačové listy používajú nový príbeh.
+ID zostáva v `.openai/hosting.json`. Trvalý hosting nezávisí od Codespace. Platformové nastavenie prístupu Sites sa vzťahuje na celý web; verejná dostupnosť atlasu bez prihlasovania vyžaduje verejný prístup existujúcej Site. Zmena publika sa vykonáva iba podľa používateľovho rozhodnutia.
 
-## Trvalý online náhľad
-
-Adresa hostovaného prototypu: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site
-
-Hosting cez Sites funguje nezávisle od spusteného Codespace. Prístup je predvolene súkromný pre vlastníka. Budúce úpravy sa publikujú do toho istého webu. Súbory na nasadenie pripraví `node scripts/prepare-static.mjs` do ignorovaného priečinka `dist/`; identita webu je uložená v `.openai/hosting.json`.
+Po dokončení zmien sa zdroje commitnú a pushnú výlučne do `origin/main` vrátane commitov vytvorených Sites helperom. Nepoužíva sa force-push.
