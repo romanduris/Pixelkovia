@@ -109,10 +109,15 @@
       const input=document.activeElement;
       if(!input?.matches('.signal-form #answer')||!app.contains(input)){resetAnswerViewport();return;}
       const viewport=window.visualViewport;
-      app.style.setProperty('--answer-viewport-height',`${viewport?.height||innerHeight}px`);
+      const visibleHeight=viewport?.height||innerHeight;
+      app.style.setProperty('--answer-viewport-height',`${visibleHeight}px`);
       app.style.setProperty('--answer-viewport-top',`${viewport?.offsetTop||0}px`);
       app.classList.add('is-entering-answer');
-      const delta=input.getBoundingClientRect().top-app.getBoundingClientRect().top-44;
+      const inputRect=input.getBoundingClientRect(),formRect=input.closest('form').getBoundingClientRect();
+      const centeredTop=(visibleHeight-inputRect.height)/2;
+      const roomForButton=visibleHeight-(formRect.bottom-inputRect.top)-20;
+      const targetTop=Math.max(24,Math.min(centeredTop,roomForButton));
+      const delta=inputRect.top-app.getBoundingClientRect().top-targetTop;
       if(Math.abs(delta)>1)app.scrollTop+=delta;
     });
   }

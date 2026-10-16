@@ -254,7 +254,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   if(width===390){
    await kp.locator('#answer').focus();
    await kp.evaluate(()=>{Object.defineProperty(visualViewport,'height',{configurable:true,get:()=>360});visualViewport.dispatchEvent(new Event('resize'));});
-   await kp.waitForFunction(()=>{const r=document.querySelector('#answer').getBoundingClientRect();return r.top>=20&&r.top<70&&r.bottom<360;});
+   await kp.waitForFunction(()=>{const r=document.querySelector('#answer').getBoundingClientRect(),button=document.querySelector('.answer-form button').getBoundingClientRect();return Math.abs(r.top+r.height/2-180)<3&&button.bottom<=340;});
    assert.equal(await kp.locator('#app').evaluate(e=>Math.round(e.getBoundingClientRect().height)),360,'scroller follows the keyboard-sized visual viewport');
    await kp.screenshot({path:'/tmp/kvak-input-keyboard.png',clip:{x:0,y:0,width:390,height:360}});
    await kp.locator('#answer').blur();
