@@ -42,10 +42,18 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   await page.locator('.site-header [data-view="designer"]').click();
   assert.equal(await page.locator('.storyboard').count(),10);assert.equal(await page.locator('.gm-atlas').count(),1);
   assert.equal(await page.locator('.tts-block').count(),2);
-  assert.equal(await page.locator('.tts-block h4').first().textContent(),'Čaká na dodanie');
+  assert.equal(await page.locator('.tts-block h4').first().textContent(),'ElevenLabs v3 · cca 7 sekúnd');
   assert.equal(await page.locator('#gm-intro video').getAttribute('src'),'assets/PicoVideo.mp4');
   assert.equal(await page.locator('#gm-envelope audio').getAttribute('src'),'assets/KvakMessage.mpeg');
-  assert.ok((await page.locator('#gm-intro .script-status').textContent()).includes('čaká na potvrdenie'));
+  assert.ok((await page.locator('#gm-intro .script-status').textContent()).includes('Prepis podľa dodaného zadania'));
+  const scripts=await page.evaluate(()=>GAME.voiceScripts);
+  for(const id of ['piko','kvak'])assert.equal(await page.locator(`[data-tts="${id}"] pre`).textContent(),scripts[id].prompt,'verbatim production direction');
+  assert.ok(scripts.piko.prompt.includes('[panicked, speaking quickly] Obálka jedna… v kúpeľni! Rýchlo!'));
+  assert.ok(scripts.kvak.prompt.includes('[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!'));
+  assert.equal(await page.locator('#gm-intro .script-copy>div>p').count(),5);
+  const speech=await page.locator('#gm-intro .script-copy>div').textContent();
+  assert.ok(speech.includes('Ah—'));assert.ok(!speech.includes('[curious'));
+  assert.ok((await page.locator('#gm-envelope .script-copy').textContent()).includes('Toto musím povedať Pikovi!'));
   assert.ok((await page.locator('#gm-envelope .worksheet-text').textContent()).includes('neviem sa spojiť'));
   await page.locator('#gm-intro [data-action="preview-media"]').click();
   await page.waitForFunction(()=>{const v=document.querySelector('dialog video');return v&&!v.paused&&v.currentTime>0});
@@ -77,6 +85,6 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    }
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: three tabs, preserved hero, sales offer and honest purchase state, seven PDF downloads, customer checklist, playable StoryBoard media, exact worksheet copy, pending original TTS prompts, refresh-to-home without save loss, mobile and desktop.');
+  console.log('PASS: three tabs, preserved hero, sales offer and honest purchase state, seven PDF downloads, customer checklist, playable StoryBoard media, exact worksheet copy, exact original ElevenLabs TTS prompts, refresh-to-home without save loss, mobile and desktop.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

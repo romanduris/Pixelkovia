@@ -16,9 +16,9 @@ Tri horné taby:
 
 - **Dobrodružstvo**: predajná prezentácia so zachovanou titulnou ilustráciou, ilustračnými zábermi rodinného riešenia, predstavením postáv, obsahom balíka, FAQ a plánovanou ponukou 14,99 € pri bežnej cene 19,99 €. Nákupné CTA otvára pravdivé oznámenie o pripravovanom predaji; platobný odkaz zatiaľ nebol dodaný.
 - **Príprava hry**: návrh zákazníckej sekcie po kúpe, uložený checklist, rola dospelého, samostatné PDF P1–P6 a diplom, náhľady tlačovín, umiestnenie štyroch obálok a oddelených stôp, kontrola nahrávok a spustenie hry. P1 je hotový list; neskoršie podklady sú označené ako pracovné.
-- **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a dostupný autorský scenár s označením, že doslovný prepis nahrávky ešte treba potvrdiť. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom.
+- **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a krátky prepis podľa dodaného TTS zadania; dlhší autorský scenár zostáva oddelene v kompletných podkladoch. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom.
 
-Pôvodné zadania pre text-to-speech neboli dodané. StoryBoard ich vedie oddelene od scenára ako **Čaká na dodanie**; žiadne pokyny, hlas ani nastavenia nie sú vymyslené.
+Pôvodné zadania pre **ElevenLabs v3** sú uložené v `GAME.voiceScripts` a zobrazené doslova v StoryBoarde, oddelene od hovoreného textu. Obsahujú emočné pokyny v hranatých zátvorkách aj charakter hlasov. Piko má krátku správu s piatimi replikami (cca 7 sekúnd), Kvak desať replík (cca 45–60 sekúnd). Prepisy `GAME.pikoMessage`, `GAME.kvakMessage` a Kvakova scéna vychádzajú z týchto podkladov. Dodané súbory videa a MPEG audia zostávajú nezmenené.
 
 Toto je funkčný statický prototyp týchto troch rozhraní. Platba a serverové overenie nároku po kúpe ešte nie sú pripojené; zákaznícka sekcia ani StoryBoard nemajú samostatnú ochranu prístupu. Existujúce publikum Sites sa nemení. Pred ostrým predajom treba pripojiť nákup a serverom overovaný prístup, nie iba skryť tlačidlá.
 

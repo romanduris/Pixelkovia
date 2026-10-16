@@ -142,9 +142,9 @@ window.GAME = {
       ],
       "resolution": [
         [
-          "Kvak?! Kvak! Čo to je? Kto mi lezie do signálu?!",
+          "Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!",
           "Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!",
-          "Ľudia?! Naozajstní ľudia?! Kvak! Tak toto som ešte nezažil!",
+          "Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!",
           "Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!",
           "Ďakujem vám! Bez vás by som sa s ním nespojil!",
           "Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.",
@@ -1050,9 +1050,9 @@ window.GAME = {
   "source": "GAME STUDIO V2; úvod a Kvakova misia V4. Schválené názvoslovie Ochranné pole.",
   "atlasInvitation": "Psst! Ešte niečo som vám zabudol dať.",
   "kvakMessage": [
-    "Kvak?! Kvak! Čo to je? Kto mi lezie do signálu?!",
+    "Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!",
     "Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!",
-    "Ľudia?! Naozajstní ľudia?! Kvak! Tak toto som ešte nezažil!",
+    "Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!",
     "Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!",
     "Ďakujem vám! Bez vás by som sa s ním nespojil!",
     "Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.",
@@ -1110,6 +1110,27 @@ window.GAME = {
       "digit": "7",
       "rotation": 180
     }
+  ],
+  "voiceScripts": {
+    "piko": {
+      "title": "PIKO – úvodná videospráva",
+      "duration": "cca 7 sekúnd",
+      "model": "ElevenLabs v3",
+      "prompt": "[curious, whispering] Haló? Vidíte ma?\n\n[surprised, excited] Ja som Piko!\n\n[worried, urgent] Potrebujem pomoc!\n\n[panicked, speaking quickly] Obálka jedna… v kúpeľni! Rýchlo!\n\n[connection breaking, voice fading] Ah—\n\nCharakter hlasu: Mladý, mierne vyššie položený mužský hlas. Zo začiatku zvedavý, potom prekvapený a na konci naliehavý až vystrašený. Posledné slová majú znieť ako prerušované spojenie."
+    },
+    "kvak": {
+      "title": "KVAK – prvá správa po obnovení spojenia",
+      "duration": "cca 45–60 sekúnd",
+      "model": "ElevenLabs v3",
+      "prompt": "[confused, startled] Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!\n\n[happy, relieved] Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!\n\n[grateful] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!\n\n[encouraging, energetic] Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Kvak! A ešte raz ďakujem, kamaráti!\n\nCharakter hlasu: Veselý, energický, trochu komický kačací hlas. Spočiatku zmätený, po obnovení spojenia nadšený, pri zmienke o zvláštnom signáli záhadný a na konci povzbudzujúci."
+    }
+  },
+  "pikoMessage": [
+    "Haló? Vidíte ma?",
+    "Ja som Piko!",
+    "Potrebujem pomoc!",
+    "Obálka jedna… v kúpeľni! Rýchlo!",
+    "Ah—"
   ]
 };
 // Telefonát používa tie isté panely ako úvodný storyboard.
