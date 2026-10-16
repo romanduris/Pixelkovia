@@ -70,6 +70,22 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   const normalize=s=>s.replace(/\s+/g,' ').trim();
   assert.equal(normalize(await page.locator('.worksheet-text').innerText()).split('Záznamy v premiešanom poradí')[0].trim(),normalize(await printable.locator('.kvak-print-story').innerText()+' '+await printable.locator('.kvak-print-mission').innerText()));
   await printable.close();
+  // StoryBoard test is the simulated scan itself, with no extra instruction screen.
+  const savedBeforeTest=await page.evaluate(()=>localStorage.getItem('zahada-v1-progress'));
+  await page.locator('#gm-envelope [data-action="test"]').click();
+  assert.equal(await page.locator('.signal-restore').count(),1);
+  assert.equal(await page.locator('.task-main, .task-aside, .scan-entry').count(),0);
+  assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
+  await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();
+  assert.ok((await page.locator('#feedback').textContent()).includes('ešte nesedí'));
+  await page.locator('.signal-header [data-action="exit-test"]').click();
+  assert.equal(await page.locator('.studio-header').count(),1,'test returns directly to StoryBoard');
+  await page.locator('#gm-envelope [data-action="test"]').click();
+  await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();
+  assert.equal(await page.locator('.signal-connected').count(),1);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'QR preview never changes family progress');
+  await page.locator('.signal-header [data-action="exit-test"]').click();
+  await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
   // Refresh must stay on the sales page regardless of saved game, tab or hash.
   for(const saved of [
    {started:true,callDone:false,stage:0,completed:[],messageOpened:true},
