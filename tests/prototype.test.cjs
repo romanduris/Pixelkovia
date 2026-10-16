@@ -117,7 +117,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.storyboard').count(),10);
  assert.equal(await page.locator('.gm-atlas').count(),1);
  assert.ok((await page.locator('#gm-cipher').textContent()).includes('OCHRANA AKTÍVNA.'));
- assert.ok((await page.locator('.gm-dramaturgy').first().textContent()).includes('Úvod musí okamžite'));
+ assert.equal(await page.locator('#gm-intro .gm-dramaturgy, #gm-envelope .gm-dramaturgy').count(),0,'first two duplicate scenarios are omitted');
+ assert.equal(await page.locator('#gm-document .gm-dramaturgy').count(),1,'later dramaturgy stays available');
  // GM stage previews remain isolated from real progress.
  await page.locator('[data-action="test"][data-stage="4"]').click();await noAtlas();
  await readScene(page);await page.locator('#answer').fill('stôl');await page.locator('.answer-form button').click();

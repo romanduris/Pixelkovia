@@ -16,7 +16,7 @@ Tri horné taby:
 
 - **Dobrodružstvo**: predajná prezentácia so zachovanou titulnou ilustráciou, ilustračnými zábermi rodinného riešenia, predstavením postáv, obsahom balíka, FAQ a plánovanou ponukou 14,99 € pri bežnej cene 19,99 €. Nákupné CTA otvára pravdivé oznámenie o pripravovanom predaji; platobný odkaz zatiaľ nebol dodaný.
 - **Príprava hry**: návrh zákazníckej sekcie po kúpe, uložený checklist, rola dospelého, samostatné PDF P1–P6 a diplom, náhľady tlačovín, umiestnenie štyroch obálok a oddelených stôp, kontrola nahrávok a spustenie hry. P1 je hotový list; neskoršie podklady sú označené ako pracovné.
-- **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a krátky prepis podľa dodaného TTS zadania; dlhší autorský scenár zostáva oddelene v kompletných podkladoch. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom.
+- **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a krátky prepis podľa dodaného TTS zadania; prepisy sú predvolene otvorené a pôvodné TTS zadania sú rozbaľovacie, predvolene zatvorené. Duplicitné kompletné scenáre Pika a Kvaka sa na stránke nezobrazujú. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom.
 
 Pôvodné zadania pre **ElevenLabs v3** sú uložené v `GAME.voiceScripts` a zobrazené doslova v StoryBoarde, oddelene od hovoreného textu. Obsahujú emočné pokyny v hranatých zátvorkách aj charakter hlasov. Piko má krátku správu s piatimi replikami (cca 7 sekúnd), Kvak desať replík (cca 45–60 sekúnd). Prepisy `GAME.pikoMessage`, `GAME.kvakMessage` a Kvakova scéna vychádzajú z týchto podkladov. Dodané súbory videa a MPEG audia zostávajú nezmenené.
 
@@ -44,7 +44,7 @@ Najprv v Príprave hry rozmiestnite štyri obálky a samostatne uzavretú kartu 
 
 Dodané Pikovo video je v **`assets/PicoVideo.mp4`**; cestu určuje `GAME.video`. Po doplnení súboru treba znovu pripraviť a publikovať statický web. Ťuknutím na notifikáciu sa prehrá video so zvukom, bez prepisu či titulkov prezrádzajúcich úkryt. Prvý hlavolam je porozumieť správe: **Kde je obálka? V kúpeľni.** Túto odpoveď obsahuje len rodičovský návod a Game Master. Video má na telefóne prioritu, prispôsobuje sa dostupnej ploche so zachovaním pomeru strán a jedného rámu. Po prehratí ostane na displeji s označením „Správa od Pika“ a šípkou na opätovné prehratie priamo na obraze. Ťuknutím kdekoľvek na obraz sa prehrá znova; samostatné tlačidlo zostáva dostupné pod videom. Pokračuje sa ručne tlačidlom „Máme obálku“. Počas úloh možno video znova otvoriť cez „Pikova správa“ bez straty postupu. Chýbajúce alebo neprehrateľné video zobrazí chybu bez odhalenia odpovede; pred hrou overte obraz aj zvuk dodaného videa.
 
-Pôvodný úplný autorský scenár úvodného hovoru ostáva v Game Masterovi ako podklad, v hráčskom úvode sa nečíta.
+Pôvodný úplný autorský scenár úvodného hovoru zostáva v herných dátach. StoryBoard pri Pikovi a Kvakovi zobrazuje iba aktuálne médiá, prepisy, tlačovinu a voliteľné TTS zadania; duplicitné kompletné scenáre sú z týchto dvoch sekcií odstránené.
 
 ## Kvakova záchranná misia V4
 
@@ -88,7 +88,7 @@ Iskrine pásiky stále skladajú „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJ
 
 Hráč dostane CTA **OBJAVIŤ TAJNÝ SVET PIXELKOV** až na úspešnej obrazovke finále. Úvod, hráčska navigácia ani bežné úlohy atlas neodkazujú. Game Master má odkaz kedykoľvek ako zámernú rodičovskú výnimku. Samotné `atlas.html` nie je uzamknuté hrou a dá sa priamo otvoriť alebo zdieľať bez hrania.
 
-Game Master obsahuje úplné autorské scény pred aj po úlohách, úvodnú videosprávu aj pôvodný scenár hovoru, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, tri úvodné rodičovské nápovedy, bezpečnostné pokyny a prechody. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
+StoryBoard obsahuje úvodnú videosprávu, prepisy Pika a Kvaka, pôvodné TTS zadania a od Iskrinej etapy úplné autorské scény pred aj po úlohách, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, tri úvodné rodičovské nápovedy, bezpečnostné pokyny a prechody. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
 
 ## Kompatibilita postupu
 
