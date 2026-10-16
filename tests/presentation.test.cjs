@@ -81,7 +81,18 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.ok(await page.locator('dialog video').evaluate(v=>v.paused));
   const printable=await page.context().newPage();await printable.goto(BASE+'/printables.html?sheet=p1');
   const normalize=s=>s.replace(/\s+/g,' ').trim();
-  assert.equal(normalize(await page.locator('.worksheet-text').innerText()).split('Záznamy v premiešanom poradí')[0].trim(),normalize(await printable.locator('.kvak-print-story').innerText()+' '+await printable.locator('.kvak-print-mission').innerText()));
+  assert.equal(normalize(await page.locator('.worksheet-text').innerText()).split('KÓD NA OBNOVENIE SPOJENIA')[0].trim(),normalize(await printable.locator('.kvak-print-story').innerText()+' '+await printable.locator('.kvak-print-mission').innerText()));
+  await printable.emulateMedia({media:'print'});
+  const layout=await printable.evaluate(()=>{
+   const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON();
+   return {retained:rect('.kvak-retained'),controls:rect('.kvak-print-controls'),divider:rect('.kvak-cut-divider'),cutouts:rect('.signal-cutouts'),sheet:rect('#p1'),footer:rect('#p1 .footer'),qrLoaded:document.querySelector('.qr-mockup img').naturalWidth>0};
+  });
+  assert.ok(layout.controls.bottom<=layout.retained.bottom&&layout.retained.bottom<layout.divider.top,'code and QR stay with the instructions above the cutting line');
+  assert.ok(layout.cutouts.top>layout.divider.bottom,'all six cutouts remain below the cutting line');
+  assert.ok(layout.footer.bottom<=layout.sheet.bottom,'the whole worksheet fits on one A4');
+  assert.ok(layout.qrLoaded,'dummy QR illustration is available in the printable');
+  assert.equal(await printable.locator('.qr-mockup a').count(),0);
+  assert.ok((await printable.locator('.qr-mockup').innerText()).includes('NEFUNKČNÁ'));
   await printable.close();
   // StoryBoard test is the simulated scan itself, with no extra instruction screen.
   const savedBeforeTest=await page.evaluate(()=>localStorage.getItem('zahada-v1-progress'));

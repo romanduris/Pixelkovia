@@ -30,7 +30,7 @@ Stiahnuteľné PDF v `assets/printables/` a skutočný náhľad `assets/kvak-she
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node scripts/export-printables.cjs
 ```
 
-Každý export overuje presne jednu A4. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; samotné `PicoVideo.mp4` sa nemení.
+Každý export overuje presne jednu A4. Voliteľný argument `p1` exportuje iba prvý list a jeho náhľad, bez prepisovania ostatných PDF. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; samotné `PicoVideo.mp4` sa nemení.
 
 ## Príbeh a hranie
 
@@ -59,7 +59,7 @@ Obálka 1 obsahuje iba celý P1. Deti vystrihnú šesť signálov, otočia ich a
 | 15. 9. | 08:35 | 9 |
 | 15. 12. | 08:40 | 6 |
 
-Na hárku sú premiešané a otočené o 90°, 180° a −90°. Riešenie **741296** je iba tu a v Game Masterovi. Hráčsky list obsahuje príbeh, schopnosti a problém Kvaka, päť krokov, šesť ústrižkov, prázdne políčka na kód a miesto pre budúci QR. Skutočný QR sa nevytvára.
+Na hárku sú premiešané a otočené o 90°, 180° a −90°. Riešenie **741296** je iba tu a v Game Masterovi. Hráčsky list obsahuje príbeh, schopnosti a problém Kvaka, päť krokov, šesť ústrižkov, prázdne políčka na kód a nefunkčnú maketu QR. Zadanie, políčka aj QR panel sú nad vyznačenou deliacou čiarou, takže po odstrihnutí spodných signálov zostanú spolu hore. Maketa `assets/kvak-qr-dummy.svg` neobsahuje zakódované dáta ani navigáciu; je označená DEMO / NEFUNKČNÁ. Skutočný QR sa nevytvára.
 
 Tlačidlo **Otestovať QR** pri Kvakovi v StoryBoarde simuluje naskenovanie QR a otvorí priamo mobilnú obrazovku obnovy spojenia so vstupom pre kód. Úvodná vysvetľujúca medzistránka s pracovným listom a záchrannou linkou je odstránená; návod je na fyzickom liste a v StoryBoarde. Aj hráč sa po „Máme obálku“ dostane priamo na obnovu spojenia. Späť z testu sa vracia rovno do StoryBoardu. Má numerickú klávesnicu, kontrolu presne šiestich číslic, opakovateľné pokusy a pôvodné nápovedy. Prechod je oddelený od overenia a možno naň neskôr napojiť QR navigáciu. Správny kód uloží S a zobrazí oficiálneho Pika a Kvaka. Hovorí iba Kvak. Súbor **`assets/KvakMessage.mpeg`** je dodané MPEG audio; `GAME.audio` určuje cestu a `GAME.kvakMessage` presný prepis. Hlas sa spúšťa ručne, možno ho pozastaviť aj neobmedzene opakovať. Pri nedostupnom alebo nepodporovanom audiu sa automaticky otvorí celý prepis. Audio nikdy samo nepresunie hru do ďalšej úlohy.
 

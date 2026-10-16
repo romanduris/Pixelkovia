@@ -31,3 +31,7 @@ Use case: photorealistic-natural. Asset type: illustrative lifestyle photograph 
 ### assets/kvak-sheet-preview.png a assets/printables/*.pdf
 
 Skutočný náhľad a jednostranové A4 PDF sú exportované z koreňového `printables.html` a jeho CSS cez `scripts/export-printables.cjs`. Nie sú generované obrazovou AI; zdrojom pravdy zostáva HTML/CSS. PDF P1–P6 a diplom sú pripravené na samostatné stiahnutie.
+
+### assets/kvak-qr-dummy.svg
+
+Ručne zostavená dekoratívna SVG maketa pre predstavu rozloženia P1. Neobsahuje zakódované dáta ani odkaz; nemá platnú štruktúru QR a je označená DEMO / NEFUNKČNÁ.

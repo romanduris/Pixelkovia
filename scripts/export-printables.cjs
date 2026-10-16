@@ -7,11 +7,15 @@ const {pathToFileURL}=require('node:url');
 (async()=>{
  const root=path.resolve(__dirname,'..');
  await fs.mkdir(path.join(root,'assets/printables'),{recursive:true});
+ const allIds=['p1','p2','p3','p4','p5','p6','diplom'];
+ const requestedIds=process.argv.slice(2);
+ if(requestedIds.some(id=>!allIds.includes(id)))throw new Error('Unknown worksheet ID');
+ const ids=requestedIds.length?requestedIds:allIds;
  const browser=await chromium.launch({headless:true});
  try{
   const page=await browser.newPage({viewport:{width:850,height:1200}});
   await page.emulateMedia({media:'print'});
-  for(const id of ['p1','p2','p3','p4','p5','p6','diplom']){
+  for(const id of ids){
    await page.goto(pathToFileURL(path.join(root,'printables.html')).href);
    await page.evaluate(selected=>document.querySelectorAll('.sheet').forEach(s=>s.hidden=selected==='diplom'?!s.classList.contains('diploma'):s.id!==selected),id);
    await page.evaluate(()=>document.fonts.ready);
