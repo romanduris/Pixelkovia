@@ -7,3 +7,9 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
 @media(min-width:701px){.package-art{max-width:470px}.package-art>img{left:45px}}
 
 .tts-block>summary{font-size:12px;font-weight:600;line-height:1.6;color:#5b467d;cursor:pointer;min-height:24px}
+
+/* Collapse a complete storyboard stage while keeping its test action available. */
+.storyboard-heading{flex:1;min-width:0}.storyboard-toggle{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;align-self:flex-start;padding:0;border:1px solid #b8c3da;border-radius:6px;background:#e5e9f5;color:#4f3c78;cursor:pointer}.storyboard-toggle:hover{background:#d7ddef}.storyboard-toggle>span{font-size:23px;line-height:1;transition:transform .15s}.storyboard-toggle[aria-expanded="false"]>span{transform:rotate(-90deg)}.storyboard-content[hidden]{display:none}.storyboard.is-collapsed>.storyboard-head{border-bottom:0;padding-bottom:0;margin-bottom:0}
+@media(max-width:700px){.storyboard-head>.storyboard-toggle{margin-top:2px}.storyboard-heading{flex-basis:calc(100% - 60px)}.storyboard-head>.btn{margin-left:52px}}
+@media(prefers-reduced-motion:reduce){.storyboard-toggle>span{transition:none}}
+@media print{.storyboard-toggle{display:none}}

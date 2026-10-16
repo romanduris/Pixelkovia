@@ -168,6 +168,15 @@
     if(b.dataset.view){preview=null;navigate(b.dataset.view);return;}
     if(b.dataset.symbol){if(sequence.length<3){sequence.push(b.dataset.symbol);const el=document.querySelector('#sequence');el.textContent=sequence.map(k=>symbols[k]).join(' ');el.setAttribute('aria-label',sequence.map(k=>names[k]).join(', '));}return;}
     const a=b.dataset.action;if(!a)return;
+    if(a==='toggle-storyboard'){
+      const content=document.getElementById(b.getAttribute('aria-controls'));if(!content)return;
+      content.hidden=!content.hidden;
+      b.setAttribute('aria-expanded',String(!content.hidden));
+      b.setAttribute('aria-label',`${content.hidden?'Rozbaliť':'Zbaliť'} blok ${b.dataset.label}`);
+      content.closest('.storyboard').classList.toggle('is-collapsed',content.hidden);
+      if(content.hidden)content.querySelectorAll('video,audio').forEach(media=>media.pause());
+      return;
+    }
     if(a==='kvak-play'||a==='kvak-replay'){const audio=app.querySelector('#kvak-audio');if(audio){if(a==='kvak-replay')audio.currentTime=0;if(audio.error)audio.load();audio.play().catch(()=>audio.kvakFallback());}return;}
     if(a==='kvak-pause'){app.querySelector('#kvak-audio')?.pause();return;}
     if(a==='scene-page'){

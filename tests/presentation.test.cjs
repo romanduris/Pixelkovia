@@ -41,6 +41,19 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.ok(await page.locator('dialog audio').evaluate(a=>a.paused));
   await page.locator('.site-header [data-view="designer"]').click();
   assert.equal(await page.locator('.storyboard').count(),10);assert.equal(await page.locator('.gm-atlas').count(),1);
+  const blocks=page.locator('.studio-timeline>.storyboard');
+  assert.equal(await blocks.locator('.storyboard-toggle[aria-expanded="true"]').count(),10,'all stages start expanded');
+  for(const block of await blocks.all()){
+   const toggle=block.locator('.storyboard-toggle');
+   await toggle.click();
+   assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+   assert.ok(!await block.locator('.storyboard-content').isVisible(),'whole stage content collapses');
+   assert.ok(await block.locator('h2').isVisible());
+   assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'testing remains accessible when collapsed');
+   await toggle.focus();await page.keyboard.press('Enter');
+   assert.equal(await toggle.getAttribute('aria-expanded'),'true','keyboard expands the same stage');
+   assert.ok(await block.locator('.storyboard-content').isVisible());
+  }
   assert.equal(await page.locator('details.tts-block:not([open])').count(),2,'TTS prompts start collapsed');
   assert.equal(await page.locator('.script-copy[open]').count(),2,'both spoken transcripts start expanded');
   assert.equal(await page.locator('#gm-intro .studio-stage-details, #gm-envelope .studio-stage-details').count(),0,'duplicate full scenarios are absent from the first two sections');
@@ -72,6 +85,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   await printable.close();
   // StoryBoard test is the simulated scan itself, with no extra instruction screen.
   const savedBeforeTest=await page.evaluate(()=>localStorage.getItem('zahada-v1-progress'));
+  await page.locator('#gm-envelope .storyboard-toggle').click();
   await page.locator('#gm-envelope [data-action="test"]').click();
   assert.equal(await page.locator('.signal-restore').count(),1);
   assert.equal(await page.locator('.task-main, .task-aside, .scan-entry').count(),0);

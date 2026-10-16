@@ -88,7 +88,7 @@ Iskrine pásiky stále skladajú „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJ
 
 Hráč dostane CTA **OBJAVIŤ TAJNÝ SVET PIXELKOV** až na úspešnej obrazovke finále. Úvod, hráčska navigácia ani bežné úlohy atlas neodkazujú. Game Master má odkaz kedykoľvek ako zámernú rodičovskú výnimku. Samotné `atlas.html` nie je uzamknuté hrou a dá sa priamo otvoriť alebo zdieľať bez hrania.
 
-StoryBoard obsahuje úvodnú videosprávu, prepisy Pika a Kvaka, pôvodné TTS zadania a od Iskrinej etapy úplné autorské scény pred aj po úlohách, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, tri úvodné rodičovské nápovedy, bezpečnostné pokyny a prechody. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
+StoryBoard obsahuje úvodnú videosprávu, prepisy Pika a Kvaka, pôvodné TTS zadania a od Iskrinej etapy úplné autorské scény pred aj po úlohách, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, tri úvodné rodičovské nápovedy, bezpečnostné pokyny a prechody. Každý celý blok (Úvod, úlohy 1–8 aj Finále) sa dá samostatne zbaliť šípkou pri nadpise. Nadpis a tlačidlo Otestovať zostávajú dostupné; rozbalenie zachová vnútorné nastavenie prepisov a TTS. Pri zbalení sa pozastavia médiá vo vnútri bloku. Bloky sú predvolene otvorené. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
 
 ## Kompatibilita postupu
 
