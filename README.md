@@ -8,6 +8,30 @@ Otvorte `index.html` alebo `atlas.html` priamo v prehliadači. Obe stránky fung
 
 Nasadzovaný výstup pripraví `node scripts/prepare-static.mjs`. Kopíruje hlavnú stránku, atlas, tlačoviny, CSS, JavaScript aj `assets/` do ignorovaného `dist/`. Upravujte koreňové zdroje, nie `dist/`.
 
+## Predajná prezentácia, zákaznícka príprava a StoryBoard
+
+Každé nové otvorenie a refresh `index.html` zobrazí hlavnú predajnú stránku od vrchu. Uložená hra sa nespúšťa automaticky ani pri rozpracovanej správe. Tlačidlo **Pokračovať v dobrodružstve** na hlavnej stránke alebo v Príprave hry obnoví presne uložený postup. Pôvodný kľúč localStorage, nápovedy aj ID etáp zostávajú zachované.
+
+Tri horné taby:
+
+- **Dobrodružstvo**: predajná prezentácia so zachovanou titulnou ilustráciou, ilustračnými zábermi rodinného riešenia, predstavením postáv, obsahom balíka, FAQ a plánovanou ponukou 14,99 € pri bežnej cene 19,99 €. Nákupné CTA otvára pravdivé oznámenie o pripravovanom predaji; platobný odkaz zatiaľ nebol dodaný.
+- **Príprava hry**: návrh zákazníckej sekcie po kúpe, uložený checklist, rola dospelého, samostatné PDF P1–P6 a diplom, náhľady tlačovín, umiestnenie štyroch obálok a oddelených stôp, kontrola nahrávok a spustenie hry. P1 je hotový list; neskoršie podklady sú označené ako pracovné.
+- **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a dostupný autorský scenár s označením, že doslovný prepis nahrávky ešte treba potvrdiť. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom.
+
+Pôvodné zadania pre text-to-speech neboli dodané. StoryBoard ich vedie oddelene od scenára ako **Čaká na dodanie**; žiadne pokyny, hlas ani nastavenia nie sú vymyslené.
+
+Toto je funkčný statický prototyp týchto troch rozhraní. Platba a serverové overenie nároku po kúpe ešte nie sú pripojené; zákaznícka sekcia ani StoryBoard nemajú samostatnú ochranu prístupu. Existujúce publikum Sites sa nemení. Pred ostrým predajom treba pripojiť nákup a serverom overovaný prístup, nie iba skryť tlačidlá.
+
+Prezentačný obsah je v `site-content.js`, samostatné štýly v `presentation.css`. Herný tok a uloženie postupu zostávajú v `app.js`. Ilustračné fotografie nevydávame za skutočné rodinné testovanie ani presné finálne materiály. Ich pôvod a úplné prompty sú v `assets/IMAGE-SOURCES.md`.
+
+Stiahnuteľné PDF v `assets/printables/` a skutočný náhľad `assets/kvak-sheet-preview.png` možno obnoviť z koreňového HTML/CSS:
+
+```sh
+PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node scripts/export-printables.cjs
+```
+
+Každý export overuje presne jednu A4. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; samotné `PicoVideo.mp4` sa nemení.
+
 ## Príbeh a hranie
 
 Pixelkovia potajomky žijú v každej domácnosti s mobilom, tabletom, počítačom či televízorom. Piko po veľkom bliknutí stratí spojenie s kamarátmi. Úvod nevysvetľuje príčinu. Kvak zachytí opakujúci sa signál, Iskra objaví skryté značky a Šutko rozpozná priechod uzavretý zvnútra. Lístok po úlohe 4 prečíta varovanie: Ochranné pole nie je pokazené. Kubo nájde bezpečnú návratovú cestu a Ryško po úlohe 6 vysvetlí, že sa pole automaticky preventívne uzavrelo, aby zabránilo prezradeniu ich sveta.
@@ -79,6 +103,8 @@ npm install --prefix /tmp/pixelkovia-qa playwright
 /tmp/pixelkovia-qa/node_modules/.bin/playwright install --with-deps chromium
 # V inom termináli: python3 -m http.server 8080
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/prototype.test.cjs
+PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/presentation.test.cjs
+node tests/mission-data.test.cjs
 ```
 
 Testujú tiež šesťmiestny kód a nesprávne pokusy, simulovaný QR prechod, oficiálnu dvojicu postáv, prehratie/pauzu/opakovanie MPEG aj chýbajúce audio, starú splnenú prvú úlohu, mobilný fullscreen a samostatnú A4 s úspornou farebnou aj čiernobielou tlačou. Testujú celoobrazovkovú prichádzajúcu správu, opakovanie a zastavenie cinkania, dodané video, jeho opakované prehrávanie aj obnovu úvodu, úplný priechod dialógmi aj ôsmimi úlohami, načasovanie zvratu, zlé odpovede, nápovedy, obnovu V1 postupu aj stránkovania, izoláciu GM testov, reset, mobil/desktop, tlačoviny, offline otvorenie a nedostupné úložisko. Atlas sa testuje priamym otvorením bez postupu, aj bez JavaScriptu, vrátane úplnosti textu, siedmich výrezov a dostupnosti CTA až vo finále alebo v GM. Screenshoty a skúšobná tlač smerujú do `/tmp`.

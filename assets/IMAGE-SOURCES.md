@@ -15,3 +15,19 @@ Atlas: 4 stĺpce × 2 riadky. Piko, Kvak, Iskra, Šutko / Lístok, Kubo, Ryško,
 ## Fonty
 
 Caveat je lokálne pribalený v assets/fonts/Caveat.ttf s licenciou OFL-Caveat.txt. Ostatné webové fonty majú systémovú zálohu. Herné mechaniky aj materiály fungujú bez siete.
+
+## Predajná prezentácia · ilustračné rodinné scény
+
+Vytvorené vstavaným nástrojom `image_gen` (nie CLI). Ide o ilustračné vizualizácie rodinnej aktivity, nie fotografie reálnych zákazníkov ani presné vyobrazenie finálnych tlačovín. Popisky na stránke to uvádzajú. Pôvodná titulná ilustrácia a oficiálne postavy zostali zachované.
+
+### assets/family-signal-puzzle.png
+
+Use case: photorealistic-natural. Asset type: illustrative lifestyle photograph for a Slovak at-home family mystery game sales page, landscape 3:2. Overhead editorial photograph of a warm wooden dining table in a cozy real family home. Only hands of two school-age children and one parent are visible, no faces. The children are collaboratively arranging six small white paper signal cards printed with dark navy thin outlines and tiny date-and-time-like marks, one hand moves a card, another points, pencil and a pale kraft paper envelope nearby, a white A4 instruction sheet with dark blue framing partly visible. A phone sits unobtrusively in upper corner with an abstract blue light, no readable UI. Tactile white paper, a little creative mess, genuine shared concentration and play. Warm natural window light, touches of deep navy and muted violet, premium candid family activity photography, realistic anatomically correct hands. No legible words or numerals, no visible solutions, no invented mascots, no branding, no watermark, no collage, no text overlay. Frame for a generous full-width website image.
+
+### assets/family-cipher-puzzle.png
+
+Use case: photorealistic-natural. Asset type: illustrative lifestyle photograph for a Slovak family mystery game product page, landscape 3:2. Close view at a 45-degree angle over a light wooden table in a cozy home: a child's hands carefully rotate two concentric hand-cut white paper cipher wheels while an adult hand steadies the outer wheel. Dark navy fine outlined alphabet-like small markings on the rings, no legible answer or word. Nearby a pencil, two folded white puzzle strips and a kraft paper envelope. Hands and practical paper craft are the main story, faces outside frame. Beautiful warm window light from left, quiet violet blue shadows, premium natural family activity photography. Realistic hands with accurate anatomy, ordinary accessible home materials, tangible and inviting. No readable text, no logos, no watermarks, no invented characters, no screens taking focus, no collage, no text overlay.
+
+### assets/kvak-sheet-preview.png a assets/printables/*.pdf
+
+Skutočný náhľad a jednostranové A4 PDF sú exportované z koreňového `printables.html` a jeho CSS cez `scripts/export-printables.cjs`. Nie sú generované obrazovou AI; zdrojom pravdy zostáva HTML/CSS. PDF P1–P6 a diplom sú pripravené na samostatné stiahnutie.

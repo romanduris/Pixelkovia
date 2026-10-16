@@ -5,7 +5,7 @@ const vm=require('node:vm');
 const ctx={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),ctx);
 const game=ctx.window.GAME;
-const app=fs.readFileSync('app.js','utf8');
+const app=fs.readFileSync('site-content.js','utf8');
 const print=fs.readFileSync('printables.html','utf8');
 const one=game.stages[1],two=game.stages[2],three=game.stages[3];
 assert.match(one.parent,/iba celý P1/);
