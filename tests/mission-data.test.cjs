@@ -1,0 +1,26 @@
+// Parent preparation and physical clues must agree across data, printouts and UI.
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const ctx={window:{}};
+vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),ctx);
+const game=ctx.window.GAME;
+const app=fs.readFileSync('app.js','utf8');
+const print=fs.readFileSync('printables.html','utf8');
+const one=game.stages[1],two=game.stages[2],three=game.stages[3];
+assert.match(one.parent,/iba celý P1/);
+assert.ok(!one.materials.includes('P2'));
+assert.match(two.materials,/P2:.*obálke 2 pri okne/);
+assert.match(two.parent,/Okno sa neotvára a na parapet sa nelezie/);
+assert.match(two.task,/POD OKNOM.*JE LIST.*SO SYMBOLMI.*HĽADAJTE NÍZKO/);
+assert.match(three.parent,/samostatný obal P3 pod oknom/);
+assert.match(three.parent,/Obálka 3 na stole.*P4.*uzavretý P5/);
+assert.match(game.stages[7].action,/obálku 4 pod sedadlom/);
+for(const location of ['medzi uterákmi','práčky','sušičky','elektrickým zariadeniam'])assert.ok(game.stages[0].parent.includes(location));
+for(const hint of game.stages[0].hints)assert.ok(hint.length>10);
+for(const label of ['Obálka 1: iba celý P1','Obálka 2: iba rozstrihaný P2','Obálka 3: P4','Obálka 4: P6'])assert.ok(app.includes(label),label);
+for(const label of ['P2 / Obálka 2 pri okne','P4 / Obálka 3','P5 / Obálka 3','P6 / Obálka 4'])assert.ok(print.includes(label),label);
+assert.ok(!JSON.stringify(game.stages.slice(3)).includes('obálke 2 na stole'));
+assert.ok(fs.readFileSync('scripts/prepare-static.mjs','utf8').includes('signal-print.css'));
+assert.ok(!/obálk[ay] 1[^.]*rozstrihan/i.test(app));
+console.log('PASS: parent preparation, safe hiding places, envelope numbering, sealed later clues and retained Iskra puzzle agree.');

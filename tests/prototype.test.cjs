@@ -6,13 +6,13 @@ const context={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);
 const game=context.window.GAME;
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const legacyAnswers=[['314'],['OKNO','POD OKNOM'],['9'],['STOL','STÔL'],['246'],['moon,sun,star'],['SPOLU'],['SVETLO']];
+const legacyAnswers=[['741296'],['OKNO','POD OKNOM'],['9'],['STOL','STÔL'],['246'],['moon,sun,star'],['SPOLU'],['SVETLO']];
 assert.equal(game.stages.length,10);
 assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),60);
 assert.equal(new Set(game.stages.map(s=>s.id)).size,10);
 assert.equal(game.characters.length,7);
 assert.equal(new Set(game.stages.slice(1,7).map(s=>s.character)).size,6);
-assert.equal(JSON.stringify(game.stages.slice(1,9).map(s=>s.answer)),JSON.stringify(legacyAnswers),'V1 answers remain compatible');
+assert.equal(JSON.stringify(game.stages.slice(1,9).map(s=>s.answer)),JSON.stringify(legacyAnswers),'new first code; answers 2–8 remain compatible');
 assert.equal(game.stages.slice(1,7).map(s=>s.reward).join(''),'SVETLO');
 assert.equal(game.call,game.stages[0].story,'one source for call and introductory storyboard');
 for(const s of game.stages){
@@ -24,6 +24,14 @@ for(const file of ['game-data.js','app.js','index.html','printables.html','atlas
 assert.ok(!JSON.stringify(game.call).includes('Ochranné pole'),'no explanation in the incoming call');
 assert.ok(JSON.stringify(game.stages[4].resolution).includes('OCHRANA AKTÍVNA.'),'the authored twist is present');
 assert.ok(JSON.stringify(game.stages[8].resolution).includes('Piko. Poď.'),'Piko is included in the safe return');
+const ordered=[...game.signalRecords].sort((a,b)=>a.month-b.month||a.day-b.day||a.time.localeCompare(b.time));
+assert.equal(ordered.map(r=>r.digit).join(''),'741296');
+assert.notEqual(game.signalRecords.map(r=>r.digit).join(''),'741296','printed order is scrambled');
+assert.equal(new Set(ordered.map(r=>`${r.month}-${r.day}-${r.time}`)).size,6,'unique chronological order');
+assert.ok(Object.values(Object.groupBy(game.signalRecords,r=>r.date)).some(group=>group.length>=3),'three records require exact time comparison');
+assert.equal(game.audio,'assets/KvakMessage.mpeg');
+assert.ok(fs.existsSync(game.audio));
+assert.equal(game.stages[0].hints.length,3);
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 (async()=>{
  const browser=await chromium.launch({headless:true});
@@ -49,6 +57,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  const noOverflow=async(p,label)=>assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label);
  async function readScene(p){
   let text='',turns=0;
+  if(await p.locator('.signal-connected').count())return p.locator('#kvak-transcript').textContent();
+  if(!await p.locator('.scene-panel').count())return '';
   while(true){
    text+='\n'+await p.locator('.scene-panel').textContent();
    assert.ok(!(await p.locator('#app').textContent()).includes('POZNÁMKA PRE GAME DESIGN'));
@@ -139,14 +149,24 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.locator('[data-action="finish-call"]').click();await readScene(page);
  await page.locator('[data-action="reopen-message"]').click();
  await page.locator('[data-action="finish-call"]').click();
- assert.equal(await page.locator('#answer').count(),1,'reopening message preserves current stage');
- await page.locator('#answer').fill('000');await page.locator('.answer-form button').click();
+ assert.equal(await page.locator('[data-action="scan-kvak"]').count(),1,'reopening message preserves first stage');
+ assert.equal(await page.locator('#answer').count(),0,'restoration has its own screen');
+ assert.ok((await page.locator('a[href*="sheet=p1"]').getAttribute('href')).includes('?sheet=p1'));
+ await page.locator('[data-action="scan-kvak"]').click();
+ assert.equal(await page.locator('.signal-restore').count(),1);
+ assert.equal(await page.locator('#answer').getAttribute('inputmode'),'numeric');
+ assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
+ assert.equal(await page.locator('#answer').getAttribute('pattern'),'[0-9]{6}');
+ await page.locator('#answer').fill('314');await page.locator('.answer-form button').click();
+ assert.equal(await page.locator('.signal-restore').count(),1,'legacy code is no longer accepted');
+ await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();
  assert.ok((await page.locator('#feedback').textContent()).includes('ešte nesedí'));
- await page.locator('[data-action="hint"]').click();assert.equal(await page.locator('#answer').inputValue(),'000');
+ await page.locator('[data-action="hint"]').click();assert.equal(await page.locator('#answer').inputValue(),'000000');
  await page.reload();assert.equal(await page.locator('#hints p').count(),1);
  let entireJourney='';
  for(let i=1;i<=8;i++){
   await noAtlas();entireJourney+=await readScene(page);
+  if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
   if(i===6){
    assert.ok(!(await page.locator('.task-main').textContent()).includes('dve obrazovky rozžiarili'));
    await page.locator('[data-symbol="sun"]').click();await page.locator('[data-action="verify-sequence"]').click();
@@ -159,6 +179,27 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   if(i<=6)assert.equal(await page.locator('.success-character').count(),1);
   if(i===4){await page.reload();assert.equal(await page.locator('.success-card').count(),1,'reload does not lose unread resolution');}
   const resolution=await readScene(page);entireJourney+=resolution;
+  if(i===1){
+   assert.equal(await page.locator('.signal-duo [aria-label="Piko"]').count(),1);
+   assert.equal(await page.locator('.signal-duo [aria-label="Kvak"]').count(),1);
+   const positions=await page.locator('.signal-duo .pixel-sprite').evaluateAll(els=>els.map(e=>getComputedStyle(e).backgroundPosition));
+   assert.equal(new Set(positions).size,2,'official first and second atlas crops');
+   assert.ok(resolution.includes('Kto mi lezie do signálu?!'));
+   assert.ok(!resolution.includes('Pikov hlas'),'only Kvak speaks');
+   assert.ok(!(await page.locator('#kvak-transcript').getAttribute('open')),'transcript starts collapsed');
+   await page.locator('[data-action="kvak-play"]').click();
+   await page.waitForFunction(()=>{const a=document.querySelector('audio');return a&&!a.paused&&a.currentTime>0;});
+   assert.equal(await page.locator('.is-speaking').count(),1);
+   await page.locator('[data-action="kvak-pause"]').click();
+   assert.ok(await page.locator('audio').evaluate(a=>a.paused));
+   await page.locator('[data-action="kvak-replay"]').click();
+   await page.waitForFunction(()=>{const a=document.querySelector('audio');return a&&!a.paused&&a.currentTime<2;});
+   await page.locator('[data-action="kvak-pause"]').click();
+   await page.locator('audio').evaluate(a=>a.dispatchEvent(new Event('ended')));
+   assert.equal(await page.locator('.signal-connected').count(),1,'audio never advances automatically');
+   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).stage),1);
+   await page.reload();assert.equal(await page.locator('.signal-connected').count(),1,'saved first puzzle restores new connection scene');
+  }
   if(i===4){assert.ok(resolution.includes('OCHRANA AKTÍVNA.'));assert.ok(resolution.includes('vôbec nie je pokazené'));}
   if(i===6){assert.ok(resolution.includes('dve obrazovky rozžiarili'));assert.ok(resolution.includes('Takže to nebola porucha.'));}
   if(i===8){assert.ok(resolution.includes('Ryško prechádza ako predposledný.'));assert.ok(resolution.includes('Piko. Poď.'));}
@@ -176,6 +217,26 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.locator('[data-action="notebook"]').click();assert.equal(await page.locator('.notebook-row').count(),8);await page.locator('.dialog-close').click();
  await page.locator('[data-action="reset"]').click();await page.locator('.dialog-close').click();assert.equal(await page.locator('.finale').count(),1);
  await page.locator('[data-action="reset"]').click();await page.locator('[data-action="confirm-reset"]').click();await noAtlas();
+ // Old completion, absent MPEG, screen fallbacks and every phone width.
+ const kvakContext=await browser.newContext();const kp=await kvakContext.newPage();const audioErrors=[];kp.on('pageerror',e=>audioErrors.push(e.message));
+ await kp.addInitScript(()=>{Object.defineProperty(document,'fullscreenEnabled',{get(){return false;}});});
+ await kp.route('**/assets/KvakMessage.mpeg',route=>route.fulfill({status:404,body:'Missing audio'}));
+ await kp.goto(BASE);await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[1],hints:{1:1}})));await kp.reload();
+ assert.equal(await kp.locator('.signal-connected').count(),1,'legacy first completion remains completed');
+ await kp.locator('[data-action="kvak-play"]').click();await kp.locator('#kvak-transcript[open]').waitFor();
+ assert.ok((await kp.locator('#kvak-audio-status').textContent()).includes('nepodarilo'));
+ assert.ok((await kp.locator('#kvak-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
+ await kp.locator('[data-action="next"]').click();assert.equal(await kp.locator('.task-main h1').textContent(),game.stages[2].title);
+ for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
+  await kp.setViewportSize({width,height});await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[],hints:{}})));await kp.reload();
+  await kp.locator('[data-action="scan-kvak"]').click();await noOverflow(kp,`Kvak restore ${width}`);
+  const box=await kp.locator('#app').boundingBox();assert.equal(box.width,width);assert.equal(box.height,height);
+  await kp.screenshot({path:`/tmp/kvak-restore-${width}.png`});
+  await kp.locator('[data-action="restore-back"]').click();assert.equal(await kp.locator('[data-action="scan-kvak"]').count(),1);
+  await kp.locator('[data-action="scan-kvak"]').click();await kp.locator('#answer').fill('741296');await kp.locator('.answer-form button').click();
+  await noOverflow(kp,`Kvak connection ${width}`);await kp.screenshot({path:`/tmp/kvak-connection-${width}.png`});
+ }
+ assert.deepEqual(audioErrors,[]);await kvakContext.close();
  // Narrow phone, phone, tablet and desktop layouts.
  for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:844});await noOverflow(page,`home ${width}`);}
  await resizePlayerViewport({width:390,height:844});await page.screenshot({path:'/tmp/mystery-home-mobile.png',fullPage:true});
@@ -186,6 +247,31 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.screenshot({path:'/tmp/mystery-task-mobile.png',fullPage:true});
  await page.goto(BASE+'/printables.html');assert.equal(await page.locator('.sheet').count(),7);assert.equal(await page.locator('#circles svg').count(),2);await noOverflow(page,'mobile printables');
  await page.emulateMedia({media:'print'});const pdf=await page.pdf({path:'/tmp/mystery-working-print.pdf',format:'A4',printBackground:true});assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,7,'seven printable sheets fit seven pages');await page.emulateMedia({media:'screen'});
+ // The first worksheet is self-contained, low-ink, and one A4 even without colour.
+ await page.goto(BASE+'/printables.html?sheet=p1');
+ assert.equal(await page.locator('.sheet:visible').count(),1,'player cannot see future worksheets');
+ const sheet=page.locator('#p1');const text=await sheet.textContent();
+ assert.ok(!text.includes('741296'),'no solution on worksheet');
+ for(const copy of ['zachytávač signálov','neviem sa spojiť','Pikom','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ KVAKOV SIGNÁL'])assert.ok(text.includes(copy),copy);
+ assert.equal(await sheet.locator('.signal-cutout').count(),6);assert.equal(await sheet.locator('.code-boxes span').count(),6);
+ assert.equal(await sheet.locator('[role="img"][aria-label*="Kvak"]').count(),1);
+ assert.equal(await sheet.locator('.kvak-print-mission li').count(),5);
+ const printed=await sheet.locator('.signal-cutout').evaluateAll(els=>els.map(e=>({date:e.dataset.date,time:e.dataset.time,digit:e.dataset.digit})));
+ assert.equal(JSON.stringify(printed),JSON.stringify(game.signalRecords.map(r=>({date:r.date,time:r.time,digit:r.digit}))));
+ await page.emulateMedia({media:'print'});
+ const a4=await page.pdf({path:'/tmp/kvak-a4.pdf',format:'A4',printBackground:true});
+ assert.equal((a4.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,1,'single-sided A4');
+ const geometry=await sheet.evaluate(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height,bottom:e.getBoundingClientRect().bottom,footer:e.querySelector('.footer').getBoundingClientRect().bottom,bg:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));
+ assert.ok(geometry.footer<=geometry.bottom,'footer and all content stay on A4');assert.equal(geometry.bg,'rgb(255, 255, 255)');assert.equal(geometry.color,'rgb(20, 40, 64)');
+ const cutBounds=await sheet.locator('.signal-cutout').evaluateAll(els=>els.map(e=>{const a=e.getBoundingClientRect(),b=e.querySelector('.cutout-content').getBoundingClientRect();return {contained:b.left>=a.left&&b.right<=a.right&&b.top>=a.top&&b.bottom<=a.bottom,width:a.width,height:a.height,transform:getComputedStyle(e.querySelector('.cutout-content')).transform};}));
+ assert.ok(cutBounds.every(b=>b.contained&&b.width>150&&b.height>150),'rotated information fits child-sized physical cutouts');
+ assert.equal(new Set(cutBounds.map(b=>b.transform)).size,3,'90, 180 and minus 90 degrees');
+ const darkPanels=await sheet.locator('*').evaluateAll(els=>els.filter(e=>{const s=getComputedStyle(e),c=s.backgroundColor.match(/^rgb\((\d+), (\d+), (\d+)\)$/),r=e.getBoundingClientRect();return c&&Math.max(+c[1],+c[2],+c[3])<128&&r.width*r.height>4000;}).length);
+ assert.equal(darkPanels,0,'no large dark filled panels');
+ await sheet.screenshot({path:'/tmp/kvak-a4-colour.png'});
+ await sheet.evaluate(e=>e.style.filter='grayscale(1)');await sheet.screenshot({path:'/tmp/kvak-a4-grayscale.png'});
+ assert.equal(await sheet.locator('.record-date strong').count(),6);assert.equal(await sheet.locator('.record-time strong').count(),6);assert.equal(await sheet.locator('.record-digit b').count(),6,'labels and outlines retain every meaning without colour');
+ await page.emulateMedia({media:'screen'});
  // Directly shared atlas works with a fresh profile, without gameplay or JavaScript.
  const bookContext=await browser.newContext({javaScriptEnabled:false,viewport:{width:1440,height:1000}});
  const book=await bookContext.newPage();await book.goto(BASE+'/atlas.html');
@@ -226,6 +312,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: complete V2 dialogue journey, twist timing, seven safe returns, V1 saves, reader persistence, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Kvak V4 six-digit chronological code, simulated QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete V2 dialogue journey, twist timing, seven safe returns, V1 saves, reader persistence, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

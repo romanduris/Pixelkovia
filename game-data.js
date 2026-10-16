@@ -1,8 +1,8 @@
-/* GAME STUDIO V2. Príbehové panely sú jediný zdroj scén; mechaniky a uložený postup V1 ostávajú kompatibilné. */
+/* Pixelkovia V4. Zachované ID etáp a kompatibilita uloženého postupu. */
 window.GAME = {
   "title": "Pixelkovia: Stratený signál",
-  "version": 2,
-  "audio": null,
+  "version": 4,
+  "audio": "assets/KvakMessage.mpeg",
   "video": "assets/PicoVideo.mp4",
   "stages": [
     {
@@ -73,9 +73,11 @@ window.GAME = {
       "mobile": "Celoobrazovkový displej → tri cinknutia každých pár sekúnd → otvorenie videa ťuknutím → opakované prehrávanie → Máme obálku.",
       "solution": "Kde je obálka? V kúpeľni. Odpoveď prezradí iba zvuk videosprávy; hráčsky displej ju nevypisuje.",
       "hints": [
-        "Piko pomenoval miestnosť s umývadlom."
+        "Skúste si Pikovu správu vypočuť ešte raz.",
+        "Počúvajte najmä to, čo hovorí tesne pred prerušením spojenia.",
+        "Piko spomína kúpeľňu."
       ],
-      "parent": "Obálku 1 ukryte v kúpeľni. Video spustite až po rozmiestnení materiálov. Prvý hlavolam je porozumieť Pikovi; nepomáhajte hneď. Pomôcka: Kde je obálka? Odpoveď: v kúpeľni.",
+      "parent": "Obálku 1 iba s celým pracovným listom P1 ukryte v kúpeľni medzi uterákmi, do skrinky s uterákmi alebo na suchú dostupnú poličku. Nie medzi lieky a čistiace prostriedky, k elektrickým zariadeniam, do práčky ani sušičky. Miesto deťom prezradí iba zvuk Pikovej správy. Nápovedy ponúkajte postupne.",
       "transition": "Pikov signál zoslabol. Nájdite Kvaka — bez jeho sluchu ostatné linky nespojíte.",
       "dramaturgy": [
         "Úvod musí okamžite vzbudiť otázky. Piko ešte nevie, či sa Ochranné pole pokazilo, či sú jeho priatelia v nebezpečenstve ani čo presne spôsobilo veľké bliknutie.",
@@ -100,7 +102,7 @@ window.GAME = {
     },
     {
       "id": "envelope",
-      "title": "Kvakovo stratené pípnutie",
+      "title": "Kvakove rozhádzané signály",
       "label": "Úloha 1",
       "icon": "✉",
       "time": [
@@ -110,75 +112,46 @@ window.GAME = {
       ],
       "reward": "S",
       "answer": [
-        "314"
+        "741296"
       ],
-      "placeholder": "Trojmiestny kód",
+      "placeholder": "Šesťmiestny kód",
       "story": [
         [
-          "V obálke nájdete zvláštne záznamy a krátky Pikov odkaz.",
-          "„Ak čítate tieto riadky, naše spojenie stále funguje aspoň trochu. Kvak necháva za sebou zvukové stopy. Dokáže nájsť správny signál aj tam, kde ostatní počujú iba šum.“",
-          "„Pokúste sa obnoviť poradie jeho posledných pípnutí. Možno sa nám ozve.“"
+          "V obálke je Kvakov pracovný list. Jeho spojenie s Pikom aj ostatnými kamarátmi sa rozpadlo.",
+          "Kvak dokáže zachytiť aj veľmi slabé správy. Šesť záznamov jeho signálu sa však pomiešalo. Pomôžte mu obnoviť spojenie!"
         ]
       ],
-      "action": "Vezmite obálku 1 v kúpeľni. Vyberte tri záznamy pípnutí a štyri pásiky; tie budete potrebovať v ďalšej úlohe.",
-      "task": "Usporiadajte tri záznamy podľa času od najskoršieho. Číslice pri nich vytvoria trojmiestny kód Kvakovho kontaktu.",
-      "materials": "P1: Pikov list a záznamy „09:20 → 4“, „09:00 → 3“, „09:10 → 1“. P2: štyri vopred rozstrihané pásiky.",
-      "mobile": "Kód 314 obnoví kontakt s Kvakom a uloží jeho písmeno S. Kvak čaká na spoločný návrat vo finále.",
-      "solution": "09:00, 09:10, 09:20 → 3, 1, 4 → 314.",
+      "action": "Vyberte z obálky 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
+      "task": "Zoraďte záznamy od najstaršieho po najnovší: najskôr podľa dátumu, v rovnaký deň podľa presného času. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód.",
+      "materials": "P1: jeden jednostranný pracovný list A4 s Kvakovým príbehom, návodom a šiestimi otočenými vystrihovacími signálmi. Ceruzka a detské nožnice.",
+      "mobile": "Simulovať naskenovanie QR → fullscreen Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mpeg. Písmeno S sa uloží bez automatického pokračovania.",
+      "solution": "13. 3. 20:05 → 7; 13. 3. 20:10 → 4; 13. 3. 20:15 → 1; 14. 6. 19:50 → 2; 15. 9. 08:35 → 9; 15. 12. 08:40 → 6. Kód 741296.",
       "hints": [
-        "Začnite najskorším časom, nie prvým riadkom.",
-        "Najprv 09:00, potom 09:10 a nakoniec 09:20."
+        "Najprv porovnajte mesiace, potom dni. Všetky záznamy vznikli v jednom roku.",
+        "Tri marcové záznamy majú rovnaký dátum. O ich poradí rozhodne presný čas: od skoršieho po neskorší."
       ],
-      "parent": "Obálku položte na suchú dostupnú poličku. Neumiestňujte ju pri liekoch, čistiacich prostriedkoch ani vode.",
-      "transition": "Píp! „Som tu! Moje písmeno je S,“ ozve sa Kvak. „Zachytil som Iskru. Jej adresu nájdete na pásikoch!“",
+      "parent": "Obálka 1 v kúpeľni obsahuje iba celý P1. Ústrižky vystrihujú až deti. P2 patrí do samostatnej obálky 2 pri okne. Farebná tlač je odporúčaná, čiernobiela na bielom papieri je plne hrateľná.",
+      "transition": "Vypočujte si Kvakov odkaz. Keď nájdete ďalšiu obálku, pokračujte na Iskrin odkaz. Vaše získané písmeno S je uložené v zápisníku.",
       "character": "kvak",
       "dramaturgy": [
-        "Obnovuje sa prvý kontakt. Kvak je veselý a jeho humor uvoľní napätie po dramatickom úvode.",
-        "Príbehový objav: signál nie je náhodný. Niekto alebo niečo ho vysiela opakovane.",
-        "Kvak ešte nerozumie jeho významu.",
-        "Schopnosť: rozpoznávanie signálov. Hráči získavajú písmeno S.",
-        "Nasledujúca aktivita: skladanie papierového odkazu a pátranie po Iskre."
+        "Obnovuje sa prvý kontakt. V celej scéne hovorí iba Kvak; Piko je prítomný ako poslucháč.",
+        "Príbehový objav: pred bliknutím sa opakoval zvláštny signál. Kvak ešte nerozumie jeho významu.",
+        "Schopnosť: zachytávanie slabých signálov. Hráči získavajú písmeno S.",
+        "Kvakov zvukový odkaz smeruje k obálke 2 pri okne. Nepreskakuje sa automaticky.",
+        "Na želanie používateľa majú tri záznamy rovnaký dátum 13. 3.; o poradí rozhodujú časy 20:05, 20:10 a 20:15. Kód zostáva 741296."
       ],
       "resolution": [
         [
-          "Po správnom vyriešení sa na displeji objaví žltá bodka.",
-          "Raz blikne.",
-          "Dvakrát.",
-          "A potom…",
-          "„KVAK!“",
-          "Na obrazovke vyskočí malá kačacia postavička so žltým zobáčikom.",
-          "„Kvak! Kvak! Kto mi lezie do signálu?“",
-          "V pozadí sa ozve Pikov hlas.",
-          "„Kvak! Ty žiješ!“",
-          "„Samozrejme, že žijem. Len som sa nemohol nikam dovolať.“",
-          "Kvak sa rozhliadne.",
-          "„Počkaj. Kto sú tí obrovskí ľudia?“",
-          "„Pomáhajú nám,“ vysvetlí Piko.",
-          "Kvak sa na hráčov zahľadí.",
-          "„Ľudia? Naozajstní ľudia?“",
-          "Na okamih otvorí zobák."
-        ],
-        [
-          "„No teda. Mama mi vždy hovorila, že raz budem počuť niečo neuveriteľné. Ale toto je naozaj dosť hlasné prekvapenie.“",
-          "Piko sa zasmeje.",
-          "„Kvak, čo sa stalo?“",
-          "Kvak stíchne.",
-          "„Neviem. Ale pred veľkým bliknutím som zachytil zvláštny signál.“",
-          "„Aký?“",
-          "„Opakoval sa. Stále rovnako. To nie je obyčajný šum.“",
-          "Piko sa zamyslí.",
-          "„Dokážeš ho rozpoznať?“",
-          "„Zatiaľ nie. Je príliš slabý.“",
-          "Kvak sa otočí k hráčom.",
-          "„Ale vďaka vám aspoň viem, že nie som sám!“"
-        ],
-        [
-          "Na displeji sa objaví malé žiariace písmeno S.",
-          "„Toto je moja značka zo záložného plánu. Odložte si ju. Možno sa ešte zíde.“",
-          "„A ešte niečo!“ dodá Kvak.",
-          "„Zachytil som časť správy od Iskry. Len sa roztrhala na kúsky.“",
-          "Piko sa usmeje.",
-          "„Tak to vyzerá, že máme ďalšiu stopu.“"
+          "Kvak?! Kvak! Čo to je? Kto mi lezie do signálu?!",
+          "Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!",
+          "Ľudia?! Naozajstní ľudia?! Kvak! Tak toto som ešte nezažil!",
+          "Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!",
+          "Ďakujem vám! Bez vás by som sa s ním nespojil!",
+          "Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.",
+          "Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.",
+          "Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!",
+          "Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!",
+          "Kvak! A ešte raz ďakujem, kamaráti!"
         ]
       ]
     },
@@ -208,16 +181,16 @@ window.GAME = {
           "„Len keby sme vedeli, kde ju hľadať.“"
         ]
       ],
-      "action": "Na stole poskladajte štyri pásiky z obálky 1 podľa čísiel v ich rohoch. Môžete ich spojiť papierovou páskou.",
+      "action": "Nájdite obálku 2 podľa Kvakovej hlasovej indície. Vyberte iba štyri Iskrine pásiky P2 a na stole ich poskladajte podľa čísel v rohoch. Môžete ich spojiť papierovou páskou.",
       "task": "Prečítajte zloženú vetu „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJTE NÍZKO.“ Zadajte hlavné miesto, ku ktorému vás veta posiela.",
-      "materials": "P2: pásiky 1–4, pripravené rodičom. P3: karta symbolov prilepená zvnútra pod parapetom.",
+      "materials": "P2: štyri premiešané pásiky v obálke 2 pri okne. P3: osobitne uzavretá karta symbolov nízko pod oknom, označená Úloha 3.",
       "mobile": "Zadanie názvu miesta odomkne druhé písmeno a pokyn vyzdvihnúť kartu.",
       "solution": "OKNO; uznáva sa aj POD OKNOM.",
       "hints": [
         "Malé čísla určujú poradie pásikov.",
         "Veta sa začína slovami POD OKNOM."
       ],
-      "parent": "Kartu dajte nízko a na dosah. Okno sa neotvára a na parapet sa nelezie. Ak je miesto nevhodné, kartu položte na podlahu pod okno.",
+      "parent": "Obálku 2 s P2 položte pri okne na bezpečné miesto na dosah detí. Okno sa neotvára a na parapet sa nelezie. P3 samostatne preložte a uzavrite do označeného obalu Úloha 3 – otvoriť po zložení odkazu; umiestnite nízko pod okno.",
       "transition": "„Moje písmeno je V!“ Iskra rozsvieti značky na ceste. „Pod oknom čakajú Šutkove symboly.“",
       "character": "iskra",
       "dramaturgy": [
@@ -301,15 +274,15 @@ window.GAME = {
       ],
       "action": "Vezmite kartu symbolov spod okna. Ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na karte platí △ + △ = 6, ○ + △ = 5 a □ + ○ = 6. Koľko je △ + ○ + □?",
-      "materials": "P3: tri rovnice a otázka. P4: dva šifrovacie kruhy a zakódovaný odkaz, pripravené na stole v obálke 2.",
-      "mobile": "Overenie jedného čísla; potom pokyn otvoriť obálku 2 na stole.",
+      "materials": "P3: tri rovnice a otázka. P4: dva šifrovacie kruhy a zakódovaný odkaz, pripravené na stole v obálke 3.",
+      "mobile": "Overenie jedného čísla; potom pokyn otvoriť obálku 3 na stole.",
       "solution": "△ = 3, ○ = 2, □ = 4. Súčet je 9.",
       "hints": [
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3.",
         "Kruh má hodnotu 2 a štvorec 4. Sčítajte 3 + 2 + 4."
       ],
-      "parent": "Dovoľte deťom kresliť si tvary alebo nahradiť ich predmetmi. Obálka 2 na stole obsahuje P4 a P5, bludisko zatiaľ nechajte otočené.",
-      "transition": "Šutko čaká pri priechode uzavretom zvnútra. Vezmite obálku 2 zo stola; Lístkov prekladač môže vysvetliť jeho značky.",
+      "parent": "Po úspešnej úlohe 2 otvorte samostatný obal P3 pod oknom. Obálka 3 na stole obsahuje P4 a osobitne uzavretý P5 s označením Úloha 5 – otvoriť po prekladači. Dovoľte deťom kresliť tvary alebo ich nahradiť predmetmi.",
+      "transition": "Šutko čaká pri priechode uzavretom zvnútra. Vezmite obálku 3 zo stola; Lístkov prekladač môže vysvetliť jeho značky.",
       "character": "sutko",
       "dramaturgy": [
         "Šutko prináša prvú výraznejšiu pochybnosť.",
@@ -404,7 +377,7 @@ window.GAME = {
         "V sa prečíta ako S, W ako T. Pokračujte rovnako."
       ],
       "parent": "Vystrihujú deti pod dohľadom. Nie je nutné prepichovať papier. Tlačené kruhy majú rovnaké uhly, aby sa dali skutočne použiť.",
-      "transition": "STÔL ukázal miesto ďalšej stopy. Lístok varuje: nič neotvárajte nasilu. Na stole otočte Kubov plán P5 a nájdite bezpečnú cestu.",
+      "transition": "STÔL ukázal miesto ďalšej stopy. Lístok varuje: nič neotvárajte nasilu. Na stole otvorte samostatný obal s Kubovým plánom P5 a nájdite bezpečnú cestu.",
       "character": "listok",
       "dramaturgy": [
         "Toto je bod, kde sa mení cieľ hráčov.",
@@ -500,12 +473,12 @@ window.GAME = {
           "„Poznám niekoho, kto dokáže postaviť cestu aj tam, kde žiadna nie je.“",
           "Kvak sa usmeje.",
           "„Kubo!“",
-          "Na displeji sa objaví náčrt svetelných chodbičiek. Papierový plán čaká v obálke 2 na stole.",
+          "Na displeji sa objaví náčrt svetelných chodbičiek. Papierový plán čaká v osobitnom obale v obálke 3 na stole.",
           "„Toto je jeho mapa,“ vysvetlí Piko.",
           "„Ak nájdeme cestu k jadru, možno sa mu dovoláme.“"
         ]
       ],
-      "action": "Otočte P5 z obálky 2. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
+      "action": "Otvorte samostatný obal P5 z obálky 3. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
       "task": "Sledujte spojité potrubie až k jadru. Odbočky končia bez výstupu. Prečítajte tri čísla na úspešnej ceste v poradí od vstupu.",
       "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; poznámka o noci, dni a hviezde.",
       "mobile": "Trojmiestny kód otvorí digitálny ovládací panel.",
@@ -610,7 +583,7 @@ window.GAME = {
         "Poradie je mesiac, slnko, hviezda."
       ],
       "parent": "Odhalenie príčiny sa zobrazí až po správnej sekvencii. Zdôraznite, že Ochranné pole všetkých chránilo a nikto nie je zranený.",
-      "transition": "Ryško pozná príčinu uzavretia Ochranného poľa. Posledný odkaz čaká v obálke 3 pod stoličkou pri stole.",
+      "transition": "Ryško pozná príčinu uzavretia Ochranného poľa. Posledný odkaz čaká v obálke 4 pod stoličkou pri stole.",
       "character": "rysko",
       "dramaturgy": [
         "Toto je druhé veľké odhalenie, tentoraz úplné vysvetlenie príčiny.",
@@ -733,9 +706,9 @@ window.GAME = {
           "„Je tam odkaz, ktorý nám pripomenie, čo musíme urobiť.“"
         ]
       ],
-      "action": "Nájdite obálku 3 pod sedadlom dostupnej stoličky pri stole. Vyberte sľub Pixelkov a kartu poradia.",
+      "action": "Nájdite obálku 4 pod sedadlom dostupnej stoličky pri stole. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
-      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; obálka 3.",
+      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; obálka 4.",
       "mobile": "Overí slovo SPOLU a uloží kartu poradia do zápisníka.",
       "solution": "Prvé písmená viet tvoria SPOLU. Karta určuje poradie šiestich nazbieraných písmen podľa úloh.",
       "hints": [
@@ -1074,8 +1047,70 @@ window.GAME = {
       "tile": 6
     }
   ],
-  "source": "GAME STUDIO — kompletný herný scenár V2, dodaný používateľom; schválené názvoslovie Ochranné pole.",
-  "atlasInvitation": "Psst! Ešte niečo som vám zabudol dať."
+  "source": "GAME STUDIO V2; úvod a Kvakova misia V4. Schválené názvoslovie Ochranné pole.",
+  "atlasInvitation": "Psst! Ešte niečo som vám zabudol dať.",
+  "kvakMessage": [
+    "Kvak?! Kvak! Čo to je? Kto mi lezie do signálu?!",
+    "Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!",
+    "Ľudia?! Naozajstní ľudia?! Kvak! Tak toto som ešte nezažil!",
+    "Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!",
+    "Ďakujem vám! Bez vás by som sa s ním nespojil!",
+    "Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.",
+    "Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.",
+    "Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!",
+    "Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!",
+    "Kvak! A ešte raz ďakujem, kamaráti!"
+  ],
+  "signalRecords": [
+    {
+      "date": "14. 6.",
+      "month": 6,
+      "day": 14,
+      "time": "19:50",
+      "digit": "2",
+      "rotation": 90
+    },
+    {
+      "date": "13. 3.",
+      "month": 3,
+      "day": 13,
+      "time": "20:10",
+      "digit": "4",
+      "rotation": 180
+    },
+    {
+      "date": "15. 12.",
+      "month": 12,
+      "day": 15,
+      "time": "08:40",
+      "digit": "6",
+      "rotation": -90
+    },
+    {
+      "date": "13. 3.",
+      "month": 3,
+      "day": 13,
+      "time": "20:15",
+      "digit": "1",
+      "rotation": -90
+    },
+    {
+      "date": "15. 9.",
+      "month": 9,
+      "day": 15,
+      "time": "08:35",
+      "digit": "9",
+      "rotation": 90
+    },
+    {
+      "date": "13. 3.",
+      "month": 3,
+      "day": 13,
+      "time": "20:05",
+      "digit": "7",
+      "rotation": 180
+    }
+  ]
 };
 // Telefonát používa tie isté panely ako úvodný storyboard.
 window.GAME.call = window.GAME.stages[0].story;
