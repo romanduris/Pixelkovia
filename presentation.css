@@ -16,3 +16,5 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
 
 /* Riešenie je viditeľné hneď po otvorení každej etapy storyboardu. */
 .storyboard-solution{margin:20px 0;padding:18px 22px;border:1px solid #a5bbba;border-left:4px solid #417b76;border-radius:6px;background:#e8f1ef;break-inside:avoid}.studio-timeline .storyboard-solution h3{margin:0 0 10px;font-size:14px;letter-spacing:.04em;color:#315e59}.storyboard-answer{display:block;font-size:24px;line-height:1.4;color:#243e45;overflow-wrap:anywhere}.studio-timeline .storyboard-solution p{margin:10px 0 0;color:#3d585f}.studio-timeline .storyboard-solution h3+p{margin-top:0}@media(max-width:700px){.storyboard-solution{padding:16px}.storyboard-answer{font-size:21px}}
+
+@media print{.storyboard-content[hidden]{display:block!important}}
