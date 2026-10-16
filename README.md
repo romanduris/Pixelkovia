@@ -18,7 +18,7 @@ Tri horné taby:
 - **Príprava hry**: návrh zákazníckej sekcie po kúpe, uložený checklist, rola dospelého, samostatné PDF P1–P6 a diplom, náhľady tlačovín, umiestnenie štyroch obálok a oddelených stôp, kontrola nahrávok a spustenie hry. P1 je hotový list; neskoršie podklady sú označené ako pracovné.
 - **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a krátky prepis podľa dodaného TTS zadania; prepisy sú predvolene otvorené a pôvodné TTS zadania sú rozbaľovacie, predvolene zatvorené. Duplicitné kompletné scenáre Pika a Kvaka sa na stránke nezobrazujú. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom. Každá etapa má hneď pod nadpisom viditeľný panel **Riešenie**: pri úlohách konkrétnu uznávanú odpoveď alebo poradie symbolov a vysvetlenie z herných dát, pri úvode úkryt prvej obálky. Panel sa zbalí spolu s celou etapou.
 
-Pôvodné zadania pre **ElevenLabs v3** sú uložené v `GAME.voiceScripts` a zobrazené doslova v StoryBoarde, oddelene od hovoreného textu. Obsahujú emočné pokyny v hranatých zátvorkách aj charakter hlasov. Piko má krátku správu s piatimi replikami (cca 7 sekúnd), Kvak desať replík (cca 45–60 sekúnd). Prepisy `GAME.pikoMessage`, `GAME.kvakMessage` a Kvakova scéna vychádzajú z týchto podkladov. Dodané súbory videa a MPEG audia zostávajú nezmenené.
+Pôvodné zadania pre **ElevenLabs v3** sú uložené v `GAME.voiceScripts` a zobrazené doslova v StoryBoarde, oddelene od hovoreného textu. Obsahujú emočné pokyny v hranatých zátvorkách aj charakter hlasov. Piko má krátku správu s piatimi replikami (cca 7 sekúnd), Kvak desať replík (cca 45–60 sekúnd). Prepisy `GAME.pikoMessage`, `GAME.kvakMessage` a Kvakova scéna vychádzajú z týchto podkladov. Pôvodné TTS zadania zostávajú zachované; aktuálne video bolo na žiadosť používateľa nahradené novým WhatsApp súborom. MPEG audio zostáva nezmenené.
 
 Toto je funkčný statický prototyp týchto troch rozhraní. Platba a serverové overenie nároku po kúpe ešte nie sú pripojené; zákaznícka sekcia ani StoryBoard nemajú samostatnú ochranu prístupu. Existujúce publikum Sites sa nemení. Pred ostrým predajom treba pripojiť nákup a serverom overovaný prístup, nie iba skryť tlačidlá.
 
@@ -30,7 +30,7 @@ Stiahnuteľné PDF v `assets/printables/` a skutočný náhľad `assets/kvak-she
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node scripts/export-printables.cjs
 ```
 
-Každý export overuje presne jednu A4. Voliteľný argument `p1` exportuje iba prvý list a jeho náhľad, bez prepisovania ostatných PDF. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; samotné `PicoVideo.mp4` sa nemení.
+Každý export overuje presne jednu A4. Voliteľný argument `p1` exportuje iba prvý list a jeho náhľad, bez prepisovania ostatných PDF. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; aktuálne `PicoVideo.mp4` je nové používateľom dodané WhatsApp video (približne 15 sekúnd), uložené pod pôvodnou hernou cestou.
 
 ## Príbeh a hranie
 
