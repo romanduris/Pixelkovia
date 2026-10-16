@@ -100,6 +100,26 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'QR preview never changes family progress');
   await page.locator('.signal-header [data-action="exit-test"]').click();
   await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
+  // Later stage tests open only the interaction, not duplicate instruction pages.
+  for(let n=2;n<=8;n++){
+   await page.locator(`[data-action="test"][data-stage="${n}"]`).click();
+   assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
+   assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
+   const answer=await page.evaluate(n=>GAME.stages[n].answer[0],n);
+   if(n===6){
+    for(const symbol of answer.split(','))await page.locator(`[data-symbol="${symbol}"]`).click();
+    await page.locator('[data-action="verify-sequence"]').click();
+   }else{
+    assert.equal(await page.locator('#answer').count(),1);
+    await page.locator('#answer').fill(answer);await page.locator('.answer-form button').click();
+   }
+   assert.equal(await page.locator('.signal-stage-result').count(),1);
+   assert.equal(await page.locator('.scene-reader, .task-main, .task-aside').count(),0);
+   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'stage '+n+' preview is isolated');
+   await page.locator('.signal-header [data-action="exit-test"]').click();
+   assert.equal(await page.locator('.studio-header').count(),1);
+  }
+  await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
   // Refresh must stay on the sales page regardless of saved game, tab or hash.
   for(const saved of [
    {started:true,callDone:false,stage:0,completed:[],messageOpened:true},

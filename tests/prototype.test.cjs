@@ -85,20 +85,21 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.faq-list details').count(),6);
  assert.equal(await page.locator('.character-card').count(),7);
  // Existing progress remains usable; the new optional panel cursor persists independently.
- await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}})));
+ await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{'cipher:before':1}})));
  await reloadAndResume(page);
- assert.ok((await page.locator('.task-main h1').textContent()).includes('Lístkov'));
- assert.equal(await page.locator('.contact.connected').count(),3);
- assert.equal(await page.locator('#answer').count(),game.stages[4].story.length>1?0:1,'puzzle appears on the last before-scene panel');
+ assert.ok((await page.locator('.signal-task h1').textContent()).includes('Lístkov'));
+ assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'old instruction screen is removed');
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).completed.length),3);
+ assert.equal(await page.locator('#answer').count(),1,'task opens directly at answer input');
  await readScene(page);
  assert.equal(await page.locator('#hints p').count(),1);
- const cursor=await page.locator('.reader-count').textContent();
- await reloadAndResume(page);assert.equal(await page.locator('.reader-count').textContent(),cursor);
+ const cursor=await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).scenePages['cipher:before']);
+ await reloadAndResume(page);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).scenePages['cipher:before']),cursor);
  // The home restart clears the entire saved journey and immediately opens a fresh incoming message.
  await page.locator('[data-action="home"]').click();
  assert.equal(await page.getByRole('button',{name:'Začať dobrodružstvo od začiatku',exact:false}).count(),1);
  await resume(page);
- assert.equal(await page.locator('.reader-count').textContent(),cursor,'continue preserves the current scene');
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).scenePages['cipher:before']),cursor,'continue preserves the current scene');
  assert.equal(await page.locator('#hints p').count(),1,'continue preserves hints');
  await page.locator('[data-action="home"]').click();
  await page.evaluate(()=>localStorage.setItem('zahada-prep-0','1'));
@@ -175,7 +176,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
   if(i===6){
-   assert.ok(!(await page.locator('.task-main').textContent()).includes('dve obrazovky rozžiarili'));
+   assert.ok(!(await page.locator('.signal-task').textContent()).includes('dve obrazovky rozžiarili'));
    await page.locator('[data-symbol="sun"]').click();await page.locator('[data-action="verify-sequence"]').click();
    assert.ok((await page.locator('#feedback').textContent()).includes('ešte nesedí'));
    await page.locator('[data-action="clear-sequence"]').click();await page.locator('[data-symbol="moon"]').click();
@@ -184,7 +185,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6)assert.equal(await page.locator('.success-character').count(),1);
-  if(i===4){await reloadAndResume(page);assert.equal(await page.locator('.success-card').count(),1,'reload does not lose unread resolution');}
+  if(i===4){await reloadAndResume(page);assert.equal(await page.locator('.success-card').count(),1,'reload preserves completed task confirmation');}
   const resolution=await readScene(page);entireJourney+=resolution;
   if(i===1){
    assert.equal(await page.locator('.signal-duo [aria-label="Piko"]').count(),1);
@@ -207,9 +208,11 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).stage),1);
    await reloadAndResume(page);assert.equal(await page.locator('.signal-connected').count(),1,'saved first puzzle restores new connection scene');
   }
-  if(i===4){assert.ok(resolution.includes('OCHRANA AKTÍVNA.'));assert.ok(resolution.includes('vôbec nie je pokazené'));}
-  if(i===6){assert.ok(resolution.includes('dve obrazovky rozžiarili'));assert.ok(resolution.includes('Takže to nebola porucha.'));}
-  if(i===8){assert.ok(resolution.includes('Ryško prechádza ako predposledný.'));assert.ok(resolution.includes('Piko. Poď.'));}
+  if(i>=2){
+   assert.equal(await page.locator('.signal-stage-result').count(),1,'direct result confirmation');
+   assert.equal(await page.locator('.signal-reward strong').textContent(),game.stages[i].reward);
+   assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'no duplicate narrative or task page');
+  }
   await page.locator('[data-action="next"]').click();
  }
  assert.equal(await page.locator('.finale').count(),1);entireJourney+=await readScene(page);
@@ -234,7 +237,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await kp.locator('[data-action="kvak-play"]').click();await kp.locator('#kvak-transcript[open]').waitFor();
  assert.ok((await kp.locator('#kvak-audio-status').textContent()).includes('nepodarilo'));
  assert.ok((await kp.locator('#kvak-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
- await kp.locator('[data-action="next"]').click();assert.equal(await kp.locator('.task-main h1').textContent(),game.stages[2].title);
+ await kp.locator('[data-action="next"]').click();assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[2].title);
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
   await kp.setViewportSize({width,height});await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[],hints:{}})));await reloadAndResume(kp);
   assert.equal(await kp.locator('.signal-restore').count(),1);await noOverflow(kp,`Kvak restore ${width}`);
@@ -320,6 +323,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: Kvak V4 six-digit chronological code, simulated QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete V2 dialogue journey, twist timing, seven safe returns, V1 saves, reader persistence, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Kvak V4 six-digit chronological code, simulated QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete eight-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
