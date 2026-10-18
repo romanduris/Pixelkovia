@@ -1,22 +1,31 @@
-# Pixelkovia: Stratený signál V4 + Tajný atlas
+# Pixelkovia V5 / Etapa 1 – funnel, rodičovský portál a storyboard
 
 Slovenská rodinná hra v domácnosti a samostatná ilustrovaná miniknižka. Statické HTML/CSS/JS, bez frameworku a aplikačných účtov. Literárnym zdrojom je úplný autorský dokument GAME STUDIO V2 dodaný používateľom.
 
 ## Spustenie a build
 
-Otvorte `index.html` alebo `atlas.html` priamo v prehliadači. Obe stránky fungujú aj bez siete. Pre HTTP náhľad spustite `python3 -m http.server 8080` v koreňovom priečinku.
+Otvorte `index.html` (predajná stránka), `parent.html` (rodičovský testovací náhľad), `storyboard.html` (interný vývojový náhľad) alebo `atlas.html` priamo v prehliadači. Hra a atlas fungujú aj bez siete; lokálne HTML nemusia medzi jednotlivými súbormi zdieľať úložisko. Pre HTTP náhľad spustite `python3 -m http.server 8080` v koreňovom priečinku.
 
 Nasadzovaný výstup pripraví `node scripts/prepare-static.mjs`. Kopíruje hlavnú stránku, atlas, tlačoviny, CSS, JavaScript aj `assets/` do ignorovaného `dist/`. Upravujte koreňové zdroje, nie `dist/`.
 
-## Predajná prezentácia, zákaznícka príprava a StoryBoard
+## Oddelené prostredia V5 / Etapa 1
 
-Každé nové otvorenie a refresh `index.html` zobrazí hlavnú predajnú stránku od vrchu. Uložená hra sa nespúšťa automaticky ani pri rozpracovanej správe. Tlačidlo **Pokračovať v dobrodružstve** na hlavnej stránke alebo v Príprave hry obnoví presne uložený postup. Pôvodný kľúč localStorage, nápovedy aj ID etáp zostávajú zachované.
+- **`index.html` – predajný funnel.** Hero s hodnotou produktu, cenou a CTA nad prvým mobilným posunom; pôvodné zábery aktivít, tri kroky, rodinné benefity, Pixelkovia, obsah balíka, cena, FAQ a záverečné CTA. Žiadna navigácia na prípravu, materiály, Atlas, storyboard, administráciu ani testovaciu hru. Ani rozpracovaný postup nezobrazí verejné tlačidlo na hranie. Všetky nákupné CTA používajú jedinú integračnú akciu `purchase` a otvárajú oznámenie **Predaj pripravujeme**, bez platby, objednávky či odomknutia hry. Cena základnej hry je 14,99 €; nie je zobrazená zľava ani predchádzajúca cena.
+- **`parent.html` – rodičovský testovací portál.** Uvítanie, stiahnutie všetkých aj jednotlivých materiálov, povinný checklist, presné rozmiestnenie stôp, pomoc rodičovi, upozornenie na telefón a testovací štart. Neodkazuje na funnel, storyboard ani administráciu. Pripravované rozšírenia: rozprávková knižka 4,99 €, Piko/Lístok/Kvak po 2,99 €, pracovný kompletný balík 19,99 €. Ich obsah ani nákup sa nepredstierajú a tlačidlá sú deaktivované. Existujúci Atlas zostáva bonusom po finále.
+- **`storyboard.html` – interný vývojový náhľad.** Desať pôvodných etáp, scény, odpovede, nápovedy, médiá, tlač jednotlivých listov a izolované testovanie. Interná navigácia vedie na funnel a rodičovský náhľad; budúca administrácia je len označenie „Pripravujeme“. Duplicitná veľká navigácia k Atlasu a kompletným materiálom je odstránená. Každá etapa je predvolene zbalená; po otvorení sa hneď ukazuje riešenie. Testovacie odkazy nemenia rodinný postup.
+- **`game.html` – adresa existujúceho herného rozhrania.** Štart z pripraveného portálu zachová používateľské gesto pre video/zvuk/fullscreen. Návrat do prehľadu vedie do rodičovského portálu. Nové načítanie tejto adresy otvorí prípravu; hra ani video sa nespúšťajú automaticky. Tlačidlo Pokračovať obnoví existujúci postup v rovnakom prehliadači. Herný kľúč `zahada-v1-progress`, ID etáp, odpovede, médiá a nápovedy zostávajú kompatibilné.
 
-Tri horné taby:
+### Checklist a rozhrania pre ďalšiu etapu
 
-- **Dobrodružstvo**: predajná prezentácia so zachovanou titulnou ilustráciou, ilustračnými zábermi rodinného riešenia, predstavením postáv, obsahom balíka, FAQ a plánovanou ponukou 14,99 € pri bežnej cene 19,99 €. Nákupné CTA otvára pravdivé oznámenie o pripravovanom predaji; platobný odkaz zatiaľ nebol dodaný.
-- **Príprava hry**: návrh zákazníckej sekcie po kúpe, uložený checklist, rola dospelého, samostatné PDF P1–P6 a diplom, náhľady tlačovín, umiestnenie štyroch obálok a oddelených stôp, kontrola nahrávok a spustenie hry. P1 je hotový list; neskoršie podklady sú označené ako pracovné.
-- **StoryBoard**: vývojársky priebeh všetkých desiatich etáp, odkaz na Atlas, materiály, pôvodné scény a riešenia, izolované testovanie etáp. Úvod má priamo prehrateľné Pikovo video a krátky prepis podľa dodaného TTS zadania; prepisy sú predvolene otvorené a pôvodné TTS zadania sú rozbaľovacie, predvolene zatvorené. Duplicitné kompletné scenáre Pika a Kvaka sa na stránke nezobrazujú. Prvá úloha má skutočný náhľad aj text kúpeľňového listu, záznamy a Kvakovo audio s presným textom. Každá etapa má hneď pod nadpisom viditeľný panel **Riešenie**: pri úlohách konkrétnu uznávanú odpoveď alebo poradie symbolov a vysvetlenie z herných dát, pri úvode úkryt prvej obálky. Panel sa zbalí spolu s celou etapou. Pri otvorení StoryBoardu sú všetky etapy predvolene zbalené; nadpisy a testovacie odkazy zostávajú dostupné. Tlač StoryBoardu zahŕňa aj obsah zbalených etáp.
+`prep-store.js` definuje dvanásť povinných krokov podľa aktuálnej logistiky štyroch obálok a samostatných P3/P5. Progress zobrazuje počet splnených krokov. Štart aj reštart sa odblokujú až po všetkých krokoch **a** samostatnom potvrdení o telefóne. Kontrola je aj v obsluhe akcie, nielen v atribúte `disabled`. Odškrtnutie kroku štart znovu blokuje.
+
+Nové stabilné kľúče `zahada-prep-v5-*` zachovajú tri rovnocenné staré zaškrtnutia (tlač, pomôcky, rozstrihanie P2). Pôvodný všeobecný krok rozmiestnenia automaticky nepotvrdzuje všetky nové jednotlivé úkryty. Staré kľúče ani herný postup sa nemažú. Pri nedostupnom localStorage funguje príprava v pamäti do opustenia stránky. API `read`, `write`, `snapshot`, `ready`, `scope` a `useAdapter` umožňuje neskôr pridať synchronizačný adaptér; teraz ide výlučne o lokálne dáta, bez synchronizácie medzi zariadeniami.
+
+`site-config.js` je spoločný katalóg cien, návrhov produktov a nákupného CTA. Má aj nezobrazovanú zamýšľanú budúcu cenu 29,99 €, nulovú referenčnú cenu/kampaň a rozhranie stavov `not-purchased`, `purchased`, `available`, `coming-soon`. Aktuálne doplnky sú vždy `coming-soon`; nič sa nepredáva ani neoznačuje za zakúpené. Budúci server musí dodať overené oprávnenia; aktuálny klient ich nevyrába.
+
+`SITE_CONFIG.access.mode` je `test`. Pri zmene na `production` sa portál, storyboard a herný vstup zastavia pred vykreslením obsahu a vyžadujú budúce serverové overenie. **Nie je to zabezpečenie statických súborov:** všetky publikované HTML, JS a PDF možno otvoriť priamou známou cestou v rámci prístupu k celej Site. Skryté odkazy, `noindex` ani klientsky režim nie sú autentifikácia. Pred skutočným predajom treba zaviesť serverové overenie a doručovanie súkromných dát/materiálov. Publikovanie zachováva pôvodné publikum Site a nemení ho na verejné.
+
+Etapa 1 neimplementuje dashboard, Cloudflare D1, platby, zákaznícke účty, Magic Link, cookies, priradenie telefónu ani e-mailové automatizácie. QR na P1 zostáva priznanou nefunkčnou maketou; funguje existujúci herný prechod a izolovaný simulovaný QR test v storyboarde.
 
 Pôvodné zadania pre **ElevenLabs v3** sú uložené v `GAME.voiceScripts` a zobrazené doslova v StoryBoarde, oddelene od hovoreného textu. Obsahujú emočné pokyny v hranatých zátvorkách aj charakter hlasov. Piko má krátku správu s piatimi replikami (cca 7 sekúnd), Kvak desať replík (cca 45–60 sekúnd). Prepisy `GAME.pikoMessage`, `GAME.kvakMessage` a Kvakova scéna vychádzajú z týchto podkladov. Pôvodné TTS zadania zostávajú zachované; aktuálne video bolo na žiadosť používateľa nahradené novým WhatsApp súborom. MPEG audio zostáva nezmenené.
 
@@ -27,10 +36,11 @@ Prezentačný obsah je v `site-content.js`, samostatné štýly v `presentation.
 Stiahnuteľné PDF v `assets/printables/` a skutočný náhľad `assets/kvak-sheet-preview.png` možno obnoviť z koreňového HTML/CSS:
 
 ```sh
-PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node scripts/export-printables.cjs
+python3 -m pip install --target /tmp/pixelkovia-pdf pypdf
+PYTHONPATH=/tmp/pixelkovia-pdf PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node scripts/export-printables.cjs
 ```
 
-Každý export overuje presne jednu A4. Voliteľný argument `p1` exportuje iba prvý list a jeho náhľad, bez prepisovania ostatných PDF. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; aktuálne `PicoVideo.mp4` je nové používateľom dodané WhatsApp video (približne 15 sekúnd), uložené pod pôvodnou hernou cestou.
+Každý export overuje presne jednu A4 a následne zloží spoločné `assets/printables/vsetky-materialy.pdf` z tých istých siedmich individuálnych PDF cez `scripts/bundle-printables.py`. Balík tak nemá samostatný zdroj obsahu. Samotné opätovné zloženie: `PYTHONPATH=/tmp/pixelkovia-pdf python3 scripts/bundle-printables.py`. Autorovacie závislosti sú mimo projektu; nasadená hra ich nepotrebuje. Voliteľný argument `p1` exportuje iba prvý list a jeho náhľad, bez prepisovania ostatných PDF. `assets/piko-video-poster.png` je náhľadový záber z existujúceho videa; aktuálne `PicoVideo.mp4` je nové používateľom dodané WhatsApp video (približne 15 sekúnd), uložené pod pôvodnou hernou cestou.
 
 ## Príbeh a hranie
 
@@ -78,7 +88,8 @@ Iskrine pásiky stále skladajú „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJ
 ## Príbehový model a súbory
 
 - `game-data.js`: jediný zdroj scén. `stages[].story` sú panely pred úlohou, `resolution` sú panely po správnej odpovedi. Panel je pole autorských riadkov, ktoré rozhranie rozlíši na rozprávača, dialóg a svetelný odkaz. `GAME.call` odkazuje na tie isté panely úvodu, neduplikuje samostatný skrátený telefonát. `dramaturgy` je viditeľná iba v Game Masterovi. Finále má samostatnú Pikovu `invitation`.
-- `app.js`: displej s videosprávou, čítačka scén, validácia ôsmich úloh, zápisník, mapa, lokálny postup, príprava a kompletný Game Master.
+- `site-config.js` a `prep-store.js`: spoločný produktový katalóg, nákupný integračný bod a lokálny adaptér prípravy.
+- `app.js`: oddelenie prostredí, kontrola spustenia, displej s videosprávou, čítačka scén, validácia ôsmich úloh, zápisník, mapa, lokálny postup, príprava a kompletný Game Master.
 - `atlas.html` + `atlas.css`: samostatná miniknižka. Všetkých 143 odsekov kapitoly Tajný svet Pixelkov a dva úplné literárne odseky každého zo siedmich profilov sú priamo v HTML; na čítanie netreba JavaScript ani uložený postup. Názvoslovie a súvisiaca gramatika boli prispôsobené schválenému názvu Ochranné pole.
 - `printables.html` + `signal-print.css`: finálny jednostranný Kvakov P1 vo formáte A4, pôvodné hlavolamy P2–P6 a diplom. Biele/svetlé plochy, tmavomodrý text, obrysy, oficiálny výrez Kvaka a malé akcenty šetria atrament. Význam nespolieha na farbu. Hráčsky odkaz `?sheet=p1` zobrazí a vytlačí iba daný list bez neskorších indícií.
 - `styles.css` + `adventure.css`: základné rozloženie a existujúci pixel-art vzhľad vrátane V2 čítačky.
@@ -86,7 +97,7 @@ Iskrine pásiky stále skladajú „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJ
 
 ## Bonusový atlas a Game Master
 
-Hráč dostane CTA **OBJAVIŤ TAJNÝ SVET PIXELKOV** až na úspešnej obrazovke finále. Úvod, hráčska navigácia ani bežné úlohy atlas neodkazujú. Game Master má odkaz kedykoľvek ako zámernú rodičovskú výnimku. Samotné `atlas.html` nie je uzamknuté hrou a dá sa priamo otvoriť alebo zdieľať bez hrania.
+Hráč dostane CTA **OBJAVIŤ TAJNÝ SVET PIXELKOV** až na úspešnej obrazovke finále. Úvod, hráčska navigácia ani bežné úlohy atlas neodkazujú. Storyboard nemá samostatný hromadný odkaz na Atlas; rodičovská výnimka sa v tejto etape nerozširuje do predajnej navigácie. Samotné `atlas.html` nie je uzamknuté hrou a dá sa priamo otvoriť alebo zdieľať bez hrania.
 
 StoryBoard obsahuje úvodnú videosprávu, prepisy Pika a Kvaka, pôvodné TTS zadania a od Iskrinej etapy úplné autorské scény pred aj po úlohách, pozvánku, dramaturgiu, odpovede, dve nápovedy ku každej úlohe, tri úvodné rodičovské nápovedy, bezpečnostné pokyny a prechody. Každý celý blok (Úvod, úlohy 1–8 aj Finále) sa dá samostatne zbaliť šípkou pri nadpise. Nadpis a tlačidlo Otestovať zostávajú dostupné; rozbalenie zachová vnútorné nastavenie prepisov a TTS. Pri zbalení sa pozastavia médiá vo vnútri bloku. Bloky sú predvolene zbalené. Testovanie etapy je dočasné a nemení rodinný postup. Je to interná obrazovka s riešeniami, bez vlastného zabezpečenia.
 
@@ -104,6 +115,7 @@ npm install --prefix /tmp/pixelkovia-qa playwright
 # V inom termináli: python3 -m http.server 8080
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/prototype.test.cjs
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/presentation.test.cjs
+PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node tests/stage1.test.cjs
 node tests/mission-data.test.cjs
 ```
 

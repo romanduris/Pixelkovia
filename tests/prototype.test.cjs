@@ -55,11 +55,12 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  }
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  async function resume(p){
-  if(!await p.locator('[data-action="start"]').count())await p.locator('.site-header [data-view="prep"]').click();
+  if(!await p.locator('[data-action="start"]').count())await p.goto(new URL('parent.html', p.url()).href);
+  for(const check of await p.locator('[data-check]').all())await check.check();
   await p.locator('[data-action="start"]').click();
  }
  async function reloadAndResume(p){
-  await p.reload();assert.equal(await p.locator('.sales-hero').count(),1,'refresh always opens sales page');
+  await p.goto(new URL('parent.html', p.url()).href);assert.equal(await p.locator('.portal-header').count(),1,'explicit customer entry preserves saved progress');
   assert.equal(await p.locator('dialog[open]').count(),0,'refresh never autoplays a saved message');
   await resume(p);
  }
@@ -82,7 +83,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await noAtlas();
  await page.screenshot({path:'/tmp/mystery-home-desktop.png',fullPage:true});
  assert.equal(await page.locator('.chapter-card').count(),0,'sales page contains no game map spoilers');
- assert.equal(await page.locator('.faq-list details').count(),6);
+ assert.equal(await page.locator('.faq-list details').count(),9);
  assert.equal(await page.locator('.character-card').count(),7);
  // Existing progress remains usable; the new optional panel cursor persists independently.
  await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{'cipher:before':1}})));
@@ -110,13 +111,13 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-prep-0')),'1','restart keeps parent preparation');
  await reloadAndResume(page);assert.equal(await page.locator('.message-incoming').count(),1,'explicit continue retains the restarted game');
  await page.locator('.message-status [data-action="close"]').click();
- assert.equal(await page.locator('.sales-hero').count(),1);
+ assert.equal(await page.locator('.portal-header').count(),1);
 
  await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));
  await page.reload();
- await page.locator('.site-header [data-view="designer"]').click();
+ await page.goto(BASE+'/storyboard.html');
  assert.equal(await page.locator('.storyboard').count(),10);
- assert.equal(await page.locator('.gm-atlas').count(),1);
+ assert.equal(await page.locator('.gm-atlas').count(),0);
  assert.ok((await page.locator('#gm-cipher').textContent()).includes('OCHRANA AKTÍVNA.'));
  assert.equal(await page.locator('#gm-intro .gm-dramaturgy, #gm-envelope .gm-dramaturgy').count(),0,'first two duplicate scenarios are omitted');
  assert.equal(await page.locator('#gm-document .gm-dramaturgy').count(),1,'later dramaturgy stays available');
@@ -129,7 +130,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.locator('[data-action="test"][data-stage="0"]').click();await page.locator('.message-status [data-action="close"]').click();
  assert.equal(await page.locator('.storyboard').count(),10,'intro preview returns to GM');
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
- await page.locator('.site-header [data-view="sales"]').click();
+ await page.goto(BASE);
  await resume(page);
  assert.equal(await page.locator('.message-incoming').count(),1);
  assert.ok(!(await page.locator('.message-screen').textContent()).includes('kúpeľ'));
@@ -262,7 +263,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await kp.waitForFunction(()=>!document.querySelector('#app').classList.contains('is-entering-answer'));
   }
   await kp.screenshot({path:`/tmp/kvak-restore-${width}.png`});
-  await kp.locator('.signal-header [data-action="home"]').click();assert.equal(await kp.locator('.sales-hero').count(),1);
+  await kp.locator('.signal-header [data-action="home"]').click();assert.equal(await kp.locator('.portal-header').count(),1);
   await resume(kp);await kp.locator('#answer').fill('741296');await kp.locator('.answer-form button').click();
   await noOverflow(kp,`Kvak connection ${width}`);await kp.screenshot({path:`/tmp/kvak-connection-${width}.png`});
  }
@@ -270,9 +271,9 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  // Narrow phone, phone, tablet and desktop layouts.
  for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:844});await noOverflow(page,`home ${width}`);}
  await resizePlayerViewport({width:390,height:844});await page.screenshot({path:'/tmp/mystery-home-mobile.png',fullPage:true});
- await page.locator('.site-header [data-view="prep"]').click();await noOverflow(page,'mobile prep');await noAtlas();
- await page.locator('[data-check="0"]').check();await page.reload();await page.locator('.site-header [data-view="prep"]').click();assert.ok(await page.locator('[data-check="0"]').isChecked());
- await page.locator('.site-header [data-view="designer"]').click();await noOverflow(page,'mobile GM');
+ await page.goto(BASE+'/parent.html');await noOverflow(page,'mobile prep');await noAtlas();
+ await page.locator('[data-check="printed"]').check();await page.reload();await page.goto(BASE+'/parent.html');assert.ok(await page.locator('[data-check="printed"]').isChecked());
+ await page.goto(BASE+'/storyboard.html');await noOverflow(page,'mobile GM');
  await page.locator('[data-action="test"][data-stage="6"]').click();await readScene(page);await noOverflow(page,'mobile task');await noAtlas();
  await page.screenshot({path:'/tmp/mystery-task-mobile.png',fullPage:true});
  await page.goto(BASE+'/printables.html');assert.equal(await page.locator('.sheet').count(),7);assert.equal(await page.locator('#circles svg').count(),2);await noOverflow(page,'mobile printables');
@@ -327,7 +328,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.ok(!(await guest.locator('.message-screen').textContent()).includes('kúpeľ'));
  assert.ok(!(await guest.locator('[data-action="finish-call"]').isVisible()),'failed media does not reveal next task');
  await guest.locator('.message-status [data-action="close"]').click();
- assert.equal(await guest.locator('.hero').count(),1);assert.deepEqual(guestErrors,[]);await restricted.close();
+ assert.equal(await guest.locator('.portal-header').count(),1);assert.deepEqual(guestErrors,[]);await restricted.close();
  // Incoming and opened messages fill small phones and landscape without horizontal overflow.
  await page.goto(BASE);await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){

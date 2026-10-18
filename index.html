@@ -4,19 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1021">
-  <meta name="description" content="Pixelkovia: Stratený signál. Pixelkovia potajomky žijú v každej domácnosti s mobilom, tabletom, počítačom či TV. Piko po veľkom bliknutí stratil spojenie s kamarátmi. Odhaľte, čo sa stalo, a nájdite bezpečnú cestu domov.">
+  <meta name="description" content="Interaktívne rodinné dobrodružstvo u vás doma: ukryté obálky, papierové hlavolamy a príbeh na telefóne. Pre deti 7–13 rokov, približne 45–60 minút.">
   <title>Záhada u vás doma — Pixelkovia: Stratený signál</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="adventure.css">
   <link rel="stylesheet" href="presentation.css">
   <script defer src="game-data.js"></script>
+  <script defer src="site-config.js"></script>
+  <script defer src="prep-store.js"></script>
   <script defer src="site-content.js"></script>
   <script defer src="app.js"></script>
 </head>
-<body>
+<body data-environment="sales">
   <header class="site-header">
     <a class="brand" href="#" aria-label="Záhada u vás doma, úvod"><span class="brand-mark">›_</span><span>ZÁHADA<span class="brand-sub">U VÁS DOMA</span></span></a>
-    <nav aria-label="Hlavná navigácia"><button class="nav-link active" data-view="sales">Dobrodružstvo</button><button class="nav-link" data-view="prep">Príprava hry <span class="parent-tag">PRE RODIČOV</span></button><button class="nav-link" data-view="designer">StoryBoard <span class="parent-tag">VÝVOJ</span></button></nav>
+    <nav aria-label="Hlavná navigácia"><a class="nav-link" href="#ako-sa-hra">Ako sa hrá</a><a class="nav-link" href="#balik">Čo dostanete</a><a class="nav-link" href="#otazky">Otázky</a><button class="btn small nav-purchase" data-action="purchase">Zažiť dobrodružstvo</button></nav>
   </header>
   <main id="app"></main>
   <footer class="site-footer"><span>Malé postavičky. Veľké dobrodružstvo.</span><span>ZÁHADA U VÁS DOMA <span class="footer-dot">·</span> PIXELKOVIA · STRATENÝ SIGNÁL</span></footer>

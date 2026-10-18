@@ -9,24 +9,28 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   const page=await context.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE);
-  assert.equal(await page.locator('.site-header [data-view]').count(),3);
-  assert.equal(await page.locator('.site-header [data-view="designer"]').textContent(),'StoryBoard VÝVOJ');
+  assert.equal(await page.locator('.site-header [data-view]').count(),0);
   assert.equal(await page.locator('.hero-background').getAttribute('src'),'assets/pixelkovia-room.png');
-  assert.equal(await page.locator('.faq-list details').count(),6);
+  assert.equal(await page.locator('.faq-list details').count(),9);
   assert.equal(await page.locator('.activity-story img').count(),2);
   assert.ok(!(await page.locator('#app').textContent()).includes('741296'));
   assert.equal(await page.locator('a[href="atlas.html"]').count(),0);
-  await page.locator('.hero a[href="#balik"]').click();
+  assert.equal(await page.locator('a[href="parent.html"],a[href="storyboard.html"],a[href="game.html"],[data-action="start"],[data-view]').count(),0);
   assert.equal(await page.locator('.offer-price strong').textContent(),'14,99 €');
-  await page.locator('[data-action="purchase"]').click();
-  assert.ok((await page.locator('.purchase-preview').textContent()).includes('Predaj ešte nie je spustený'));
-  await page.locator('[data-action="preview-customer"]').click();
+  for(const button of await page.locator('[data-action="purchase"]').all()){
+    await button.click();
+    assert.ok((await page.locator('.purchase-preview').textContent()).includes('Predaj pripravujeme'));
+    assert.equal(await page.locator('dialog a,dialog [data-action="preview-customer"]').count(),0);
+    await page.locator('.dialog-close').click();
+  }
+  await page.goto(BASE+'/parent.html');
   assert.equal(await page.locator('.portal-header').count(),1);
   assert.equal(await page.locator('.material-card').count(),6);
-  assert.equal(await page.locator('[data-check]').count(),6);
+  assert.equal(await page.locator('[data-check]').count(),13);
   assert.equal(await page.locator('.prep-table tbody tr').count(),5);
-  assert.ok((await page.locator('.prototype-access').textContent()).includes('overenie nákupu ešte nie sú pripojené'));
-  await page.locator('[data-check="0"]').check();
+  assert.ok((await page.locator('.prototype-access').textContent()).includes('Nie je produkčne chránený'));
+  assert.ok(await page.locator('[data-action="start"]').isDisabled());
+  await page.locator('[data-check="printed"]').check();
   for(const id of ['p1','p2','p3','p4','p5','p6','diplom']){
    const link=page.locator(`a[download][href="assets/printables/${id}.pdf"]`);assert.equal(await link.count(),1);
    const response=await page.request.get(BASE+'/assets/printables/'+id+'.pdf');assert.equal(response.status(),200);
@@ -39,8 +43,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   await page.waitForFunction(()=>{const a=document.querySelector('dialog audio');return a&&!a.paused&&a.currentTime>0});
   await page.locator('.dialog-close').click();
   assert.ok(await page.locator('dialog audio').evaluate(a=>a.paused));
-  await page.locator('.site-header [data-view="designer"]').click();
-  assert.equal(await page.locator('.storyboard').count(),10);assert.equal(await page.locator('.gm-atlas').count(),1);
+  await page.goto(BASE+'/storyboard.html');
+  assert.equal(await page.locator('.storyboard').count(),10);assert.equal(await page.locator('.gm-atlas').count(),0);
   const blocks=page.locator('.studio-timeline>.storyboard');
   assert.equal(await blocks.locator('.storyboard-toggle[aria-expanded="false"]').count(),10,'all stages start collapsed');
   for(const block of await blocks.all()){
@@ -59,6 +63,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   }
   assert.equal(await page.locator('details.tts-block:not([open])').count(),2,'TTS prompts start collapsed');
   assert.equal(await page.locator('.script-copy[open]').count(),2,'both spoken transcripts start expanded');
+  assert.equal(await page.locator('#gm-intro .studio-early-help li').count(),3);
+  assert.equal(await page.locator('#gm-envelope .studio-early-help li').count(),2);
   assert.equal(await page.locator('#gm-intro .studio-stage-details, #gm-envelope .studio-stage-details').count(),0,'duplicate full scenarios are absent from the first two sections');
   assert.equal(await page.locator('#gm-document .studio-stage-details').count(),1,'later scenarios remain available');
   await page.locator('[data-tts="piko"]>summary').click();
@@ -146,20 +152,20 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    {started:true,callDone:true,stage:9,completed:[1,2,3,4,5,6,7,8]}
   ]){
    await page.evaluate(saved=>{localStorage.setItem('zahada-v1-progress',JSON.stringify(saved));location.hash='gm-envelope';scrollTo(0,1000);},saved);
-   await page.reload();
+   await page.goto(BASE);
    assert.equal(await page.locator('.sales-hero').count(),1);assert.equal(await page.locator('dialog[open]').count(),0);
    assert.equal(await page.evaluate(()=>location.hash),'');assert.equal(await page.evaluate(()=>scrollY),0);
    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')));assert.deepEqual(stored,saved,'refresh does not change saved progress');
   }
-  await page.locator('.site-header [data-view="prep"]').click();assert.ok(await page.locator('[data-check="0"]').isChecked());
+  await page.goto(BASE+'/parent.html');assert.ok(await page.locator('[data-check="printed"]').isChecked());
   for(const width of [320,390,768,1440]){
    await page.setViewportSize({width,height:900});
    for(const view of ['sales','prep','designer']){
-    await page.locator(`.site-header [data-view="${view}"]`).click();
+    await page.goto(BASE+'/'+({sales:'index.html',prep:'parent.html',designer:'storyboard.html'}[view]));
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),view+' '+width);
    }
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: three tabs, preserved hero, sales offer and honest purchase state, seven PDF downloads, customer checklist, playable StoryBoard media, exact worksheet copy, exact original ElevenLabs TTS prompts, refresh-to-home without save loss, mobile and desktop.');
+  console.log('PASS: separate entries, preserved hero, sales offer and isolated purchase state, seven PDF downloads, customer checklist, playable StoryBoard media, exact worksheet copy, exact original ElevenLabs TTS prompts, refresh-to-home without save loss, mobile and desktop.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

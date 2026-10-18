@@ -25,5 +25,7 @@ const {pathToFileURL}=require('node:url');
    if(id==='p1')await page.locator('#p1').screenshot({path:path.join(root,'assets/kvak-sheet-preview.png')});
    console.log(`${id}: exported one A4 page`);
   }
+  const result=require('node:child_process').spawnSync('python3',[path.join(root,'scripts/bundle-printables.py')],{stdio:'inherit'});
+  if(result.status!==0)throw new Error('Bundle generation failed. Install the authoring dependency pypdf; see README.');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1);});
