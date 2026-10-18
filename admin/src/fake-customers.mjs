@@ -4,6 +4,11 @@ import {createOrder,saveChecklist,portalVisit,activate,gameEvent} from './game-s
 import {stages} from './game-rules.mjs';
 import {checklist} from './checklist.mjs';
 export const FAKE_BATCH='fake-tq-15-v1';
+export const FAKE_NAMES=[
+  'Jana Kováčová','Peter Novák','Lucia Horváthová','Martin Varga','Zuzana Poláková',
+  'Tomáš Baláž','Eva Urbanová','Michal Šimko','Katarína Králiková','Marek Farkaš',
+  'Andrea Bartošová','Filip Kováčik','Lenka Mikušová','Daniel Švec','Simona Hudecová'
+];
 export async function fakeCustomerCount(db){
   return (await first(db,"SELECT COUNT(*) n FROM customers c WHERE EXISTS(SELECT 1 FROM audit_events a WHERE a.entity_id=c.id AND a.action='fake_customer_created')")).n;
 }
@@ -15,7 +20,7 @@ export async function seedFakeCustomers(db,{local=false,at=Date.now()}={}){
     const type=index<5?'purchased':index<10?'playing':'completed';
     const purchase=at-(16-index)*86400000;
     const started=at-(4+index%5)*3600000;
-    await execute(db,'INSERT INTO customers VALUES(?,?,?,?)',key+'-customer',`fake.rodina${number}@example.invalid`,`FAKE · Rodina ${number}`,purchase);
+    await execute(db,'INSERT INTO customers VALUES(?,?,?,?)',key+'-customer',`fake.rodina${number}@example.invalid`,`FAKE · ${FAKE_NAMES[index]}`,purchase);
     await execute(db,'INSERT INTO audit_events VALUES(?,?,?,?,?)',key+'-audit','explicit-user-request','fake_customer_created',key+'-customer',at);
     const order=await createOrder(db,{id:key+'-order',customerId:key+'-customer',productId:'episode-1',externalReference:key+'-FAKE-payment',at:purchase});
     const right=await first(db,'SELECT e.* FROM entitlements e JOIN order_items i ON i.id=e.order_item_id WHERE i.order_id=?',order.id);
