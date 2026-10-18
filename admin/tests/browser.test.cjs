@@ -1,0 +1,36 @@
+const assert=require('node:assert/strict');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const BASE=process.env.ADMIN_BASE_URL||'http://127.0.0.1:8787';
+(async()=>{const browser=await chromium.launch();try{
+ const page=await browser.newPage({viewport:{width:1512,height:1100}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(BASE);await page.locator('.metric').first().waitFor();
+ assert.equal(await page.locator('.metric').count(),10);
+ assert.ok((await page.locator('#environment-banner').innerText()).includes('fiktívne'));
+ assert.equal(await page.locator('.funnel-cell').count(),8);
+ assert.equal(await page.locator('#external-links a').count(),5);
+ for(const link of await page.locator('#external-links a').all())assert.ok((await link.getAttribute('href')).includes('internalPreview=1'));
+ await page.screenshot({path:'/tmp/treasurequest-admin-dashboard.png',fullPage:true});
+ await page.locator('[data-page="customers"]').click();await page.locator('[data-customer]').first().waitFor();
+ assert.equal(await page.locator('.customer-table tbody tr').count(),18);
+ await page.locator('#customer-search').fill('rodina4@');
+ await page.waitForFunction(()=>document.querySelectorAll('.customer-table tbody tr').length===1);
+ assert.ok((await page.locator('.customer-table').innerText()).includes('Martin Vzorový'));
+ await page.locator('[data-customer]').click();await page.waitForFunction(()=>document.querySelector('#detail-title')?.textContent==='Martin Vzorový');
+ assert.equal(await page.locator('#detail [data-customer]').count(),0);
+ assert.ok((await page.locator('#detail-content').innerText()).includes('ELAPSED'));
+ assert.ok((await page.locator('#detail-content').innerText()).includes('Celkové trvanie'));
+ await page.screenshot({path:'/tmp/treasurequest-admin-detail.png'});
+ await page.locator('#close-detail').click();
+ await page.locator('#customer-search').fill('');await page.waitForFunction(()=>document.querySelectorAll('.customer-table tbody tr').length===18);
+ await page.locator('#customer-state').selectOption('preparing');await page.waitForFunction(()=>document.querySelectorAll('.customer-table tbody tr').length===3);
+ await page.locator('[data-page="analytics"]').click();await page.waitForFunction(()=>document.querySelectorAll('#view tbody tr').length===8);
+ assert.ok((await page.locator('#view').innerText()).includes('90 sekúnd'));
+ await page.locator('[data-page="emails"]').click();await page.locator('.email-grid').waitFor();assert.equal(await page.locator('.email-grid .panel').count(),8);assert.ok(await page.locator('#filters').isHidden());assert.equal(await page.locator('.email-grid button').count(),0);
+ await page.locator('[data-page="dashboard"]').click();await page.locator('.metric').first().waitFor();
+ await page.locator('#product').selectOption('kvak-mission');await page.locator('#filters .button[type="submit"]').click();await page.waitForFunction(()=>document.querySelector('.metric strong')?.textContent==='0');assert.equal(await page.locator('.bar').count(),0);
+ await page.locator('#clear-filters').click();await page.waitForFunction(()=>document.querySelector('.metric strong')?.textContent==='18');
+ for(const width of [320,390,768,1512]){await page.setViewportSize({width,height:950});for(const route of ['dashboard','customers','analytics','emails']){await page.goto(BASE+'/#'+route);await page.waitForFunction(()=>document.querySelector('#view[aria-busy="false"]'));assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route+' '+width);}}
+ await page.setViewportSize({width:390,height:844});await page.goto(BASE+'/#customers');await page.locator('[data-customer]').first().waitFor();await page.screenshot({path:'/tmp/treasurequest-admin-phone.png'});
+ assert.deepEqual(errors,[]);console.log('PASS: real local Worker/D1 dashboard, 18 labeled demo customers, search/status/product filters, customer detail, eight-stage analytics, disabled email sending, desktop and mobile layouts.');
+}finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

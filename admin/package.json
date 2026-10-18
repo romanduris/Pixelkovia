@@ -1,0 +1,19 @@
+{
+  "name": "treasurequest-admin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local --ip 127.0.0.1 --config wrangler.jsonc",
+    "migrate:local": "wrangler d1 migrations apply treasurequest-local --local --config wrangler.jsonc",
+    "demo:local": "node scripts/seed-demo.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build:check": "wrangler deploy --dry-run --config wrangler.jsonc --outdir .build-check"
+  },
+  "dependencies": {
+    "jose": "6.2.12"
+  },
+  "devDependencies": {
+    "miniflare": "5.20261012.1-beta",
+    "wrangler": "4.151.1"
+  }
+}

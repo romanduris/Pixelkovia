@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "treasurequest-local",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-10-18",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {"directory": "public", "binding": "ASSETS", "run_worker_first": true},
+  "vars": {"ENVIRONMENT": "local", "DEMO_MODE": "false", "WEB_URL": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site"},
+  "d1_databases": [{"binding": "TQ_DB", "database_name": "treasurequest-local", "database_id": "local-only-not-a-cloudflare-id", "migrations_dir": "migrations"}]
+}

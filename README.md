@@ -2,6 +2,12 @@
 
 Slovenská rodinná hra v domácnosti a samostatná ilustrovaná miniknižka. Statické HTML/CSS/JS, bez frameworku a aplikačných účtov. Literárnym zdrojom je úplný autorský dokument GAME STUDIO V2 dodaný používateľom.
 
+## V5 / Etapa 2 – lokálna administrácia
+
+Nový [TreasureQuest Admin](admin/README.md) má dashboard, zákazníkov/detail, objednávky, hernú analytiku, e-mailové koncepty, Worker API a samostatné D1 migrácie. [Ukážka](admin/docs/dashboard-preview.png) obsahuje iba fiktívne lokálne dáta. [Inventúra a schvaľovací plán](admin/docs/DEPLOYMENT.md) zaznamenávajú oddelenie od existujúcich Cloudflare projektov.
+
+Produkčné Cloudflare zdroje ani Access sa zatiaľ nevytvárali. Administrácia zostáva lokálna; `admin/` sa **nekopíruje do `dist/`**. Existujúca hra, lokálny postup a `.openai/hosting.json` zostávajú zachované. Storyboard má na loopback náhľade návrat do lokálneho adminu; na publikovanej Site zostáva admin odkaz neaktívny, kým nebude schválené bezpečné nasadenie. Verejný funnel a rodičovský portál na admin neodkazujú.
+
 ## Spustenie a build
 
 Otvorte `index.html` (predajná stránka), `parent.html` (rodičovský testovací náhľad), `storyboard.html` (interný vývojový náhľad) alebo `atlas.html` priamo v prehliadači. Hra a atlas fungujú aj bez siete; lokálne HTML nemusia medzi jednotlivými súbormi zdieľať úložisko. Pre HTTP náhľad spustite `python3 -m http.server 8080` v koreňovom priečinku.

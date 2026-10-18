@@ -22,6 +22,13 @@
   const purchase = {action:'purchase', label:`ZAŽIŤ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'coming-soon'};
   // Production is deliberately fail-closed until real server purchase verification exists.
   const access = {mode:'test', canLaunch: preparationReady => access.mode === 'test' && preparationReady};
+  const management = {url:null, localPreviewUrl:'http://127.0.0.1:8787'};
+  const managementUrl = () => {
+    const local = ['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+    const value = management.url || (local ? management.localPreviewUrl : null);
+    if (!value) return null;
+    try {const url = new URL(value);return url.protocol === 'https:' || (local && url.origin === management.localPreviewUrl) ? url.href : null;} catch (_) {return null;}
+  };
   const purchaseHTML = () => `<div class="purchase-preview"><span class="section-kicker">PIXELKOVIA / VAŠA RODINNÁ VÝPRAVA</span><h2>Predaj pripravujeme</h2><p>Dobrodružstvo u vás doma bude dostupné za <strong>${money(product('episode-1').priceCents)}</strong>.</p><p>Predaj ešte nie je spustený. Na tejto stránke neprijímame platby ani nevytvárame objednávky.</p><div class="purchase-summary">✉ Papierové stopy doma<br>▷ Interaktívny príbeh na telefóne<br>♡ Spoločný čas s rodinou</div><button class="btn" data-action="close">Rozumiem, teším sa na dobrodružstvo</button></div>`;
-  window.SITE_CONFIG = {products, product, money, states, productState, purchase, access, purchaseHTML};
+  window.SITE_CONFIG = {products, product, money, states, productState, purchase, access, purchaseHTML, management, managementUrl};
 })();
