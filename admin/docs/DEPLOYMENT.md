@@ -1,5 +1,7 @@
 # Cloudflare nasadenie TreasureQuest
 
+**Aktuálne:** produkčný admin obsahuje 15 výslovne vyžiadaných FAKE zákazníkov; preview zostáva prázdny. Pozri poslednú časť tohto dokumentu.
+
 Používateľ 18. 10. 2026 schválil samostatné zdroje v nižšie uvedenom účte a zvolil **prihlásenie iba heslom bez e-mailu a Access**. Po vytvorení databáz výslovne potvrdil obe presné UUID a migrácie. Pôvodný všeobecný súhlas nenahrádzal toto druhé potvrdenie.
 
 ## Overený účet a existujúce zdroje
@@ -35,7 +37,7 @@ Produkcia: https://treasurequest-admin.livingstones-romanduris.workers.dev
 
 Preview: https://treasurequest-admin-preview.livingstones-romanduris.workers.dev
 
-API používa rovnaký host pod `/api/admin/`. Budúce `/api/customer/` ostáva vypnuté bez privátneho identity service bindingu. Verejná hra a rodičovský portál neodosielajú produkčné udalosti. Produkcia ani preview neobsahujú demo zákazníkov.
+API používa rovnaký host pod `/api/admin/`. Budúce `/api/customer/` ostáva vypnuté bez privátneho identity service bindingu. Verejná hra a rodičovský portál neodosielajú produkčné udalosti. Pri prvom nasadení produkcia ani preview neobsahovali demo zákazníkov; neskorší výslovne vyžiadaný import 15 FAKE zákazníkov je zaznamenaný nižšie.
 
 ## Vykonané a overované poradie
 
@@ -77,7 +79,7 @@ Agregačné prehľady načítavajú filtrovanú kohortu a počítajú medián na
 - E-mailový poskytovateľ, odhlasovanie a personalizované diplomy.
 - Schválený limit nedokončenej hry.
 
-Tieto body sa nesimulujú vo verejnom webe. Fiktívne udalosti ostávajú iba v lokálnej demo DB.
+Tieto body sa nesimulujú vo verejnom webe. Pôvodný 18-členný demo seed ostáva iba lokálny. Výslovne vyžiadaný import 15 FAKE zákazníkov do produkcie je opísaný nižšie.
 
 ## Výsledok nasadenia 18. 10. 2026
 
@@ -93,3 +95,16 @@ Oba hosty sú nasadené a overené. Aktívne verzie pri odovzdaní:
 - Živé HTTP kontroly oboch hostov potvrdili 401 pre anonymné admin API, presmerovanie chránených assetov, funkčné login assety, odmietnutie nesprávneho hesla a cudzieho Origin, zneplatnenie odhlásenej cookie a 501 pre nezapojené zákaznícke API.
 - Testy etapy 1 a hernej logistiky prešli po nastavení odkazu zo storyboardu.
 - Záverečná inventúra potvrdila pôvodné modification timestamps a bindings `flightscanner-contact` a `livingstones-api`, pôvodné D1 UUID, Pages, KV a domény bez zmien. DNS sa nemenilo.
+
+## Výslovne vyžiadaný import 15 FAKE zákazníkov – 18. 10. 2026
+
+Používateľ požiadal o fiktívnych zákazníkov priamo v DB s rôznym priebehom hry. Táto výslovná požiadavka povoľuje nižšie uvedené označené skúšobné dáta v produkcii. Nenahrádza budúce skutočné platby ani zákaznícke meranie.
+
+- Cieľ výhradne `treasurequest-db` / `a92475ad-b1e6-4a92-90dd-76e9b8e95b7a` v schválenom účte. Pred importom bolo 0 zákazníkov a 0 kolízií prefixu `fake-tq-15-v1-`.
+- Vložených 15 zákazníkov `FAKE · Rodina 01` až `15`, každý s fiktívnym `@example.invalid` e-mailom a auditom `fake_customer_created`. Päť iba s nákupom, päť s rozhranými úlohami 2–6 a päť s dokončenými ôsmimi úlohami.
+- 15 simulovaných objednávok, 10 herných relácií, návštevy portálu, checklisty, časy, pokusy a nápovedy. Bez reálnej platby a bez odosielania e-mailov. Tržby v prehľade zahŕňajú 224,85 € simulovaných nákupov; viditeľný FAKE banner to výslovne uvádza.
+- Dáta sa najprv vytvorili v pamäti, exportovali ako INSERT-only SQL a overili importom do čistej lokálnej schémy. Samostatný vzdialený import prešiel cez Wrangler proti presnému UUID s čerstvou kontrolou kolízií. Nevznikla schéma ani nová databáza, existujúce riadky sa nemenili.
+- Následné čítanie produkčnej DB cez rovnaké analytické funkcie potvrdilo 15 označených zákazníkov a rozdelenie `purchased=5`, `playing=5`, `completed=5`; cudzie kľúče bez chýb. Preview má stále 0 zákazníkov. Anonymný admin context vracia 401.
+- Všetkých 17 backendových testov prešlo. Lokálny prehliadač overil FAKE banner, filtre po piatich zákazníkoch, načítaný detail a mobilné zobrazenie. Na kontrolu sa nemenilo produkčné heslo.
+- Nové Worker verzie s FAKE bannerom: produkcia `8737ab24-d66f-47dd-b92f-04730af08310`, preview `55785e35-f8b0-49dc-b88e-7eefb987443e`.
+- Kontrolná GET inventúra potvrdila pôvodné modification timestamps a bindings oboch nesúvisiacich Workerov, D1 identifikátory a domény bez zmien.

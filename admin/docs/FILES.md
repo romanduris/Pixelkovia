@@ -46,3 +46,9 @@ Doplnenie prihlásenia iba heslom:
 - `admin/src/password-auth.mjs`
 - `admin/tests/password.test.mjs`
 - `admin/tests/password-browser.test.cjs`
+
+Doplnenie výslovne vyžiadaných FAKE zákazníkov:
+
+- `admin/src/fake-customers.mjs`
+- `admin/scripts/prepare-fake-customers.mjs`
+- `admin/tests/fake-customers.test.mjs`

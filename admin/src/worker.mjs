@@ -4,6 +4,7 @@ import {dashboard,analytics,customers,customerDetail,orders,filters} from './ana
 import {entitlement,readChecklist,saveChecklist,portalVisit,activate,requireRun,gameEvent,publicRun} from './game-service.mjs';
 import {templates} from './email-templates.mjs';
 import {passwordLogin,passwordLogout,sessionCookie,clearCookie} from './password-auth.mjs';
+import {fakeCustomerCount} from './fake-customers.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
 async function body(request){
@@ -69,7 +70,7 @@ export default {async fetch(request,env){
     }
     sameOrigin(request);
     if(request.method!=='GET'&&request.method!=='HEAD')throw new HttpError(405,'Administrátorské rozhranie je v tejto etape iba na čítanie.');
-    if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH});
+    if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',fakeCustomers:await fakeCustomerCount(env.TQ_DB),webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH});
     if(path==='/api/admin/products')return json(await query(env.TQ_DB,'SELECT * FROM products ORDER BY id'));
     if(path==='/api/admin/dashboard')return json(await dashboard(env.TQ_DB,filters(url.searchParams)));
     if(path==='/api/admin/analytics')return json(await analytics(env.TQ_DB,filters(url.searchParams)));

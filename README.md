@@ -6,7 +6,7 @@ Slovenská rodinná hra v domácnosti a samostatná ilustrovaná miniknižka. St
 
 Nový [TreasureQuest Admin](admin/README.md) má dashboard, zákazníkov/detail, objednávky, hernú analytiku, e-mailové koncepty, Worker API a samostatné D1 migrácie. [Ukážka](admin/docs/dashboard-preview.png) obsahuje iba fiktívne lokálne dáta. [Inventúra a schvaľovací plán](admin/docs/DEPLOYMENT.md) zaznamenávajú oddelenie od existujúcich Cloudflare projektov.
 
-[Produkčný TreasureQuest Admin](https://treasurequest-admin.livingstones-romanduris.workers.dev) je na samostatnom Workeri a D1. Prihlásenie vyžaduje iba heslo; ochrana HTML, assetov a API sa overuje na serveri. Používateľ schválil nové zdroje aj presné D1 UUID pred migráciami. Produkcia aj oddelený preview majú prázdne zákaznícke dáta. Pôvodné dva Cloudflare projekty sa nemenili.
+[Produkčný TreasureQuest Admin](https://treasurequest-admin.livingstones-romanduris.workers.dev) je na samostatnom Workeri a D1. Prihlásenie vyžaduje iba heslo; ochrana HTML, assetov a API sa overuje na serveri. Používateľ schválil nové zdroje aj presné D1 UUID pred migráciami. Na neskoršiu výslovnú žiadosť používateľa produkcia obsahuje 15 označených FAKE zákazníkov (5 zakúpených, 5 rozhraných, 5 dokončených); admin upozorňuje, že metriky zahŕňajú simulované údaje. Oddelený preview zostáva prázdny. Pôvodné dva Cloudflare projekty sa nemenili.
 
 `admin/` sa **nekopíruje do `dist/`**. Existujúca hra, lokálny postup a `.openai/hosting.json` zostávajú zachované. Interný storyboard umožňuje návrat na chránenú administráciu. Verejný funnel a rodičovský portál na admin neodkazujú.
 

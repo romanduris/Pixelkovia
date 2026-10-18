@@ -130,3 +130,11 @@ PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright \
 TQ_ADMIN_PASSWORD_FILE=/tmp/treasurequest-admin-password \
 node admin/tests/password-browser.test.cjs
 ```
+
+## Výslovne vyžiadaných 15 FAKE zákazníkov
+
+Používateľ po nasadení výslovne požiadal o 15 fiktívnych zákazníkov v produkčnej TreasureQuest DB: päť iba s nákupom, päť s rozhranou hrou (úlohy 2–6) a päť s dokončenými ôsmimi úlohami. Toto je samostatná výnimka na označené skúšobné dáta; pôvodný 18-členný lokálny demo seed ostáva výhradne lokálny.
+
+Mená majú prefix `FAKE ·`, adresy sú `@example.invalid`, objednávky majú FAKE referencie. Každý zákazník má audit `fake_customer_created`; administrácia podľa neho zobrazuje trvalé upozornenie, že prehľady vrátane tržieb zahŕňajú simulované údaje. Neuskutočnia sa platby, odosielanie e-mailov ani zákaznícke prihlásenia.
+
+`node admin/scripts/prepare-fake-customers.mjs` vygeneruje fixture iba v pamäti a exportuje INSERT-only `/tmp/treasurequest-fake-customers.sql`. Overí import a cudzie kľúče lokálne; sám nekontaktuje Cloudflare. Vzdialený import je samostatná výslovne autorizovaná operácia iba proti presnému `treasurequest-db` UUID z deployment dokumentácie, po kontrole existujúcich záznamov a kolízií. Žiadne DROP, UPDATE alebo mazanie existujúcich zákazníkov. Opakovaný import sa nesmie slepo opakovať; najprv preveriť audit a prefix `fake-tq-15-v1-`, aby nevznikli duplicity. Preview DB zostáva bez týchto zákazníkov.
