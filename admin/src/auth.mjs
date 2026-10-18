@@ -1,4 +1,5 @@
 import {createRemoteJWKSet,jwtVerify} from 'jose';
+import {passwordSession} from './password-auth.mjs';
 const keys=new Map();
 export class HttpError extends Error {constructor(status,message){super(message);this.status=status;}}
 export function localRequest(request,env){
@@ -13,7 +14,12 @@ export async function verifyAdminToken(token,env,resolver){
   return {email:payload.email,sub:payload.sub};
 }
 export async function requireAdmin(request,env){
-  if(localRequest(request,env))return {email:'lokalny-vyvojar',local:true};
+  if(localRequest(request,env))return {email:'lokalny-vyvojar',local:true,authMode:'local'};
+  if(env.ADMIN_AUTH_MODE==='password'){
+    const session=await passwordSession(request,env);
+    if(!session)throw new HttpError(401,'Vyžaduje sa heslo do administrácie.');
+    return session;
+  }
   if(!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD || !env.ADMIN_EMAILS)throw new HttpError(403,'Administrácia čaká na konfiguráciu Cloudflare Access.');
   const issuer='https://'+env.ACCESS_TEAM_DOMAIN;
   if(!/^[a-z0-9-]+\.cloudflareaccess\.com$/.test(env.ACCESS_TEAM_DOMAIN))throw new HttpError(403,'Neplatná konfigurácia Access.');

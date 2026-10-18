@@ -1,8 +1,8 @@
 # TreasureQuest Admin – V5 / Etapa 2
 
-Samostatná administrácia a Worker API v existujúcom repozitári Pixelkovia. Frontend je čisté HTML/CSS/JS, Worker používa D1 a `jose` na overenie Cloudflare Access. Verejný web, rodičovský portál a hra zostávajú v koreňových súboroch a v pôvodnej ChatGPT Site. `admin/` sa nekopíruje do `dist/` a nesmie byť publikovaný obyčajným statickým hostingom.
+Samostatná administrácia a Worker API v existujúcom repozitári Pixelkovia. Frontend je čisté HTML/CSS/JS, Worker používa D1. Na žiadosť používateľa je produkčné prihlásenie iba heslom; voliteľný režim Cloudflare Access zostáva samostatne otestovaný. Verejný web, rodičovský portál a hra zostávajú v koreňových súboroch a v pôvodnej ChatGPT Site. `admin/` sa nekopíruje do `dist/` a nesmie byť publikovaný obyčajným statickým hostingom.
 
-**Stav: lokálne implementované a testované; produkčný Cloudflare deploy čaká na výslovné schválenie.** Neexistuje produkčná admin URL ani produkčná TreasureQuest databáza. Súčasný Cloudflare token bol použitý výlučne na GET inventúru.
+**Stav nasadenia a presné identifikátory:** pozri [DEPLOYMENT.md](docs/DEPLOYMENT.md). Používateľ schválil vytvorenie oddelených zdrojov, prihlásenie iba heslom a následne presné nové D1 UUID pred migráciami.
 
 [Ukážka dashboardu s fiktívnymi dátami](docs/dashboard-preview.png) · [Plán nasadenia a inventúra](docs/DEPLOYMENT.md)
 
@@ -36,7 +36,7 @@ Seed vytvorí 18 fiktívnych rodín s adresami `@example.invalid`: zakúpené/ne
 - Objednávky: najnovších 200 filtrovaných objednávok, bez checkoutu alebo ručnej simulácie platieb v admin UI.
 - Analytika úloh: začaté/vyriešené relácie, úspešnosť, priemer/medián elapsed, priemer active, nesprávne odpovede, priemerné nápovedy a posledné nedokončené hrania.
 - Osem e-mailových konceptov, história udalostí a príznak vypnutého odosielania. Marketingové koncepty majú zástupný odhlasovací odkaz. Poskytovateľ ani produkčné odosielanie nie sú zapojené.
-- Interné odkazy na funnel, rodičovský test, storyboard, Atlas a tlačoviny majú `internalPreview=1`. Samotné prekliky nevytvárajú aktivácie ani udalosti. Storyboard ponúka návrat do lokálneho adminu len na loopback pôvode; produkčný odkaz zostáva neaktívny, kým nebude schválená chránená URL.
+- Interné odkazy na funnel, rodičovský test, storyboard, Atlas a tlačoviny majú `internalPreview=1`. Samotné prekliky nevytvárajú aktivácie ani udalosti. Storyboard ponúka návrat na nasadenú chránenú administráciu.
 - Frontend má desktopové tabuľky, zákaznícke karty na mobile, ovládanie klávesnicou a zrozumiteľné prázdne/chybové stavy.
 
 ## Význam metrík a časov
@@ -62,7 +62,13 @@ Tieto serverové pravidlá a odpovede nie sú v adresári admin verejných asset
 
 ## Zabezpečenie
 
-`run_worker_first: true` vedie všetky admin assety aj API cez Worker. Cloudflare Access musí pokrývať celý host vrátane `/api/admin/*`. Worker navyše kontroluje podpis RS256, issuer tímu, AUD konkrétnej aplikácie, expiráciu a výslovne povolený admin e-mail. Hlavička s e-mailom sama nestačí. Pri chýbajúcom Access nastavení sa administrácia odmietne. CSP, `no-store`, `nosniff`, zákaz embedovania a `noindex` sa nastavujú aj na odpovede; SQL používa bind parametre a whitelist radenia.
+`run_worker_first: true` vedie všetky admin assety aj API cez Worker. Produkcia používa `ADMIN_AUTH_MODE=password`: verejné sú iba prihlasovacie HTML/CSS/JS a login/logout endpointy. Dashboard, jeho assety a všetky dátové admin API vyžadujú serverom overenú reláciu. E-mail ani Cloudflare Access sa v tomto režime nevyžadujú.
+
+Heslo (16–128 znakov) sa číta zo súboru s právami 600 a nikdy sa neposiela do Cloudflare v pôvodnom znení. `node admin/scripts/prepare-admin-password.mjs` vytvorí chránený dočasný JSON pre dva Worker secrets: `ADMIN_PASSWORD_RECORD` a `ADMIN_PASSWORD_PEPPER`. PBKDF2-SHA256 so 100 000 iteráciami používa náhodnú soľ a vstup cez HMAC s oddeleným náhodným serverovým pepperom. Počet iterácií rešpektuje limit nasadeného Workers WebCrypto. Tieto secrets nepatria do Git, konfigurácie ani verejných assetov.
+
+Prihlásenie povoľuje najviac 5 pokusov na IP za 15 minút a 100 globálne; databáza ukladá iba HMAC identifikátor IP. Náhodná 256-bitová cookie `__Host-tq-admin` má `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/`. D1 obsahuje iba hash tokenu. Relácia vyprší po 8 hodinách alebo 30 minútach nečinnosti; odhlásenie ju odstráni na serveri a zmena heslových secrets zneplatní staré relácie. POST vyžaduje rovnaký `Origin`; login nepovoľuje CORS.
+
+Voliteľný režim Access ostáva dostupný pri jeho samostatnej konfigurácii: RS256 podpis, issuer tímu, AUD aplikácie, expirácia a povolený e-mail. Hlavička s e-mailom sama nestačí. Chýbajúca konfigurácia nikdy neotvorí administráciu. CSP, `no-store`, `nosniff`, zákaz embedovania a `noindex` chránia assety; SQL používa bind parametre a whitelist radenia.
 
 Jediná lokálna výnimka vyžaduje súčasne `ENVIRONMENT=local` a loopback hostname. Lokálny režim sa na vzdialenom hoste odmietne **pred** assetmi aj API. Produkcia nikdy nepoužíva lokálny admin bypass.
 
@@ -78,6 +84,7 @@ Prvé úspešné dokončenie nastaví pevnú hranicu `first_completed_at + 24 ho
 
 | Rozhranie | Stav |
 | --- | --- |
+| `POST /api/admin/login`, `/logout` | Prihlásenie heslom a zrušenie serverovej relácie, kontrola Origin |
 | `GET /api/admin/context`, `/products`, `/dashboard`, `/customers`, `/customers/:id`, `/orders`, `/analytics`, `/events`, `/emails` | Implementované; serverová admin autorizácia pri každej požiadavke |
 | `GET /api/customer/entitlements` | Implementované za budúcim overením zákazníka |
 | `GET/POST /api/customer/checklist` | Načítanie a serverové uloženie bez aktivácie |
@@ -92,7 +99,7 @@ Prvé úspešné dokončenie nastaví pevnú hranicu `first_completed_at + 24 ho
 | Klientské sledovanie na existujúcom webe | Nie je zapnuté; interné náhľady a staré hrania neposielajú falošné udalosti |
 | QR odkazy | Model počíta so spoločnými QR a bezpečnou serverovou reláciou; pôvodná maketa P1 sa nemení |
 
-Prepojenie aktuálnej Site s budúcou zákazníckou cookie vyžaduje samostatne navrhnutý same-origin gateway/doménu. Budúci zákaznícky hostname/gateway musí mať zákaznícke overenie oddelené od Access ochrany admin hosta. Nepovoľujeme všeobecný CORS ani treťostranné cookies ako skratku.
+Prepojenie aktuálnej Site s budúcou zákazníckou cookie vyžaduje samostatne navrhnutý same-origin gateway/doménu. Budúci zákaznícky hostname/gateway musí mať zákaznícke overenie oddelené od ochrany admin hosta. Nepovoľujeme všeobecný CORS ani treťostranné cookies ako skratku.
 
 ## Testy
 
@@ -102,7 +109,7 @@ npm test --prefix admin
 PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node admin/tests/browser.test.cjs
 ```
 
-Backendové testy používajú lokálny SQLite adaptér a samostatný integračný test v skutočnom `workerd`/D1 simulátore Miniflare. Integrácia vyžaduje predchádzajúci `build:check`; nepoužíva Cloudflare účet ani API token. Testuje migrácie, objednávku, checklist, aktiváciu, cookie telefónu, overenie odpovede a duplicitu. Testy overujú tiež prázdny stav, 18 demo rodín, izoláciu zákazníkov, anonymný a podvrhnutý Access, platné aj neplatné RS256 JWT, radenie/SQL injection, stránkovanie, transakčný rollback, elapsed/active čas, opakovanie a pevných 24 hodín.
+Backendové testy používajú lokálny SQLite adaptér a samostatný integračný test v skutočnom `workerd`/D1 simulátore Miniflare. Integrácia vyžaduje predchádzajúci `build:check`; nepoužíva Cloudflare účet ani API token. Testuje migrácie, objednávku, checklist, aktiváciu, cookie telefónu, overenie odpovede a duplicitu. Testy overujú aj heslový login/logout, cookies, zneplatnenie relácií, expiráciu, limity pokusov, zmenu hesla a odmietnutie CSRF. Testy overujú tiež prázdny stav, 18 demo rodín, izoláciu zákazníkov, anonymný a podvrhnutý Access, platné aj neplatné RS256 JWT, radenie/SQL injection, stránkovanie, transakčný rollback, elapsed/active čas, opakovanie a pevných 24 hodín.
 
 Browser test vyžaduje bežiaci lokálny demo Worker na 8787. Overuje reálne D1 dáta, vyhľadávanie, stavové aj produktové filtre, detail, grafy/analytiku, mobilné karty a šírky 320/390/768/1512. Pôvodné testy `tests/` zostávajú samostatné a overujú celú hru, portál, PDF, médiá, staré uloženia a navigáciu.
 
@@ -114,3 +121,12 @@ node admin/scripts/deployment-plan.mjs
 ```
 
 Token je v premennej `CLOUDFLARE_API_TOKEN` alebo v chránenom súbore `/tmp/treasurequest-cloudflare-token`; nikdy v argumentoch, zdrojovom kóde alebo GitHube. Inventarizačný skript odosiela iba GET, nečíta hodnoty secrets a výsledok ukladá do ignorovaného `admin/docs/cloudflare-inventory.local.json`. Účel existujúcich projektov neháda. Pri viacerých účtoch sa zastaví pred inventúrou a vyžiada konkrétne Account ID. Nasadzovací plán je iba výpis – nenasadzuje ani nemigruje nič.
+
+Heslový browser test je výslovne spúšťaný proti zvolenému hostu; číta heslo iba z chráneného súboru, neprijíma ho v argumentoch a po overení sa odhlási:
+
+```bash
+ADMIN_BASE_URL=https://treasurequest-admin.livingstones-romanduris.workers.dev \
+PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright \
+TQ_ADMIN_PASSWORD_FILE=/tmp/treasurequest-admin-password \
+node admin/tests/password-browser.test.cjs
+```

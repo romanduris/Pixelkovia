@@ -34,4 +34,15 @@
 - `admin/wrangler.jsonc`
 - `admin/wrangler.production.example.jsonc`
 
-Upravené existujúce súbory: `README.md`, `site-config.js`, `site-content.js`.
+Upravené koreňové súbory etapy 2: `README.md`, `site-config.js`, `site-content.js`. Doplnenie heslového nasadenia mení iba prvé dva z nich.
+
+Doplnenie prihlásenia iba heslom:
+
+- `admin/migrations/0003_admin_password_sessions.sql`
+- `admin/public/login.css`
+- `admin/public/login.html`
+- `admin/public/login.js`
+- `admin/scripts/prepare-admin-password.mjs`
+- `admin/src/password-auth.mjs`
+- `admin/tests/password.test.mjs`
+- `admin/tests/password-browser.test.cjs`

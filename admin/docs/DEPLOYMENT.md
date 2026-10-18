@@ -1,6 +1,6 @@
-# Inventúra a plán nasadenia – čaká na schválenie
+# Cloudflare nasadenie TreasureQuest
 
-**Stav k 18. 10. 2026: iba GET inventúra, lokálne migrácie, lokálne demo a dry-run balenie. Žiadny produkčný Cloudflare zdroj nebol vytvorený ani zmenený.**
+Používateľ 18. 10. 2026 schválil samostatné zdroje v nižšie uvedenom účte a zvolil **prihlásenie iba heslom bez e-mailu a Access**. Po vytvorení databáz výslovne potvrdil obe presné UUID a migrácie. Pôvodný všeobecný súhlas nenahrádzal toto druhé potvrdenie.
 
 ## Overený účet a existujúce zdroje
 
@@ -22,70 +22,74 @@ Zoznam vlastných Workers domén je prázdny. Čítanie Workers routes pre `rodu
 
 Detailná inventúra vrátane názvov bindings je lokálne v ignorovanom `cloudflare-inventory.local.json`. Účel aplikácií nie je overovaný z ich kódu ani z obsahu DB; názvy nie sú dôvod na žiadne úpravy. Existujúce Workery, DB, e-mailové bindings, secrets a doména zostávajú bez zásahu.
 
-## Navrhnuté oddelené zdroje
+## Oddelené zdroje a schválené databázy
 
-| Prostredie | Worker: admin + API | Databáza | Binding |
+| Prostredie | Worker: admin + API | Databáza | Presné D1 UUID |
 | --- | --- | --- | --- |
-| Lokálne, už vytvorené iba na disku | `treasurequest-local` | lokálny SQLite D1 simulátor | `TQ_DB` |
-| Testovacie, zatiaľ len návrh | `treasurequest-admin-preview` | `treasurequest-db-preview` | `TQ_DB` |
-| Produkčné, zatiaľ len návrh | `treasurequest-admin` | `treasurequest-db` | `TQ_DB` |
+| Produkcia | `treasurequest-admin` | `treasurequest-db` | `a92475ad-b1e6-4a92-90dd-76e9b8e95b7a` |
+| Preview | `treasurequest-admin-preview` | `treasurequest-db-preview` | `992a2f73-b515-456a-97a6-d277eadd27c8` |
 
-API a administrácia sú v jednom Workeri. Nevzniká tretí nepotrebný `treasurequest-api` Worker. Obe navrhované Worker mená a obe DB mená boli pri inventúre voľné; pred vytvorením sa preveria znovu.
+Každý Worker má binding `TQ_DB` výhradne na svoju TreasureQuest databázu. Oba názvy boli pred vytvorením znovu overené ako voľné. Lokálny `treasurequest-local` ostáva v SQLite simulátore. Nevznikajú R2/KV, nové domény ani tretí API Worker.
 
-Navrhovaná produkčná URL: `https://treasurequest-admin.livingstones-romanduris.workers.dev`.
-API: rovnaký host pod `/api/admin/` a neskôr `/api/customer/`.
-Preview má vlastný host `treasurequest-admin-preview.livingstones-romanduris.workers.dev` a oddelený AUD/DB.
-**Ide o návrhy, nie o funkčné publikované odkazy.**
+Produkcia: https://treasurequest-admin.livingstones-romanduris.workers.dev
 
-Pre administráciu môže neskôr používateľ zvoliť vlastnú subdoménu. Tento plán **nepridáva DNS záznamy ani routes na `rodulab.com`** a nepresúva existujúcu ChatGPT Site.
+Preview: https://treasurequest-admin-preview.livingstones-romanduris.workers.dev
 
-## Schvaľovací bod 1 – pred prvým Cloudflare zápisom
+API používa rovnaký host pod `/api/admin/`. Budúce `/api/customer/` ostáva vypnuté bez privátneho identity service bindingu. Verejná hra a rodičovský portál neodosielajú produkčné udalosti. Produkcia ani preview neobsahujú demo zákazníkov.
 
-Vyžiadať výslovné potvrdenie:
+## Vykonané a overované poradie
 
-1. Account ID uvedeného účtu.
-2. Nové Worker a D1 názvy pre produkciu aj preview.
-3. Presnú e-mailovú adresu administrátora, prípadne ďalších administrátorov.
-4. Zapnutie Cloudflare Access / Zero Trust a vytvorenie **iba nových** TreasureQuest aplikácií/politík; existujúce pravidlá sa nemenia.
-5. Použitie navrhnutých `workers.dev` adries bez DNS zmien.
-6. Že sa nevytvára platené predplatné ani nesúhlasí s navýšením plánu automaticky.
+1. GET inventúra potvrdila účet, pôvodné dva Workery a pôvodnú DB. Používateľ schválil nové zdroje a heslovú ochranu.
+2. D1 API vytvorilo iba dve nové databázy uvedené vyššie. Používateľ následne potvrdil mená a obe UUID.
+3. Wrangler aplikoval migrácie `0001_initial.sql`, `0002_product_catalog.sql`, `0003_admin_password_sessions.sql` výlučne na tieto UUID. Bez demo seedu, zákazníkov alebo objednávok.
+4. Ignorované konfigurácie `wrangler.production.jsonc` a `wrangler.preview.jsonc` obsahujú overený účet a D1 UUID. `ENVIRONMENT=production` alebo `preview`, `DEMO_MODE=false`, `ADMIN_AUTH_MODE=password`. Zdrojový príklad má zástupné UUID.
+5. Prvý upload Workera má vypnuté `workers_dev` a preview URL. Potom sa cez chránený dočasný súbor nahrajú iba secrets `ADMIN_PASSWORD_RECORD`, `ADMIN_PASSWORD_PEPPER`; pôvodné heslo sa neposiela na Cloudflare. Pred zapnutím hosta sa cez API overia mená secrets a správny D1 binding.
+6. Až s pripravenou serverovou ochranou sa zapne schválená `workers.dev` adresa. Náhodné version preview URL zostávajú vypnuté. Konfigurácia si po zapnutí uloží `workers_dev=true` pre ďalšie schválené nasadenia.
+7. Verejné kontroly musia potvrdiť: dashboard a jeho JS/CSS bez cookie presmerujú na login, všetky dátové admin API vrátia 401, podvrhnutá e-mailová hlavička nestačí. Verejné sú iba login assety. Nesprávny Origin pri POST vráti 403. Prihlásenie overí heslo serverovo; odhlásenie zneplatní reláciu aj pri opakovanom použití cookie.
+8. Prihlásený prehliadač overí prázdny dashboard, zákazníkov, objednávky, analytiku, e-mailové koncepty a interné odkazy. Bez produkčných platieb či e-mailov.
+9. Až po úspešnom chránenom spustení sa nastaví `SITE_CONFIG.management.url`; odkaz používa iba interný storyboard. Zdrojové súbory sa pushnú do GitHub `main`, existujúca Site sa publikuje s nezmeneným publikom a ID.
+10. Záverečná GET inventúra porovná pôvodné Worker modification timestamps, bindings, pôvodnú DB a doménu. Nasadené Worker verzie a výsledky kontrol sú uvedené v závere tejto stránky.
 
-Až potom pripraviť token na zápis, obmedzený na tento jediný účet. Potrebné oblasti budú Workers Scripts, D1, Access Apps/Policies a podľa možností onboarding Access. Oprávnenie na Workers Scripts je účtové; samo osebe neizoluje existujúce Workery. Preto sa pred každým zápisom overí povolený zoznam **nových** názvov. Žiadne DNS Edit, mazanie zdrojov ani úprava existujúcich projektov nie sú súčasťou súhlasu.
+## Heslo a budúce aktualizácie
 
-Access onboarding môže vyžadovať, aby používateľ v dashboarde vybral organizáciu/plán a potvrdil podmienky. Tieto osobné a prípadné platobné potvrdenia sa neobchádzajú API. Po dokončení onboardingu možno aplikácie a politiky nastaviť cez API.
+Na prihlásenie stačí používateľom uložené heslo. Platí 8-hodinová maximálna a 30-minútová neaktívna relácia, serverové odhlásenie, ochrana Origin a limity pokusov. Podrobnosti sú v [README](../README.md#zabezpečenie).
 
-## Presné poradie po schválení
+Token je mimo repozitára: `CLOUDFLARE_API_TOKEN` alebo chránený dočasný súbor `/tmp/treasurequest-cloudflare-token`. Potrebuje **Workers Scripts Edit/Write** a **D1 Edit/Write** len pre tento účet; Account Settings Read stačí na inventúru. Ostatné oprávnenia nemusia mať zápis. Access sa v schválenom heslovom režime nepoužíva.
 
-1. Zopakovať GET inventúru a potvrdiť ten istý účet a voľné nové názvy. Ak sa stav zmenil alebo meno už existuje, zastaviť sa; nepripojiť sa automaticky k rovnomennému zdroju.
-2. Vytvoriť iba `treasurequest-db` a `treasurequest-db-preview` cez D1 API. Uchovať vrátené nové UUID. Nevytvárať R2/KV.
-3. **Schvaľovací bod 2:** ukázať presné mená a nové UUID oboch databáz a vyžiadať výslovné potvrdenie pred vzdialenými migráciami. Toto schválenie nemožno nahradiť menom databázy či pôvodným všeobecným súhlasom.
-4. Po tomto potvrdení aplikovať iba `0001_initial.sql` a `0002_product_catalog.sql` na potvrdené nové DB. Nevkladať demo zákazníkov do produkcie.
-5. Vytvoriť nové Access aplikácie pre celé dva admin hosty a politiky s konkrétnymi povolenými e-mailmi. Žiadne anonymné Allow, Everyone ani Bypass. Overiť, že politika zahŕňa assety aj `/api/admin/*`. Uchovať skutočný issuer a AUD každého prostredia.
-6. Z príkladu `wrangler.production.example.jsonc` pripraviť ignorovaný `wrangler.production.jsonc` s overeným Account ID, **novými** DB UUID, presnými admin e-mailmi, team domain a AUD. Nepridávať `CUSTOMER_AUTH` ani platobné/e-mailové secrets, pokiaľ tieto služby neboli samostatne pripravené a schválené. `DEMO_MODE=false`, `ENVIRONMENT=production` alebo `preview`; `workers_dev` a preview URL sú spočiatku vypnuté.
-7. Lokálne zopakovať testy a dry-run; porovnať binding `TQ_DB` s potvrdeným UUID. Ak sa objaví ID `livingstones-db`, okamžite zastaviť postup.
-8. Nasadiť iba nové Workery cez Wrangler/API s ochranou v kóde a vypnutými verejnými routes. Po overení Access konfigurácie zapnúť výlučne schválené nové hosty. Server musí odmietnuť všetko bez správneho Access JWT ešte pred akýmkoľvek čítaním osobných údajov.
-9. Otestovať z neprihláseného profilu HTML, JS/CSS a všetky admin API: žiadne dáta, len Access challenge alebo 401/403. Podvrhnutá e-mailová hlavička ani JWT nesmú stačiť. Potom overiť konkrétneho administrátora a prázdnu produkčnú DB.
-10. Až po úspešnom chránenom nasadení zapísať schválenú admin URL do `SITE_CONFIG.management.url` a aktualizovať storyboard/pôvodnú Site. Funnel ani rodičovský portál nedostanú administrátorský odkaz.
-11. Na záver znovu prečítať existujúce Worker nastavenia, bindings, doménu a DB a potvrdiť, že nesúvisiace projekty neboli zmenené. Uchovať presné nasadené verzie a migračný audit.
+Príkaz `node admin/scripts/prepare-admin-password.mjs` číta `/tmp/treasurequest-admin-password` s právami 600 a pripraví `/tmp/treasurequest-admin-secrets.json` s právami 600. Hodnoty sa nevypisujú. Zmena hesla vyžaduje vytvorenie nového záznamu a nahratie **oboch** secrets na príslušný nový Worker. Zmena verzie záznamu zneplatní staré relácie; počas výmeny musí ochrana pri nezhode odmietnuť prístup. Po dokončení sa dočasný pôvodný password aj JSON so secrets odstránia.
 
-Všetky operácie GitHubu zostávajú na `main`, s bežným push bez force. `admin/` nie je súčasťou statického deploymentu Site. Aktualizácia Site nemôže nahradiť schválenie Cloudflare produkčných operácií.
+Pred každou ďalšou migráciou porovnať názov aj UUID so schváleným prostredím, nikdy nekopírovať ID `livingstones-db`. Nové produkčné databázy a zmeny DNS vyžadujú osobitný súhlas. Zápisové oprávnenie tokenu je účtové, preto každý deployment musí overiť povolený zoznam dvoch TreasureQuest Worker názvov.
+
+Obnova existujúcej lokálnej konfigurácie: skopírovať `wrangler.production.example.jsonc` do ignorovaného súboru, vložiť overený Account ID a správne nové D1 UUID, skontrolovať produkčné/preview vars a binding, potom dry-run a schválený deploy cez Wrangler. Dočasne vypnutý verejný hostname zapnúť až po kontrole ochrany. Žiadne secrets v Git ani v shell argumentoch.
 
 ## Náklady a limity
 
-Zatiaľ nevznikli žiadne nové vzdialené zdroje ani zmeny tarify. Pre malý admin môže byť východiskom Workers Free; uplatňujú sa limity účtu a existujúce projekty môžu čerpať rovnakú kvótu. Workers Paid má podľa aktuálnej dokumentácie minimálny mesačný poplatok 5 USD; nezapína sa automaticky. D1 Free zahŕňa denné kvóty čítania/zápisu, ktoré treba sledovať najmä pri analytických dotazoch.
+Platené predplatné ani zmena tarify sa nezapínajú. Uplatňujú sa existujúce kvóty účtu, ktoré zdieľajú aj pôvodné projekty. Aktuálne podmienky: [Workers](https://developers.cloudflare.com/workers/platform/pricing/), [D1](https://developers.cloudflare.com/d1/platform/pricing/). Nasadenie negarantuje neobmedzené využitie.
 
-Pred schváleným spustením preveriť plán konkrétneho účtu a aktuálne ceny: [Workers](https://developers.cloudflare.com/workers/platform/pricing/), [D1](https://developers.cloudflare.com/d1/platform/pricing/), [Access plány](https://www.cloudflare.com/plans/zero-trust-services/). Tento návrh nezaručuje nulové náklady a neautorizuje platené služby.
-
-Agregačné prehľady aktuálne načítavajú filtrovanú kohortu a vypočítajú medián na serveri. Pred veľkými objemami treba zaviesť SQL agregácie/window funkcie alebo inkrementálne súhrny a preveriť D1/Worker limity; prototyp sa nevydáva za neobmedzený analytický systém.
+Agregačné prehľady načítavajú filtrovanú kohortu a počítajú medián na serveri. Pri veľkých objemoch treba SQL agregácie alebo inkrementálne súhrny a preverenie limitov. Globálny limit prihlasovania môže pri útoku dočasne zablokovať aj správcu; chráni náročné overovanie hesla pred neobmedzenými pokusmi.
 
 ## Čo ešte nie je zapojené
 
-- Cloudflare produkčné/preview zdroje, skutočný Access účet a app AUD.
 - Zákaznícka identita, Magic Link, bezpečný transfer telefónu.
-- Overený platobný webhook a reálne objednávky.
-- Napojenie aktuálnej statickej hry na serverové oprávnenia a udalosti.
-- Produkčná ochrana a súkromné doručovanie existujúcich herných PDF/JS.
+- Platobný webhook a reálne objednávky.
+- Napojenie statickej hry na serverové oprávnenia a udalosti.
+- Súkromné produkčné doručovanie existujúcich herných PDF/JS.
 - E-mailový poskytovateľ, odhlasovanie a personalizované diplomy.
 - Schválený limit nedokončenej hry.
 
-Tieto body sa nesimulujú vo verejnom webe. Všetky zobrazené demo udalosti vznikli výlučne v lokálnej testovacej DB.
+Tieto body sa nesimulujú vo verejnom webe. Fiktívne udalosti ostávajú iba v lokálnej demo DB.
+
+## Výsledok nasadenia 18. 10. 2026
+
+Oba hosty sú nasadené a overené. Aktívne verzie pri odovzdaní:
+
+| Worker | Verzia (100 % prevádzky) | Deployment ID |
+| --- | --- | --- |
+| `treasurequest-admin` | `db770201-7e90-4836-a514-1be9ab6f456c` | `00b866ee-1556-4bca-abdc-b6a7bf65202a` |
+| `treasurequest-admin-preview` | `65cf436b-f238-4daf-80d2-04c23ec3680a` | `9ec951bc-5c44-4d61-b3e8-c5f062d5583d` |
+
+- V oboch D1 sú evidované všetky tri migrácie; nulový počet zákazníkov, objednávok a hier. Testovacie prihlásenia sa odhlásili a nezanechali aktívne relácie.
+- Všetkých 16 backendových testov prešlo vrátane skutočného `workerd`/D1. Produkčný browser test prešiel loginom, šiestimi sekciami, bezpečnou cookie a odhlásením; rozloženie sa overilo v šírkach 320/390/768/1512.
+- Živé HTTP kontroly oboch hostov potvrdili 401 pre anonymné admin API, presmerovanie chránených assetov, funkčné login assety, odmietnutie nesprávneho hesla a cudzieho Origin, zneplatnenie odhlásenej cookie a 501 pre nezapojené zákaznícke API.
+- Testy etapy 1 a hernej logistiky prešli po nastavení odkazu zo storyboardu.
+- Záverečná inventúra potvrdila pôvodné modification timestamps a bindings `flightscanner-contact` a `livingstones-api`, pôvodné D1 UUID, Pages, KV a domény bez zmien. DNS sa nemenilo.

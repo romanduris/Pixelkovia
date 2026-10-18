@@ -9,7 +9,7 @@ const badge=status=>`<span class="status ${escape(status)}">${escape(stateNames[
 const titles={dashboard:['Prehľad dobrodružstiev','Zákazníci, príprava a cesta Pixelkov domov na jednom mieste.'],customers:['Zákazníci','Od zakúpeného dobrodružstva po poslednú vyriešenú stopu.'],orders:['Objednávky','Nákupy a platobné stavy oddelené od herných relácií.'],analytics:['Herná analytika','Kde príbeh plynie a kde tím potrebuje malú pomoc.'],emails:['E-maily a šablóny','Pripravené scenáre. Produkčné odosielanie zatiaľ nie je zapojené.'],events:['História udalostí','Serverom potvrdené udalosti jednotlivých herných relácií.']};
 const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',context:null};
 let loadingId=0,detailId=0,debounce;
-async function api(path,params){const response=await fetch(path+(params?.toString()?'?'+params:''),{credentials:'same-origin'});const value=await response.json();if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
+async function api(path,params){const response=await fetch(path+(params?.toString()?'?'+params:''),{credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/login');throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
 function midnight(day){const utc=Date.parse(day+'T00:00:00Z');const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(utc).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const represented=Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));return new Date(utc-(represented-utc)).toISOString();}
 function params(){const values=new URLSearchParams();if($('#from').value)values.set('from',midnight($('#from').value));if($('#to').value){const end=new Date($('#to').value+'T00:00:00Z');end.setUTCDate(end.getUTCDate()+1);values.set('to',midnight(end.toISOString().slice(0,10)));}if($('#product').value)values.set('product',$('#product').value);return values;}
 
@@ -65,7 +65,13 @@ $('#close-detail').addEventListener('click',()=>{detailId++;$('#detail').close()
 (async()=>{try{
   const context=await api('/api/admin/context');state.context=context;
   $('#identity-label').textContent=context.admin;
-  $('#mode-label').textContent=context.environment==='local'?'Lokálne prostredie':'Overené cez Cloudflare Access';
+  if(context.authMode==='password'){
+    $('#logout-button').hidden=false;
+    $('#logout-button').addEventListener('click',async()=>{
+      try{const response=await fetch('/api/admin/logout',{method:'POST',credentials:'same-origin'});if(!response.ok)throw Error('Odhlásenie sa nepodarilo.');location.replace('/login');}catch(error){$('#notice').textContent=error.message;}
+    });
+  }
+  $('#mode-label').textContent=context.environment==='local'?'Lokálne prostredie':context.authMode==='password'?'Prihlásenie heslom':'Overené cez Cloudflare Access';
   if(context.environment==='local'){$('#environment-banner').hidden=false;$('#environment-banner').textContent=context.demo?'LOKÁLNE DEMO · Všetci zákazníci, nákupy a herné relácie sú fiktívne testovacie údaje.':'LOKÁLNY TEST · Bez produkčného prihlásenia. Prázdne dáta sa nenahrádzajú demo zákazníkmi.';}
   if(context.webUrl){const base=new URL(context.webUrl);if(base.protocol==='https:')$('#external-links').innerHTML=[['Funnel','index.html'],['Rodičovský testovací náhľad','parent.html'],['Storyboard','storyboard.html'],['Atlas Pixelkov','atlas.html'],['Tlačové materiály','printables.html']].map(([label,path])=>`<a href="${escape(new URL(path+'?internalPreview=1',base).href)}" target="_blank" rel="noopener noreferrer">${label} <span>↗</span></a>`).join('');}
   const products=await api('/api/admin/products');$('#product').insertAdjacentHTML('beforeend',products.map(p=>`<option value="${escape(p.id)}">${escape(p.name)}</option>`).join(''));

@@ -3,6 +3,7 @@ import {query,first} from './db.mjs';
 import {dashboard,analytics,customers,customerDetail,orders,filters} from './analytics.mjs';
 import {entitlement,readChecklist,saveChecklist,portalVisit,activate,requireRun,gameEvent,publicRun} from './game-service.mjs';
 import {templates} from './email-templates.mjs';
+import {passwordLogin,passwordLogout,sessionCookie,clearCookie} from './password-auth.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
 async function body(request){
@@ -45,9 +46,30 @@ export default {async fetch(request,env){
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
     if(path.startsWith('/api/customer/'))return await customerApi(request,env,path);
-    const admin=await requireAdmin(request,env);sameOrigin(request);
+    if(env.ADMIN_AUTH_MODE==='password' && ['/login','/login.html','/login.css','/login.js'].includes(path) && ['GET','HEAD'].includes(request.method)){
+      // Assets resolves extensionless HTML itself; requesting /login.html redirects back to /login.
+      const target=new URL(request.url);if(path==='/login.html')target.pathname='/login';
+      return secureAsset(await env.ASSETS.fetch(new Request(target,request)));
+    }
+    if(path==='/api/admin/login'&&request.method==='POST'&&env.ADMIN_AUTH_MODE==='password'){
+      sameOrigin(request);const input=await body(request);
+      const login=await passwordLogin(request,env,input?.password);
+      const response=json(login.status===200?{authenticated:true}:{error:login.error},login.status);
+      if(login.token)response.headers.set('Set-Cookie',sessionCookie(login.token));
+      if(login.retryAfter)response.headers.set('Retry-After',String(login.retryAfter));
+      return response;
+    }
+    if(path==='/api/admin/logout'&&request.method==='POST'&&env.ADMIN_AUTH_MODE==='password'){
+      sameOrigin(request);await passwordLogout(request,env);const response=json({authenticated:false});response.headers.set('Set-Cookie',clearCookie());return response;
+    }
+    let admin;
+    try{admin=await requireAdmin(request,env);}catch(error){
+      if(env.ADMIN_AUTH_MODE==='password'&&error.status===401&&!path.startsWith('/api/')&&['GET','HEAD'].includes(request.method))return new Response(null,{status:303,headers:{Location:'/login','Cache-Control':'no-store'}});
+      throw error;
+    }
+    sameOrigin(request);
     if(request.method!=='GET'&&request.method!=='HEAD')throw new HttpError(405,'Administrátorské rozhranie je v tejto etape iba na čítanie.');
-    if(path==='/api/admin/context')return json({admin:admin.email,environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH});
+    if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH});
     if(path==='/api/admin/products')return json(await query(env.TQ_DB,'SELECT * FROM products ORDER BY id'));
     if(path==='/api/admin/dashboard')return json(await dashboard(env.TQ_DB,filters(url.searchParams)));
     if(path==='/api/admin/analytics')return json(await analytics(env.TQ_DB,filters(url.searchParams)));
@@ -59,9 +81,13 @@ export default {async fetch(request,env){
     if(path.startsWith('/api/'))throw new HttpError(404,'Endpoint neexistuje.');
     // Never return the demo UI on a remote host, even if a local configuration is accidentally deployed.
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
-    const response=await env.ASSETS.fetch(request);
-    const secured=new Response(response.body,response);for(const [key,value] of Object.entries(headers))if(key!=='Content-Type')secured.headers.set(key,value);
-    secured.headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
-    return secured;
+    return secureAsset(await env.ASSETS.fetch(request));
   }catch(error){return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.'},error instanceof HttpError?error.status:500);}
 }};
+
+function secureAsset(response){
+  const secured=new Response(response.body,response);
+  for(const [key,value] of Object.entries(headers))if(key!=='Content-Type')secured.headers.set(key,value);
+  secured.headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+  return secured;
+}

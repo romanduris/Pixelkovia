@@ -1,0 +1,57 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {fresh} from './support.mjs';import {first,query} from '../src/db.mjs';
+import {makePasswordSecrets,passwordLogin,passwordSession,passwordLogout,SESSION_MS,IDLE_MS} from '../src/password-auth.mjs';
+import worker from '../src/worker.mjs';
+const TEST_PASSWORD='local-test-only-password-84931';
+const request=(path='/',cookie='')=>new Request('https://admin.example.invalid'+path,{headers:{cookie,'CF-Connecting-IP':'192.0.2.22'}});
+const cookie=token=>'__Host-tq-admin='+token;
+test('password-only admin rejects anonymous data, verifies password and stores only revocable hashed session tokens',async()=>{
+ const db=fresh(),secrets=await makePasswordSecrets(TEST_PASSWORD),env={ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',TQ_DB:db,...secrets};
+ assert.ok(!JSON.stringify(secrets).includes(TEST_PASSWORD));
+ const anonymous=await worker.fetch(request('/api/admin/dashboard'),env);assert.equal(anonymous.status,401);
+ const root=await worker.fetch(request('/'),env);assert.equal(root.status,303);assert.equal(root.headers.get('location'),'/login');
+ const bad=await passwordLogin(request(),env,'wrong-long-password-000');assert.equal(bad.status,401);
+ const good=await passwordLogin(request(),env,TEST_PASSWORD);assert.equal(good.status,200);assert.ok(good.token.length===64);
+ const stored=await first(db,'SELECT * FROM admin_sessions');assert.notEqual(stored.token_hash,good.token);assert.equal(stored.token_hash.length,64);
+ const authenticated=await worker.fetch(request('/api/admin/dashboard',cookie(good.token)),env);assert.equal(authenticated.status,200);
+ assert.equal((await authenticated.json()).metrics.customers,0);
+ await passwordLogout(request('/',cookie(good.token)),env);
+ assert.equal(await passwordSession(request('/',cookie(good.token)),env),null);
+ assert.equal((await worker.fetch(request('/api/admin/customers',cookie(good.token)),env)).status,401);
+ db.close();
+});
+test('login is same-origin, omits secrets from JSON, issues HttpOnly secure cookies and clears session on logout',async()=>{
+ const db=fresh(),env={ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',TQ_DB:db,...await makePasswordSecrets(TEST_PASSWORD)};
+ const post=(path,origin='https://admin.example.invalid',extra={})=>new Request('https://admin.example.invalid'+path,{method:'POST',headers:{origin,'Content-Type':'application/json',...extra},body:JSON.stringify({password:TEST_PASSWORD})});
+ assert.equal((await worker.fetch(post('/api/admin/login','https://attacker.example.invalid'),env)).status,403);
+ const login=await worker.fetch(post('/api/admin/login'),env);assert.equal(login.status,200);
+ assert.deepEqual(await login.json(),{authenticated:true});
+ const setCookie=login.headers.get('set-cookie');for(const flag of ['__Host-tq-admin=','HttpOnly','Secure','SameSite=Strict','Path=/'])assert.ok(setCookie.includes(flag));
+ const logout=await worker.fetch(post('/api/admin/logout','https://admin.example.invalid',{cookie:setCookie.split(';')[0]}),env);assert.equal(logout.status,200);assert.ok(logout.headers.get('set-cookie').includes('Max-Age=0'));
+ assert.equal((await first(db,'SELECT COUNT(*) count FROM admin_sessions')).count,0);db.close();
+});
+test('per-IP login throttling, eight-hour absolute expiry, idle timeout and password rotation are enforced server-side',async()=>{
+ const db=fresh(),at=Date.now(),env={ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',TQ_DB:db,...await makePasswordSecrets(TEST_PASSWORD)};
+ for(let n=0;n<5;n++)assert.equal((await passwordLogin(request(),env,'wrong-long-password-000',at)).status,401);
+ const limited=await passwordLogin(request(),env,TEST_PASSWORD,at);assert.equal(limited.status,429);assert.ok(limited.retryAfter>0);
+ const rows=await query(db,'SELECT scope_key FROM admin_login_attempts');assert.ok(rows.every(row=>!row.scope_key.includes('192.0.2.22')));
+ const good=await passwordLogin(request(),env,TEST_PASSWORD,at+16*60000);assert.equal(good.status,200);
+ assert.ok(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+1000));
+ assert.equal(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+IDLE_MS+1),null);
+ const next=await passwordLogin(request(),env,TEST_PASSWORD,at+32*60000);assert.equal(next.status,200);
+ assert.equal(await passwordSession(request('/',cookie(next.token)),env,at+32*60000+SESSION_MS+1),null);
+ const rotating=await passwordLogin(request(),env,TEST_PASSWORD,at+48*60000);assert.equal(rotating.status,200);
+ const changed={...env,...await makePasswordSecrets('new-local-test-password-65432')};
+ assert.equal(await passwordSession(request('/',cookie(rotating.token)),changed,at+48*60000+1000),null);db.close();
+});
+test('global throttle, missing secrets and oversized/malformed password requests fail closed',async()=>{
+ const db=fresh(),at=Date.now(),env={ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',TQ_DB:db,...await makePasswordSecrets(TEST_PASSWORD)};
+ await db.prepare("INSERT INTO admin_login_attempts VALUES('global',100,?)").bind(at).run();
+ assert.equal((await passwordLogin(request(),env,TEST_PASSWORD,at)).status,429);
+ assert.equal((await passwordLogin(request(),{TQ_DB:db},TEST_PASSWORD)).status,503);
+ const invalid=new Request('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:'{broken'});
+ assert.equal((await worker.fetch(invalid,env)).status,400);
+ const large=new Request('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:'x'.repeat(17000)});
+ assert.equal((await worker.fetch(large,env)).status,413);
+ await assert.rejects(()=>makePasswordSecrets('short'));db.close();
+});

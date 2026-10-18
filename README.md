@@ -2,11 +2,13 @@
 
 Slovenská rodinná hra v domácnosti a samostatná ilustrovaná miniknižka. Statické HTML/CSS/JS, bez frameworku a aplikačných účtov. Literárnym zdrojom je úplný autorský dokument GAME STUDIO V2 dodaný používateľom.
 
-## V5 / Etapa 2 – lokálna administrácia
+## V5 / Etapa 2 – administrácia a Cloudflare
 
 Nový [TreasureQuest Admin](admin/README.md) má dashboard, zákazníkov/detail, objednávky, hernú analytiku, e-mailové koncepty, Worker API a samostatné D1 migrácie. [Ukážka](admin/docs/dashboard-preview.png) obsahuje iba fiktívne lokálne dáta. [Inventúra a schvaľovací plán](admin/docs/DEPLOYMENT.md) zaznamenávajú oddelenie od existujúcich Cloudflare projektov.
 
-Produkčné Cloudflare zdroje ani Access sa zatiaľ nevytvárali. Administrácia zostáva lokálna; `admin/` sa **nekopíruje do `dist/`**. Existujúca hra, lokálny postup a `.openai/hosting.json` zostávajú zachované. Storyboard má na loopback náhľade návrat do lokálneho adminu; na publikovanej Site zostáva admin odkaz neaktívny, kým nebude schválené bezpečné nasadenie. Verejný funnel a rodičovský portál na admin neodkazujú.
+[Produkčný TreasureQuest Admin](https://treasurequest-admin.livingstones-romanduris.workers.dev) je na samostatnom Workeri a D1. Prihlásenie vyžaduje iba heslo; ochrana HTML, assetov a API sa overuje na serveri. Používateľ schválil nové zdroje aj presné D1 UUID pred migráciami. Produkcia aj oddelený preview majú prázdne zákaznícke dáta. Pôvodné dva Cloudflare projekty sa nemenili.
+
+`admin/` sa **nekopíruje do `dist/`**. Existujúca hra, lokálny postup a `.openai/hosting.json` zostávajú zachované. Interný storyboard umožňuje návrat na chránenú administráciu. Verejný funnel a rodičovský portál na admin neodkazujú.
 
 ## Spustenie a build
 
@@ -18,7 +20,7 @@ Nasadzovaný výstup pripraví `node scripts/prepare-static.mjs`. Kopíruje hlav
 
 - **`index.html` – predajný funnel.** Hero s hodnotou produktu, cenou a CTA nad prvým mobilným posunom; pôvodné zábery aktivít, tri kroky, rodinné benefity, Pixelkovia, obsah balíka, cena, FAQ a záverečné CTA. Žiadna navigácia na prípravu, materiály, Atlas, storyboard, administráciu ani testovaciu hru. Ani rozpracovaný postup nezobrazí verejné tlačidlo na hranie. Všetky nákupné CTA používajú jedinú integračnú akciu `purchase` a otvárajú oznámenie **Predaj pripravujeme**, bez platby, objednávky či odomknutia hry. Cena základnej hry je 14,99 €; nie je zobrazená zľava ani predchádzajúca cena.
 - **`parent.html` – rodičovský testovací portál.** Uvítanie, stiahnutie všetkých aj jednotlivých materiálov, povinný checklist, presné rozmiestnenie stôp, pomoc rodičovi, upozornenie na telefón a testovací štart. Neodkazuje na funnel, storyboard ani administráciu. Pripravované rozšírenia: rozprávková knižka 4,99 €, Piko/Lístok/Kvak po 2,99 €, pracovný kompletný balík 19,99 €. Ich obsah ani nákup sa nepredstierajú a tlačidlá sú deaktivované. Existujúci Atlas zostáva bonusom po finále.
-- **`storyboard.html` – interný vývojový náhľad.** Desať pôvodných etáp, scény, odpovede, nápovedy, médiá, tlač jednotlivých listov a izolované testovanie. Interná navigácia vedie na funnel a rodičovský náhľad; budúca administrácia je len označenie „Pripravujeme“. Duplicitná veľká navigácia k Atlasu a kompletným materiálom je odstránená. Každá etapa je predvolene zbalená; po otvorení sa hneď ukazuje riešenie. Testovacie odkazy nemenia rodinný postup.
+- **`storyboard.html` – interný vývojový náhľad.** Desať pôvodných etáp, scény, odpovede, nápovedy, médiá, tlač jednotlivých listov a izolované testovanie. Interná navigácia vedie na funnel a rodičovský náhľad; odkaz TreasureQuest Admin vedie na samostatnú chránenú administráciu. Duplicitná veľká navigácia k Atlasu a kompletným materiálom je odstránená. Každá etapa je predvolene zbalená; po otvorení sa hneď ukazuje riešenie. Testovacie odkazy nemenia rodinný postup.
 - **`game.html` – adresa existujúceho herného rozhrania.** Štart z pripraveného portálu zachová používateľské gesto pre video/zvuk/fullscreen. Návrat do prehľadu vedie do rodičovského portálu. Nové načítanie tejto adresy otvorí prípravu; hra ani video sa nespúšťajú automaticky. Tlačidlo Pokračovať obnoví existujúci postup v rovnakom prehliadači. Herný kľúč `zahada-v1-progress`, ID etáp, odpovede, médiá a nápovedy zostávajú kompatibilné.
 
 ### Checklist a rozhrania pre ďalšiu etapu

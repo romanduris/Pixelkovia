@@ -22,7 +22,7 @@
   const purchase = {action:'purchase', label:`ZAŽIŤ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'coming-soon'};
   // Production is deliberately fail-closed until real server purchase verification exists.
   const access = {mode:'test', canLaunch: preparationReady => access.mode === 'test' && preparationReady};
-  const management = {url:null, localPreviewUrl:'http://127.0.0.1:8787'};
+  const management = {url:'https://treasurequest-admin.livingstones-romanduris.workers.dev', localPreviewUrl:'http://127.0.0.1:8787'};
   const managementUrl = () => {
     const local = ['localhost','127.0.0.1','[::1]'].includes(location.hostname);
     const value = management.url || (local ? management.localPreviewUrl : null);

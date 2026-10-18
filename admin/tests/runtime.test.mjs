@@ -23,3 +23,23 @@ test('actual workerd/D1 runtime: migrations, protected APIs, server checklist, d
   assert.equal((await first(db,'SELECT attempts FROM game_stage_progress')).attempts,1);
  }finally{await mf.dispose();}
 });
+
+test('password-only authentication works in actual Workers/D1 runtime and gates assets and APIs',async()=>{
+ const {makePasswordSecrets}=await import('../src/password-auth.mjs');
+ const password='runtime-test-only-password-84931';
+ const secrets=await makePasswordSecrets(password);
+ const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-password-runtime'},bindings:{ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',...secrets},serviceBindings:{ASSETS:async request=>new Response(new URL(request.url).pathname==='/'?'protected-admin':'login-asset')}}));
+ try{
+  const db=await mf.getD1Database('TQ_DB');
+  for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
+  const unauth=await mf.dispatchFetch('https://admin.example.invalid/',{redirect:'manual'});assert.equal(unauth.status,303);
+  assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/customers')).status,401);
+  assert.equal((await mf.dispatchFetch('https://admin.example.invalid/login')).status,200);
+  const login=await mf.dispatchFetch('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify({password})});
+  assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
+  const authenticated=await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}});assert.equal(authenticated.status,200);
+  assert.equal((await mf.dispatchFetch('https://admin.example.invalid/',{headers:{cookie}})).status,200);
+  const logout=await mf.dispatchFetch('https://admin.example.invalid/api/admin/logout',{method:'POST',headers:{origin:'https://admin.example.invalid',cookie}});assert.equal(logout.status,200);
+  assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}})).status,401);
+ }finally{await mf.dispose();}
+});
