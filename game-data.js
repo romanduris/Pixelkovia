@@ -157,40 +157,43 @@ window.GAME = {
     },
     {
       "id": "document",
-      "title": "Iskrin odkaz",
+      "title": "Iskrin dekódovací stroj",
       "label": "Úloha 2",
-      "icon": "▤",
+      "icon": "◉",
       "time": [
         1,
         2,
-        4
+        5
       ],
       "reward": "V",
       "answer": [
         "OKNO",
         "POD OKNOM"
       ],
-      "placeholder": "Miesto z dokumentu",
+      "placeholder": "Rozlúštené miesto",
       "story": [
         [
           "Na displeji sa objaví Kvak.",
-          "„Zachytil som časti Iskrinho odkazu. Lenže signál nimi tak zatriasol, že neviem, v akom poradí majú byť.“",
+          "„Zachytil som časti Iskrinho odkazu. Je zašifrovaný a jej dekódovací stroj sa rozpadol na dva kruhy.“",
           "Vedľa neho sa objaví Piko.",
           "„Iskra je naša najlepšia hľadačka skrytých značiek. Keď niekde zhasne svetlo, ona vždy nájde spôsob, ako ukázať ostatným cestu.“",
-          "Kvak si povzdychne.",
-          "„Len keby sme vedeli, kde ju hľadať.“"
+          "Na papieri čakajú dva kruhy s písmenami.",
+          "Kvak sa na ne zahľadí.",
+          "„Vyzerá to ako dva koláče.“",
+          "Piko sa usmeje.",
+          "„Nie sú to koláče. Je to Iskrin dekódovací stroj. Keď ho správne nastavíme, ukáže nám ďalšiu stopu.“"
         ]
       ],
-      "action": "Nájdite obálku 2 podľa Kvakovej hlasovej indície. Vyberte iba štyri Iskrine pásiky P2 a na stole ich poskladajte podľa čísel v rohoch. Môžete ich spojiť papierovou páskou.",
-      "task": "Prečítajte zloženú vetu „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJTE NÍZKO.“ Zadajte hlavné miesto, ku ktorému vás veta posiela.",
-      "materials": "P2: štyri premiešané pásiky v obálke 2 pri okne. P3: osobitne uzavretá karta symbolov nízko pod oknom, označená Úloha 3.",
-      "mobile": "Zadanie názvu miesta odomkne druhé písmeno a pokyn vyzdvihnúť kartu.",
-      "solution": "OKNO; uznáva sa aj POD OKNOM.",
+      "action": "Nájdite obálku 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
+      "task": "Na Iskrinom dekódovacom stroji nastavte vonkajšie D oproti vnútornému A. Každé písmeno odkazu SRG RNQRP na vonkajšom kruhu prečítajte ako zodpovedajúce vnútorné písmeno. Kam vás odkaz posiela?",
+      "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a odkazom SRG RNQRP, celý v obálke 2 pri okne. P3: osobitne uzavretá karta symbolov nízko pod oknom. Detské nožnice.",
+      "mobile": "Zadanie rozlúšteného miesta POD OKNOM odomkne písmeno V a pokyn vyzdvihnúť Šutkovu kartu.",
+      "solution": "Posun −3: SRG RNQRP → POD OKNOM. Uznáva sa aj OKNO. Pod oknom nájdete kartu P3 so Šutkovými symbolmi.",
       "hints": [
-        "Malé čísla určujú poradie pásikov.",
-        "Veta sa začína slovami POD OKNOM."
+        "Vonkajšie D nastavte oproti vnútornému A. Pre každé vonkajšie písmeno čítajte vnútorné písmeno o tri dozadu.",
+        "S sa prečíta ako P, R ako O a G ako D. Prvé slovo je POD."
       ],
-      "parent": "Obálku 2 s P2 položte pri okne na bezpečné miesto na dosah detí. Okno sa neotvára a na parapet sa nelezie. P3 samostatne preložte a uzavrite do označeného obalu Úloha 3 – otvoriť po zložení odkazu; umiestnite nízko pod okno.",
+      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 samostatne uzavrite a označte Úloha 3 – otvoriť po dekódovaní odkazu; umiestnite nízko pod okno.",
       "transition": "„Moje písmeno je V!“ Iskra rozsvieti značky na ceste. „Pod oknom čakajú Šutkove symboly.“",
       "character": "iskra",
       "dramaturgy": [
@@ -198,11 +201,12 @@ window.GAME = {
         "Schopnosť: odhaľovanie skrytých značiek.",
         "Písmeno: V.",
         "Príbehová indícia: svetelné značky sú skryté, nie zničené.",
-        "Nasledujúca aktivita: symboly, logické vzťahy a získanie kontaktu na Šutka."
+        "Nasledujúca aktivita: symboly, logické vzťahy a získanie kontaktu na Šutka.",
+        "Iskra teraz používa dekódovací stroj. Kvakove kúsky odkazu predstavujú dva papierové kruhy; jeho existujúca hlasová správa naďalej vedie k oknu."
       ],
       "resolution": [
         [
-          "Po potvrdení miesta OKNO vezmite kartu symbolov spod okna. Práve cez túto stopu sa Iskra ozve:",
+          "Po rozlúštení odkazu POD OKNOM vezmite kartu symbolov spod okna. Práve cez túto stopu sa Iskra ozve:",
           "Po objavení miesta a nájdení ďalšej fyzickej indície sa mobil rozžiari.",
           "„Haló? Haló!“",
           "Tentoraz sa ozve živý, radostný hlas.",
@@ -274,15 +278,15 @@ window.GAME = {
       ],
       "action": "Vezmite kartu symbolov spod okna. Ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na karte platí △ + △ = 6, ○ + △ = 5 a □ + ○ = 6. Koľko je △ + ○ + □?",
-      "materials": "P3: tri rovnice a otázka. P4: dva šifrovacie kruhy a zakódovaný odkaz, pripravené na stole v obálke 3.",
+      "materials": "P3: tri rovnice a otázka. P4: štyri premiešané pásiky Lístkovho odkazu, pripravené na stole v obálke 3.",
       "mobile": "Overenie jedného čísla; potom pokyn otvoriť obálku 3 na stole.",
       "solution": "△ = 3, ○ = 2, □ = 4. Súčet je 9.",
       "hints": [
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3.",
         "Kruh má hodnotu 2 a štvorec 4. Sčítajte 3 + 2 + 4."
       ],
-      "parent": "Po úspešnej úlohe 2 otvorte samostatný obal P3 pod oknom. Obálka 3 na stole obsahuje P4 a osobitne uzavretý P5 s označením Úloha 5 – otvoriť po prekladači. Dovoľte deťom kresliť tvary alebo ich nahradiť predmetmi.",
-      "transition": "Šutko čaká pri priechode uzavretom zvnútra. Vezmite obálku 3 zo stola; Lístkov prekladač môže vysvetliť jeho značky.",
+      "parent": "Po úspešnej úlohe 2 otvorte samostatný obal P3 pod oknom. Obálka 3 na stole obsahuje P4 a osobitne uzavretý P5 s označením Úloha 5 – otvoriť po zložení odkazu. Dovoľte deťom kresliť tvary alebo ich nahradiť predmetmi.",
+      "transition": "Šutko čaká pri priechode uzavretom zvnútra. Vezmite obálku 3 zo stola; Lístkov poskladaný odkaz môže vysvetliť jeho značky.",
       "character": "sutko",
       "dramaturgy": [
         "Šutko prináša prvú výraznejšiu pochybnosť.",
@@ -290,7 +294,7 @@ window.GAME = {
         "Schopnosť: spevňovanie priechodov.",
         "Písmeno: E.",
         "Atmosféra má byť pokojne tajomná. V tejto chvíli ešte nie je známe, prečo sa priechod uzavrel.",
-        "Nasledujúca aktivita: zostavenie papierového šifrovacieho stroja, kontakt s Lístkom."
+        "Nasledujúca aktivita: zoradenie pásikov Lístkovho odkazu, kontakt s Lístkom."
       ],
       "resolution": [
         [
@@ -340,43 +344,42 @@ window.GAME = {
     },
     {
       "id": "cipher",
-      "title": "Lístkovo varovanie",
+      "title": "Lístkov roztrhaný odkaz",
       "label": "Úloha 4",
-      "icon": "◉",
+      "icon": "▤",
       "time": [
         1,
         2,
-        5
+        4
       ],
       "reward": "T",
       "answer": [
         "STOL",
         "STÔL"
       ],
-      "placeholder": "Rozlúštené slovo",
+      "placeholder": "Miesto zo zloženého odkazu",
       "story": [
         [
           "„Potrebujeme Lístka,“ povie Piko.",
           "„On rozumie starým značkám nášho sveta. Ak niekto vie vysvetliť, čo sa stalo, je to práve on.“",
-          "Na stole čakajú dva papierové kruhy.",
+          "Na stole čakajú štyri papierové pásiky.",
           "Kvak sa na ne zahľadí.",
-          "„Vyzerá to ako dve koláče.“",
-          "„Kvak,“ povzdychne si Iskra.",
-          "„Čo? Veď som ešte nejedol.“",
-          "Piko sa usmeje.",
-          "„Nie sú to koláče. Je to prekladač tajných správ.“"
+          "„Aj Lístkov odkaz sa rozpadol?“",
+          "„Aspoň na ňom zostali čísla,“ všimne si Iskra.",
+          "Piko prikývne.",
+          "„Zoraďme pásiky podľa nich. Možno nám Lístok ukáže, ako pokračovať.“"
         ]
       ],
-      "action": "Vystrihnite oba kruhy P4. Položte menší na väčší a nastavte D nad A. Otáčajte ich okolo spoločného stredu; stačí ich pridržať prstom.",
-      "task": "Použite abecedu A–Z bez diakritiky. Každé vonkajšie písmeno VWRO prečítajte ako zodpovedajúce vnútorné písmeno. Kam vás odkaz posiela?",
-      "materials": "P4: kruhy s 26 písmenami A–Z, značka D → A a odkaz VWRO. Detské nožnice; spinka je voliteľná.",
-      "mobile": "Slovná odpoveď. Po úspechu sprístupní Kubov plán signálu na stole.",
-      "solution": "Posun −3: V → S, W → T, R → O, O → L. Výsledok STOL.",
+      "action": "Vyberte štyri vopred rozstrihané pásiky P4 z obálky 3 na stole. Zoraďte ich podľa čísiel v rohoch od 1 po 4. Môžete ich spojiť papierovou páskou.",
+      "task": "Zoraďte pásiky podľa čísiel. Prečítajte odkaz STÔL / SKRÝVA / KUBOV PLÁN. / TERAZ HO OTVORTE. Do telefónu zadajte miesto, kde čaká Kubov plán.",
+      "materials": "P4: štyri premiešané pásiky Lístkovho odkazu. P5: Kubov plán zostáva v osobitne uzavretom obale na stole až do vyriešenia úlohy 4.",
+      "mobile": "Slovná odpoveď STÔL odomkne písmeno T a sprístupní Kubov plán P5 na stole.",
+      "solution": "Pásiky v poradí 1–4 vytvoria STÔL / SKRÝVA / KUBOV PLÁN. / TERAZ HO OTVORTE. Odpoveď je STÔL; uznáva sa aj STOL.",
       "hints": [
-        "Vonkajšie D musí byť oproti vnútornému A. Vonkajšie písmená teda posuňte o tri dozadu.",
-        "V sa prečíta ako S, W ako T. Pokračujte rovnako."
+        "Malé čísla v rohoch určujú poradie štyroch pásikov.",
+        "Začnite pásikom s číslom 1. Veta sa začína slovom STÔL."
       ],
-      "parent": "Vystrihujú deti pod dohľadom. Nie je nutné prepichovať papier. Tlačené kruhy majú rovnaké uhly, aby sa dali skutočne použiť.",
+      "parent": "P4 vopred rozstrihajte na štyri pásiky, premiešajte a vložte do obálky 3 na stole. P5 nechajte osobitne uzavretý s označením Úloha 5 – otvoriť po zložení odkazu.",
       "transition": "STÔL ukázal miesto ďalšej stopy. Lístok varuje: nič neotvárajte nasilu. Na stole otvorte samostatný obal s Kubovým plánom P5 a nájdite bezpečnú cestu.",
       "character": "listok",
       "dramaturgy": [
@@ -390,14 +393,14 @@ window.GAME = {
       ],
       "resolution": [
         [
-          "Rozlúštené slovo STÔL označuje miesto s Kubovým plánom. Skôr než ho otočíte, spojenie zachytí Lístka:",
+          "Rozlúštené slovo STÔL označuje miesto s Kubovým plánom. Skôr než ho otvoríte, spojenie zachytí Lístka:",
           "Po úspešnom rozlúštení odkazu sa na obrazovke objaví zelená postavička.",
           "V ruke drží drobný zápisník.",
           "„Á, výborne,“ povie pokojne.",
-          "„Už som si myslel, že niekto zabudol, ako sa tieto kruhy používajú.“",
+          "„Už som si myslel, že niekto zabudol, ako sa číta odkaz po poriadku.“",
           "„Lístok!“ vykríkne Piko.",
           "„Som rád, že ťa vidím.“",
-          "„Aj ja vás. A najmä som rád, že ste našli môj prekladač.“",
+          "„Aj ja vás. A najmä som rád, že ste poskladali môj odkaz.“",
           "Lístok sa zadíva na hráčov.",
           "„Vidím, že máme návštevu.“",
           "„Pomáhajú nám!“ vysvetlí Iskra.",

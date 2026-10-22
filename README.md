@@ -27,7 +27,7 @@ Nasadzovaný výstup pripraví `node scripts/prepare-static.mjs`. Kopíruje hlav
 
 `prep-store.js` definuje dvanásť povinných krokov podľa aktuálnej logistiky štyroch obálok a samostatných P3/P5. Progress zobrazuje počet splnených krokov. Štart aj reštart sa odblokujú až po všetkých krokoch **a** samostatnom potvrdení o telefóne. Kontrola je aj v obsluhe akcie, nielen v atribúte `disabled`. Odškrtnutie kroku štart znovu blokuje.
 
-Nové stabilné kľúče `zahada-prep-v5-*` zachovajú tri rovnocenné staré zaškrtnutia (tlač, pomôcky, rozstrihanie P2). Pôvodný všeobecný krok rozmiestnenia automaticky nepotvrdzuje všetky nové jednotlivé úkryty. Staré kľúče ani herný postup sa nemažú. Pri nedostupnom localStorage funguje príprava v pamäti do opustenia stránky. API `read`, `write`, `snapshot`, `ready`, `scope` a `useAdapter` umožňuje neskôr pridať synchronizačný adaptér; teraz ide výlučne o lokálne dáta, bez synchronizácie medzi zariadeniami.
+Kľúče `zahada-prep-v5-*` zachovávajú hotový herný postup a nezmenené prípravné kroky. Po výmene Iskrinej a Lístkovej mechaniky treba znovu potvrdiť tlač a dotknuté obálky s revíziou `iskra-decoder`; rozstrihanie P4 má nový samostatný krok. Staré potvrdenie rozstrihania P2 sa nepovažuje za prípravu P4. Pôvodný všeobecný krok rozmiestnenia automaticky nepotvrdzuje všetky nové jednotlivé úkryty. Staré kľúče ani herný postup sa nemažú. Pri nedostupnom localStorage funguje príprava v pamäti do opustenia stránky. API `read`, `write`, `snapshot`, `ready`, `scope` a `useAdapter` umožňuje neskôr pridať synchronizačný adaptér; teraz ide výlučne o lokálne dáta, bez synchronizácie medzi zariadeniami.
 
 `site-config.js` je spoločný katalóg cien, návrhov produktov a nákupného CTA. Má aj nezobrazovanú zamýšľanú budúcu cenu 29,99 €, nulovú referenčnú cenu/kampaň a rozhranie stavov `not-purchased`, `purchased`, `available`, `coming-soon`. Aktuálne doplnky sú vždy `coming-soon`; nič sa nepredáva ani neoznačuje za zakúpené. Budúci server musí dodať overené oprávnenia; aktuálny klient ich nevyrába.
 
@@ -86,12 +86,12 @@ Príprava pre rodiča:
 | Miesto | Obsah |
 | --- | --- |
 | Kúpeľňa, suchá dostupná polička alebo uteráky | Obálka Kúpeľňa: iba celý P1. Nikdy lieky, čistiace prostriedky, elektrické zariadenia, práčka či sušička. |
-| Pri okne na dosah detí | Obálka 2: iba štyri vopred rozstrihané pásiky P2. Okno sa neotvára, na parapet sa nelezie. |
-| Nízko pod oknom | Samostatne uzavretý P3: „Úloha 3 – otvoriť po zložení odkazu“. |
-| Stôl | Obálka 3: P4 a samostatne uzavretý P5 označený „Úloha 5 – otvoriť po prekladači“. |
+| Pri okne na dosah detí | Obálka 2: celý P2 s Iskriným dekódovacím strojom; dva kruhy vystrihujú až deti. Okno sa neotvára, na parapet sa nelezie. |
+| Nízko pod oknom | Samostatne uzavretý P3: „Úloha 3 – otvoriť po dekódovaní odkazu“. |
+| Stôl | Obálka 3: štyri vopred rozstrihané pásiky P4 a samostatne uzavretý P5 označený „Úloha 5 – otvoriť po zložení odkazu“. |
 | Pod sedadlom dostupnej stoličky | Obálka 4: P6. |
 
-Iskrine pásiky stále skladajú „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJTE NÍZKO.“ Odpoveď OKNO/POD OKNOM zostáva. Oddelené obaly zabránia predčasnému získaniu neskorších stôp. Úlohy 3–8 majú pôvodné riešenia; menia sa iba čísla následných obálok.
+Iskra v úlohe 2 skladá dekódovací stroj P2 a nastavuje vonkajšie D oproti vnútornému A. Posun −3 preloží `SRG RNQRP` na `POD OKNOM`; odpovede OKNO/POD OKNOM zostávajú platné. Lístok v úlohe 4 má namiesto stroja pásiky P4: `STÔL / SKRÝVA / KUBOV PLÁN. / TERAZ HO OTVORTE.` Odpovede STÔL/STOL zostávajú platné. Preto sa nemenia úkryty, ID etáp, získavané písmená ani uložené splnené úlohy. Príbeh, checklist, návod, jednotlivé PDF a spoločný balík používajú nové mechaniky. Dodané video a Kvakova nahrávka sa nemenia; jeho kúsky odkazu predstavujú časti Iskrinho stroja.
 
 ## Príbehový model a súbory
 
@@ -99,7 +99,7 @@ Iskrine pásiky stále skladajú „POD OKNOM / JE LIST / SO SYMBOLMI. / HĽADAJ
 - `site-config.js` a `prep-store.js`: spoločný produktový katalóg, nákupný integračný bod a lokálny adaptér prípravy.
 - `app.js`: oddelenie prostredí, kontrola spustenia, displej s videosprávou, čítačka scén, validácia ôsmich úloh, zápisník, mapa, lokálny postup, príprava a kompletný Game Master.
 - `atlas.html` + `atlas.css`: samostatná miniknižka. Všetkých 143 odsekov kapitoly Tajný svet Pixelkov a dva úplné literárne odseky každého zo siedmich profilov sú priamo v HTML; na čítanie netreba JavaScript ani uložený postup. Názvoslovie a súvisiaca gramatika boli prispôsobené schválenému názvu Ochranné pole.
-- `printables.html` + `print-materials.js` + `signal-print.css`: finálny jednostranný Kvakov P1 vo formáte A4, pôvodné hlavolamy P2–P6, diplom a úvodný jednostranový návod pre Game mastra. Návod obsahuje odporúčanie farebnej aj čiernobielej tlače, balenie stôp a spoločné pokyny s nápovedou ku každej etape. Biele/svetlé plochy, tmavomodrý text, obrysy, oficiálny výrez Kvaka a malé akcenty šetria atrament. Význam nespolieha na farbu. Hráčsky odkaz `?sheet=p1` zobrazí a vytlačí iba daný list bez neskorších indícií a rodičovského riešenia. Interný odkaz `?internalPreview=1#p1` ponechá všetkých osem strán a posunie na vybraný list. Návrat vedie do storyboardu.
+- `printables.html` + `print-materials.js` + `signal-print.css`: finálny jednostranný Kvakov P1 vo formáte A4, aktuálne hlavolamy P2–P6, diplom a úvodný jednostranový návod pre Game mastra. Návod obsahuje odporúčanie farebnej aj čiernobielej tlače, balenie stôp a spoločné pokyny s nápovedou ku každej etape. Biele/svetlé plochy, tmavomodrý text, obrysy, oficiálny výrez Kvaka a malé akcenty šetria atrament. Význam nespolieha na farbu. Hráčsky odkaz `?sheet=p1` zobrazí a vytlačí iba daný list bez neskorších indícií a rodičovského riešenia. Interný odkaz `?internalPreview=1#p1` ponechá všetkých osem strán a posunie na vybraný list. Návrat vedie do storyboardu.
 - `styles.css` + `adventure.css`: základné rozloženie a existujúci pixel-art vzhľad vrátane V2 čítačky.
 - `assets/pixelkovia-atlas.png`: oficiálny obrazový atlas 4 × 2 políčka, Piko / Kvak / Iskra / Šutko, Lístok / Kubo / Ryško / priechod. Rovnaké CSS výrezy slúžia hre aj literárnym profilom. `assets/pixelkovia-room.png` tvorí titulnú ilustráciu. Nové postavy ani externé referenčné obrázky nepribudli. Podrobnosti sú v `assets/IMAGE-SOURCES.md`.
 

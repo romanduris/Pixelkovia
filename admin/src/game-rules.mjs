@@ -14,15 +14,15 @@ export const stages = [
   },
   {
     "stage": 2,
-    "title": "Iskrin odkaz",
+    "title": "Iskrin dekódovací stroj",
     "answers": [
       "OKNO",
       "POD OKNOM"
     ],
     "digital": false,
     "hints": [
-      "Malé čísla určujú poradie pásikov.",
-      "Veta sa začína slovami POD OKNOM."
+      "Vonkajšie D nastavte oproti vnútornému A. Pre každé vonkajšie písmeno čítajte vnútorné písmeno o tri dozadu.",
+      "S sa prečíta ako P, R ako O a G ako D. Prvé slovo je POD."
     ]
   },
   {
@@ -39,15 +39,15 @@ export const stages = [
   },
   {
     "stage": 4,
-    "title": "Lístkovo varovanie",
+    "title": "Lístkov roztrhaný odkaz",
     "answers": [
       "STOL",
       "STÔL"
     ],
     "digital": false,
     "hints": [
-      "Vonkajšie D musí byť oproti vnútornému A. Vonkajšie písmená teda posuňte o tri dozadu.",
-      "V sa prečíta ako S, W ako T. Pokračujte rovnako."
+      "Malé čísla v rohoch určujú poradie štyroch pásikov.",
+      "Začnite pásikom s číslom 1. Veta sa začína slovom STÔL."
     ]
   },
   {

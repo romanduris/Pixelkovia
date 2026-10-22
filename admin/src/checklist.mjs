@@ -2,15 +2,15 @@
 export const checklist = [
   {
     "id": "printed",
-    "label": "Vytlačil som P1–P6 jednostranne na A4; P4 obsahuje oba kruhy."
+    "label": "Vytlačil som P1–P6 jednostranne na A4; P2 obsahuje oba kruhy."
   },
   {
     "id": "supplies",
     "label": "Pripravil som štyri obálky, dva samostatné obaly, ceruzku, pásku a detské nožnice."
   },
   {
-    "id": "cut-p2",
-    "label": "Rozstrihal som iba P2 na štyri pásiky. P1 a kruhy P4 vystrihujú až deti."
+    "id": "cut-p4",
+    "label": "Rozstrihal som iba P4 na štyri pásiky. P1 a kruhy P2 vystrihujú až deti."
   },
   {
     "id": "envelope-1",
@@ -22,7 +22,7 @@ export const checklist = [
   },
   {
     "id": "envelope-2",
-    "label": "Pripravil som druhú obálku so štyrmi premiešanými pásikmi P2."
+    "label": "Pripravil som druhú obálku s celým Iskriným dekódovacím strojom P2."
   },
   {
     "id": "window",
@@ -30,11 +30,11 @@ export const checklist = [
   },
   {
     "id": "symbols",
-    "label": "P3 je nízko pod oknom v samostatnom obale označenom „Úloha 3 – otvoriť po zložení odkazu“."
+    "label": "P3 je nízko pod oknom v samostatnom obale označenom „Úloha 3 – otvoriť po dekódovaní odkazu“."
   },
   {
     "id": "table",
-    "label": "Obálka 3 je na stole: P4 a osobitne uzavretý P5 označený „Úloha 5 – otvoriť po prekladači“."
+    "label": "Obálka 3 je na stole: štyri premiešané pásiky P4 a osobitne uzavretý P5 označený „Úloha 5 – otvoriť po zložení odkazu“."
   },
   {
     "id": "chair",

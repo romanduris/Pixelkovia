@@ -114,7 +114,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     await old.goto(BASE);
     await old.evaluate(() => {for(let i=0;i<6;i++)localStorage.setItem('zahada-prep-'+i,'1');});
     await old.goto(BASE+'/parent.html');
-    assert.equal(await old.locator('[data-check]:checked').count(),3);
+    assert.equal(await old.locator('[data-check]:checked').count(),1,'only unchanged supplies migrate; old paper preparation is obsolete');
     assert.ok(await old.locator('[data-action="start"]').isDisabled());
     await legacy.close();
     assert.deepEqual(errors,[]);
