@@ -35,3 +35,18 @@ Skutočný náhľad a jednostranové A4 PDF sú exportované z koreňového `pri
 ### assets/kvak-qr-dummy.svg
 
 Ručne zostavená dekoratívna SVG maketa pre predstavu rozloženia P1. Neobsahuje zakódované dáta ani odkaz; nemá platnú štruktúru QR a je označená DEMO / NEFUNKČNÁ.
+
+## Spoločné príbehové ilustrácie na P1–P6
+
+Šesť nových scén v `assets/printable-scenes/` vzniklo vstavaným nástrojom `image_gen`, s existujúcim `pixelkovia-atlas.png` ako predlohou vzhľadu postáv. Nejde o zostavu pôvodných portrétov: postavičky majú nové pózy, gestá a spoločnú činnosť podľa príbehu. Biele pozadie obmedzuje veľké farebné plochy pri tlači. Obrázky neobsahujú riešenia ani čitateľné písmená a čísla.
+
+| Súbor | Scéna |
+| --- | --- |
+| `p1-kvak-piko.png` | Piko volá komunikátorom a Kvak načúva slabému spojeniu. Iba títo dvaja kamaráti. |
+| `p2-iskra.png` | Iskra svieti pri papierovom stroji, Piko a Kvak jej pomáhajú. |
+| `p3-sutko.png` | Šutko drží most, pri ňom sú Piko, Kvak a Iskra. |
+| `p4-listok.png` | Lístok číta knižku a s predchádzajúcimi štyrmi kamarátmi skúma presne štyri pásiky. Cielená druhá úprava odstránila nadbytočný piaty papier. |
+| `p5-kubo-rysko.png` | Kubo s partiou opravuje cestu a na jej konci sa ozýva posledný kamarát Ryško. PDF obsahuje úlohy 5 aj 6. |
+| `p6-spolocny-navrat.png` | Všetkých sedem Pixelkov spolu pripravuje návrat pri svetelnej bráne. |
+
+Úplné použité prompty vrátane cielenej opravy sú uložené v [printable-scenes/PROMPTS.json](printable-scenes/PROMPTS.json). Pôvodné výstupy zostali zachované v priečinku generátora; vybrané obrázky sú skopírované do repozitára. Horný portrét na každom liste je pôvodný výrez aktuálne hovoriaceho Pixelka, spoločná scéna má vlastný rámček vedľa misie.

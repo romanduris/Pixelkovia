@@ -175,3 +175,43 @@
  .story-sheet .card>strong{font-size:12pt;letter-spacing:1pt;padding:1mm}
  .story-sheet .footer{margin-top:auto;padding-top:2mm;font-size:6pt}
 }
+
+/* The speaking character stays with the letter; the shared scene has its own frame. */
+.worksheet-speaker{float:right;display:flex;flex-direction:column;align-items:center;gap:4px;margin:0 0 6px 14px;break-inside:avoid}
+.worksheet-speaker .worksheet-speaker-avatar{width:48px;height:48px;border:1px solid #9aaec6;border-radius:8px}
+.worksheet-speaker figcaption{font:600 10px/1.3 Arial,sans-serif;color:#172e4d}
+.worksheet-visual-row{display:grid;grid-template-columns:3fr 2fr;gap:12px;margin:13px 0;break-inside:avoid}
+.worksheet-visual-row>.worksheet-mission,.worksheet-visual-row>.kvak-print-mission{margin:0}
+.worksheet-scene{border:1px solid #9aaec6;background:white;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:10px;margin:0;min-width:0;break-inside:avoid}
+.worksheet-scene-label{font:700 9px/1.3 monospace;letter-spacing:.3px;color:#334d70;text-align:center}
+.worksheet-scene img{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:contain}
+.worksheet-scene figcaption{font:11px/1.5 Arial,sans-serif;color:#253c4d;text-align:center}
+@media screen and (max-width:600px){.worksheet-visual-row{grid-template-columns:1fr}.worksheet-scene{padding:14px}.worksheet-speaker .worksheet-speaker-avatar{width:45px;height:45px}}
+@media print{
+ .worksheet-speaker{gap:1mm;margin:0 0 1mm 3mm}
+ .worksheet-speaker .worksheet-speaker-avatar,.story-sheet .worksheet-speaker .worksheet-speaker-avatar{width:12mm;height:12mm;border-radius:2mm}
+ .worksheet-speaker figcaption{font-size:6.5pt}
+ .worksheet-visual-row{grid-template-columns:3fr 2fr;gap:3mm;margin:3mm 0}
+ .worksheet-visual-row>.worksheet-mission,.worksheet-visual-row>.kvak-print-mission{margin:0;padding:2mm 3mm}
+ .worksheet-scene{padding:2mm;gap:1.5mm}
+ .worksheet-scene-label{font-size:6.5pt}
+ .worksheet-scene figcaption{font-size:7.5pt;line-height:1.35}
+ #p1 .worksheet-scene img{height:30mm;aspect-ratio:auto;object-fit:cover;object-position:center}
+ .kvak-print-heading h2{max-width:calc(100% - 35mm);font-size:19pt}
+ .kvak-code-panel,.kvak-qr-panel{padding:2mm}
+ .kvak-print-controls{margin-top:2mm}
+ .signal-cutout{height:41mm}
+ #p5 .worksheet-visual-row{margin:2mm 0}
+ #p5 .worksheet-visual-row>.worksheet-mission{margin:0}
+ #p2 .worksheet-heading,#p6 .worksheet-heading{margin-bottom:2mm}
+ #p2 .worksheet-visual-row{margin:2mm 0}
+ #p2 .worksheet-story{padding-block:2mm}
+ #p2 .worksheet-puzzle{padding:2mm;margin-bottom:2mm}
+ #p2 .worksheet-secret,#p2 .worksheet-next,#p2 .instructions{margin-bottom:2mm}
+ #p2 .footer{padding-top:1.5mm}
+ #p5 .worksheet-puzzle{padding-block:1.5mm}
+ #p5 .worksheet-companion{margin-bottom:2mm}
+ #p6 .poem>div{padding-block:1mm}
+ #p6 .pledge-puzzle{padding-block:2mm}
+ #p6 .card{padding-block:2mm}
+}

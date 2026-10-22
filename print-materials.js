@@ -68,6 +68,29 @@
     html=html.replace(/<span class="footer">[^<]+<\/span>/,`<span class="footer">PIXELKOVIA · ${envelopeLabel}</span>`);
     sheets[id]=html;
   }
+  const illustratedScenes={
+    p1:{file:'p1-kvak-piko',caption:'Hľadáme spoločné spojenie.',alt:'Piko volá cez komunikátor a Kvak načúva slabému signálu.'},
+    p2:{file:'p2-iskra',caption:'Posvietim nám na ďalšiu stopu.',alt:'Iskra svieti na dekódovací stroj a Piko s Kvakom jej pomáhajú.'},
+    p3:{file:'p3-sutko',caption:'Podržím most, aby sme mohli ísť spolu.',alt:'Šutko podopiera most a pomáhajú mu Piko, Kvak a Iskra.'},
+    p4:{file:'p4-listok',caption:'Spolu prečítame môj odkaz.',alt:'Lístok skúma knižku a pásiky spolu s Pikom, Kvakom, Iskrou a Šutkom.'},
+    p5:{file:'p5-kubo-rysko',caption:'Opravujeme cestu a hľadáme Ryška.',alt:'Kubo s piatimi kamarátmi opravuje cestu a na jej konci sa ozýva Ryško.'},
+    p6:{file:'p6-spolocny-navrat',caption:'Spolu sa pripravujeme na cestu domov.',alt:'Všetkých sedem Pixelkov spája svoje schopnosti pri návratovej bráne.'}
+  };
+  function speakerPortrait(stageId) {
+    const stage=window.GAME.stages.find(item=>item.id===stageId);
+    const character=window.GAME.characters.find(item=>item.id===(stage.character||'piko'));
+    return `<figure class="worksheet-speaker"><span class="party-sprite worksheet-speaker-avatar" role="img" aria-label="${character.name}" style="--sprite-x:${character.tile%4*100/3}%;--sprite-y:${character.tile>=4?100:0}%"></span><figcaption>${character.name}</figcaption></figure>`;
+  }
+  for(const [id,stageId] of Object.entries(sheetStages)) {
+    const scene=illustratedScenes[id];
+    const illustration=`<figure class="worksheet-scene" data-scene="${scene.file}"><div class="worksheet-scene-label">SPOLU V PRÍBEHU</div><img src="assets/printable-scenes/${scene.file}.png" alt="${scene.alt}" width="1536" height="512"><figcaption>${scene.caption}</figcaption></figure>`;
+    let html=sheets[id].replace(window.STORY_TEXT.party(stageId),speakerPortrait(stageId));
+    if(id==='p5')html=html.replace(window.STORY_TEXT.party('digital'),speakerPortrait('digital'));
+    const mission=id==='p1'?/<div class="kvak-print-mission">[\s\S]*?<\/ol><\/div>/:/<section class="worksheet-mission">[\s\S]*?<\/section>/;
+    html=html.replace(mission,match=>`<div class="worksheet-visual-row">${match}${illustration}</div>`);
+    if(id==='p1')html=html.replace('KVAKOVE<br>ROZHÁDZANÉ SIGNÁLY','KVAKOVE ROZHÁDZANÉ SIGNÁLY');
+    sheets[id]=html;
+  }
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const bathroom = {
     label: 'Úloha 1 – Kúpeľňa',
@@ -118,7 +141,7 @@
     if(stageId==='code')return sheet.querySelector('.card').outerHTML;
     sheet.querySelector('.worksheet-heading .label')?.remove();
     sheet.querySelector('.worksheet-heading .print-wave')?.remove();
-    sheet.querySelectorAll('.sheet-avatar,.footer,.no-print,svg,.circles').forEach(node=>node.remove());
+    sheet.querySelectorAll('.sheet-avatar,.footer,.no-print,.worksheet-scene,svg,.circles').forEach(node=>node.remove());
     return sheet.innerHTML;
   }
   function parentGuide() {
