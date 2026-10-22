@@ -25,7 +25,11 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await printed.locator('.sheet').count(),8);assert.equal(await printed.locator('.sheet:visible').count(),8);
  assert.equal(normalize(await bathroom.locator('.worksheet-text').innerText()),normalize(await printed.locator('.kvak-print-story').innerText()+' '+await printed.locator('.kvak-print-mission').innerText()));
  assert.equal(normalize((await bathroom.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator('#rodicovsky-navod .adult-help[data-stage="envelope"] p').allTextContents()).join(' ')));
- assert.equal(normalize(await bathroom.locator('.storyboard-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .storyboard-solution').innerText()));
+ assert.equal(normalize(await bathroom.locator('.gm-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .gm-solution').innerText()));
+ assert.equal(await bathroom.locator('.storyboard-content>.gm-instructions').count(),1);
+ assert.equal(await bathroom.locator('.storyboard-content>.adult-help').count(),0);
+ assert.match(await bathroom.locator('.gm-instructions>h3').innerText(),/Inštrukcie pre Game mastra/);
+ assert.ok(!/Celý list P1|vložte do obálky|previažte/.test(await bathroom.locator('.gm-instructions').innerText()));
  assert.equal(await printed.locator('.sheet').first().getAttribute('id'),'rodicovsky-navod');
  assert.equal(await printed.locator('.guide-stage').count(),10);
  for(const id of await page.evaluate(()=>GAME.stages.map(stage=>stage.id))){

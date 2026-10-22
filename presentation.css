@@ -146,11 +146,17 @@ body[data-environment="designer"] .message-copy p,body[data-environment="designe
 .message-copy p{margin:0 0 12px}.message-copy p:last-child{margin:0}
 .message-copy pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:14px 0 0}
 body[data-environment="designer"] .message-copy h4{font-weight:700;margin:0 0 12px}
-body[data-environment="designer"] .adult-help{padding:23px 26px;background:#163a35;border:1px solid #477e6c;border-radius:8px;margin:12px 0 22px}
-body[data-environment="designer"] .adult-help h3{font-size:17px;color:#cbf1de;margin:0 0 14px}
-body[data-environment="designer"] .adult-help p{font-size:14px;line-height:1.8;color:#b8d8cc;margin:0 0 12px}
+body[data-environment="designer"] .adult-help{padding:23px 26px;background:#e8f1ee;border:1px solid #a2bfc0;border-left:4px solid #528d87;border-radius:6px;margin:12px 0 22px}
+body[data-environment="designer"] .adult-help h3{font-size:17px;color:#2d5558;margin:0 0 14px}
+body[data-environment="designer"] .adult-help p{font-size:14px;line-height:1.8;color:#405b68;margin:0 0 12px}
 body[data-environment="designer"] .adult-help p:last-child{margin-bottom:0}
-body[data-environment="designer"] .adult-help .adult-safety{font-size:12px;color:#a2c5b6}
+body[data-environment="designer"] .adult-help .adult-safety{font-size:12px;color:#526b6b}
+body[data-environment="designer"] .gm-instructions .adult-help{padding:0!important;border:0;background:none;margin:0 0 20px}
+body[data-environment="designer"] .gm-instructions .gm-solution{border-top:1px solid #b5ceca;padding-top:17px}
+body[data-environment="designer"] .gm-instructions h4{font:700 14px/1.5 'DM Sans',sans-serif;color:#2d5558;margin:0 0 10px}
 .storyboard-sheet-actions{justify-content:flex-start;padding-top:6px;margin-bottom:0}
 @media(max-width:800px){body[data-environment="designer"] .site-header{height:auto;min-height:100px;padding-top:20px;padding-bottom:20px;gap:22px;flex-wrap:wrap}.storyboard-top-links{margin-left:0!important;justify-content:flex-start;gap:9px}.storyboard-top-links .btn{font-size:10px;white-space:normal}body[data-environment="designer"] .worksheet-review{grid-template-columns:1fr;gap:25px}.worksheet-image{max-width:460px}.kvak-message-controls{align-items:flex-start}.message-copy{padding:18px}.adult-help{padding:20px!important}}
-@media print{.storyboard-top-links,.storyboard-sheet-actions{display:none}}
+@media print{.storyboard-top-links,body[data-environment="designer"] .gm-instructions .adult-help{padding:0!important;border:0;background:none;margin:0 0 20px}
+body[data-environment="designer"] .gm-instructions .gm-solution{border-top:1px solid #b5ceca;padding-top:17px}
+body[data-environment="designer"] .gm-instructions h4{font:700 14px/1.5 'DM Sans',sans-serif;color:#2d5558;margin:0 0 10px}
+.storyboard-sheet-actions{display:none}}

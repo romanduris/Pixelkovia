@@ -16,7 +16,7 @@
 .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:12px;line-height:1.45;margin:0 0 5px}
 .parent-guide .adult-safety{font-size:11px!important;color:#52665c}
 .parent-guide .storyboard-solution{padding:6px 8px;border-left:2px solid #759b87;background:#f1f6f2;margin-top:7px}
-.parent-guide .storyboard-solution h3{font-size:12px;margin-bottom:3px}
+.parent-guide .storyboard-solution h3,.parent-guide .storyboard-solution h4{font-size:12px;margin-bottom:3px}
 .parent-guide .storyboard-answer{display:block;font:700 15px/1.3 monospace;color:#24583d;margin-bottom:4px}
 .parent-guide .footer{position:static;display:block;margin-top:15px;font-size:9px}
 @media screen{header nav{flex-wrap:wrap}body:has(.parent-guide) .sheet:not(.kvak-sheet){scroll-margin-top:25px}}
@@ -34,7 +34,7 @@
   .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:9pt;line-height:1.38;margin-bottom:1mm}
   .parent-guide .adult-safety{font-size:8pt!important}
   .parent-guide .storyboard-solution{padding:1mm 2mm;margin-top:1mm;background:white}
-  .parent-guide .storyboard-solution h3{font-size:9pt}
+  .parent-guide .storyboard-solution h3,.parent-guide .storyboard-solution h4{font-size:9pt}
   .parent-guide .storyboard-answer{font-size:11pt;margin-bottom:1mm}
   .parent-guide .footer{font-size:6pt;margin-top:2mm}
 }

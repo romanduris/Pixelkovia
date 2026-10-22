@@ -13,9 +13,8 @@
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const bathroom = {
     label: 'Úloha Kúpeľňa',
-    placement: 'Celý list P1 vložte do obálky označenej Kúpeľňa. Schovajte ju medzi zložené uteráky, do dostupnej skrinky s uterákmi alebo za ľahký košík na suchej poličke. Signály vystrihujú až deti.',
-    hint: 'Nechajte deti vystrihnúť a otočiť všetkých šesť signálov. Zoraďujú ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.',
-    safety: 'Vyberte suché miesto na dosah detí. Obálku nedávajte do práčky ani sušičky, k elektrickým zariadeniam, liekom alebo čistiacim prostriedkom.'
+    placement: 'Stopu k úlohe Kúpeľňa schovajte medzi zložené uteráky, do dostupnej skrinky s uterákmi alebo za ľahký košík na suchej poličke.',
+    hint: 'Deti vystrihnú a otočia šesť signálov. Zoradia ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.'
   };
   const parentInstructions = {
     intro: {label:'Úvod', placement:'Telefón so spustenou hrou a zapnutým zvukom položte tam, kde ho deti budú počuť. Vyzvite ich, nech si vypočujú Pikovu správu aj viackrát a skúsia zistiť, kam ísť.', hint:'Ak váhajú, nech pozorne počúvajú posledné slová pred prerušením spojenia.'},
@@ -31,7 +30,7 @@
   };
   function adultHelp(id='envelope', compact=false) {
     const entry=parentInstructions[id];
-    return `<section class="adult-help" data-stage="${esc(id)}" aria-label="Inštrukcie a nápoveda pre dospelého">${compact?'':'<h3>Inštrukcie a nápoveda pre dospelého</h3>'}<p><strong>${id==='intro'?'Spustenie.':'Príprava.'}</strong> ${esc(entry.placement)}</p><p><strong>Nápoveda.</strong> ${esc(entry.hint)}</p>${entry.safety?`<p class="adult-safety">${esc(entry.safety)}</p>`:''}</section>`;
+    return `<section class="adult-help" data-stage="${esc(id)}" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}<p><strong>${id==='intro'?'Spustenie.':id==='envelope'?'Úkryt.':'Príprava.'}</strong> ${esc(entry.placement)}</p><p><strong>Nápoveda.</strong> ${esc(entry.hint)}</p>${entry.safety?`<p class="adult-safety">${esc(entry.safety)}</p>`:''}</section>`;
   }
   function solutionAnswer(stage) {
     const symbols={moon:'mesiac',sun:'slnko',star:'hviezda'};
@@ -39,7 +38,10 @@
   }
   function bathroomSolution() {
     const stage=GAME.stages[1];
-    return `<section class="storyboard-solution" aria-label="Riešenie etapy"><h3>Riešenie</h3><strong class="storyboard-answer">${esc(stage.answer[0])}</strong><p>${esc(stage.solution)}</p></section>`;
+    return `<div class="gm-solution" aria-label="Riešenie etapy"><h4>Riešenie</h4><strong class="storyboard-answer">${esc(stage.answer[0])}</strong><p>${esc(stage.solution)}</p></div>`;
+  }
+  function bathroomInstructions(compact=false) {
+    return `<section class="storyboard-solution gm-instructions" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}${adultHelp('envelope',true)}${bathroomSolution()}</section>`;
   }
   function summary(id) {
     const document=new DOMParser().parseFromString(sheets[id]||'', 'text/html');
@@ -52,7 +54,7 @@
     return sheet.innerHTML;
   }
   function parentGuide() {
-    return `<section class="sheet parent-guide" id="rodicovsky-navod"><div class="label">PIXELKOVIA / LEN PRE DOSPELÉHO</div><h2>Rodičovský návod</h2><div class="guide-intro"><p>Ak môžete, tlačte farebne – podklady budú krajšie. Hru však plnohodnotne zahráte aj s čiernobielou tlačou. Tlačte jednostranne na A4, v mierke 100 %.</p><p>Jednotlivé stopy vložte do obálok alebo škatuľiek, previažte stužkou, mašľou či gumičkou a až potom ich schovajte. Deti tak objavia balíček, nie iba voľný papier. P3 a P5 nechajte samostatne uzavreté podľa pokynov nižšie. Tento návod si nechajte pri sebe.</p></div><div class="guide-stages">${GAME.stages.map(stage=>`<section class="guide-stage" data-stage="${esc(stage.id)}"><h3>${esc(parentInstructions[stage.id].label)}</h3>${adultHelp(stage.id,true)}${stage.id==='envelope'?bathroomSolution():stage.answer?`<p class="guide-answer"><strong>Riešenie:</strong> ${esc(solutionAnswer(stage))}.</p>`:stage.id==='intro'?'<p class="guide-answer"><strong>Cieľ:</strong> kúpeľňa.</p>':''}</section>`).join('')}</div><span class="footer">PIXELKOVIA · RODIČOVSKÝ NÁVOD · ÚVOD A VŠETKY ÚLOHY</span></section>`;
+    return `<section class="sheet parent-guide" id="rodicovsky-navod"><div class="label">PIXELKOVIA / GAME MASTER</div><h2>Návod pre Game mastra</h2><div class="guide-intro"><p>Ak môžete, tlačte farebne – podklady budú krajšie. Hru však plnohodnotne zahráte aj s čiernobielou tlačou. Tlačte jednostranne na A4, v mierke 100 %.</p><p>Jednotlivé stopy vložte do obálok alebo škatuľiek, previažte stužkou, mašľou či gumičkou a až potom ich schovajte. Deti tak objavia balíček, nie iba voľný papier. P3 a P5 nechajte samostatne uzavreté podľa pokynov nižšie. Tento návod si nechajte pri sebe.</p><p>Vyberajte suché miesta na dosah detí. Stopy nedávajte do práčky ani sušičky, k elektrickým zariadeniam, liekom alebo čistiacim prostriedkom.</p></div><div class="guide-stages">${GAME.stages.map(stage=>`<section class="guide-stage" data-stage="${esc(stage.id)}"><h3>${esc(parentInstructions[stage.id].label)}</h3>${stage.id==='envelope'?bathroomInstructions(true):adultHelp(stage.id,true)}${stage.id==='envelope'?'':stage.answer?`<p class="guide-answer"><strong>Riešenie:</strong> ${esc(solutionAnswer(stage))}.</p>`:stage.id==='intro'?'<p class="guide-answer"><strong>Cieľ:</strong> kúpeľňa.</p>':''}</section>`).join('')}</div><span class="footer">PIXELKOVIA · GAME MASTER · ÚVOD A VŠETKY ÚLOHY</span></section>`;
   }
-  window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,bathroomSolution,parentGuide};
+  window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,bathroomSolution,bathroomInstructions,parentGuide};
 })();
