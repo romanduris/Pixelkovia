@@ -46,39 +46,132 @@
 .parent-guide .gm-solution{margin-top:6px}
 @media print{.parent-guide .gm-solution{margin-top:1mm}}
 
-/* Story and puzzle share one A4; keep the cut-outs at their original size. */
-.story-sheet{font:15px/1.6 Arial,sans-serif;color:#253c4d;padding:30px}
-.story-sheet h2{font:700 27px/1.2 Arial,sans-serif;margin:10px 0 18px}
-.story-sheet .label{font-size:10px;letter-spacing:1px}
-.story-sheet .quest-story p{margin:0 0 10px}
-.story-sheet .quest-story{margin:0 0 16px}
-.story-sheet .note{font-style:normal;padding:14px}
-.story-sheet .note h3{font-size:15px;margin:0 0 12px}
-.story-sheet .card{font:inherit;text-align:left;padding:16px;margin-top:22px}
-.story-sheet .card>p,.story-sheet .card>strong{text-align:center;display:block}
-.story-sheet .card .quest-story{margin-top:12px}
-.story-sheet .poem{font-size:20px;line-height:2.1}
-.story-sheet .footer{left:30px}
-@media screen and (max-width:600px){#p2 .code{font-size:20px;letter-spacing:2px;overflow-wrap:anywhere}}
+/* P2–P6 follow P1: signal header, framed letter, mission and a distinct puzzle. */
+.story-sheet{font:13px/1.5 Arial,sans-serif;color:#142840;background:#fff;padding:30px;min-height:0;border-top:4px solid #35547d}
+.story-sheet .label{font:10px/1.4 monospace;letter-spacing:1px;color:#334d70}
+.worksheet-heading{position:relative;border-bottom:2px solid #233f65;padding-bottom:12px;margin-bottom:13px}
+.story-sheet h2{font:800 29px/1.1 monospace;color:#172e4d;letter-spacing:-.7px;text-transform:uppercase;margin:10px 0 2px;max-width:84%}
+.story-sheet h3{font:700 12px/1.3 monospace;letter-spacing:.3px;color:#172e4d;margin:0 0 8px}
+.worksheet-story{border:1px solid #9aaec6;border-left:4px solid #2e547a;padding:13px 15px;display:flow-root}
+.worksheet-story h3{font-size:15px}
+.story-sheet .quest-story{margin:0}
+.story-sheet .quest-story p{margin:0 0 8px}
+.story-sheet .quest-story p:last-child{margin-bottom:0}
+.story-sheet .worksheet-story .quest-party,.story-sheet .worksheet-companion .quest-party{float:right;max-width:50%;margin:0 0 8px 15px}
+.story-sheet .quest-party figcaption{display:none}
+.story-sheet .party-lineup{gap:8px}
+.story-sheet .party-person{min-width:36px;gap:4px;font-size:10px}
+.story-sheet .party-sprite{width:40px;height:40px;border-radius:7px}
+.story-sheet .party-current .party-sprite{width:48px;height:48px}
+.worksheet-mission{border:1px solid #9aaec6;background:#f7fafc;padding:12px 15px;margin:13px 0}
+.worksheet-mission h3{color:#234c71}
+.worksheet-mission p{margin:0}
+.worksheet-puzzle{border:1px solid #a9bcd4;padding:14px;margin:13px 0;background:#fff;break-inside:avoid}
+.worksheet-puzzle-heading{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 12px;margin-bottom:10px}
+.worksheet-puzzle-heading h3{margin:0}
+.worksheet-puzzle-heading>span{font:9px/1.4 monospace;letter-spacing:.2px;color:#334d70}
+.story-sheet .circles{margin:8px 0 0;gap:12px}
+.worksheet-secret{margin:13px 0}
+.story-sheet .code{color:#172e4d;font:28px/1.4 monospace;letter-spacing:5px;border:1px solid #8096b1;padding:10px;margin:0}
+.symbol-puzzle .equations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0;font:30px/1.4 monospace;color:#172e4d}
+.equation-clue{border:1px solid #ced9e6;background:#fbfcfe;padding:12px 8px;text-align:center}
+.equation-number{display:block;width:22px;height:22px;border:1px solid #9aaec6;margin:0 auto 14px;font:10px/20px monospace;border-radius:50%}
+.equation-clue>div{white-space:nowrap}
+.equation-working{font:18px/1.4 monospace;margin:16px 0 2px}
+.equation-working span{display:inline-block;vertical-align:baseline;width:38px;height:22px;border-bottom:1px solid #8096b1}
+.equation-result{border:2px solid #35547d;padding:14px;text-align:center;background:#f7fafc}
+.equation-result>div{font:34px/1.4 monospace;color:#172e4d;white-space:nowrap}
+.result-box{display:inline-grid;place-items:center;width:46px;height:46px;border:1.5px solid #233f65;background:white;margin-left:6px}
+.equation-result p{font:11px/1.5 Arial,sans-serif;margin:8px 0 0}
+.story-sheet .strip{border:1.5px dashed #233f65;padding:18px 14px;margin:12px 0;font:22px/1.3 monospace;gap:18px;background:white;color:#172e4d;break-inside:avoid}
+.story-sheet .strip:last-child{margin-bottom:0}
+.story-sheet .strip span{border-color:#8096b1;flex-shrink:0}
+.worksheet-next{border:1px solid #8096b1;padding:11px 15px;margin:13px 0;break-inside:avoid}
+.worksheet-next h3{font-size:11px}
+.story-sheet .worksheet-next .note{font:inherit;border:0;background:none;padding:0;margin:0}
+.story-sheet .worksheet-companion{font:inherit;font-style:normal;border:1px solid #9aaec6;border-left:4px solid #2e547a;padding:12px 15px;display:flow-root;margin:13px 0 0}
+.story-sheet .worksheet-companion .quest-story{margin-bottom:10px}
+.story-sheet .worksheet-companion h3{font-size:13px}
+.story-sheet .card{font:inherit;text-align:left;border:1.5px dashed #35547d;padding:14px;margin-top:13px;background:#fff}
+.story-sheet .card>.label{display:block;border-bottom:1px solid #ced9e6;padding-bottom:8px;margin-bottom:10px}
+.story-sheet .card .quest-story{margin-bottom:12px}
+.story-sheet .card>p,.story-sheet .card>strong{text-align:center;display:block;margin:6px 0}
+.story-sheet .card>strong{font:700 20px/1.6 monospace;letter-spacing:2px;border:1px solid #9aaec6;background:#f7fafc;padding:6px}
+.story-sheet .poem{font:19px/1.6 Arial,sans-serif;margin:0}
+.story-sheet .poem>div{padding:6px 10px;border-bottom:1px solid #dce4ed}
+.story-sheet .poem>div:last-child{border:0}
+.story-sheet .poem strong{font:700 24px/1.2 monospace;color:#233f65}
+.story-sheet .footer{position:static;display:block;margin-top:16px;padding-top:8px;border-top:1px solid #9aaec6;font:8px/1.4 monospace;color:#334d70}
+@media screen and (max-width:600px){
+ .story-sheet{padding:18px;font-size:13px}
+ .story-sheet h2{font-size:23px;max-width:100%}
+ .worksheet-heading .print-wave{display:none}
+ .worksheet-story,.worksheet-mission,.worksheet-next{padding:12px}
+ .story-sheet .worksheet-story .quest-party,.story-sheet .worksheet-companion .quest-party{float:none;max-width:none;margin:14px 0}
+ .symbol-puzzle .equations{grid-template-columns:1fr;font-size:30px}
+ .equation-number{margin-bottom:8px}
+ .equation-working{margin-top:8px}
+ .equation-result>div{font-size:23px}
+ .result-box{width:36px;height:36px;margin-left:0}
+ .story-sheet .strip{font-size:17px;gap:10px;padding:15px 8px}
+ #p2 .code{font-size:19px;letter-spacing:2px;overflow-wrap:anywhere}
+ .story-sheet .card>strong{font-size:15px;letter-spacing:0}
+ .story-sheet .worksheet-companion{padding:12px}
+}
 @media print{
- .story-sheet{width:186mm;min-height:266mm;padding:4mm 3mm 8mm;font-size:9.5pt;line-height:1.4}
- .story-sheet h2{font-size:19pt;margin:2mm 0 3mm}
- .story-sheet .label{font-size:7pt;letter-spacing:.5pt}
- .story-sheet .sheet-avatar{width:20mm;height:20mm;margin:0 0 2mm 3mm}
- .story-sheet .quest-story{margin-bottom:2mm}
- .story-sheet .quest-story p,.story-sheet>p{margin:0 0 2mm}
- .story-sheet .note{padding:2mm 3mm;margin:2mm 0}
- .story-sheet .note h3{font-size:10pt;margin:0 0 2mm}
- .story-sheet .circles{gap:2mm}
- .story-sheet .code{font-size:23pt;margin:3mm 0;padding:2mm}
- .story-sheet .equations{font-size:26pt;line-height:2;margin:5mm 0}
- .story-sheet .strip{font-size:15pt;padding:4mm;margin:3mm 0}
- .story-sheet .maze{max-height:85mm}
- .story-sheet .poem{font-size:13pt;line-height:1.9;margin:3mm 0}
- .story-sheet .card{padding:3mm;margin-top:3mm;font-size:9.5pt;line-height:1.4}
- .story-sheet .card p{margin:0 0 2mm}
- .story-sheet .card>strong{font-size:14pt}
- .story-sheet .footer{left:3mm;bottom:1mm;font-size:6pt}
- #p5.story-sheet{font-size:9pt;line-height:1.35}
- #p5.story-sheet .maze{max-height:60mm}
+ .story-sheet{width:186mm;min-height:273mm;padding:5mm 4mm 4mm;font-size:9pt;line-height:1.42;border:0;display:flex;flex-direction:column}
+ .story-sheet>*{flex-shrink:0}
+ .story-sheet h2{font-size:21pt;letter-spacing:-.5pt;margin:2mm 0 0}
+ .story-sheet .label{font-size:7pt;letter-spacing:.4pt}
+ .worksheet-heading{padding-bottom:2mm;margin-bottom:3mm}
+ .story-sheet h3{font-size:9pt;margin-bottom:1.5mm}
+ .worksheet-story{padding:2.5mm 3mm}
+ .worksheet-story h3{font-size:10pt}
+ .story-sheet .quest-story p{margin:0 0 1.6mm}
+ .story-sheet .worksheet-story .quest-party,.story-sheet .worksheet-companion .quest-party{margin:0 0 2mm 3mm}
+ .story-sheet .party-lineup{gap:1.5mm;flex-wrap:nowrap}
+ .story-sheet .party-person{min-width:9mm;gap:1mm;font-size:6.5pt}
+ .story-sheet .party-sprite{width:10mm;height:10mm;border-radius:2mm}
+ .story-sheet .party-current .party-sprite{width:12mm;height:12mm}
+ .worksheet-mission{padding:2mm 3mm;margin:3mm 0}
+ .worksheet-puzzle{padding:3mm;margin:0 0 3mm}
+ .worksheet-puzzle-heading{margin-bottom:2mm;gap:1mm 3mm}
+ .worksheet-puzzle-heading h3{font-size:8.5pt;margin:0}
+ .worksheet-puzzle-heading>span{font-size:6.5pt}
+ .story-sheet .circles{margin:1mm 0 0;gap:2mm}
+ .worksheet-secret{margin:0 0 3mm}
+ .story-sheet .code{font-size:21pt;letter-spacing:1.5mm;padding:2mm}
+ .symbol-puzzle .equations{gap:3mm;font-size:23pt;line-height:1.4;margin:3mm 0}
+ .equation-clue{padding:3mm 2mm}
+ .equation-number{width:6mm;height:6mm;font-size:7pt;line-height:5.5mm;margin-bottom:4mm}
+ .equation-working{font-size:14pt;margin:4mm 0 1mm}
+ .equation-working span{width:12mm;height:6mm}
+ .equation-result{padding:4mm 3mm}
+ .equation-result>div{font-size:27pt}
+ .result-box{width:13mm;height:13mm}
+ .equation-result p{font-size:8pt;margin-top:2mm}
+ .story-sheet .strip{font-size:15pt;min-height:15mm;padding:3mm;margin:3mm 0;gap:4mm}
+ .worksheet-next{padding:2mm 3mm;margin:0 0 3mm}
+ .worksheet-next h3{font-size:8pt}
+ .story-sheet .instructions{font-size:8pt;margin:0 0 3mm}
+ .story-sheet .worksheet-companion{padding:2.5mm 3mm;margin:0 0 3mm}
+ .story-sheet .worksheet-companion h3{font-size:9pt}
+ .story-sheet .worksheet-companion .quest-story{margin-bottom:2mm}
+ #p5 .party-person{min-width:8mm;font-size:6pt}
+ #p5 .party-sprite{width:8mm;height:8mm}
+ #p5 .party-current .party-sprite{width:10mm;height:10mm}
+ #p5 .maze{max-height:60mm;display:block}
+ #p5 .worksheet-heading{margin-bottom:2mm}
+ #p5 .worksheet-mission{margin:2mm 0}
+ #p5 .worksheet-puzzle{padding:2mm 3mm}
+ .story-sheet .poem{font-size:12pt;line-height:1.65}
+ .story-sheet .poem>div{padding:1.5mm 2mm}
+ #p6 .poem>div{padding-block:1.25mm}
+ .story-sheet .poem strong{font-size:15pt}
+ .story-sheet .card{padding:3mm;margin:0 0 3mm;font-size:9pt;line-height:1.4}
+ .story-sheet .card>.label{font-size:7pt;padding-bottom:2mm;margin-bottom:2mm}
+ .story-sheet .card .quest-story{margin-bottom:2mm}
+ .story-sheet .card>p,.story-sheet .card>strong{margin:1mm 0}
+ .story-sheet .card>strong{font-size:12pt;letter-spacing:1pt;padding:1mm}
+ .story-sheet .footer{margin-top:auto;padding-top:2mm;font-size:6pt}
 }

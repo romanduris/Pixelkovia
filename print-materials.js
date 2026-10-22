@@ -32,6 +32,42 @@
   sheets.p5=sheets.p5.replace('<div class="note">Kubov odkaz pre Ryška:', '<div class="note"><h3>'+window.GAME.stages[6].label+' / Ryškov pozdrav</h3>'+window.STORY_TEXT.party('digital')+story('digital')+'Kubov odkaz pre Ryška:');
   sheets.p6=sheets.p6.replace('<p>Ochranné pole nás chránilo celý čas. Pred návratom do jeho bežného režimu musia byť všetci doma, aj Piko. Prvé písmená nášho sľubu vám pripomenú, ako to dokážeme. — Piko</p>','');
   sheets.p6=sheets.p6.replace('<span class="label">Karta poradia / odložiť na finále</span>','<span class="label">'+window.GAME.stages[8].label+' / Karta poradia</span>'+story('code'));
+  // P2–P6 use the same framed story, mission and signal-sheet language as Kvak's P1.
+  const storyTitles={document:'Iskrin odkaz',symbols:'Šutkov odkaz',cipher:'Lístkov odkaz',maze:'Kubov odkaz',search:'Pikov odkaz'};
+  const puzzleHeading=(title,detail='')=>`<div class="worksheet-puzzle-heading"><h3>${title}</h3>${detail?`<span>${detail}</span>`:''}</div>`;
+  for(const [id,stageId] of Object.entries(sheetStages)) {
+    if(id==='p1')continue;
+    let html=sheets[id];
+    const stage=window.GAME.stages.find(item=>item.id===stageId);
+    const envelopeLabel=html.match(/<div class="label">([^<]+)<\/div>/)[1].replace(stage.label+' / ','');
+    html=html.replace(/<div class="label">[\s\S]*?<\/div>(<h2>[\s\S]*?<\/h2>)/,`<div class="worksheet-heading"><div class="label">PIXELKOVIA / ${stage.label} / ${id.toUpperCase()}</div>$1<span class="print-wave" aria-hidden="true">▂ ▄ ▆ ▃ ▅ ▂ ▇ ▄</span></div>`);
+    const storyBlock=window.STORY_TEXT.party(stageId)+story(stageId);
+    const framedStory=`<section class="worksheet-story"><h3>${storyTitles[stageId]}</h3>${storyBlock}</section>`;
+    html=html.replace(storyBlock,framedStory);
+    const missionStart=html.indexOf(framedStory)+framedStory.length;
+    let remainder=html.slice(missionStart);
+    if(id==='p6')remainder=`<section class="worksheet-mission"><h3>VAŠA MISIA</h3><p>${stage.task}</p></section>`+remainder;
+    else remainder=remainder.replace(/^<p>([\s\S]*?)<\/p>/,'<section class="worksheet-mission"><h3>VAŠA MISIA</h3><p>$1</p></section>');
+    html=html.slice(0,missionStart)+remainder;
+    html=html.replace(/<p class="note">([\s\S]*?)<\/p>/,'<section class="worksheet-next"><h3>KEĎ TO VYRIEŠITE</h3><p class="note">$1</p></section>');
+    if(id==='p2') {
+      html=html.replace('<div class="circles" id="circles"></div>',`<section class="worksheet-puzzle decoder-puzzle">${puzzleHeading('DVA KRUHY. JEDEN STROJ.','VYSTRIHNITE PO VONKAJŠEJ ČIARE')}<div class="circles" id="circles"></div></section>`);
+      html=html.replace(/(<div class="code"[^>]*>[\s\S]*?<\/div>)/,`<section class="worksheet-secret">${puzzleHeading('TAJNÁ SPRÁVA')}$1</section>`);
+    }
+    if(id==='p3') {
+      const equations=html.match(/<div class="equations">[\s\S]*?<\/div><\/div>/)[0];
+      const clues=[...equations.matchAll(/<div>([^<]+)<\/div>/g)].slice(0,3).map((match,index)=>[match[1],['△','○','□'][index]]);
+      html=html.replace(/<div class="equations">[\s\S]*?<\/div><\/div>/,`<section class="worksheet-puzzle symbol-puzzle">${puzzleHeading('ŠUTKOV ZÁMOK','ROVNAKÝ TVAR = ROVNAKÁ HODNOTA')}<div class="equations">${clues.map(([equation,symbol],index)=>`<div class="equation-clue"><span class="equation-number">0${index+1}</span><div>${equation}</div><p class="equation-working">${symbol} = <span aria-label="Miesto na poznámku"></span></p></div>`).join('')}</div><div class="equation-result"><h3>VÝSLEDNÉ ČÍSLO</h3><div>△ + ○ + □ = <span class="result-box" aria-label="Zapíšte výsledok">?</span></div><p>Výsledok zadajte do hry v telefóne.</p></div></section>`);
+    }
+    if(id==='p4')html=html.replace(/((?:<div class="strip"[\s\S]*?<\/div>){4})/,`<section class="worksheet-puzzle strip-puzzle">${puzzleHeading('ŠTYRI KÚSKY ODKAZU','✂ STRIHAJTE IBA PO PRERUŠOVANÝCH ČIARACH')}$1</section>`);
+    if(id==='p5') {
+      html=html.replace(/(<svg class="maze"[\s\S]*?<\/svg>)/,`<section class="worksheet-puzzle maze-puzzle">${puzzleHeading('NÁVRATOVÁ CESTA','OD VSTUPU AŽ K JADRU')}$1</section>`);
+      html=html.replace('<div class="note">','<div class="note worksheet-companion">');
+    }
+    if(id==='p6')html=html.replace(/(<div class="poem">[\s\S]*?<\/div><\/div>)/,`<section class="worksheet-puzzle pledge-puzzle">${puzzleHeading('NÁŠ SPOLOČNÝ SĽUB','ČÍTAJTE ZAČIATKY RIADKOV')}$1</section>`);
+    html=html.replace(/<span class="footer">[^<]+<\/span>/,`<span class="footer">PIXELKOVIA · ${envelopeLabel}</span>`);
+    sheets[id]=html;
+  }
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const bathroom = {
     label: 'Úloha 1 – Kúpeľňa',
@@ -77,9 +113,11 @@
       return story.innerHTML+document.querySelector('.kvak-print-mission').innerHTML;
     }
     const sheet=document.querySelector('.sheet');
+    sheet.querySelectorAll('.quest-party figcaption').forEach(node=>node.remove());
     if(stageId==='digital')return sheet.querySelector('.note').outerHTML;
     if(stageId==='code')return sheet.querySelector('.card').outerHTML;
-    sheet.querySelector(':scope>.label')?.remove();
+    sheet.querySelector('.worksheet-heading .label')?.remove();
+    sheet.querySelector('.worksheet-heading .print-wave')?.remove();
     sheet.querySelectorAll('.sheet-avatar,.footer,.no-print,svg,.circles').forEach(node=>node.remove());
     return sheet.innerHTML;
   }
