@@ -106,7 +106,7 @@ window.GAME = {
       ],
       "placeholder": "Rozlúštené miesto",
       "action": "Nájdite obálku 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
-      "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštite celú vetu a choďte podľa nej hľadať obálku označenú Úloha 3. Odpoveď sa do telefónu nezadáva.",
+      "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštite celú vetu a choďte podľa nej hľadať obálku označenú Úloha 3.",
       "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v obálke 2 pri okne. P3: samostatná obálka Úloha 3 prilepená zo spodnej strany sedadla stoličky. Detské nožnice.",
       "mobile": "Papierová úloha bez zadávania a overovania odpovede. Až po nájdení obálky Úloha 3 deti ťuknú Máme obálku Úloha 3. Tým sa uloží V a sprístupní Šutko.",
       "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú obálku Úloha 3 prilepenú zospodu sedadla. V telefóne sa neoveruje odpoveď.",
@@ -125,7 +125,7 @@ window.GAME = {
         "before": [
           "Ahojte, ja som Iskra! Som malý veselý plamienok. V našom svete rozsvecujem cestičky a malé svetielka nad dverami domčekov, aby kamaráti v tme nezablúdili. Kvak ma už začul a priviedol vás ku mne. Konečne viem, že ma niekto hľadá! Rada sa pridám k nemu aj k Pikovi.",
           "Rozsvietila som kúsok cesty a našla som na nej odkaz od Šutka. Je to náš pevný kamenný kamarát. Vie podržať most, po ktorom sa potrebujeme vrátiť domov. Ja vám môžem svietiť, ale most sama neudržím. Najprv teda musíme zistiť, kde na nás Šutko čaká.",
-          "Písmená jeho odkazu sa pri rannom bliknutí posunuli. Pomôže nám môj dekódovací stroj z dvoch papierových kruhov. Vystrihnite ich a nastavte vonkajšie D oproti vnútornému A. Potom preložte celú správu. Do telefónu ju nepíšte; odkaz vám sám povie, kam máte ísť hľadať ďalšiu obálku!"
+          "Písmená jeho odkazu sa pri rannom bliknutí posunuli. Pomôže nám môj dekódovací stroj z dvoch papierových kruhov. Vystrihnite ich a nastavte vonkajšie D oproti vnútornému A. Potom preložte celú správu. Odkaz vám sám povie, kam máte ísť hľadať ďalšiu obálku!"
         ],
         "after": [
           "Ďakujem! Rozlúštili ste môj odkaz a našli Šutkovu obálku pod stoličkou. Do zápisníka vám posielam V a pridávam sa k Pikovi a Kvakovi. Kvak nás dokáže počuť, ja nám zase posvietim. Už sa nám bude hľadať oveľa ľahšie!",
