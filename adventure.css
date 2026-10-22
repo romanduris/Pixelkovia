@@ -102,3 +102,24 @@ main.signal-mode{position:fixed;inset:0;z-index:30;padding:0;background:#080d1d;
 .signal-content h1:focus{outline:none}
 main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:auto;height:var(--answer-viewport-height,100dvh)}
 .is-entering-answer .signal-screen{padding-bottom:var(--answer-viewport-height,100dvh)}
+
+/* The written story stays readable without opening any media or transcript. */
+.signal-content .quest-story{max-width:620px;margin:24px auto;text-align:left}
+.signal-content .quest-story p{font:400 16px/1.8 var(--font-body,Arial,sans-serif);color:#d8e3f2;margin:0 0 16px}
+.signal-content .quest-story p:last-child{margin-bottom:0}
+.signal-content .task-question{border-top:1px solid #34435d;padding-top:20px;text-align:left;color:#e4ecf9;line-height:1.7}
+.signal-content .answer-prompt{font-size:14px;color:#aebed5;margin-top:18px}
+.message-reading{overflow-y:auto;min-height:0}
+.message-reading .quest-story{max-width:680px;margin:18px auto;text-align:left}
+.message-reading .quest-story p{font-size:16px;line-height:1.8;color:#e4ecf9;margin:0 0 18px}
+.message-actions{flex-wrap:wrap}
+.message-reading .message-actions{flex-shrink:0;padding-bottom:12px}
+.message-waiting>[data-action="read-message"]{margin-top:16px;min-height:44px}
+@media(max-width:600px){
+ .signal-content .quest-story{margin:22px 0}
+ .signal-content .quest-story p,.message-reading .quest-story p{font-size:15px;line-height:1.8}
+ .message-reading{padding:18px 20px}
+ .message-reading .message-sender{gap:10px}
+ .message-reading .message-sender h1{font-size:24px}
+ .message-actions .btn{min-height:44px;flex:1 1 140px}
+}

@@ -12,7 +12,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.ok(!/[←→↗↓↺]/.test(await page.locator('.storyboard-top-links').innerText()+await page.locator('.designer-bar').innerText()));
  assert.equal(await page.locator('[data-action="print"]').count(),0);
  assert.equal(await page.locator('.storyboard-content:not([hidden])').count(),0);
- const bathroom=page.locator('#gm-envelope');assert.ok((await bathroom.locator('.section-kicker').first().textContent()).includes('Úloha Kúpeľňa / 6 min'));
+ const bathroom=page.locator('#gm-envelope');assert.match(await bathroom.locator('.storyboard-heading h2').innerText(),/Úloha 1 – Kúpeľňa/);assert.ok((await bathroom.locator('.section-kicker').first().textContent()).includes('6 min'));
  assert.equal(await bathroom.locator('.storyboard-head [data-action="test"]').count(),1);
  await bathroom.locator('.storyboard-toggle').click();
  assert.equal(await bathroom.locator('.storyboard-content>div').first().getAttribute('class'),'worksheet-review');
@@ -49,7 +49,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  }
  const guideText=await printed.locator('#rodicovsky-navod').innerText();
  assert.match(guideText,/farebne.*krajšie/);assert.match(guideText,/čiernobielou/);assert.match(guideText,/obálok alebo škatuľiek/);assert.match(guideText,/mašľou či gumičkou/);
- assert.match(guideText,/vypočujú Pikovu správu aj viackrát/);
+ assert.match(guideText,/vypočuť alebo prečítať aj viackrát/);
  assert.equal(await page.locator('#gm-intro video').count(),0,'intro uses a video button');
  assert.ok(await page.locator('#gm-intro .video-message-button svg').isVisible());
  for(const id of ['piko-message-text','piko-message-tts']){assert.ok(await page.locator('#'+id).isHidden());await page.locator(`[data-target="${id}"]`).click();assert.ok(await page.locator('#'+id).isVisible());await page.locator(`[data-target="${id}"]`).click();}

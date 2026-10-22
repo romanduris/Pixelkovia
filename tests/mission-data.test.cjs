@@ -6,6 +6,7 @@ const ctx={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),ctx);
 const game=ctx.window.GAME;
 const app=fs.readFileSync('site-content.js','utf8');
+vm.runInNewContext(fs.readFileSync('story-text.js','utf8'),ctx);
 vm.runInNewContext(fs.readFileSync('print-materials.js','utf8'),ctx);
 const print=Object.values(ctx.window.PRINT_MATERIALS.sheets).join('');
 const one=game.stages[1],two=game.stages[2],three=game.stages[3];

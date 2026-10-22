@@ -10,14 +10,34 @@
   "p6": "<section class=\"sheet\" id=\"p6\"><span class=\"sheet-avatar\" aria-hidden=\"true\" style=\"--sprite-x:0.0%;--sprite-y:0%\"></span><div class=\"label\">P6 / Obálka 4 / Sľub Pixelkov</div><h2>Začiatky prezradia najviac.</h2><p>Ochranné pole nás chránilo celý čas. Pred návratom do jeho bežného režimu musia byť všetci doma, aj Piko. Prvé písmená nášho sľubu vám pripomenú, ako to dokážeme. — Piko</p><div class=\"poem\"><div><strong>S</strong>polu spojíme svoje schopnosti.</div><div><strong>P</strong>riateľov nenecháme stratených.</div><div><strong>O</strong>dvahu si môžeme požičať.</div><div><strong>L</strong>en celá partia sa vráti domov.</div><div><strong>U</strong>kryjeme svet za svetielkami.</div></div><div class=\"card\"><span class=\"label\">Karta poradia / odložiť na finále</span><p>Písmená z úloh</p><strong>1 → 2 → 3 → 4 → 5 → 6</strong><p style=\"font-size:14px\">Šesť písmen. Jedno návratové heslo.</p></div><span class=\"footer\">ZÁHADA U VÁS DOMA · ZÁCHRANNÉ LISTY · P6</span></section>",
   "diplom": "<section class=\"sheet diploma\" id=\"diplom\"><span class=\"sheet-avatar\" aria-hidden=\"true\" style=\"--sprite-x:0%;--sprite-y:0%\"></span><div class=\"label\">Pixelkovia / Stratený signál / Čestný tím záchrancov</div><h2>Veľké záhady<br>riešime spolu.</h2><p>Tento diplom patrí tímu</p><div class=\"write-line\"></div><p>za dôvtip, spoluprácu a bezpečný návrat všetkých siedmich Pixelkov.</p><div style=\"font-size:70px;margin:50px 0\">✧</div><p><em>„Každý vie niečo, bez čoho by to nešlo.“</em></p><p>Váš Piko</p><span class=\"footer\">ZÁHADA U VÁS DOMA · DIPLOM ZÁCHRANCOV PIXELKOV</span></section>"
 };
+  // Story paragraphs are rendered from the same source as the phone game.
+  const story=(id)=>window.STORY_TEXT.html(id);
+  sheets.p1=sheets.p1.replace('PIXELKOVIA / ÚLOHA KÚPEĽŇA / OBÁLKA KÚPEĽŇA','PIXELKOVIA / P1');
+  sheets.p1=sheets.p1.replace(/(<div class="kvak-print-story">[\s\S]*?<\/span>)[\s\S]*?(<\/div>\n<div class="kvak-print-mission">)/, '$1<h3>Kvakov odkaz</h3>'+story('envelope')+'$2');
+  const sheetStages={p1:'envelope',p2:'document',p3:'symbols',p4:'cipher',p5:'maze',p6:'search'};
+  for(const [id,stageId] of Object.entries(sheetStages)) {
+    const stage=window.GAME.stages.find(stage=>stage.id===stageId);
+    sheets[id]=sheets[id].replace(/(<div class="label">)([^<]+)/, '$1'+stage.label+' / $2');
+    if(id!=='p1') {
+      sheets[id]=sheets[id].replace('class="sheet"','class="sheet story-sheet"');
+      sheets[id]=sheets[id].replace(/(<h2>[\s\S]*?<\/h2>)/,'$1'+story(stageId));
+    }
+  }
+  sheets.p2=sheets.p2.replace('Iskra vie odhaliť skryté značky. Jej zašifrovaný odkaz prečítate pomocou dvoch kruhov. ','');
+  sheets.p3=sheets.p3.replace('Šutko udrží priechod pevný pre celú partiu. Vysiela pomocou tvarov. ','');
+  sheets.p4=sheets.p4.replace('Lístok rozumie reči signálov. Jeho správa sa však roztrhala na štyri pásiky. ','');
+  sheets.p5=sheets.p5.replace('Kubo podľa tohto plánu postaví návratovú cestu medzi obrazovkami. ','');
+  sheets.p5=sheets.p5.replace('<div class="note">Kubov odkaz pre Ryška:', '<div class="note"><h3>'+window.GAME.stages[6].label+' / Ryškov pozdrav</h3>'+story('digital')+'Kubov odkaz pre Ryška:');
+  sheets.p6=sheets.p6.replace('<p>Ochranné pole nás chránilo celý čas. Pred návratom do jeho bežného režimu musia byť všetci doma, aj Piko. Prvé písmená nášho sľubu vám pripomenú, ako to dokážeme. — Piko</p>','');
+  sheets.p6=sheets.p6.replace('<span class="label">Karta poradia / odložiť na finále</span>','<span class="label">'+window.GAME.stages[8].label+' / Karta poradia</span>'+story('code'));
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const bathroom = {
-    label: 'Úloha Kúpeľňa',
+    label: 'Úloha 1 – Kúpeľňa',
     placement: 'Stopu k úlohe Kúpeľňa schovajte medzi zložené uteráky, do dostupnej skrinky s uterákmi alebo za ľahký košík na suchej poličke.',
     hint: 'Deti vystrihnú a otočia šesť signálov. Zoradia ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.'
   };
   const parentInstructions = {
-    intro: {label:'Úvod', placement:'Telefón so spustenou hrou a zapnutým zvukom položte tam, kde ho deti budú počuť. Vyzvite ich, nech si vypočujú Pikovu správu aj viackrát a skúsia zistiť, kam ísť.', hint:'Ak váhajú, nech pozorne počúvajú posledné slová pred prerušením spojenia.'},
+    intro: {label:'Úvod', placement:'Telefón so spustenou hrou položte tam, kde ho deti objavia. Pikovu správu si môžu vypočuť alebo prečítať aj viackrát. Nech samy zistia, kam ísť.', hint:'Ak váhajú, nech si znova vypočujú záver správy alebo prečítajú posledný odsek.'},
     envelope: bathroom,
     document: {label:'Úloha pri okne · Iskra', placement:'Stopu P2 schovajte pri okne na bezpečné miesto na dosah detí. Okno sa neotvára, na parapet sa nelezie.', hint:'Nastavte vonkajšie D oproti vnútornému A. Vonkajšie písmená odkazu čítajte na vnútornom kruhu.'},
     symbols: {label:'Úloha pod oknom · Šutko', placement:'Stopu P3 schovajte nízko pod okno. Označte ju „Úloha 3 – otvoriť po dekódovaní odkazu“.', hint:'Rovnaký tvar má vždy rovnakú hodnotu. Začnite dvojicou trojuholníkov.'},
@@ -28,6 +48,7 @@
     code: {label:'Spoločné heslo · P6', placement:'Novú stopu netreba. Použite kartu poradia P6 a písmená uložené v telefóne. Nech heslo vysloví celý tím.', hint:'Zoraďte šesť písmen podľa úloh 1 až 6. Šípka ani fajka do hesla nepatria.'},
     finale: {label:'Finále', placement:'Oslávte pomoc každého člena tímu, doplňte názov tímu na voliteľný diplom. Atlas si môžete prezrieť spolu.', hint:'Hra nemá časový limit. Nápovedy dávajte postupne; riešenia si nechajte pre seba.'}
   };
+  for(const stage of window.GAME.stages)parentInstructions[stage.id].label=stage.label;
   function adultHelp(id='envelope', compact=false) {
     const entry=parentInstructions[id];
     return `<section class="adult-help" data-stage="${esc(id)}" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}<p><strong>${id==='intro'?'Spustenie.':id==='envelope'?'Úkryt.':'Príprava.'}</strong> ${esc(entry.placement)}</p><p><strong>Nápoveda.</strong> ${esc(entry.hint)}</p>${entry.safety?`<p class="adult-safety">${esc(entry.safety)}</p>`:''}</section>`;

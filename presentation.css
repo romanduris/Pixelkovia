@@ -172,3 +172,10 @@ body[data-environment="designer"] .message-copy .detail-grid{gap:22px}
 body[data-environment="designer"] .message-copy li{font:inherit;color:inherit}
 body[data-environment="designer"] .stage-introduction p{font:400 14px/1.8 'DM Sans',sans-serif;color:#405779;margin:0 0 24px}
 body[data-environment="designer"] .gm-instructions{margin-top:22px}
+
+.storyboard .quest-story p{font:inherit;line-height:1.8;color:#3e5270;margin:0 0 16px}
+.storyboard-continuation{border-top:1px solid #b9c5d8;margin:28px 0;padding-top:22px}
+.storyboard-continuation h3{font-size:18px;color:#304766;margin:0 0 16px}
+.stage-index{flex-wrap:wrap}
+.storyboard .worksheet-text .note h3{font-size:16px}
+.storyboard .worksheet-text .card .quest-story{text-align:left;font:inherit}

@@ -44,3 +44,37 @@
 .parent-guide .gm-instructions .adult-help{margin:0}
 .parent-guide .gm-solution{margin-top:6px}
 @media print{.parent-guide .gm-solution{margin-top:1mm}}
+
+/* Story and puzzle share one A4; keep the cut-outs at their original size. */
+.story-sheet{font:15px/1.6 Arial,sans-serif;color:#253c4d;padding:30px}
+.story-sheet h2{font:700 27px/1.2 Arial,sans-serif;margin:10px 0 18px}
+.story-sheet .label{font-size:10px;letter-spacing:1px}
+.story-sheet .quest-story p{margin:0 0 10px}
+.story-sheet .quest-story{margin:0 0 16px}
+.story-sheet .note{font-style:normal;padding:14px}
+.story-sheet .note h3{font-size:15px;margin:0 0 12px}
+.story-sheet .card{font:inherit;text-align:left;padding:16px;margin-top:22px}
+.story-sheet .card>p,.story-sheet .card>strong{text-align:center;display:block}
+.story-sheet .card .quest-story{margin-top:12px}
+.story-sheet .poem{font-size:20px;line-height:2.1}
+.story-sheet .footer{left:30px}
+@media print{
+ .story-sheet{width:186mm;min-height:266mm;padding:4mm 3mm 8mm;font-size:9.5pt;line-height:1.4}
+ .story-sheet h2{font-size:19pt;margin:2mm 0 3mm}
+ .story-sheet .label{font-size:7pt;letter-spacing:.5pt}
+ .story-sheet .sheet-avatar{width:20mm;height:20mm;margin:0 0 2mm 3mm}
+ .story-sheet .quest-story{margin-bottom:2mm}
+ .story-sheet .quest-story p,.story-sheet>p{margin:0 0 2mm}
+ .story-sheet .note{padding:2mm 3mm;margin:2mm 0}
+ .story-sheet .note h3{font-size:10pt;margin:0 0 2mm}
+ .story-sheet .circles{gap:2mm}
+ .story-sheet .code{font-size:23pt;margin:3mm 0;padding:2mm}
+ .story-sheet .equations{font-size:26pt;line-height:2;margin:5mm 0}
+ .story-sheet .strip{font-size:15pt;padding:4mm;margin:3mm 0}
+ .story-sheet .maze{max-height:85mm}
+ .story-sheet .poem{font-size:13pt;line-height:1.9;margin:3mm 0}
+ .story-sheet .card{padding:3mm;margin-top:3mm;font-size:9.5pt;line-height:1.4}
+ .story-sheet .card p{margin:0 0 2mm}
+ .story-sheet .card>strong{font-size:14pt}
+ .story-sheet .footer{left:3mm;bottom:1mm;font-size:6pt}
+}

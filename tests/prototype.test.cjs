@@ -88,7 +88,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  // Existing progress remains usable; the new optional panel cursor persists independently.
  await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{'cipher:before':1}})));
  await reloadAndResume(page);
- assert.ok((await page.locator('.signal-task h1').textContent()).includes('Lístkov'));
+ assert.equal(await page.locator('.signal-task h1').textContent(),game.stages[4].label);
  assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'old instruction screen is removed');
  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).completed.length),3);
  assert.equal(await page.locator('#answer').count(),1,'task opens directly at answer input');
@@ -247,7 +247,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await kp.locator('[data-action="kvak-audio-toggle"]').click();await kp.locator('#kvak-transcript[open]').waitFor();
  assert.ok((await kp.locator('#kvak-audio-status').textContent()).includes('nepodarilo'));
  assert.ok((await kp.locator('#kvak-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
- await kp.locator('[data-action="next"]').click();assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[2].title);
+ await kp.locator('[data-action="next"]').click();assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[2].label);
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
   await kp.setViewportSize({width,height});await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[],hints:{}})));await reloadAndResume(kp);
   assert.equal(await kp.locator('.signal-restore').count(),1);await noOverflow(kp,`Kvak restore ${width}`);
