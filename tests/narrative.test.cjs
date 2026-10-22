@@ -15,7 +15,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  await page.locator('[data-action="read-message"]').click();
  assert.equal(await page.locator('dialog video,dialog audio').count(),0,'reading does not require loading media');
  assert.match(await page.locator('.message-reading').innerText(),/Prvá obálka je v kúpeľni/);
- const narrative=await page.evaluate(()=>GAME.stages.map(stage=>({id:stage.id,label:stage.label,narrative:stage.narrative,answer:stage.answer,character:stage.character})));
+ const narrative=await page.evaluate(()=>GAME.stages.map(stage=>({id:stage.id,label:stage.label,narrative:stage.narrative,answer:stage.answer,character:stage.character,paperOnly:stage.paperOnly})));
  assert.equal(normal(await page.locator('[data-story-stage="intro"]').innerText()),normal(narrative[0].narrative.before.join(' ')));
  await page.screenshot({path:'/tmp/narrative-intro-phone.png'});
  await page.locator('[data-action="finish-call"]').click();
@@ -25,14 +25,17 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   assert.equal(normal(await before.innerText()),normal(stage.narrative.before.join(' ')),stage.id+': readable setup');
   assert.equal(await page.locator('.signal-content h1').innerText(),stage.label,'number and envelope place form the heading');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'phone has no horizontal overflow');
+  assert.equal(await page.locator('.quest-party .party-person').count(),Math.min(index,6)+1,'party grows by one friend per task');
+  if(index===3)await page.screenshot({path:'/tmp/narrative-sutko-phone.png'});
   if(index===2)await page.screenshot({path:'/tmp/narrative-iskra-phone.png',fullPage:true});
   if(index===4)assert.ok(!(await page.locator('.task-question').innerText()).includes('STÔL'),'do not print the solved strip sentence in the question');
-  if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
+  if(stage.paperOnly){assert.match(await page.locator('.signal-header').innerText(),/PAPIEROVÁ ÚLOHA/);assert.equal(await page.locator('#answer,.answer-form').count(),0);assert.ok(!(await page.locator('.signal-content').innerText()).includes('HĽADAJ POD STOLIČKAMI'),'destination must be decoded on paper');await page.locator('[data-action="paper-found"]').click();}
+  else if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
   else{await page.locator('#answer').fill(stage.answer[0]);await page.locator('.answer-form button').click();}
   const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
   if(index===4)assert.match(await after.innerText(),/OCHRANA AKTÍVNA/);
-  if(index===6)assert.match(await after.innerText(),/automaticky uzavrelo/);
+  if(index===6)assert.match(await after.innerText(),/automaticky uzavrela/);
   if(index===6)await page.screenshot({path:'/tmp/narrative-rysko-phone.png',fullPage:true});
   assert.ok(await page.locator('[data-action="next"]').isVisible());
   await page.locator('[data-action="next"]').click();
@@ -59,6 +62,14 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   await layoutPage.screenshot({path:`/tmp/narrative-story-${width}.png`,fullPage:true});
   await layout.close();
  }
+ // Old completed paper tasks retain their letter and never require repeating the hunt.
+ await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:2,completed:[1,2],hints:{}})));
+ await page.goto(BASE+'/parent.html');await page.locator('[data-action="start"]').click();
+ assert.equal(await page.locator('.signal-reward strong').innerText(),'V');
+ assert.equal(await page.locator('[data-action="paper-found"]').count(),0);
+ await page.locator('[data-action="next"]').click();
+ assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
+ assert.equal(await page.locator('.quest-party .party-person').count(),4);
  // Every printed question uses the identical paragraph source as the live game.
  const printed=await context.newPage();await printed.goto(BASE+'/printables.html');
  for(const stage of narrative.slice(1,9))assert.equal(normal(await printed.locator(`[data-story-stage="${stage.id}"]`).innerText()),normal(stage.narrative.before.join(' ')),stage.id+': printable story agrees');

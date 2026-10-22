@@ -6,13 +6,13 @@ const context={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);
 const game=context.window.GAME;
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const legacyAnswers=[['741296'],['OKNO','POD OKNOM'],['9'],['STOL','STÔL'],['246'],['moon,sun,star'],['SPOLU'],['SVETLO']];
+const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['STOL','STÔL'],['246'],['moon,sun,star'],['SPOLU'],['SVETLO']];
 assert.equal(game.stages.length,10);
 assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),60);
 assert.equal(new Set(game.stages.map(s=>s.id)).size,10);
 assert.equal(game.characters.length,7);
 assert.equal(new Set(game.stages.slice(1,7).map(s=>s.character)).size,6);
-assert.equal(JSON.stringify(game.stages.slice(1,9).map(s=>s.answer)),JSON.stringify(legacyAnswers),'new first code; answers 2–8 remain compatible');
+assert.equal(JSON.stringify(game.stages.slice(1,9).map(s=>s.answer)),JSON.stringify(legacyAnswers),'paper route is updated; all numeric codes and final letters stay compatible');
 assert.equal(game.stages.slice(1,7).map(s=>s.reward).join(''),'SVETLO');
 assert.equal(game.call,game.stages[0].story,'one source for call and introductory storyboard');
 for(const s of game.stages){
@@ -183,7 +183,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.locator('[data-action="clear-sequence"]').click();await page.locator('[data-symbol="moon"]').click();
    await page.locator('[data-action="hint"]').click();assert.ok((await page.locator('#sequence').textContent()).includes('☾'));
    await page.locator('[data-symbol="sun"]').click();await page.locator('[data-symbol="star"]').click();await page.locator('[data-action="verify-sequence"]').click();
-  }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
+  }else if(i===2){assert.equal(await page.locator('#answer').count(),0);await page.locator('[data-action="paper-found"]').click();}else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6)assert.equal(await page.locator('.success-character').count(),1);
   if(i===4){await reloadAndResume(page);assert.equal(await page.locator('.success-card').count(),1,'reload preserves completed task confirmation');}
@@ -226,7 +226,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await page.locator('[data-action="next"]').click();
  }
  assert.equal(await page.locator('.finale').count(),1);entireJourney+=await readScene(page);
- assert.ok(entireJourney.includes('Ochranné pole obnovené'));
+ assert.ok(entireJourney.includes('bezpečne vrátili'));
  assert.equal(await page.locator('.finale .contact.connected').count(),7);
  assert.equal(await page.locator('.finale .contact small').first().textContent(),'Doma ✓');
  assert.equal(await page.locator('.atlas-cta').count(),1);
@@ -283,7 +283,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.sheet:visible').count(),1,'player cannot see future worksheets');
  const sheet=page.locator('#p1');const text=await sheet.textContent();
  assert.ok(!text.includes('741296'),'no solution on worksheet');
- for(const copy of ['zachytávač signálov','neviem sa spojiť','Pikom','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ KVAKOV SIGNÁL'])assert.ok(text.includes(copy),copy);
+ for(const copy of ['výborný sluch','Piko','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ KVAKOV SIGNÁL'])assert.ok(text.includes(copy),copy);
  assert.equal(await sheet.locator('.signal-cutout').count(),6);assert.equal(await sheet.locator('.code-boxes span').count(),6);
  assert.equal(await sheet.locator('[role="img"][aria-label*="Kvak"]').count(),1);
  assert.equal(await sheet.locator('.kvak-print-mission li').count(),5);

@@ -85,7 +85,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   const speech=await page.locator('#gm-intro .script-copy>div').textContent();
   assert.ok(speech.includes('Ah—'));assert.ok(!speech.includes('[curious'));
   assert.ok((await page.locator('#gm-envelope .script-copy').textContent()).includes('Toto musím povedať Pikovi!'));
-  assert.ok((await page.locator('#gm-envelope .worksheet-text').textContent()).includes('neviem sa spojiť'));
+  assert.ok((await page.locator('#gm-envelope .worksheet-text').textContent()).includes('Piko ma nepočuje'));
   await page.locator('#gm-intro [data-action="preview-media"]').click();
   await page.waitForFunction(()=>{const v=document.querySelector('dialog video');return v&&!v.paused&&v.currentTime>0});
   await page.locator('.dialog-close').click();
@@ -115,7 +115,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
    const answer=await page.evaluate(n=>GAME.stages[n].answer[0],n);
-   if(n===6){
+   if(n===2){assert.equal(await page.locator('#answer,.answer-form').count(),0);await page.locator('[data-action="paper-found"]').click();}
+   else if(n===6){
     for(const symbol of answer.split(','))await page.locator(`[data-symbol="${symbol}"]`).click();
     await page.locator('[data-action="verify-sequence"]').click();
    }else{

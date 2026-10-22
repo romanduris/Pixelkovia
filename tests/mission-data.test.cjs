@@ -14,10 +14,10 @@ assert.match(one.parent,/iba celý P1/);
 assert.ok(!one.materials.includes('P2'));
 assert.match(two.materials,/P2:.*dekódovací stroj.*obálke 2 pri okne/);
 assert.match(two.parent,/Okno sa neotvára a na parapet sa nelezie/);
-assert.match(two.task,/SRG RNQRP/);
+assert.match(two.task,/KODGDM SRG VWROLFNDPL/);
 assert.match(two.action,/vonkajšie D oproti vnútornému A/);
 assert.match(game.stages[4].action,/štyri.*pásiky P4/);
-assert.match(three.parent,/samostatný obal P3 pod oknom/);
+assert.match(three.parent,/obálku Úloha 3 s P3 pod sedadlom/);
 assert.match(three.parent,/Obálka 3 na stole.*P4.*uzavretý P5/);
 assert.match(game.stages[7].action,/obálku 4 pod sedadlom/);
 for(const location of ['medzi uterákmi','práčky','sušičky','elektrickým zariadeniam'])assert.ok(game.stages[0].parent.includes(location));
@@ -33,13 +33,14 @@ console.log('PASS: parent preparation, safe hiding places, envelope numbering, s
 const sheets=ctx.window.PRINT_MATERIALS.sheets;
 const encoded=sheets.p2.match(/data-ciphertext="([^"]+)"/)[1],shift=Number(sheets.p2.match(/data-shift="([^"]+)"/)[1]);
 const decoded=[...encoded].map(letter=>/[A-Z]/.test(letter)?String.fromCharCode(65+(letter.charCodeAt(0)-65+shift+26)%26):letter).join('');
-assert.equal(decoded,'POD OKNOM');assert.ok(two.answer.includes(decoded));
+assert.equal(decoded,'HLADAJ POD STOLICKAMI');assert.ok(two.answer.includes(decoded));
 assert.ok(sheets.p2.includes('id="circles"'));assert.ok(!sheets.p4.includes('id="circles"'));
 const strips=[...sheets.p4.matchAll(/data-order="(\d)"[^>]*><span>\d<\/span>\s*([^<]+)/g)].map(match=>({order:Number(match[1]),copy:match[2].trim()}));
 assert.equal(strips.length,4);assert.notEqual(strips.map(s=>s.order).join(''),'1234');
 assert.equal(strips.sort((a,b)=>a.order-b.order).map(s=>s.copy).join(' '),'STÔL SKRÝVA KUBOV PLÁN. TERAZ HO OTVORTE.');
 assert.ok(game.stages[4].answer.includes(strips[0].copy));
 // Old paper confirmations cannot silently attest the new worksheets, and game saves are retained.
+assert.equal(two.paperOnly,true);assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 zostáva pod inou stoličkou/);
 const saved=new Map([['zahada-v1-progress','existing-game'],['zahada-prep-0','1'],['zahada-prep-1','1'],['zahada-prep-2','1'],...['printed','cut-p2','envelope-2','symbols','table','supplies'].map(id=>['zahada-prep-v5-'+id,'1'])]);
 const prepContext={window:{},localStorage:{getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,value)}};
 vm.runInNewContext(fs.readFileSync('prep-store.js','utf8'),prepContext);const prep=prepContext.window.PREP_STORE;
@@ -47,4 +48,4 @@ for(const id of ['printed','cut-p4','envelope-2','symbols','table'])assert.equal
 assert.equal(prep.read('supplies'),true);assert.equal(prep.ready(),false);
 for(const step of prep.steps)prep.write(step.id,true);prep.write('device-understood',true);assert.equal(prep.ready(),true);
 assert.equal(saved.get('zahada-v1-progress'),'existing-game');assert.equal(saved.get('zahada-prep-v5-cut-p2'),'1');
-console.log('PASS: Iskra decoder → POD OKNOM; Lístok strips → STÔL; updated preparation requires confirmation and preserves saved games.');
+console.log('PASS: Iskra decoder → HĽADAJ POD STOLIČKAMI; Lístok strips → STÔL; updated preparation requires confirmation and preserves saved games.');

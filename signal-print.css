@@ -4,6 +4,7 @@
 @media print{.kvak-sheet{width:186mm;height:273mm;min-height:273mm;padding:5mm 4mm 3mm;margin:0;background:white;font-size:9pt;line-height:1.42;border:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.kvak-print-heading{padding-bottom:3mm;margin-bottom:3mm}.kvak-sheet h2{font-size:21pt;margin-top:2mm}.kvak-sheet .label{font-size:7pt}.print-wave{font-size:12pt}.kvak-print-story{padding:3mm}.kvak-print-story h3{font-size:11pt}.kvak-print-story .kvak-print-avatar{width:27mm;height:27mm;margin-left:3mm}.kvak-sheet p{margin-bottom:1.6mm}.kvak-print-mission{margin:3mm 0;padding:2.5mm 3mm}.kvak-print-mission h3{font-size:9pt;margin-bottom:1mm}.kvak-print-mission li{margin:.5mm 0}.cutouts-heading{font-size:6.5pt;margin:2mm 0}.signal-cutouts{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm}.signal-cutout{height:43mm}.cutout-content{width:37mm;height:37mm;padding:2.5mm;grid-template-columns:1fr 12mm;grid-template-rows:5mm 1fr 1fr}.cutout-content strong{font-size:13pt}.cutout-content small{font-size:5.5pt}.record-label{font-size:5.5pt}.record-digit b{font-size:27pt}.kvak-print-controls{margin-top:3mm;gap:3mm}.kvak-code-panel,.kvak-qr-panel{padding:2.5mm}.kvak-print-controls h3{font-size:7pt;margin-bottom:2mm}.kvak-print-controls p{font-size:7pt}.code-boxes{gap:1.2mm;margin:2mm 0}.code-boxes span{width:7mm;height:8mm}.kvak-qr-panel{gap:2mm}.qr-mockup{width:20mm}.qr-mockup img{width:19mm;height:19mm}.qr-mockup small{font-size:4.5pt}.kvak-cut-divider{margin:5mm 0 2mm}.kvak-cut-divider span{top:-2mm;font-size:6pt;padding:0 2mm}.kvak-retained{break-inside:avoid}.kvak-sheet .footer{position:static;margin-top:3mm;font-size:6pt;color:#334d70}}
 
 /* One parent A4, with the same instructions as the storyboard. */
+@media print{.kvak-print-heading{padding-bottom:2mm;margin-bottom:2mm}.kvak-cut-divider{margin-top:4mm}}
 .sheet[hidden]{display:none!important}
 .parent-guide{font:13px/1.45 Arial,sans-serif;color:#263c36;padding:30px;min-height:0;border-top-color:#3d6c58}
 .parent-guide h2{font-size:27px;line-height:1.2;margin:9px 0 14px;color:#244738}
@@ -29,9 +30,9 @@
   .parent-guide .guide-intro{padding-bottom:2mm;margin-bottom:3mm}
   .parent-guide .guide-intro p{margin-bottom:1.5mm}
   .guide-stages{columns:2;column-gap:7mm}
-  .guide-stage{margin-bottom:3mm}
+  .guide-stage{margin-bottom:2mm}
   .parent-guide h3{font-size:10pt;margin-bottom:1mm}
-  .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:9pt;line-height:1.38;margin-bottom:1mm}
+  .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:9pt;line-height:1.3;margin-bottom:1mm}
   .parent-guide .adult-safety{font-size:8pt!important}
   .parent-guide .storyboard-solution{padding:1mm 2mm;margin-top:1mm;background:white}
   .parent-guide .storyboard-solution h3,.parent-guide .storyboard-solution h4{font-size:9pt}
@@ -58,6 +59,7 @@
 .story-sheet .card .quest-story{margin-top:12px}
 .story-sheet .poem{font-size:20px;line-height:2.1}
 .story-sheet .footer{left:30px}
+@media screen and (max-width:600px){#p2 .code{font-size:20px;letter-spacing:2px;overflow-wrap:anywhere}}
 @media print{
  .story-sheet{width:186mm;min-height:266mm;padding:4mm 3mm 8mm;font-size:9.5pt;line-height:1.4}
  .story-sheet h2{font-size:19pt;margin:2mm 0 3mm}
@@ -77,4 +79,6 @@
  .story-sheet .card p{margin:0 0 2mm}
  .story-sheet .card>strong{font-size:14pt}
  .story-sheet .footer{left:3mm;bottom:1mm;font-size:6pt}
+ #p5.story-sheet{font-size:9pt;line-height:1.35}
+ #p5.story-sheet .maze{max-height:60mm}
 }
