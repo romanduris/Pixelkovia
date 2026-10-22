@@ -36,7 +36,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
   }
   if(process.env.QA_SCREENSHOT_DIR)await page.screenshot({path:process.env.QA_SCREENSHOT_DIR+'/treasurequest-live-dashboard.png',fullPage:true});
   const links=await page.locator('#external-links a').evaluateAll(items=>items.map(a=>a.href));
-  assert.equal(links.length,5);assert.ok(links.every(link=>link.includes('internalPreview=1')));
+  assert.equal(links.length,3);assert.ok(links.every(link=>link.includes('internalPreview=1')));
   await page.locator('#logout-button').click();await page.waitForURL('**/login');
   assert.equal((await context.request.get(new URL('/api/admin/dashboard',base).href,{headers:{cookie:beforeLogoutCookie}})).status(),401);
   await page.goto(base.href);await page.waitForURL('**/login');

@@ -11,7 +11,7 @@ const BASE=process.env.ADMIN_BASE_URL||'http://127.0.0.1:8787';
  assert.equal(await page.locator('.product-tab:disabled').count(),2);
  assert.equal(await page.locator('#page-title').innerText(),'Overview');
  assert.equal(await page.locator('.metric').count(),10);assert.equal(await page.locator('.funnel-cell').count(),8);
- assert.equal(await page.locator('#external-links a').count(),5);
+ assert.equal(await page.locator('#external-links a').count(),3);
  for(const link of await page.locator('#external-links a').all())assert.ok((await link.getAttribute('href')).includes('internalPreview=1'));
  await page.screenshot({path:'/tmp/treasurequest-admin-dashboard.png',fullPage:true});
  const wait=()=>page.waitForFunction(()=>document.querySelector('#view')?.getAttribute('aria-busy')==='false');

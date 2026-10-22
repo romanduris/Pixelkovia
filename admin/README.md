@@ -36,7 +36,7 @@ Seed vytvorí 18 fiktívnych rodín s adresami `@example.invalid`: zakúpené/ne
 - Objednávky: najnovších 200 filtrovaných objednávok, bez checkoutu alebo ručnej simulácie platieb v admin UI.
 - Analytika úloh: začaté/vyriešené relácie, úspešnosť, priemer/medián elapsed, priemer active, nesprávne odpovede, priemerné nápovedy a posledné nedokončené hrania.
 - Osem e-mailových konceptov, história udalostí a príznak vypnutého odosielania. Marketingové koncepty majú zástupný odhlasovací odkaz. Poskytovateľ ani produkčné odosielanie nie sú zapojené.
-- Interné odkazy na funnel, rodičovský test, storyboard, Atlas a tlačoviny majú `internalPreview=1`. Samotné prekliky nevytvárajú aktivácie ani udalosti. Storyboard ponúka návrat na nasadenú chránenú administráciu.
+- Produktové odkazy Pixelkovia v administrácii obsahujú iba Funnel, Customer page a Storyboard; otvárajú sa v novej karte s `internalPreview=1`. Atlas Pixelkov a Tlačové materiály sú dostupné z navigácie storyboardu, tiež v novej karte. Samotné prekliky nevytvárajú aktivácie ani udalosti. Storyboard ponúka návrat na nasadenú chránenú administráciu.
 - Frontend má desktopové tabuľky, zákaznícke karty na mobile, ovládanie klávesnicou a zrozumiteľné prázdne/chybové stavy.
 
 ## Význam metrík a časov
