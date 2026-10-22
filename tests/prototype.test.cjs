@@ -276,8 +276,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.goto(BASE+'/storyboard.html');await noOverflow(page,'mobile GM');
  await page.locator('[data-action="test"][data-stage="6"]').click();await readScene(page);await noOverflow(page,'mobile task');await noAtlas();
  await page.screenshot({path:'/tmp/mystery-task-mobile.png',fullPage:true});
- await page.goto(BASE+'/printables.html');assert.equal(await page.locator('.sheet').count(),7);assert.equal(await page.locator('#circles svg').count(),2);await noOverflow(page,'mobile printables');
- await page.emulateMedia({media:'print'});const pdf=await page.pdf({path:'/tmp/mystery-working-print.pdf',format:'A4',printBackground:true});assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,7,'seven printable sheets fit seven pages');await page.emulateMedia({media:'screen'});
+ await page.goto(BASE+'/printables.html');assert.equal(await page.locator('.sheet').count(),8);assert.equal(await page.locator('#circles svg').count(),2);await noOverflow(page,'mobile printables');
+ await page.emulateMedia({media:'print'});const pdf=await page.pdf({path:'/tmp/mystery-working-print.pdf',format:'A4',printBackground:true});assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,8,'six worksheets, diploma and adult guide fit eight pages');await page.emulateMedia({media:'screen'});
  // The first worksheet is self-contained, low-ink, and one A4 even without colour.
  await page.goto(BASE+'/printables.html?sheet=p1');
  assert.equal(await page.locator('.sheet:visible').count(),1,'player cannot see future worksheets');
@@ -343,6 +343,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: Kvak V4 six-digit chronological code, simulated QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete eight-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, seven print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Kvak V4 six-digit chronological code, simulated QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete eight-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

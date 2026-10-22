@@ -55,16 +55,19 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    await toggle.click();
    assert.equal(await toggle.getAttribute('aria-expanded'),'false');
    assert.ok(!await block.locator('.storyboard-content').isVisible(),'whole stage content collapses');
-   assert.ok(await block.locator('h2').isVisible());
-   assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'testing remains accessible when collapsed');
+   assert.ok(await block.locator('.storyboard-head h2').isVisible());
+   if(await block.getAttribute('id')==='gm-envelope')assert.equal(await block.locator('[data-action="test"]').count(),0,'bathroom QR simulation is removed');else assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'other testing remains accessible when collapsed');
    await toggle.focus();await page.keyboard.press('Enter');
    assert.equal(await toggle.getAttribute('aria-expanded'),'true','keyboard expands the same stage');
    assert.ok(await block.locator('.storyboard-content').isVisible());
   }
-  assert.equal(await page.locator('details.tts-block:not([open])').count(),2,'TTS prompts start collapsed');
-  assert.equal(await page.locator('.script-copy[open]').count(),2,'both spoken transcripts start expanded');
+  assert.equal(await page.locator('details.tts-block:not([open])').count(),1,'TTS prompts start collapsed');
+  assert.equal(await page.locator('.script-copy[open]').count(),1,'Piko transcript remains expanded; Kvak uses closed buttons');
   assert.equal(await page.locator('#gm-intro .studio-early-help li').count(),3);
-  assert.equal(await page.locator('#gm-envelope .studio-early-help li').count(),2);
+  assert.equal(await page.locator('#gm-envelope .adult-help').count(),1);
+  assert.ok(await page.locator('#kvak-message-text').isHidden());assert.ok(await page.locator('#kvak-message-tts').isHidden());
+  await page.locator('[data-target="kvak-message-tts"]').click();assert.ok(await page.locator('#kvak-message-tts').isVisible());
+  await page.locator('[data-target="kvak-message-tts"]').click();
   assert.equal(await page.locator('#gm-intro .studio-stage-details, #gm-envelope .studio-stage-details').count(),0,'duplicate full scenarios are absent from the first two sections');
   assert.equal(await page.locator('#gm-document .studio-stage-details').count(),1,'later scenarios remain available');
   await page.locator('[data-tts="piko"]>summary').click();
@@ -90,7 +93,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.ok(await page.locator('dialog video').evaluate(v=>v.paused));
   const printable=await page.context().newPage();await printable.goto(BASE+'/printables.html?sheet=p1');
   const normalize=s=>s.replace(/\s+/g,' ').trim();
-  assert.equal(normalize(await page.locator('.worksheet-text').innerText()).split('KÓD NA OBNOVENIE SPOJENIA')[0].trim(),normalize(await printable.locator('.kvak-print-story').innerText()+' '+await printable.locator('.kvak-print-mission').innerText()));
+  assert.equal(normalize(await page.locator('#gm-envelope .worksheet-text').innerText()).split('KÓD NA OBNOVENIE SPOJENIA')[0].trim(),normalize(await printable.locator('.kvak-print-story').innerText()+' '+await printable.locator('.kvak-print-mission').innerText()));
   await printable.emulateMedia({media:'print'});
   const layout=await printable.evaluate(()=>{
    const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON();
@@ -103,27 +106,10 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await printable.locator('.qr-mockup a').count(),0);
   assert.ok((await printable.locator('.qr-mockup').innerText()).includes('NEFUNKČNÁ'));
   await printable.close();
-  // StoryBoard test is the simulated scan itself, with no extra instruction screen.
+  // The bathroom prototype is an editorial worksheet, without the removed QR simulator.
   const savedBeforeTest=await page.evaluate(()=>localStorage.getItem('zahada-v1-progress'));
-  await page.locator('#gm-envelope .storyboard-toggle').click();
-  await page.locator('#gm-envelope [data-action="test"]').click();
-  assert.equal(await page.locator('.signal-restore').count(),1);
-  assert.equal(await page.locator('.signal-restore [data-action="hint"]').count(),0);
-  assert.equal(await page.locator('.task-main, .task-aside, .scan-entry').count(),0);
-  assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
-  await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();
-  assert.ok((await page.locator('#feedback').textContent()).includes('ešte nesedí'));
-  await page.locator('.signal-header [data-action="exit-test"]').click();
-  assert.equal(await page.locator('.studio-header').count(),1,'test returns directly to StoryBoard');
-  await page.locator('#gm-envelope [data-action="test"]').click();
-  await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();
-  assert.equal(await page.locator('.signal-connected').count(),1);
-  await page.waitForFunction(()=>{const a=document.querySelector('#kvak-audio');return a&&!a.paused&&a.currentTime>0;});
-  assert.equal(await page.locator('.signal-audio-controls button').count(),1);
-  assert.ok((await page.locator('.signal-audio-controls button').textContent()).includes('Pozastaviť'));
-  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'QR preview never changes family progress');
-  await page.locator('.signal-header [data-action="exit-test"]').click();
-  await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
+  assert.equal(await page.locator('#gm-envelope [data-action="test"]').count(),0);
+  assert.ok(!(await page.locator('#gm-envelope').innerText()).includes('Nasleduje obálka 2'));
   // Later stage tests open only the interaction, not duplicate instruction pages.
   for(let n=2;n<=8;n++){
    await page.locator(`[data-action="test"][data-stage="${n}"]`).click();

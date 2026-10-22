@@ -1,5 +1,5 @@
 // Optional authoring helper. Install Playwright outside the repository and set
-// PLAYWRIGHT_MODULE; root HTML/CSS remain the source of truth for all PDFs.
+// PLAYWRIGHT_MODULE; root HTML/CSS and print-materials.js are the source of truth for all PDFs.
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const fs=require('node:fs/promises');
 const path=require('node:path');
@@ -7,7 +7,7 @@ const {pathToFileURL}=require('node:url');
 (async()=>{
  const root=path.resolve(__dirname,'..');
  await fs.mkdir(path.join(root,'assets/printables'),{recursive:true});
- const allIds=['p1','p2','p3','p4','p5','p6','diplom'];
+ const allIds=['p1','p2','p3','p4','p5','p6','diplom','rodicovsky-navod'];
  const requestedIds=process.argv.slice(2);
  if(requestedIds.some(id=>!allIds.includes(id)))throw new Error('Unknown worksheet ID');
  const ids=requestedIds.length?requestedIds:allIds;
@@ -22,7 +22,7 @@ const {pathToFileURL}=require('node:url');
    const pdf=await page.pdf({path:path.join(root,'assets/printables',id+'.pdf'),format:'A4',printBackground:true});
    const count=(pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length;
    if(count!==1)throw new Error(`${id}: expected one A4 page, got ${count}`);
-   if(id==='p1')await page.locator('#p1').screenshot({path:path.join(root,'assets/kvak-sheet-preview.png')});
+   if(/^p[1-6]$/.test(id))await page.locator('#'+id).screenshot({path:path.join(root,id==='p1'?'assets/kvak-sheet-preview.png':`assets/printables/${id}-preview.png`)});
    console.log(`${id}: exported one A4 page`);
   }
   const result=require('node:child_process').spawnSync('python3',[path.join(root,'scripts/bundle-printables.py')],{stdio:'inherit'});

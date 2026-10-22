@@ -14,11 +14,11 @@ export const checklist = [
   },
   {
     "id": "envelope-1",
-    "label": "Pripravil som prvú obálku: obsahuje iba celý P1."
+    "label": "Pripravil som obálku Kúpeľňa: obsahuje iba celý P1."
   },
   {
     "id": "bathroom",
-    "label": "Ukryl som obálku 1 v kúpeľni na suchej dostupnej poličke alebo medzi uterákmi."
+    "label": "Ukryl som obálku Kúpeľňa na suchej dostupnej poličke alebo medzi uterákmi."
   },
   {
     "id": "envelope-2",

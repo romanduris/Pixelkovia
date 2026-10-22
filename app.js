@@ -139,6 +139,7 @@
       app.innerHTML='<section class="portal-header"><div><h1>Prístup zatiaľ nie je dostupný</h1><p>Produkčná verzia vyžaduje serverové overenie nákupu. V tejto etape nie je implementované.</p></div></section>';return;
     }
     document.querySelectorAll('.nav-purchase').forEach(button=>{button.textContent=SITE_CONFIG.purchase.label;});
+    document.querySelectorAll('[data-management-link]').forEach(link=>{const url=SITE_CONFIG.managementUrl();link.hidden=!url;if(url)link.href=url;});
     app.innerHTML=view==='prep'?prep():view==='designer'?designer():view==='player'&&state().started&&state().stage>0?taskScreen():landing();
     bindKvakAudio(autoplayKvak);
     if(view==='prep'){app.querySelectorAll('[data-check]').forEach(el=>{el.checked=PREP_STORE.read(el.dataset.check);});updatePreparation();}
@@ -222,10 +223,15 @@
     if(b.dataset.view){preview=null;navigate(b.dataset.view);return;}
     if(b.dataset.symbol){if(sequence.length<3){sequence.push(b.dataset.symbol);const el=document.querySelector('#sequence');el.textContent=sequence.map(k=>symbols[k]).join(' ');el.setAttribute('aria-label',sequence.map(k=>names[k]).join(', '));}return;}
     const a=b.dataset.action;if(!a)return;
+    if(a==='toggle-copy'){
+      const content=document.getElementById(b.dataset.target);if(!content)return;
+      content.hidden=!content.hidden;b.setAttribute('aria-expanded',String(!content.hidden));return;
+    }
     if(a==='toggle-storyboard'){
       const content=document.getElementById(b.getAttribute('aria-controls'));if(!content)return;
       content.hidden=!content.hidden;
       b.setAttribute('aria-expanded',String(!content.hidden));
+      b.querySelector('span').textContent=content.hidden?'+':'−';
       b.setAttribute('aria-label',`${content.hidden?'Rozbaliť':'Zbaliť'} blok ${b.dataset.label}`);
       content.closest('.storyboard').classList.toggle('is-collapsed',content.hidden);
       if(content.hidden)content.querySelectorAll('video,audio').forEach(media=>media.pause());
