@@ -13,7 +13,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await page.locator('[data-action="print"]').count(),0);
  assert.equal(await page.locator('.storyboard-content:not([hidden])').count(),0);
  const bathroom=page.locator('#gm-envelope');assert.ok((await bathroom.locator('.section-kicker').first().textContent()).includes('Úloha Kúpeľňa / 6 min'));
- assert.equal(await bathroom.locator('[data-action="test"]').count(),0);
+ assert.equal(await bathroom.locator('.storyboard-head [data-action="test"]').count(),1);
  await bathroom.locator('.storyboard-toggle').click();
  assert.equal(await bathroom.locator('.storyboard-content>div').first().getAttribute('class'),'worksheet-review');
  assert.equal(await bathroom.locator('.storyboard-content>*').last().getAttribute('class'),'material-actions storyboard-sheet-actions');
@@ -36,7 +36,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
   const block=page.locator('#gm-'+id),toggle=block.locator('.storyboard-toggle');
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
   assert.equal(await block.locator('.storyboard-content>.gm-instructions').count(),1,id+': one shared Game master section');
-  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),0);
+  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),1);
   assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
  }
  assert.equal(normalize(await page.locator('#gm-digital .worksheet-text').innerText()),normalize(await printed.locator('#p5 .note').innerText()),'Ryško shows his printed greeting');
@@ -63,10 +63,29 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  for(const [stage,sheet] of Object.entries(map))assert.ok((await page.locator('#gm-'+stage+' .worksheet-image').getAttribute('href')).endsWith('#'+sheet));
  await printed.goto(BASE+'/printables.html?sheet=p1');assert.equal(await printed.locator('.sheet:visible').count(),1);assert.ok(await printed.locator('#rodicovsky-navod').isHidden());assert.ok(!(await printed.locator('#p1').innerText()).includes('741296'));
  await printed.close();
+ // Every collapsed header starts a real isolated test, including the intro and bathroom.
+ const saved=JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}});
+ await page.evaluate(saved=>localStorage.setItem('zahada-v1-progress',saved),saved);await page.reload();
+ for(let stage=0;stage<10;stage++){
+  const button=page.locator(`.storyboard-head [data-action="test"][data-stage="${stage}"]`);
+  assert.ok(await button.isVisible());assert.equal(await page.locator('.storyboard-content:visible').count(),0);
+  await button.click();
+  if(stage===0){await page.locator('.message-incoming').waitFor();await page.locator('.message-status [data-action="close"]').click();}
+  else if(stage===1){
+   assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
+   await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();assert.match(await page.locator('#feedback').innerText(),/nesedí/);
+   await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();await page.locator('.signal-connected').waitFor();
+   await page.locator('audio').evaluate(audio=>audio.pause());await page.locator('.signal-header [data-action="exit-test"]').click();
+  }else if(stage===9){await page.locator('.finale').waitFor();assert.equal(await page.locator('.finale [data-action="reset"]').count(),0,'finale test cannot reset family progress');await page.locator('.finale [data-action="exit-test"]').click();}
+  else{await page.locator('.signal-task').waitFor();await page.locator('.signal-header [data-action="exit-test"]').click();}
+  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),saved,'test '+stage+' preserves family progress');
+ }
+ await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
+ await bathroom.locator('.storyboard-toggle').click();
  await page.evaluate(()=>scrollTo(0,0));
  await page.screenshot({path:'/tmp/storyboard-header.png'});
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom.png'});
  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom-phone.png'});
- assert.deepEqual(errors,[]);console.log('PASS: storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
+ assert.deepEqual(errors,[]);console.log('PASS: all ten isolated header tests including intro/bathroom/finale, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

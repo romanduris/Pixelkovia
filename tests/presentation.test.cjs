@@ -56,7 +56,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await toggle.getAttribute('aria-expanded'),'false');
    assert.ok(!await block.locator('.storyboard-content').isVisible(),'whole stage content collapses');
    assert.ok(await block.locator('.storyboard-head h2').isVisible());
-   assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),0,'headers follow the bathroom template');
+   assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'testing stays available while the stage is collapsed');
    await toggle.focus();await page.keyboard.press('Enter');
    assert.equal(await toggle.getAttribute('aria-expanded'),'true','keyboard expands the same stage');
    assert.ok(await block.locator('.storyboard-content').isVisible());
@@ -105,15 +105,12 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await printable.locator('.qr-mockup a').count(),0);
   assert.ok((await printable.locator('.qr-mockup').innerText()).includes('NEFUNKČNÁ'));
   await printable.close();
-  // The bathroom prototype is an editorial worksheet, without the removed QR simulator.
+  // Bathroom and later tasks expose direct tests in their headers.
   const savedBeforeTest=await page.evaluate(()=>localStorage.getItem('zahada-v1-progress'));
-  assert.equal(await page.locator('#gm-envelope [data-action="test"]').count(),0);
+  assert.equal(await page.locator('#gm-envelope .storyboard-head [data-action="test"]').count(),1);
   assert.ok(!(await page.locator('#gm-envelope').innerText()).includes('Nasleduje obálka 2'));
   // Later stage tests open only the interaction, not duplicate instruction pages.
   for(let n=2;n<=8;n++){
-   const id=await page.evaluate(n=>GAME.stages[n].id,n),block=page.locator('#gm-'+id);
-   if(await block.locator('.storyboard-toggle').getAttribute('aria-expanded')==='false')await block.locator('.storyboard-toggle').click();
-   await page.locator(`[data-target="stage-${id}-notes"]`).click();
    await page.locator(`[data-action="test"][data-stage="${n}"]`).click();
    assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
