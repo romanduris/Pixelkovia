@@ -59,7 +59,7 @@
   const ttsEditorLink='<a class="copy-toggle tts-copy-toggle tts-editor-link" href="https://elevenlabs.io/app/speech-synthesis/text-to-speech" target="_blank" rel="noopener noreferrer">Otvoriť ElevenLabs</a>';
   function ttsBlock(id){const script=GAME.voiceScripts[id];return `<details class="tts-block" data-tts="${id}"><summary>Pôvodné zadanie pre text-to-speech</summary><h4>${esc(script.model)} · ${esc(script.duration)}</h4><p>Presné zadanie dodané autorom vrátane emočných pokynov v hranatých zátvorkách a charakteru hlasu.</p>${ttsEditorLink}<pre>${esc(script.prompt)}</pre></details>`;}
   const internalSheetLink=id=>`printables.html?internalPreview=1#${id}`;
-  function sheetActions(id){return `<div class="material-actions storyboard-sheet-actions">${download(id)}<a class="btn small secondary" href="${internalSheetLink(id)}" target="_blank" rel="noopener noreferrer">Skontrolovať tlačený dokument</a></div>`;}
+  function sheetActions(id){return `<div class="material-actions storyboard-sheet-actions"><a class="btn small secondary" href="${internalSheetLink(id)}" target="_blank" rel="noopener noreferrer">Skontrolovať tlačený dokument</a></div>`;}
   function worksheetReview(id){
     const material=materials.find(item=>item.id===id),image=id==='p1'?'assets/kvak-sheet-preview.png':`assets/printables/${id}-preview.png`;
     return `<div class="worksheet-review"><a class="worksheet-image" href="${internalSheetLink(id)}" target="_blank" rel="noopener noreferrer" aria-label="Otvoriť tlačený list ${id.toUpperCase()} – ${esc(material.title)}"><img src="${image}" alt="Tlačený pracovný list ${esc(material.title)}" loading="lazy" width="794" height="1123"></a><div class="worksheet-text">${PRINT_MATERIALS.summary(id)}</div></div>`;
