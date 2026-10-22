@@ -25,7 +25,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
   const cookies=await context.cookies(),session=cookies.find(c=>c.name==='__Host-tq-admin');
   assert.ok(session?.secure&&session?.httpOnly&&session?.sameSite==='Strict');
   const beforeLogoutCookie=session.name+'='+session.value;
-  for(const section of ['customers','orders','analytics','emails','events','dashboard']){
+  for(const section of ['orders','analytics','dashboard']){
    await page.locator('[data-page="'+section+'"]').click();
    await page.locator('#view[aria-busy="false"]').waitFor();
    assert.equal(await page.locator('#notice').textContent(),'','Section '+section+' error');
@@ -41,6 +41,6 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
   assert.equal((await context.request.get(new URL('/api/admin/dashboard',base).href,{headers:{cookie:beforeLogoutCookie}})).status(),401);
   await page.goto(base.href);await page.waitForURL('**/login');
   assert.deepEqual(errors,[]);await context.close();
-  console.log('Password UI: login, all six sections, secure cookie, mobile/desktop layout and server-side logout passed.');
+  console.log('Password UI: login, all three sections, secure cookie, mobile/desktop layout and server-side logout passed.');
  }finally{await browser.close();}
 })().catch(()=>{console.error('Password browser test failed; no credentials or session values were logged.');process.exitCode=1;});

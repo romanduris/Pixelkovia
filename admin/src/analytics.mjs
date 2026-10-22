@@ -35,6 +35,7 @@ export async function dashboard(db,f){
 }
 const statusSql=`CASE WHEN e.status='revoked' OR (e.expires_at IS NOT NULL AND e.expires_at<=?) OR (e.replay_until IS NOT NULL AND e.replay_until<=?) THEN 'expired' WHEN EXISTS(SELECT 1 FROM game_runs r WHERE r.entitlement_id=e.id AND r.status='active') THEN 'playing' WHEN e.first_completed_at IS NOT NULL THEN 'completed' WHEN EXISTS(SELECT 1 FROM checklist_progress cp WHERE cp.entitlement_id=e.id AND cp.completed=1) THEN 'preparing' WHEN o.status='paid' THEN 'purchased' ELSE 'payment-pending' END`;
 export async function customers(db,params){
+  if(params.get('view')==='journey')return customerJourney(db,params);
   const f=filters(params),s=scope(f),at=Date.now();
   const page=Math.max(1,Math.min(100000,Number.parseInt(params.get('page')||'1')||1)),size=20;
   const fields={customer:'name',email:'email',purchase:'purchase_at',activity:'last_activity',stage:'current_stage'};
@@ -63,3 +64,41 @@ export async function customerDetail(db,id){
   return {customer,orders,entitlements:rights,portal:{visits,count:visits.length,firstVisit:visits[0]?.started_at??null,lastVisit:visits.at(-1)?.last_at??null,returnsBeforeActivation:Math.max(0,visits.filter(v=>v.before_activation).length-1)},checklist:checks,runs:runs.map(r=>({...r,stages:stages.map(s=>({stage:s.stage,title:s.title,...progress.find(p=>p.run_id===r.id&&p.stage===s.stage)}))})),events,email};
 }
 export async function orders(db,params){const s=scope(filters(params));return query(db,`SELECT o.*,c.name customer_name,c.email,GROUP_CONCAT(p.name,', ') products FROM orders o JOIN customers c ON c.id=o.customer_id JOIN order_items i ON i.order_id=o.id JOIN products p ON p.id=i.product_id WHERE ${s.sql} GROUP BY o.id ORDER BY o.created_at DESC LIMIT 200`,...s.args);}
+
+// One customer per row. Keep the original order-item API available for integrations.
+export async function customerJourney(db,params){
+  const f=filters(params),s=scope(f),q=(params.get('q')||'').slice(0,200);
+  const rows=await query(db,`SELECT c.id customer_id,c.name,c.email,
+    (SELECT MIN(o.created_at) FROM orders o JOIN order_items i ON i.order_id=o.id JOIN products p ON p.id=i.product_id WHERE o.customer_id=c.id AND o.status='paid' AND p.episode_id IN ('episode-1','bundle')) purchase_at,
+    (SELECT GROUP_CONCAT(DISTINCT i.product_id) FROM orders o JOIN order_items i ON i.order_id=o.id WHERE o.customer_id=c.id AND o.status='paid') owned_products,
+    e.id entitlement_id,e.status entitlement_status,e.expires_at,e.activated_at,e.first_completed_at,
+    (SELECT MIN(started_at) FROM portal_sessions WHERE customer_id=c.id) portal_opened_at,
+    r.id run_id,r.status run_status,r.current_stage,r.started_at,r.completed_at,r.last_at last_activity,
+    EXISTS(SELECT 1 FROM checklist_progress cp WHERE cp.entitlement_id=e.id AND cp.completed=1) preparing
+    FROM customers c
+    LEFT JOIN entitlements e ON e.id=(SELECT e2.id FROM entitlements e2 JOIN products p ON p.id=e2.product_id JOIN order_items i ON i.id=e2.order_item_id JOIN orders o ON o.id=i.order_id WHERE e2.customer_id=c.id AND o.status='paid' AND p.episode_id IN ('episode-1','bundle') ORDER BY EXISTS(SELECT 1 FROM game_runs a WHERE a.entitlement_id=e2.id AND a.status='active') DESC,e2.granted_at DESC,e2.id LIMIT 1)
+    LEFT JOIN game_runs r ON r.id=(SELECT id FROM game_runs WHERE entitlement_id=e.id ORDER BY CASE WHEN status='active' THEN 0 ELSE 1 END,started_at DESC,id LIMIT 1)
+    WHERE EXISTS(SELECT 1 FROM orders o JOIN order_items i ON i.order_id=o.id WHERE o.customer_id=c.id AND ${s.sql})
+    AND (c.name LIKE ? OR c.email LIKE ?)`,...s.args,'%'+q+'%','%'+q+'%');
+  const now=Date.now(),extensions=['bedtime-book','piko-mission','listok-mission','kvak-mission'];
+  let customers=rows.map(c=>{
+    const owned=(c.owned_products||'').split(',').filter(Boolean),bundle=owned.includes('complete');
+    const extensionIds=bundle?extensions:extensions.filter(id=>owned.includes(id));
+    const state=c.run_status==='active'?'playing':c.first_completed_at!=null||c.run_status==='completed'?'completed':c.entitlement_status==='revoked'||(c.expires_at!=null&&c.expires_at<=now)?'expired':c.portal_opened_at!=null||c.preparing?'preparing':c.purchase_at!=null?'purchased':'payment-pending';
+    return {...c,state,has_base:bundle||owned.includes('episode-1'),extension_count:extensionIds.length,extension_ids:extensionIds};
+  });
+  const status=params.get('state')||'',version=params.get('version')||'',portal=params.get('portal')||'';
+  if(status)customers=customers.filter(c=>status==='active'?['purchased','preparing','playing'].includes(c.state):c.state===status);
+  if(version)customers=customers.filter(c=>version==='base'?c.has_base&&c.extension_count===0:version==='extensions'?c.extension_count>0:version==='full'?c.extension_count===extensions.length:true);
+  if(portal)customers=customers.filter(c=>portal==='opened'?c.portal_opened_at!=null:portal==='unopened'?c.portal_opened_at==null:true);
+  const fields={customer:'name',purchase:'purchase_at',activity:'last_activity',stage:'current_stage'},sort=fields[params.get('sort')]||'purchase_at',direction=params.get('direction')==='asc'?1:-1;
+  customers.sort((a,b)=>{
+    const priority=c=>['purchased','preparing','playing'].includes(c.state)?0:c.state==='completed'?2:1;
+    const group=priority(a)-priority(b);if(group)return group;
+    const x=a[sort],y=b[sort];return (typeof x==='string'?x.localeCompare(y||'','sk'):Number(x||0)-Number(y||0))*direction||a.customer_id.localeCompare(b.customer_id);
+  });
+  const pageSize=20,total=customers.length,page=Math.max(1,Math.min(Math.ceil(total/pageSize)||1,Number.parseInt(params.get('page')||'1')||1));
+  const selected=customers.slice((page-1)*pageSize,page*pageSize),runIds=selected.map(c=>c.run_id).filter(Boolean);
+  const progress=runIds.length?await query(db,`SELECT * FROM game_stage_progress WHERE run_id IN (${runIds.map(()=>'?').join(',')})`,...runIds):[];
+  return {rows:selected.map(c=>({...c,stages:stages.map(rule=>({stage:rule.stage,title:rule.title,...progress.find(p=>p.run_id===c.run_id&&p.stage===rule.stage)}))})),total,page,pageSize,stages:stages.map(({stage,title})=>({stage,title}))};
+}
