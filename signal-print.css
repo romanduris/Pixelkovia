@@ -3,17 +3,38 @@
 @media screen and (max-width:600px){.kvak-sheet{padding:18px;font-size:12px}.kvak-sheet h2{font-size:22px}.print-wave{font-size:10px}.kvak-print-story .kvak-print-avatar{width:85px;height:85px;margin-left:10px}.signal-cutouts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.signal-cutout{height:148px}.cutout-content{width:128px;height:128px;padding:7px;grid-template-columns:1fr 42px}.cutout-content strong{font-size:16px}.record-digit b{font-size:32px}.cutouts-heading{display:block}.cutouts-heading span{display:block;margin-top:4px}.kvak-print-controls{grid-template-columns:1fr}.kvak-sheet .footer{font-size:7px}}
 @media print{.kvak-sheet{width:186mm;height:273mm;min-height:273mm;padding:5mm 4mm 3mm;margin:0;background:white;font-size:9pt;line-height:1.42;border:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.kvak-print-heading{padding-bottom:3mm;margin-bottom:3mm}.kvak-sheet h2{font-size:21pt;margin-top:2mm}.kvak-sheet .label{font-size:7pt}.print-wave{font-size:12pt}.kvak-print-story{padding:3mm}.kvak-print-story h3{font-size:11pt}.kvak-print-story .kvak-print-avatar{width:27mm;height:27mm;margin-left:3mm}.kvak-sheet p{margin-bottom:1.6mm}.kvak-print-mission{margin:3mm 0;padding:2.5mm 3mm}.kvak-print-mission h3{font-size:9pt;margin-bottom:1mm}.kvak-print-mission li{margin:.5mm 0}.cutouts-heading{font-size:6.5pt;margin:2mm 0}.signal-cutouts{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm}.signal-cutout{height:43mm}.cutout-content{width:37mm;height:37mm;padding:2.5mm;grid-template-columns:1fr 12mm;grid-template-rows:5mm 1fr 1fr}.cutout-content strong{font-size:13pt}.cutout-content small{font-size:5.5pt}.record-label{font-size:5.5pt}.record-digit b{font-size:27pt}.kvak-print-controls{margin-top:3mm;gap:3mm}.kvak-code-panel,.kvak-qr-panel{padding:2.5mm}.kvak-print-controls h3{font-size:7pt;margin-bottom:2mm}.kvak-print-controls p{font-size:7pt}.code-boxes{gap:1.2mm;margin:2mm 0}.code-boxes span{width:7mm;height:8mm}.kvak-qr-panel{gap:2mm}.qr-mockup{width:20mm}.qr-mockup img{width:19mm;height:19mm}.qr-mockup small{font-size:4.5pt}.kvak-cut-divider{margin:5mm 0 2mm}.kvak-cut-divider span{top:-2mm;font-size:6pt;padding:0 2mm}.kvak-retained{break-inside:avoid}.kvak-sheet .footer{position:static;margin-top:3mm;font-size:6pt;color:#334d70}}
 
-/* The adult page shares its wording with the storyboard. */
+/* One parent A4, with the same instructions as the storyboard. */
 .sheet[hidden]{display:none!important}
-.parent-guide{font-family:Arial,sans-serif;color:#263c36}
-.parent-guide h2{font-size:30px;line-height:1.2;margin-bottom:16px}
-.parent-guide .guide-intro{font-size:13px;line-height:1.7;color:#4d625b}
-.parent-guide .guide-task{font-size:19px;line-height:1.4;padding:18px 0 12px;margin:0}
-.parent-guide .adult-help,.parent-guide .storyboard-solution{border:1px solid #7f9d90;background:#f0f6f1;padding:20px;margin:14px 0;border-radius:4px}
-.parent-guide h3{font-size:16px;margin:0 0 13px}
-.parent-guide .adult-help p,.parent-guide .storyboard-solution p{font-size:13px;line-height:1.7;margin:0 0 13px}
-.parent-guide .adult-help p:last-child,.parent-guide .storyboard-solution p:last-child{margin-bottom:0}
-.parent-guide .adult-safety{font-size:11px!important;color:#526e60}
-.parent-guide .storyboard-answer{font:700 28px/1.4 monospace;letter-spacing:.15em;color:#24583d}
+.parent-guide{font:13px/1.45 Arial,sans-serif;color:#263c36;padding:30px;min-height:0;border-top-color:#3d6c58}
+.parent-guide h2{font-size:27px;line-height:1.2;margin:9px 0 14px;color:#244738}
+.parent-guide .guide-intro{border-bottom:1px solid #a8bbb1;padding-bottom:12px;margin-bottom:16px}
+.parent-guide .guide-intro p{margin:0 0 8px}
+.guide-stages{columns:2;column-gap:25px}
+.guide-stage{break-inside:avoid;margin-bottom:15px}
+.parent-guide h3{font-size:14px;line-height:1.3;margin:0 0 6px;color:#244738}
+.parent-guide .adult-help{padding:0;margin:0;background:none;border:0}
+.parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:12px;line-height:1.45;margin:0 0 5px}
+.parent-guide .adult-safety{font-size:11px!important;color:#52665c}
+.parent-guide .storyboard-solution{padding:6px 8px;border-left:2px solid #759b87;background:#f1f6f2;margin-top:7px}
+.parent-guide .storyboard-solution h3{font-size:12px;margin-bottom:3px}
+.parent-guide .storyboard-answer{display:block;font:700 15px/1.3 monospace;color:#24583d;margin-bottom:4px}
+.parent-guide .footer{position:static;display:block;margin-top:15px;font-size:9px}
 @media screen{header nav{flex-wrap:wrap}body:has(.parent-guide) .sheet:not(.kvak-sheet){scroll-margin-top:25px}}
-@media print{#printable-sheets>.sheet:last-child{break-after:auto}.parent-guide{min-height:266mm}.parent-guide .adult-help,.parent-guide .storyboard-solution{break-inside:avoid;background:#fff}}
+@media screen and (max-width:600px){.guide-stages{columns:1}.parent-guide{padding:22px}.parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:14px;line-height:1.6}.parent-guide h3{font-size:16px}}
+@media print{
+  #printable-sheets>.sheet:last-child{break-after:auto}
+  .parent-guide{width:186mm;min-height:266mm;padding:3mm 2mm;font-size:9.5pt;line-height:1.4;border:0}
+  .parent-guide .label{font-size:7pt;letter-spacing:1pt}
+  .parent-guide h2{font-size:19pt;margin:2mm 0 3mm}
+  .parent-guide .guide-intro{padding-bottom:2mm;margin-bottom:3mm}
+  .parent-guide .guide-intro p{margin-bottom:1.5mm}
+  .guide-stages{columns:2;column-gap:7mm}
+  .guide-stage{margin-bottom:3mm}
+  .parent-guide h3{font-size:10pt;margin-bottom:1mm}
+  .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:9pt;line-height:1.38;margin-bottom:1mm}
+  .parent-guide .adult-safety{font-size:8pt!important}
+  .parent-guide .storyboard-solution{padding:1mm 2mm;margin-top:1mm;background:white}
+  .parent-guide .storyboard-solution h3{font-size:9pt}
+  .parent-guide .storyboard-answer{font-size:11pt;margin-bottom:1mm}
+  .parent-guide .footer{font-size:6pt;margin-top:2mm}
+}

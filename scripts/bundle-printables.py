@@ -5,7 +5,7 @@ from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 
 root = Path(__file__).resolve().parents[1] / 'assets' / 'printables'
-ids = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'diplom', 'rodicovsky-navod']
+ids = ['rodicovsky-navod', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'diplom']
 writer = PdfWriter()
 for sheet in ids:
     reader = PdfReader(root / f'{sheet}.pdf')
@@ -18,4 +18,4 @@ for sheet in ids:
 writer.add_metadata({'/Title': 'Pixelkovia – všetky aktuálne herné materiály', '/Creator': 'MysteryAtHome / current P1–P6, diploma and parent instructions'})
 with (root / 'vsetky-materialy.pdf').open('wb') as output:
     writer.write(output)
-print('Bundled eight current A4 PDFs: P1–P6, diploma and parent instructions.')
+print('Bundled eight current A4 PDFs: parent instructions first, P1–P6 and diploma.')

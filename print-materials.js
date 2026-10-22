@@ -14,11 +14,28 @@
   const bathroom = {
     label: 'Úloha Kúpeľňa',
     placement: 'Celý list P1 vložte do obálky označenej Kúpeľňa. Schovajte ju medzi zložené uteráky, do dostupnej skrinky s uterákmi alebo za ľahký košík na suchej poličke. Signály vystrihujú až deti.',
-    hint: 'Nechajte deti otočiť a vystrihnúť všetkých šesť signálov. Zoraďujú ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.',
+    hint: 'Nechajte deti vystrihnúť a otočiť všetkých šesť signálov. Zoraďujú ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.',
     safety: 'Vyberte suché miesto na dosah detí. Obálku nedávajte do práčky ani sušičky, k elektrickým zariadeniam, liekom alebo čistiacim prostriedkom.'
   };
-  function adultHelp() {
-    return `<section class="adult-help" aria-label="Inštrukcie a nápoveda pre dospelého"><h3>Inštrukcie a nápoveda pre dospelého</h3><p><strong>Kam schovať obálku.</strong> ${esc(bathroom.placement)}</p><p><strong>Nápoveda.</strong> ${esc(bathroom.hint)}</p><p class="adult-safety">${esc(bathroom.safety)}</p></section>`;
+  const parentInstructions = {
+    intro: {label:'Úvod', placement:'Telefón so spustenou hrou a zapnutým zvukom položte tam, kde ho deti budú počuť. Vyzvite ich, nech si vypočujú Pikovu správu aj viackrát a skúsia zistiť, kam ísť.', hint:'Ak váhajú, nech pozorne počúvajú posledné slová pred prerušením spojenia.'},
+    envelope: bathroom,
+    document: {label:'Úloha pri okne · Iskra', placement:'P2 vopred rozstrihajte na štyri pásiky, premiešajte a uzavrite do obálky 2 pri okne, na dosah detí. Okno sa neotvára, na parapet sa nelezie.', hint:'Malé čísla v rohoch určujú poradie pásikov. Zložená veta ukáže ďalšie miesto.'},
+    symbols: {label:'Úloha pod oknom · Šutko', placement:'P3 schovajte nízko pod okno v samostatnom obale „Úloha 3 – otvoriť po zložení odkazu“. Otvoria ho až po Iskrinom odkaze.', hint:'Rovnaký tvar má vždy rovnakú hodnotu. Začnite dvojicou trojuholníkov.'},
+    cipher: {label:'Úloha pri stole · Lístok', placement:'Na stole pripravte obálku 3 s P4 a zvlášť uzavretým P5. Teraz sa otvára iba P4; oba kruhy vystrihujú deti pod dohľadom.', hint:'Nastavte vonkajšie D oproti vnútornému A. Čítajte z vonkajšieho kruhu do vnútorného.'},
+    maze: {label:'Kubova cesta · P5', placement:'Do obálky 3 vložte P5 vo vlastnom obale „Úloha 5 – otvoriť po prekladači“. Sprístupnite ho až po Lístkovej úlohe.', hint:'Sledujte potrubie od vstupu k jadru. Čísla v slepých odbočkách preskočte.'},
+    digital: {label:'Ryškov pozdrav · P5', placement:'Novú obálku netreba. Nechajte deti čítať pozdrav pod Kubovým plánom P5 a zvoliť symboly v telefóne.', hint:'Nočný pokoj, denné svetlo a večerná hviezda určujú tri symboly aj ich poradie.'},
+    search: {label:'Úloha pod stoličkou · Sľub', placement:'P6 uzavrite do obálky 4 a pripevnite papierovou páskou pod sedadlo dostupnej stoličky pri stole. Deti nemajú presúvať ťažký nábytok.', hint:'Nech čítajú prvé písmená piatich riadkov zhora nadol. Kartu poradia si odložia.'},
+    code: {label:'Spoločné heslo · P6', placement:'Novú stopu netreba. Použite kartu poradia P6 a písmená uložené v telefóne. Nech heslo vysloví celý tím.', hint:'Zoraďte šesť písmen podľa úloh 1 až 6. Šípka ani fajka do hesla nepatria.'},
+    finale: {label:'Finále', placement:'Oslávte pomoc každého člena tímu, doplňte názov tímu na voliteľný diplom. Atlas si môžete prezrieť spolu.', hint:'Hra nemá časový limit. Nápovedy dávajte postupne; riešenia si nechajte pre seba.'}
+  };
+  function adultHelp(id='envelope', compact=false) {
+    const entry=parentInstructions[id];
+    return `<section class="adult-help" data-stage="${esc(id)}" aria-label="Inštrukcie a nápoveda pre dospelého">${compact?'':'<h3>Inštrukcie a nápoveda pre dospelého</h3>'}<p><strong>${id==='intro'?'Spustenie.':'Príprava.'}</strong> ${esc(entry.placement)}</p><p><strong>Nápoveda.</strong> ${esc(entry.hint)}</p>${entry.safety?`<p class="adult-safety">${esc(entry.safety)}</p>`:''}</section>`;
+  }
+  function solutionAnswer(stage) {
+    const symbols={moon:'mesiac',sun:'slnko',star:'hviezda'};
+    return (stage.answer||[]).map(answer=>answer.includes(',')?answer.split(',').map(value=>symbols[value]||value).join(' → '):answer).join(' / ');
   }
   function bathroomSolution() {
     const stage=GAME.stages[1];
@@ -35,7 +52,7 @@
     return sheet.innerHTML;
   }
   function parentGuide() {
-    return `<section class="sheet parent-guide" id="rodicovsky-navod"><div class="label">PIXELKOVIA / PRE DOSPELÉHO</div><h2>Inštrukcie a nápoveda</h2><p class="guide-intro">Túto stranu si nechajte pri sebe. Obsahuje riešenie pre dospelého pomocníka.</p><h3 class="guide-task">${esc(bathroom.label)} · Kvakove rozhádzané signály</h3>${adultHelp()}${bathroomSolution()}<span class="footer">PIXELKOVIA · RODIČOVSKÝ NÁVOD · KÚPEĽŇA</span></section>`;
+    return `<section class="sheet parent-guide" id="rodicovsky-navod"><div class="label">PIXELKOVIA / LEN PRE DOSPELÉHO</div><h2>Rodičovský návod</h2><div class="guide-intro"><p>Ak môžete, tlačte farebne – podklady budú krajšie. Hru však plnohodnotne zahráte aj s čiernobielou tlačou. Tlačte jednostranne na A4, v mierke 100 %.</p><p>Jednotlivé stopy vložte do obálok alebo škatuľiek, previažte stužkou, mašľou či gumičkou a až potom ich schovajte. Deti tak objavia balíček, nie iba voľný papier. P3 a P5 nechajte samostatne uzavreté podľa pokynov nižšie. Tento návod si nechajte pri sebe.</p></div><div class="guide-stages">${GAME.stages.map(stage=>`<section class="guide-stage" data-stage="${esc(stage.id)}"><h3>${esc(parentInstructions[stage.id].label)}</h3>${adultHelp(stage.id,true)}${stage.id==='envelope'?bathroomSolution():stage.answer?`<p class="guide-answer"><strong>Riešenie:</strong> ${esc(solutionAnswer(stage))}.</p>`:stage.id==='intro'?'<p class="guide-answer"><strong>Cieľ:</strong> kúpeľňa.</p>':''}</section>`).join('')}</div><span class="footer">PIXELKOVIA · RODIČOVSKÝ NÁVOD · ÚVOD A VŠETKY ÚLOHY</span></section>`;
   }
-  window.PRINT_MATERIALS={sheets,bathroom,summary,adultHelp,bathroomSolution,parentGuide};
+  window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,bathroomSolution,parentGuide};
 })();

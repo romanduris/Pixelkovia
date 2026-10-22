@@ -7,7 +7,7 @@ const {pathToFileURL}=require('node:url');
 (async()=>{
  const root=path.resolve(__dirname,'..');
  await fs.mkdir(path.join(root,'assets/printables'),{recursive:true});
- const allIds=['p1','p2','p3','p4','p5','p6','diplom','rodicovsky-navod'];
+ const allIds=['rodicovsky-navod','p1','p2','p3','p4','p5','p6','diplom'];
  const requestedIds=process.argv.slice(2);
  if(requestedIds.some(id=>!allIds.includes(id)))throw new Error('Unknown worksheet ID');
  const ids=requestedIds.length?requestedIds:allIds;
