@@ -38,3 +38,9 @@
   .parent-guide .storyboard-answer{font-size:11pt;margin-bottom:1mm}
   .parent-guide .footer{font-size:6pt;margin-top:2mm}
 }
+
+/* Compact shared Game master sections keep the guide on one A4. */
+.parent-guide .gm-instructions{border:0;background:none;padding:0;margin:0;border-radius:0}
+.parent-guide .gm-instructions .adult-help{margin:0}
+.parent-guide .gm-solution{margin-top:6px}
+@media print{.parent-guide .gm-solution{margin-top:1mm}}

@@ -19,12 +19,12 @@
   const parentInstructions = {
     intro: {label:'Úvod', placement:'Telefón so spustenou hrou a zapnutým zvukom položte tam, kde ho deti budú počuť. Vyzvite ich, nech si vypočujú Pikovu správu aj viackrát a skúsia zistiť, kam ísť.', hint:'Ak váhajú, nech pozorne počúvajú posledné slová pred prerušením spojenia.'},
     envelope: bathroom,
-    document: {label:'Úloha pri okne · Iskra', placement:'P2 vopred rozstrihajte na štyri pásiky, premiešajte a uzavrite do obálky 2 pri okne, na dosah detí. Okno sa neotvára, na parapet sa nelezie.', hint:'Malé čísla v rohoch určujú poradie pásikov. Zložená veta ukáže ďalšie miesto.'},
-    symbols: {label:'Úloha pod oknom · Šutko', placement:'P3 schovajte nízko pod okno v samostatnom obale „Úloha 3 – otvoriť po zložení odkazu“. Otvoria ho až po Iskrinom odkaze.', hint:'Rovnaký tvar má vždy rovnakú hodnotu. Začnite dvojicou trojuholníkov.'},
-    cipher: {label:'Úloha pri stole · Lístok', placement:'Na stole pripravte obálku 3 s P4 a zvlášť uzavretým P5. Teraz sa otvára iba P4; oba kruhy vystrihujú deti pod dohľadom.', hint:'Nastavte vonkajšie D oproti vnútornému A. Čítajte z vonkajšieho kruhu do vnútorného.'},
-    maze: {label:'Kubova cesta · P5', placement:'Do obálky 3 vložte P5 vo vlastnom obale „Úloha 5 – otvoriť po prekladači“. Sprístupnite ho až po Lístkovej úlohe.', hint:'Sledujte potrubie od vstupu k jadru. Čísla v slepých odbočkách preskočte.'},
+    document: {label:'Úloha pri okne · Iskra', placement:'Stopu P2 schovajte pri okne na bezpečné miesto na dosah detí. Okno sa neotvára, na parapet sa nelezie.', hint:'Malé čísla v rohoch určujú poradie pásikov. Zložená veta ukáže ďalšie miesto.'},
+    symbols: {label:'Úloha pod oknom · Šutko', placement:'Stopu P3 schovajte nízko pod okno. Označte ju „Úloha 3 – otvoriť po zložení odkazu“.', hint:'Rovnaký tvar má vždy rovnakú hodnotu. Začnite dvojicou trojuholníkov.'},
+    cipher: {label:'Úloha pri stole · Lístok', placement:'Na stole ukryte P4 a zvlášť uzavretý P5. Deti teraz použijú iba P4; P5 odhalia až po prekladači.', hint:'Nastavte vonkajšie D oproti vnútornému A. Čítajte z vonkajšieho kruhu do vnútorného.'},
+    maze: {label:'Kubova cesta · P5', placement:'Stopu P5 nechajte na stole uzavretú s označením „Úloha 5 – otvoriť po prekladači“. Sprístupnite ju až po Lístkovej úlohe.', hint:'Sledujte potrubie od vstupu k jadru. Čísla v slepých odbočkách preskočte.'},
     digital: {label:'Ryškov pozdrav · P5', placement:'Novú obálku netreba. Nechajte deti čítať pozdrav pod Kubovým plánom P5 a zvoliť symboly v telefóne.', hint:'Nočný pokoj, denné svetlo a večerná hviezda určujú tri symboly aj ich poradie.'},
-    search: {label:'Úloha pod stoličkou · Sľub', placement:'P6 uzavrite do obálky 4 a pripevnite papierovou páskou pod sedadlo dostupnej stoličky pri stole. Deti nemajú presúvať ťažký nábytok.', hint:'Nech čítajú prvé písmená piatich riadkov zhora nadol. Kartu poradia si odložia.'},
+    search: {label:'Úloha pod stoličkou · Sľub', placement:'Stopu P6 pripevnite papierovou páskou pod sedadlo dostupnej stoličky pri stole. Deti nemajú presúvať ťažký nábytok.', hint:'Nech čítajú prvé písmená piatich riadkov zhora nadol. Kartu poradia si odložia.'},
     code: {label:'Spoločné heslo · P6', placement:'Novú stopu netreba. Použite kartu poradia P6 a písmená uložené v telefóne. Nech heslo vysloví celý tím.', hint:'Zoraďte šesť písmen podľa úloh 1 až 6. Šípka ani fajka do hesla nepatria.'},
     finale: {label:'Finále', placement:'Oslávte pomoc každého člena tímu, doplňte názov tímu na voliteľný diplom. Atlas si môžete prezrieť spolu.', hint:'Hra nemá časový limit. Nápovedy dávajte postupne; riešenia si nechajte pre seba.'}
   };
@@ -36,25 +36,31 @@
     const symbols={moon:'mesiac',sun:'slnko',star:'hviezda'};
     return (stage.answer||[]).map(answer=>answer.includes(',')?answer.split(',').map(value=>symbols[value]||value).join(' → '):answer).join(' / ');
   }
-  function bathroomSolution() {
-    const stage=GAME.stages[1];
-    return `<div class="gm-solution" aria-label="Riešenie etapy"><h4>Riešenie</h4><strong class="storyboard-answer">${esc(stage.answer[0])}</strong><p>${esc(stage.solution)}</p></div>`;
+  function stageSolution(id,compact=false) {
+    const stage=GAME.stages.find(stage=>stage.id===id),answer=solutionAnswer(stage);
+    if(compact&&id!=='envelope')return `<p class="gm-solution guide-answer"><strong>${id==='intro'?'Cieľ':'Riešenie'}:</strong> ${esc(answer||(id==='intro'?'kúpeľňa':'Úspech tímu'))}.</p>`;
+    return `<div class="gm-solution" aria-label="Riešenie etapy"><h4>Riešenie</h4>${answer?`<strong class="storyboard-answer">${esc(answer)}</strong>`:''}<p>${esc(stage.solution)}</p></div>`;
   }
-  function bathroomInstructions(compact=false) {
-    return `<section class="storyboard-solution gm-instructions" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}${adultHelp('envelope',true)}${bathroomSolution()}</section>`;
+  function gameMasterInstructions(id,compact=false) {
+    return `<section class="storyboard-solution gm-instructions" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}${adultHelp(id,true)}${stageSolution(id,compact)}</section>`;
   }
-  function summary(id) {
+  const bathroomSolution=()=>stageSolution('envelope');
+  const bathroomInstructions=(compact=false)=>gameMasterInstructions('envelope',compact);
+  function summary(id,stageId) {
     const document=new DOMParser().parseFromString(sheets[id]||'', 'text/html');
     if(id==='p1') {
       const story=document.querySelector('.kvak-print-story');story.querySelector('.sheet-avatar')?.remove();
       return story.innerHTML+document.querySelector('.kvak-print-mission').innerHTML;
     }
     const sheet=document.querySelector('.sheet');
+    if(stageId==='digital')return sheet.querySelector('.note').outerHTML;
+    if(stageId==='code')return sheet.querySelector('.card').outerHTML;
+    sheet.querySelector(':scope>.label')?.remove();
     sheet.querySelectorAll('.sheet-avatar,.footer,.no-print,svg,.circles').forEach(node=>node.remove());
     return sheet.innerHTML;
   }
   function parentGuide() {
-    return `<section class="sheet parent-guide" id="rodicovsky-navod"><div class="label">PIXELKOVIA / GAME MASTER</div><h2>Návod pre Game mastra</h2><div class="guide-intro"><p>Ak môžete, tlačte farebne – podklady budú krajšie. Hru však plnohodnotne zahráte aj s čiernobielou tlačou. Tlačte jednostranne na A4, v mierke 100 %.</p><p>Jednotlivé stopy vložte do obálok alebo škatuľiek, previažte stužkou, mašľou či gumičkou a až potom ich schovajte. Deti tak objavia balíček, nie iba voľný papier. P3 a P5 nechajte samostatne uzavreté podľa pokynov nižšie. Tento návod si nechajte pri sebe.</p><p>Vyberajte suché miesta na dosah detí. Stopy nedávajte do práčky ani sušičky, k elektrickým zariadeniam, liekom alebo čistiacim prostriedkom.</p></div><div class="guide-stages">${GAME.stages.map(stage=>`<section class="guide-stage" data-stage="${esc(stage.id)}"><h3>${esc(parentInstructions[stage.id].label)}</h3>${stage.id==='envelope'?bathroomInstructions(true):adultHelp(stage.id,true)}${stage.id==='envelope'?'':stage.answer?`<p class="guide-answer"><strong>Riešenie:</strong> ${esc(solutionAnswer(stage))}.</p>`:stage.id==='intro'?'<p class="guide-answer"><strong>Cieľ:</strong> kúpeľňa.</p>':''}</section>`).join('')}</div><span class="footer">PIXELKOVIA · GAME MASTER · ÚVOD A VŠETKY ÚLOHY</span></section>`;
+    return `<section class="sheet parent-guide" id="rodicovsky-navod"><div class="label">PIXELKOVIA / GAME MASTER</div><h2>Návod pre Game mastra</h2><div class="guide-intro"><p>Ak môžete, tlačte farebne – podklady budú krajšie. Hru však plnohodnotne zahráte aj s čiernobielou tlačou. Tlačte jednostranne na A4, v mierke 100 %.</p><p>Jednotlivé stopy vložte do obálok alebo škatuľiek, previažte stužkou, mašľou či gumičkou a až potom ich schovajte. Deti tak objavia balíček, nie iba voľný papier. P2 vopred rozstrihajte na štyri pásiky a premiešajte. P1 a kruhy P4 vystrihujú až deti. P3 a P5 nechajte samostatne uzavreté podľa pokynov nižšie. Tento návod si nechajte pri sebe.</p><p>Vyberajte suché miesta na dosah detí. Stopy nedávajte do práčky ani sušičky, k elektrickým zariadeniam, liekom alebo čistiacim prostriedkom.</p></div><div class="guide-stages">${GAME.stages.map(stage=>`<section class="guide-stage" data-stage="${esc(stage.id)}"><h3>${esc(parentInstructions[stage.id].label)}</h3>${gameMasterInstructions(stage.id,true)}</section>`).join('')}</div><span class="footer">PIXELKOVIA · GAME MASTER · ÚVOD A VŠETKY ÚLOHY</span></section>`;
   }
-  window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,bathroomSolution,bathroomInstructions,parentGuide};
+  window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,stageSolution,gameMasterInstructions,bathroomSolution,bathroomInstructions,parentGuide};
 })();

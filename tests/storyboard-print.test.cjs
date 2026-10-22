@@ -25,7 +25,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await printed.locator('.sheet').count(),8);assert.equal(await printed.locator('.sheet:visible').count(),8);
  assert.equal(normalize(await bathroom.locator('.worksheet-text').innerText()),normalize(await printed.locator('.kvak-print-story').innerText()+' '+await printed.locator('.kvak-print-mission').innerText()));
  assert.equal(normalize((await bathroom.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator('#rodicovsky-navod .adult-help[data-stage="envelope"] p').allTextContents()).join(' ')));
- assert.equal(normalize(await bathroom.locator('.gm-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .gm-solution').innerText()));
+ assert.equal(normalize(await bathroom.locator('.gm-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .guide-stage[data-stage="envelope"] .gm-solution').innerText()));
  assert.equal(await bathroom.locator('.storyboard-content>.gm-instructions').count(),1);
  assert.equal(await bathroom.locator('.storyboard-content>.adult-help').count(),0);
  assert.match(await bathroom.locator('.gm-instructions>h3').innerText(),/Inštrukcie pre Game mastra/);
@@ -35,11 +35,28 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  for(const id of await page.evaluate(()=>GAME.stages.map(stage=>stage.id))){
   const block=page.locator('#gm-'+id),toggle=block.locator('.storyboard-toggle');
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
+  assert.equal(await block.locator('.storyboard-content>.gm-instructions').count(),1,id+': one shared Game master section');
+  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),0);
   assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
+ }
+ assert.equal(normalize(await page.locator('#gm-digital .worksheet-text').innerText()),normalize(await printed.locator('#p5 .note').innerText()),'Ryško shows his printed greeting');
+ assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.locator('#p6 .card').textContent()),'final password shows the printed ordering card');
+ for(const stage of await page.evaluate(()=>GAME.stages.slice(2).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
+  const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
+  assert.ok(await panel.isHidden());await toggle.click();assert.ok(await panel.isVisible());
+  const text=await panel.textContent();for(const line of stage.lines)assert.ok(text.includes(line),stage.id+': full authored story retained');
+  await toggle.click();assert.ok(await panel.isHidden());
  }
  const guideText=await printed.locator('#rodicovsky-navod').innerText();
  assert.match(guideText,/farebne.*krajšie/);assert.match(guideText,/čiernobielou/);assert.match(guideText,/obálok alebo škatuľiek/);assert.match(guideText,/mašľou či gumičkou/);
  assert.match(guideText,/vypočujú Pikovu správu aj viackrát/);
+ assert.equal(await page.locator('#gm-intro video').count(),0,'intro uses a video button');
+ assert.ok(await page.locator('#gm-intro .video-message-button svg').isVisible());
+ for(const id of ['piko-message-text','piko-message-tts']){assert.ok(await page.locator('#'+id).isHidden());await page.locator(`[data-target="${id}"]`).click();assert.ok(await page.locator('#'+id).isVisible());await page.locator(`[data-target="${id}"]`).click();}
+ await page.locator('#gm-intro .video-message-button').click();
+ await page.waitForFunction(()=>{const video=document.querySelector('dialog video');return video&&!video.paused&&video.currentTime>0});
+ assert.equal(await page.locator('dialog video').getAttribute('src'),'assets/PicoVideo.mp4');
+ await page.locator('.dialog-close').click();assert.ok(await page.locator('dialog video').evaluate(video=>video.paused));
  assert.equal(await printed.locator('header>a').getAttribute('href'),'storyboard.html');assert.equal(await printed.locator('header>a').innerText(),'Späť na storyboard');
  for(const id of ['p1','p2','p3','p4','p5','p6']){await printed.goto(BASE+'/printables.html?internalPreview=1#'+id);await printed.waitForFunction(id=>Math.abs(document.getElementById(id).getBoundingClientRect().top)<40,id);assert.equal(await printed.locator('.sheet:visible').count(),8);}
  const map={envelope:'p1',document:'p2',symbols:'p3',cipher:'p4',maze:'p5',digital:'p5',search:'p6',code:'p6'};
