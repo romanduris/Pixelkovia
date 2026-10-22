@@ -1,8 +1,9 @@
 // Read-only inventory. This script only sends GET requests and never logs credentials.
 import fs from 'node:fs';
 const tokenFile=process.env.TQ_CF_TOKEN_FILE||'/tmp/treasurequest-cloudflare-token';
-const token=process.env.CLOUDFLARE_API_TOKEN||fs.readFileSync(tokenFile,'utf8').trim();
-if(!token)throw Error('Cloudflare API token is missing.');
+const environmentToken=[process.env.CLOUDFLARE_API_TOKEN,process.env.PIXELKOVIA_TOKEN].find(value=>value?.trim());
+const token=(environmentToken||(fs.existsSync(tokenFile)?fs.readFileSync(tokenFile,'utf8'):'')).trim();
+if(!token)throw Error('Cloudflare API token is missing. Set CLOUDFLARE_API_TOKEN or the PIXELKOVIA_TOKEN Codespaces secret.');
 const root='https://api.cloudflare.com/client/v4';
 async function get(path){const response=await fetch(root+path,{method:'GET',headers:{Authorization:'Bearer '+token}});const data=await response.json();return {ok:response.ok&&data.success!==false,status:response.status,result:data.result,pagination:data.result_info,error:data.errors?.map(e=>({code:e.code,message:e.message}))};}
 async function list(path){let result=[],page=1;while(true){const response=await get(path+(path.includes('?')?'&':'?')+'page='+page+'&per_page=10');if(!response.ok)return response;const rows=Array.isArray(response.result)?response.result:response.result?.buckets||[];result.push(...rows);if(response.pagination?.total_pages?page>=response.pagination.total_pages:rows.length<10)break;if(page++>=100)throw Error('Inventory pagination needs manual review.');}return {ok:true,result};}

@@ -120,7 +120,7 @@ node admin/scripts/inventory-cloudflare.mjs
 node admin/scripts/deployment-plan.mjs
 ```
 
-Token je v premennej `CLOUDFLARE_API_TOKEN` alebo v chránenom súbore `/tmp/treasurequest-cloudflare-token`; nikdy v argumentoch, zdrojovom kóde alebo GitHube. Inventarizačný skript odosiela iba GET, nečíta hodnoty secrets a výsledok ukladá do ignorovaného `admin/docs/cloudflare-inventory.local.json`. Účel existujúcich projektov neháda. Pri viacerých účtoch sa zastaví pred inventúrou a vyžiada konkrétne Account ID. Nasadzovací plán je iba výpis – nenasadzuje ani nemigruje nič.
+Token je v Codespaces secret premennej `PIXELKOVIA_TOKEN`, štandardnej premennej `CLOUDFLARE_API_TOKEN` alebo v chránenom súbore `/tmp/treasurequest-cloudflare-token`; nikdy v argumentoch, zdrojovom kóde alebo Git commitoch. Inventúra podporuje oba názvy premenných. Wrangler používa štandardný názov `CLOUDFLARE_API_TOKEN`; pri nasadzovaní sa hodnota z `PIXELKOVIA_TOKEN` odovzdá procesu v pamäti bez vypisovania. Inventarizačný skript odosiela iba GET, nečíta hodnoty secrets a výsledok ukladá do ignorovaného `admin/docs/cloudflare-inventory.local.json`. Účel existujúcich projektov neháda. Pri viacerých účtoch sa zastaví pred inventúrou a vyžiada konkrétne Account ID. Nasadzovací plán je iba výpis – nenasadzuje ani nemigruje nič.
 
 Heslový browser test je výslovne spúšťaný proti zvolenému hostu; číta heslo iba z chráneného súboru, neprijíma ho v argumentoch a po overení sa odhlási:
 

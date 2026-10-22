@@ -56,7 +56,7 @@ API používa rovnaký host pod `/api/admin/`. Budúce `/api/customer/` ostáva 
 
 Na prihlásenie stačí používateľom uložené heslo. Platí 8-hodinová maximálna a 30-minútová neaktívna relácia, serverové odhlásenie, ochrana Origin a limity pokusov. Podrobnosti sú v [README](../README.md#zabezpečenie).
 
-Token je mimo repozitára: `CLOUDFLARE_API_TOKEN` alebo chránený dočasný súbor `/tmp/treasurequest-cloudflare-token`. Potrebuje **Workers Scripts Edit/Write** a **D1 Edit/Write** len pre tento účet; Account Settings Read stačí na inventúru. Ostatné oprávnenia nemusia mať zápis. Access sa v schválenom heslovom režime nepoužíva.
+Token je mimo repozitára: Codespaces secret `PIXELKOVIA_TOKEN`, štandardný `CLOUDFLARE_API_TOKEN` alebo chránený dočasný súbor `/tmp/treasurequest-cloudflare-token`. Inventúra rozpoznáva oba názvy premenných; Wrangler dostáva token pod štandardným názvom iba v prostredí svojho procesu. Potrebuje **Workers Scripts Edit/Write** a **D1 Edit/Write** len pre tento účet; Account Settings Read stačí na inventúru. Ostatné oprávnenia nemusia mať zápis. Access sa v schválenom heslovom režime nepoužíva.
 
 Príkaz `node admin/scripts/prepare-admin-password.mjs` číta `/tmp/treasurequest-admin-password` s právami 600 a pripraví `/tmp/treasurequest-admin-secrets.json` s právami 600. Hodnoty sa nevypisujú. Zmena hesla vyžaduje vytvorenie nového záznamu a nahratie **oboch** secrets na príslušný nový Worker. Zmena verzie záznamu zneplatní staré relácie; počas výmeny musí ochrana pri nezhode odmietnuť prístup. Po dokončení sa dočasný pôvodný password aj JSON so secrets odstránia.
 
@@ -108,3 +108,18 @@ Používateľ požiadal o fiktívnych zákazníkov priamo v DB s rôznym priebeh
 - Všetkých 17 backendových testov prešlo. Lokálny prehliadač overil FAKE banner, filtre po piatich zákazníkoch, načítaný detail a mobilné zobrazenie. Na kontrolu sa nemenilo produkčné heslo.
 - Nové Worker verzie s FAKE bannerom: produkcia `8737ab24-d66f-47dd-b92f-04730af08310`, preview `55785e35-f8b0-49dc-b88e-7eefb987443e`.
 - Kontrolná GET inventúra potvrdila pôvodné modification timestamps a bindings oboch nesúvisiacich Workerov, D1 identifikátory a domény bez zmien.
+
+## Dokončenie nasadenia Digital Product Administration – 22. 10. 2026
+
+Dnešné zmeny z commitov `06e92bf` a `da42d6e` sú nasadené aj do oboch schválených Cloudflare Workerov. Administrácia má produktové záložky, Overview, objednávky a spoločnú hernú analýzu s priebehom zákazníka, filtrami, rozbaleným detailom a širokým zobrazením. Produktové odkazy obsahujú Funnel, Customer page a Storyboard; Atlas a tlačoviny sú dostupné zo storyboardu. Web so storyboardom bol už publikovaný ako Site verzia 28.
+
+Token sa načítal z používateľom pripraveného Codespaces secret `PIXELKOVIA_TOKEN`. Jeho hodnota sa nevypisovala ani neukladala do Gitu. Nebolo potrebné nové heslo, migrácia, zmena DNS ani vytváranie ďalších zdrojov.
+
+| Prostredie | Worker verzia (100 % prevádzky) | Deployment ID |
+| --- | --- | --- |
+| Preview | `3a3a9007-2ae9-4395-96e4-93a87a998abd` | `3795815c-b57f-4c7e-b889-7df3c1f60804` |
+| Produkcia | `849dc318-3643-46a6-810b-2c6f40236c8f` | `0a2cd9d2-9dc5-48c0-8d5c-a67948c6e9b0` |
+
+Overenie: všetkých 20 backendových testov prešlo, rovnako prehliadačový test záložiek, filtrov, rozbaľovania detailov, klávesnice, širokého pohľadu a mobilných šírok. Živé adresy vracajú novú prihlasovaciu stránku; anonymné admin API odpovedajú 401 a chránené assety presmerujú na login. Cudzí Origin pri prihlásení sa odmietne. Existujúce heslové secrets a D1 bindings sa zachovali.
+
+Kontrolný hash záznamov zákazníkov, produktov, objednávok, oprávnení, návštev, checklistov, herných relácií/etáp/udalostí a auditu bol pred a po nasadení zhodný. Produkcia má 15 FAKE zákazníkov, 15 objednávok a 10 hraní; preview ostáva prázdny. Nová analytická funkcia nad produkčnými dátami potvrdzuje päť zakúpených, päť rozhraných a päť dokončených zákazníkov, vrátane dokončených po uplynutí času na opakovanie. Pôvodné dva Workery majú rovnaké modification timestamps a bindings ako pred nasadením.
