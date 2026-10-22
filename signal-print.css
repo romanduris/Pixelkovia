@@ -3,48 +3,73 @@
 @media screen and (max-width:600px){.kvak-sheet{padding:18px;font-size:12px}.kvak-sheet h2{font-size:22px}.print-wave{font-size:10px}.kvak-print-story .kvak-print-avatar{width:85px;height:85px;margin-left:10px}.signal-cutouts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.signal-cutout{height:148px}.cutout-content{width:128px;height:128px;padding:7px;grid-template-columns:1fr 42px}.cutout-content strong{font-size:16px}.record-digit b{font-size:32px}.cutouts-heading{display:block}.cutouts-heading span{display:block;margin-top:4px}.kvak-print-controls{grid-template-columns:1fr}.kvak-sheet .footer{font-size:7px}}
 @media print{.kvak-sheet{width:186mm;height:273mm;min-height:273mm;padding:5mm 4mm 3mm;margin:0;background:white;font-size:9pt;line-height:1.42;border:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.kvak-print-heading{padding-bottom:3mm;margin-bottom:3mm}.kvak-sheet h2{font-size:21pt;margin-top:2mm}.kvak-sheet .label{font-size:7pt}.print-wave{font-size:12pt}.kvak-print-story{padding:3mm}.kvak-print-story h3{font-size:11pt}.kvak-print-story .kvak-print-avatar{width:27mm;height:27mm;margin-left:3mm}.kvak-sheet p{margin-bottom:1.6mm}.kvak-print-mission{margin:3mm 0;padding:2.5mm 3mm}.kvak-print-mission h3{font-size:9pt;margin-bottom:1mm}.kvak-print-mission li{margin:.5mm 0}.cutouts-heading{font-size:6.5pt;margin:2mm 0}.signal-cutouts{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm}.signal-cutout{height:43mm}.cutout-content{width:37mm;height:37mm;padding:2.5mm;grid-template-columns:1fr 12mm;grid-template-rows:5mm 1fr 1fr}.cutout-content strong{font-size:13pt}.cutout-content small{font-size:5.5pt}.record-label{font-size:5.5pt}.record-digit b{font-size:27pt}.kvak-print-controls{margin-top:3mm;gap:3mm}.kvak-code-panel,.kvak-qr-panel{padding:2.5mm}.kvak-print-controls h3{font-size:7pt;margin-bottom:2mm}.kvak-print-controls p{font-size:7pt}.code-boxes{gap:1.2mm;margin:2mm 0}.code-boxes span{width:7mm;height:8mm}.kvak-qr-panel{gap:2mm}.qr-mockup{width:20mm}.qr-mockup img{width:19mm;height:19mm}.qr-mockup small{font-size:4.5pt}.kvak-cut-divider{margin:5mm 0 2mm}.kvak-cut-divider span{top:-2mm;font-size:6pt;padding:0 2mm}.kvak-retained{break-inside:avoid}.kvak-sheet .footer{position:static;margin-top:3mm;font-size:6pt;color:#334d70}}
 
-/* One parent A4, with the same instructions as the storyboard. */
-@media print{.kvak-print-heading{padding-bottom:2mm;margin-bottom:2mm}.kvak-cut-divider{margin-top:4mm}}
+/* Parent cheat sheet: preparation, safe hiding places and ten ordered cards. */
 .sheet[hidden]{display:none!important}
-.parent-guide{font:13px/1.45 Arial,sans-serif;color:#263c36;padding:30px;min-height:0;border-top-color:#3d6c58}
-.parent-guide h2{font-size:27px;line-height:1.2;margin:9px 0 14px;color:#244738}
-.parent-guide .guide-intro{border-bottom:1px solid #a8bbb1;padding-bottom:12px;margin-bottom:16px}
-.parent-guide .guide-intro p{margin:0 0 8px}
-.guide-stages{columns:2;column-gap:25px}
-.guide-stage{break-inside:avoid;margin-bottom:15px}
-.parent-guide h3{font-size:14px;line-height:1.3;margin:0 0 6px;color:#244738}
-.parent-guide .adult-help{padding:0;margin:0;background:none;border:0}
-.parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:12px;line-height:1.45;margin:0 0 5px}
-.parent-guide .adult-safety{font-size:11px!important;color:#52665c}
-.parent-guide .storyboard-solution{padding:6px 8px;border-left:2px solid #759b87;background:#f1f6f2;margin-top:7px}
-.parent-guide .storyboard-solution h3,.parent-guide .storyboard-solution h4{font-size:12px;margin-bottom:3px}
-.parent-guide .storyboard-answer{display:block;font:700 15px/1.3 monospace;color:#24583d;margin-bottom:4px}
-.parent-guide .footer{position:static;display:block;margin-top:15px;font-size:9px}
+.parent-guide{font:12px/1.4 Arial,sans-serif;color:#142840;background:#fff;padding:28px;min-height:0;border-top:4px solid #35547d;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.parent-guide .guide-heading{max-width:none;margin:0 0 13px;padding:0 0 13px;border-bottom:2px solid #35547d;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.parent-guide .label{font:9px/1.3 monospace;letter-spacing:1px;color:#334d70}
+.parent-guide h2{font:800 25px/1.15 monospace;letter-spacing:-.8px;margin:7px 0;color:#172e4d}
+.parent-guide .guide-heading p{margin:0;font-size:11px;color:#334d70}
+.guide-stamp{flex-shrink:0;text-align:center;border:1px solid #9aaec6;padding:8px;color:#35547d;font:8px/1.5 monospace;letter-spacing:.7px;background:#f5f8fc}
+.guide-stamp strong{display:block;font-size:21px;letter-spacing:3px}
+.guide-stamp span{display:block;font-size:6px;letter-spacing:0;margin-top:3px}
+.parent-guide .guide-intro{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:10px}
+.guide-intro>section{border:1px solid #b9c9db;padding:10px;background:#f5f8fc}
+.parent-guide h3{font:700 12px/1.3 Arial,sans-serif;color:#172e4d;margin:0 0 6px}
+.guide-intro h3{display:flex;align-items:center;gap:6px}
+.guide-intro h3>span{display:inline-grid;place-items:center;width:18px;height:18px;border:1px solid #8096b1;background:#fff;font:700 11px monospace}
+.parent-guide .guide-intro p{margin:0;font-size:11px;line-height:1.4}
+.guide-safety{display:flex;align-items:baseline;gap:12px;padding:8px 10px;border:1px solid #c5ad7d;background:#fffbf2;color:#594420;margin-bottom:14px;font-size:10px;line-height:1.4}
+.guide-safety>strong{white-space:nowrap}.guide-safety p{margin:0}
+.guide-section-label{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;color:#334d70;font:8px/1.4 monospace}
+.guide-stages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.guide-column{display:flex;flex-direction:column;gap:10px;min-width:0}
+.guide-stage{break-inside:avoid;border:1px solid #b0c1d6;padding:10px;background:#fff}
+.guide-stage-heading{display:flex;align-items:center;gap:8px;margin-bottom:8px;border-bottom:1px solid #d6e0ec;padding-bottom:7px}
+.parent-guide .guide-stage-heading h3{margin:0 0 2px;font-size:12px}
+.guide-step{display:grid;place-items:center;flex-shrink:0;width:30px;height:30px;background:#edf3fa;border:1px solid #9aaec6;color:#234c71;font:700 15px monospace}
+.guide-step-label{font-size:8px}
+.guide-material{display:block;font:9px/1.4 monospace;color:#466181}
+.guide-avatar{display:block;flex-shrink:0;width:30px;height:30px;margin-left:auto;background-image:url('assets/pixelkovia-atlas.png');background-size:400% 200%;background-position:var(--sprite-x) var(--sprite-y);border-radius:5px}
+.parent-guide .gm-instructions,.parent-guide .adult-help{padding:0;margin:0;background:none;border:0;border-radius:0}
+.parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .gm-solution p{font-size:11px;line-height:1.4;margin:0 0 5px}
+.parent-guide .adult-help p>strong{color:#234c71}
+.parent-guide .gm-solution{padding:6px 8px;background:#eff5f1;border:1px solid #b8cfc0;margin:7px 0 0;color:#244738}
+.parent-guide p.gm-solution{margin-bottom:0;font-size:11px;line-height:1.4}
+.parent-guide .gm-solution h4{font:700 10px/1.3 Arial,sans-serif;margin:0 0 3px;color:#244738}
+.parent-guide .storyboard-answer{display:block;font:700 14px/1.3 monospace;color:#244738;margin-bottom:3px}
+.parent-guide .gm-solution p:last-child{margin-bottom:0}
+.parent-guide .footer{position:static;display:flex;justify-content:space-between;gap:10px;border-top:1px solid #9aaec6;padding:8px 0 0;margin:13px 0 0;font:8px/1.4 monospace;color:#334d70}
 @media screen{header nav{flex-wrap:wrap}body:has(.parent-guide) .sheet:not(.kvak-sheet){scroll-margin-top:25px}}
-@media screen and (max-width:600px){.guide-stages{columns:1}.parent-guide{padding:22px}.parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:14px;line-height:1.6}.parent-guide h3{font-size:16px}}
+@media screen and (max-width:600px){.parent-guide{padding:20px}.parent-guide .guide-heading{align-items:flex-start}.parent-guide h2{font-size:23px}.guide-stamp{display:none}.parent-guide .guide-intro,.guide-stages{grid-template-columns:1fr}.parent-guide .guide-intro p,.parent-guide .adult-help p,.parent-guide p.gm-solution,.parent-guide .gm-solution p{font-size:14px;line-height:1.5}.guide-safety{display:block;font-size:12px}.guide-safety p{margin-top:4px}.guide-section-label{display:block}.guide-section-label span{display:block;margin:5px 0}.parent-guide .footer{flex-direction:column}.guide-stage{padding:12px}.parent-guide .guide-stage-heading h3{font-size:15px}}
 @media print{
   #printable-sheets>.sheet:last-child{break-after:auto}
-  .parent-guide{width:186mm;min-height:266mm;padding:3mm 2mm;font-size:9.5pt;line-height:1.4;border:0}
-  .parent-guide .label{font-size:7pt;letter-spacing:1pt}
-  .parent-guide h2{font-size:19pt;margin:2mm 0 3mm}
-  .parent-guide .guide-intro{padding-bottom:2mm;margin-bottom:3mm}
-  .parent-guide .guide-intro p{margin-bottom:1.5mm}
-  .guide-stages{columns:2;column-gap:7mm}
-  .guide-stage{margin-bottom:2mm}
-  .parent-guide h3{font-size:10pt;margin-bottom:1mm}
-  .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .storyboard-solution p{font-size:9pt;line-height:1.3;margin-bottom:1mm}
-  .parent-guide .adult-safety{font-size:8pt!important}
-  .parent-guide .storyboard-solution{padding:1mm 2mm;margin-top:1mm;background:white}
-  .parent-guide .storyboard-solution h3,.parent-guide .storyboard-solution h4{font-size:9pt}
-  .parent-guide .storyboard-answer{font-size:11pt;margin-bottom:1mm}
-  .parent-guide .footer{font-size:6pt;margin-top:2mm}
+  .parent-guide{width:186mm;min-height:266mm;padding:0;border:0;font-size:8pt;line-height:1.3}
+  .parent-guide .guide-heading{display:flex;margin-bottom:2mm;padding-bottom:2mm;gap:3mm}
+  .parent-guide .label{font-size:6pt;letter-spacing:.6pt}
+  .parent-guide h2{font-size:18pt;margin:1.5mm 0}
+  .parent-guide .guide-heading p{font-size:7pt}
+  .guide-stamp{padding:1mm 3mm;font-size:6pt;line-height:1.2}.guide-stamp strong{font-size:15pt}.guide-stamp span{font-size:4.5pt}
+  .parent-guide .guide-intro{gap:2.5mm;margin-bottom:2mm}
+  .guide-intro>section{padding:2mm}
+  .parent-guide h3{font-size:8.5pt;margin-bottom:1.5mm}
+  .guide-intro h3{gap:1.5mm}.guide-intro h3>span{width:4mm;height:4mm;font-size:7pt}
+  .parent-guide .guide-intro p{font-size:7.5pt;line-height:1.35}
+  .guide-safety{gap:2mm;padding:1.5mm 2mm;margin-bottom:2.5mm;font-size:7pt;line-height:1.3}
+  .guide-section-label{font-size:5.5pt;margin-bottom:2mm}
+  .guide-stages{gap:3mm}.guide-column{gap:.8mm}
+  .guide-stage{padding:1.5mm}
+  .guide-stage-heading{gap:2mm;margin-bottom:1mm;padding-bottom:1mm}
+  .parent-guide .guide-stage-heading h3{font-size:9pt;margin-bottom:.5mm}
+  .guide-step{width:6mm;height:6mm;font-size:10pt}.guide-step-label{font-size:5.5pt}
+  .guide-material{font-size:6.5pt}.guide-avatar{width:6mm;height:6mm;border-radius:1mm}
+  .parent-guide .adult-help p,.parent-guide .guide-answer,.parent-guide .gm-solution p,.parent-guide p.gm-solution{font-size:8pt;line-height:1.22;margin-bottom:.8mm}
+  .parent-guide .gm-solution{padding:.8mm 1.5mm;margin:1mm 0 0}
+  .parent-guide p.gm-solution{margin-bottom:0}
+  .parent-guide .gm-solution h4{font-size:7pt;margin-bottom:.5mm}
+  .parent-guide .storyboard-answer{font-size:10pt;margin-bottom:.5mm}
+  .parent-guide .footer{display:flex;font-size:5.5pt;margin-top:1.5mm;padding-top:1mm}
 }
-
-/* Compact shared Game master sections keep the guide on one A4. */
-.parent-guide .gm-instructions{border:0;background:none;padding:0;margin:0;border-radius:0}
-.parent-guide .gm-instructions .adult-help{margin:0}
-.parent-guide .gm-solution{margin-top:6px}
-@media print{.parent-guide .gm-solution{margin-top:1mm}}
 
 /* P2–P6 follow P1: signal header, framed letter, mission and a distinct puzzle. */
 .story-sheet{font:13px/1.5 Arial,sans-serif;color:#142840;background:#fff;padding:30px;min-height:0;border-top:4px solid #35547d}
