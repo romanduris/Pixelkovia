@@ -65,7 +65,7 @@ window.GAME = {
       ],
       "placeholder": "Šesťmiestny kód",
       "action": "Vyberte z obálky 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
-      "task": "Zoraďte záznamy od najstaršieho po najnovší: najskôr podľa dátumu, v rovnaký deň podľa presného času. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód.",
+      "task": "Zoraďte záznamy od najstaršieho po najnovší. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód. Naskenujte QR kód a na otvorenej stránke skúste zadať svoj kód.",
       "materials": "P1: jeden jednostranný pracovný list A4 s Kvakovým príbehom, návodom a šiestimi otočenými vystrihovacími signálmi. Ceruzka a detské nožnice.",
       "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mpeg. Písmeno S sa uloží bez automatického pokračovania.",
       "solution": "13. 3. 20:05 → 7; 13. 3. 20:10 → 4; 13. 3. 20:15 → 1; 14. 6. 19:50 → 2; 15. 9. 08:35 → 9; 15. 12. 08:40 → 6. Kód 741296.",
@@ -83,7 +83,7 @@ window.GAME = {
         "before": [
           "Ahojte, ja som Kvak! Som žltý Pixelko s motýlikom a mám výborný sluch. V našom svete počúvam drobné pípnutia, ktoré putujú po svetelných cestičkách medzi domčekmi. Podľa nich spoznám, kto sa blíži a ktorý kamarát potrebuje pomoc. Aj úplne tiché pípnutie mi vie povedať veľa!",
           "Dnes mi však všetko zapraskalo v ušiach a správa pre Pika sa rozsypala na šesť kúskov. Piko ma nepočuje a ja nepočujem ostatných. Zostal som pri zhasnutej ceste a sám neviem zistiť, kadiaľ ísť. Potrebujem vašu pomoc, aby som sa mohol pridať k Pikovi a pomôcť hľadať ostatných.",
-          "Na každom kúsku zostal dátum, čas a jedna číslica. Vystrihnite ich, otočte a zoraďte od najstaršieho po najnovší. Najprv porovnajte dátumy, pri rovnakom dátume presné časy. Číslice potom vytvoria kód môjho spojenia. Keď ho zadáte do telefónu, konečne sa budem môcť ozvať!"
+          "Na každom kúsku zostal dátum, čas a jedna číslica. Vystrihnite ich, otočte a zoraďte od najstaršieho po najnovší. Číslice vytvoria kód môjho spojenia. Naskenujte QR kód a na otvorenej stránke ho skúste zadať. Keď bude správny, konečne sa budem môcť ozvať!"
         ],
         "after": [
           "Kvak! Ja vás počujem! Ďakujem za pomoc. Už som na spojení s Pikom a do vášho zápisníka posielam písmeno S. Teraz sme na hľadanie dvaja Pixelkovia a váš ľudský tím. To je oveľa lepšie, než keď som tu počúval celkom sám!",
