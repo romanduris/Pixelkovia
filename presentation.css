@@ -201,16 +201,16 @@ body[data-environment="designer"] .storyboard-head>.storyboard-test{margin:0;min
  body[data-environment="designer"] .designer-bar{gap:10px;margin:12px 0}
  body[data-environment="designer"] .designer-bar .btn{min-height:34px;padding:6px 12px;font-size:11px}
  body[data-environment="designer"] .studio-timeline{padding-left:18px;margin:14px 0 20px 5px}
- body[data-environment="designer"] .studio-timeline .storyboard.is-collapsed{padding:8px 16px;margin:0 0 8px}
+ body[data-environment="designer"] .studio-timeline .storyboard.is-collapsed{padding:clamp(8px,calc(4dvh - 32px),20px) 18px;margin:0 0 clamp(8px,1dvh,12px)}
  body[data-environment="designer"] .studio-timeline .storyboard:last-child{margin-bottom:0}
  body[data-environment="designer"] .studio-timeline .storyboard:before{left:-25px}
  body[data-environment="designer"] .storyboard.is-collapsed:before{top:50%;transform:translateY(-50%)}
- body[data-environment="designer"] .is-collapsed>.storyboard-head{grid-template-columns:36px 24px minmax(0,1fr) 54px;gap:12px}
- body[data-environment="designer"] .is-collapsed .storyboard-toggle{width:36px;height:36px}
- body[data-environment="designer"] .is-collapsed .storyboard-stage-icon{width:24px;height:28px;font-size:23px}
- body[data-environment="designer"] .is-collapsed .storyboard-heading .section-kicker{font-size:8px;line-height:1.4;letter-spacing:.1em;margin-bottom:2px}
- body[data-environment="designer"] .is-collapsed .storyboard-heading h2{font-size:20px;line-height:1.25}
- body[data-environment="designer"] .is-collapsed .storyboard-head>.storyboard-test{min-height:36px;padding:6px;font-size:11px}
+ body[data-environment="designer"] .is-collapsed>.storyboard-head{grid-template-columns:40px 28px minmax(0,1fr) 60px;gap:14px}
+ body[data-environment="designer"] .is-collapsed .storyboard-toggle{width:40px;height:40px}
+ body[data-environment="designer"] .is-collapsed .storyboard-stage-icon{width:28px;height:32px;font-size:26px}
+ body[data-environment="designer"] .is-collapsed .storyboard-heading .section-kicker{font-size:9px;line-height:1.4;letter-spacing:.1em;margin-bottom:3px}
+ body[data-environment="designer"] .is-collapsed .storyboard-heading h2{font-size:clamp(20px,2vw,24px);line-height:1.25}
+ body[data-environment="designer"] .is-collapsed .storyboard-head>.storyboard-test{min-height:40px;padding:8px;font-size:12px}
  body[data-environment="designer"]>.site-footer{padding-block:14px}
 }
 @media(max-width:700px){
