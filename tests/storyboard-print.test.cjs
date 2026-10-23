@@ -48,9 +48,13 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
   assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
  }
  assert.equal(await page.locator('#gm-digital').count(),0,'the separate symbol puzzle is removed');
+ const iskra=page.locator('#gm-document');
+ assert.equal(await iskra.locator('.storyboard-message').count(),0,'paper-only Iskra has no duplicate story block');
+ assert.equal(normalize(await iskra.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Iskra story remains in the shared worksheet text');
+
  assert.match(await printed.locator('#p5 .note').innerText(),/Úlohu 6/);
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.locator('#p6 .card').textContent()),'final password shows the printed ordering card');
- for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols').map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
+ for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols'&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
   const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
   assert.ok(await panel.isHidden());await toggle.click();assert.ok(await panel.isVisible());
   const text=await panel.textContent();for(const line of stage.lines)assert.ok(text.includes(line),stage.id+': full authored story retained');
