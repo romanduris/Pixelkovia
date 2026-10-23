@@ -107,15 +107,15 @@ window.GAME = {
       ],
       "placeholder": "Rozlúštené miesto",
       "action": "Nájdite obálku 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
-      "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštite celú vetu a choďte podľa nej hľadať obálku označenú Úloha 3.",
-      "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v obálke 2 pri okne. P3: samostatná obálka Úloha 3 prilepená zo spodnej strany sedadla stoličky. Detské nožnice.",
+      "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštenú vetu zapíšte na pracovný list a choďte podľa nej hľadať obálku označenú Úloha 3.",
+      "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v obálke 2 pri okne. P3: samostatná obálka Úloha 3 prilepená zo spodnej strany sedadla stoličky. Detské nožnice a ceruzka.",
       "mobile": "Papierová úloha bez zadávania a overovania odpovede. Až po nájdení obálky Úloha 3 deti ťuknú Máme obálku Úloha 3. Tým sa uloží V a sprístupní Šutko.",
       "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú obálku Úloha 3 prilepenú zospodu sedadla. V telefóne sa neoveruje odpoveď.",
       "hints": [
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
       ],
-      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je pod inou stoličkou v uzavretej obálke 4 označenej Úloha 7 – otvoriť až po Ryškovom pozdrave.",
+      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Pripravte im detské nožnice a ceruzku na zapísanie rozlúštenej správy. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je pod inou stoličkou v uzavretej obálke 4 označenej Úloha 7 – otvoriť až po Ryškovom pozdrave.",
       "transition": "Ďakujem, že ste rozlúštili môj odkaz a našli obálku Úloha 3 pod stoličkou! Moje V si odložte. Ja sa pridávam k Pikovi a Kvakovi; teraz spoločne pomôžeme Šutkovi.",
       "character": "iskra",
       "dramaturgy": [
