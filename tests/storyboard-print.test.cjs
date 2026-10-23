@@ -49,7 +49,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  }
  const guideText=await printed.locator('#rodicovsky-navod').innerText();
  assert.match(guideText,/farebne.*krajšie/);assert.match(guideText,/čiernobielou/);assert.match(guideText,/obálok alebo škatuľiek/);assert.match(guideText,/mašľou či gumičkou/);
- assert.match(guideText,/vypočuť alebo prečítať aj viackrát/);
+ assert.match(guideText,/video si môžu prehrať aj viackrát/);
  assert.equal(await page.locator('#gm-intro video').count(),0,'intro uses a video button');
  assert.ok(await page.locator('#gm-intro .video-message-button svg').isVisible());
  for(const id of ['piko-message-text','piko-message-tts']){assert.ok(await page.locator('#'+id).isHidden());await page.locator(`[data-target="${id}"]`).click();assert.ok(await page.locator('#'+id).isVisible());await page.locator(`[data-target="${id}"]`).click();}

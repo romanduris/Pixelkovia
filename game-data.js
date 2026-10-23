@@ -18,13 +18,13 @@ window.GAME = {
       "task": "Otvorte Pikovu správu a zistite, čo ďalej. Správu môžete otvoriť opakovane.",
       "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
       "mobile": "Celoobrazovkový displej → prichádzajúca správa → video alebo Prečítať správu → opakované otvorenie → Máme obálku.",
-      "solution": "Prvá obálka čaká v kúpeľni. Miesto prezradí Pikova videospráva aj jej písaná alternatíva po otvorení správy.",
+      "solution": "Prvá obálka čaká v kúpeľni. Miesto prezradí iba Pikova videospráva; hráčsky text úkryt neprezrádza.",
       "hints": [
-        "Skúste si Pikovu správu vypočuť alebo prečítať ešte raz.",
+        "Skúste si Pikovo video prehrať ešte raz.",
         "Všimnite si najmä záver správy, kde Piko spomína prvú obálku.",
         "Piko spomína kúpeľňu."
       ],
-      "parent": "Obálku 1 iba s celým pracovným listom P1 ukryte v kúpeľni medzi uterákmi, do skrinky s uterákmi alebo na suchú dostupnú poličku. Nie medzi lieky a čistiace prostriedky, k elektrickým zariadeniam, do práčky ani sušičky. Miesto deťom prezradí Pikova videospráva alebo jej písaná alternatíva. Nápovedy ponúkajte postupne.",
+      "parent": "Obálku 1 iba s celým pracovným listom P1 ukryte v kúpeľni medzi uterákmi, do skrinky s uterákmi alebo na suchú dostupnú poličku. Nie medzi lieky a čistiace prostriedky, k elektrickým zariadeniam, do práčky ani sušičky. Miesto majú deti zistiť z Pikovej videosprávy. Nápovedy ponúkajte postupne.",
       "transition": "Pikov signál zoslabol. Nájdite Kvaka — bez jeho sluchu ostatné linky nespojíte.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -44,7 +44,7 @@ window.GAME = {
           "Nahral som vám krátku správu. Skúste sa spojiť s Kvakom, mohol by nám pomôcť!"
         ],
         "after": [
-          "Ďakujem, že mi chcete pomôcť! Ja zatiaľ počúvam pri telefóne. Vy sa pozrite do kúpeľne po prvej obálke; možno už čoskoro začujem svojho kamaráta Kvaka."
+          "Ďakujem, že mi chcete pomôcť! Ja zatiaľ počúvam pri telefóne. Nájdite prvú obálku podľa môjho videa; možno už čoskoro začujem svojho kamaráta Kvaka."
         ]
       }
     },
@@ -565,6 +565,12 @@ window.GAME = {
       "prompt": "[confused, startled] Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!\n\n[happy, relieved] Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!\n\n[grateful] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!\n\n[encouraging, energetic] Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Kvak! A ešte raz ďakujem, kamaráti!\n\nCharakter hlasu: Veselý, energický, trochu komický kačací hlas. Spočiatku zmätený, po obnovení spojenia nadšený, pri zmienke o zvláštnom signáli záhadný a na konci povzbudzujúci."
     }
   },
+  "pikoTextMessage": [
+    "Haló? Vidíte ma?",
+    "Ja som Piko!",
+    "Potrebujem pomoc!",
+    "Pozrite si moje video a zistite, kde je prvá obálka."
+  ],
   "pikoMessage": [
     "Haló? Vidíte ma?",
     "Ja som Piko!",

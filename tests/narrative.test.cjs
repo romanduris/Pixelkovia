@@ -16,9 +16,9 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  assert.equal(normal(await page.locator('[data-story-stage="intro"]').innerText()),normal(intro));
  await page.locator('[data-action="read-message"]').click();
  assert.equal(await page.locator('dialog video,dialog audio').count(),0,'reading does not require loading media');
- assert.match(await page.locator('.message-reading').innerText(),/Obálka jedna… v kúpeľni/);
+ assert.ok(!/kúpeľ/i.test(await page.locator('.message-reading').innerText()),'text keeps the first hiding place exclusive to the video');
  const narrative=await page.evaluate(()=>GAME.stages.map(stage=>({id:stage.id,label:stage.label,narrative:stage.narrative,answer:stage.answer,character:stage.character,paperOnly:stage.paperOnly})));
- assert.equal(normal(await page.locator('.message-transcript').innerText()),normal(await page.evaluate(()=>GAME.pikoMessage.join(' '))));
+ assert.equal(normal(await page.locator('.message-transcript').innerText()),normal(await page.evaluate(()=>GAME.pikoTextMessage.join(' '))));
  await page.screenshot({path:'/tmp/narrative-intro-phone.png'});
  await page.locator('[data-action="finish-call"]').click();
  for(let index=1;index<=8;index++){

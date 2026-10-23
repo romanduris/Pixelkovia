@@ -98,7 +98,7 @@
     hint: 'Deti vystrihnú a otočia šesť signálov. Zoradia ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.'
   };
   const parentInstructions = {
-    intro: {label:'Úvod', placement:'Telefón so spustenou hrou položte tam, kde ho deti objavia. Pikovu správu si môžu vypočuť alebo prečítať aj viackrát. Nech samy zistia, kam ísť.', hint:'Ak váhajú, nech si znova vypočujú záver správy alebo prečítajú posledný odsek.'},
+    intro: {label:'Úvod', placement:'Telefón so spustenou hrou položte tam, kde ho deti objavia. Pikovo video si môžu prehrať aj viackrát. Nech samy zistia, kam ísť; text úkryt neprezrádza.', hint:'Ak váhajú, nech si znova prehrajú záver Pikovej videosprávy.'},
     envelope: bathroom,
     document: {label:'Úloha pri okne · Iskra', placement:'P2 schovajte pri okne na dosah detí; okno sa neotvára. Odkaz vedie pod stoličky. V telefóne sa odpoveď neoveruje, deti potvrdia až nájdenie obálky Úloha 3.', hint:'Nastavte vonkajšie D oproti vnútornému A. Vonkajšie písmená odkazu čítajte na vnútornom kruhu.'},
     symbols: {label:'Úloha pod stoličkou · Šutko', placement:'P3 vložte do obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 patrí pod inú stoličku v uzavretej obálke Úloha 7. Pomôžte s odlepením; nábytok sa nepresúva.', hint:'Rovnaký tvar má vždy rovnakú hodnotu. Začnite dvojicou trojuholníkov.'},
