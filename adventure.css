@@ -287,8 +287,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 @media(orientation:landscape) and (max-height:580px) and (min-width:640px){
  .sutko-lock .signal-content{width:min(100%,800px);display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"party grid" "heading grid" "welcome grid" "instruction grid" "hint grid";gap:7px 24px;justify-items:center}
  .sutko-lock .quest-party{grid-area:party}.sutko-lock h1{grid-area:heading}.sutko-lock .sutko-welcome{grid-area:welcome}.sutko-lock #sutko-instruction{grid-area:instruction}.sutko-lock .sutko-grid{grid-area:grid}.sutko-lock .sutko-hint{grid-area:hint}
- .sutko-connected .signal-content{width:min(100%,800px);display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding:4px 0}
- .sutko-connected h1{grid-column:1/-1}.sutko-connected .sutko-unlock{grid-column:1;grid-row:2}.sutko-connected .sutko-party-scene{grid-column:1;grid-row:3}.sutko-connected .sutko-message{grid-column:2;grid-row:2/4}.sutko-connected .signal-reward{grid-column:1;grid-row:4/6}.sutko-connected .sutko-thanks{grid-column:2;grid-row:4}
 }
 @media(orientation:portrait) and (max-height:600px){
  .signal-screen.sutko-screen{padding-top:4px;padding-bottom:8px}
@@ -309,3 +307,42 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 
 .sutko-screen .sutko-thanks{max-width:440px;color:#d8e9f5;font-size:14px;line-height:1.45}
 @media(max-height:720px){.sutko-screen .sutko-thanks{font-size:12px}}
+
+/* A single rhythm for the bridge celebration, message and keepsake. */
+.sutko-connected .signal-content{gap:16px;padding:20px 0}
+.sutko-result-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;text-align:left}
+.sutko-result-heading h1{max-width:260px;letter-spacing:-.03em}
+.sutko-connected .sutko-unlock{flex-shrink:0;gap:8px;padding:10px;border:1px solid #86dfbc40;border-radius:12px;background:#8fdfba0a;font-size:8px;letter-spacing:.03em}
+.sutko-connected .sutko-unlock strong{font-size:24px}
+.sutko-connected .sutko-unlock-sign{grid-template-columns:repeat(5,3px);grid-template-rows:repeat(7,3px);gap:1px}
+.sutko-celebration{width:100%;overflow:hidden;border:1px solid #405474;border-radius:16px;background:#17233a}
+.sutko-connected .sutko-party-scene{width:100%;max-width:none;border:0;border-radius:0}
+.sutko-connected .sutko-thanks{max-width:none;padding:14px 16px;text-align:left}
+.sutko-connected .sutko-message{padding:16px 16px 4px;border:1px solid #8675bc55;border-radius:16px;background:linear-gradient(145deg,#272340,#192238)}
+.sutko-connected .signal-audio-controls{margin:0}
+.sutko-connected .signal-audio-controls .btn{min-height:50px;border-radius:10px;font-size:14px}
+.sutko-connected #sutko-audio-status{font-size:11px;line-height:1.5;min-height:18px;margin:10px 0 0;color:#bdc7dd}
+.sutko-connected .sutko-message>.text-link{min-height:44px;font-size:12px;text-underline-offset:4px}
+.sutko-connected .signal-reward{padding:14px 16px;gap:14px;border-color:#f0c88055;border-radius:16px;background:linear-gradient(110deg,#f3c77b12,#17233a 70%)}
+.sutko-connected .signal-reward strong{display:grid;place-items:center;border:1px solid #f0c88066;border-radius:10px;background:#f3c77b0a;color:#ffd494}
+.sutko-connected .signal-reward span{color:#e9c992}
+@media(max-width:380px){
+ .sutko-result-heading{gap:10px}
+ .sutko-connected .sutko-unlock{padding:8px;gap:6px;font-size:7px}
+}
+@media(max-height:720px){
+ .sutko-connected .signal-content{gap:10px;padding:10px 0}
+ .sutko-connected .sutko-thanks{padding:10px 12px}
+ .sutko-connected .sutko-message{padding:12px 12px 0}
+ .sutko-connected .signal-reward{padding:10px 12px}
+}
+@media(orientation:landscape) and (max-height:580px) and (min-width:640px){
+ .sutko-connected .signal-content{width:min(100%,800px);display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;padding:4px 0}
+ .sutko-connected .sutko-result-heading{grid-column:1/-1}
+ .sutko-connected .sutko-result-heading h1{max-width:none}
+ .sutko-connected .sutko-unlock{padding:8px}
+ .sutko-connected .sutko-celebration{grid-column:1;grid-row:2/4;align-self:center}
+ .sutko-connected .sutko-message{grid-column:2;grid-row:2}
+ .sutko-connected .signal-reward{grid-column:2;grid-row:3}
+ .sutko-connected .sutko-party-scene{max-width:none}
+}

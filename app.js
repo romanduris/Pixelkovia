@@ -100,7 +100,7 @@
   function sutkoConnectionScreen(){
     app.classList.add('signal-mode');
     const sign=GAME.sutkoPuzzle.grid.flat().map(value=>`<i class="${GAME.sutkoPuzzle.values.includes(value)?'lit':''}"></i>`).join('');
-    return `<section class="signal-screen sutko-screen sutko-connected signal-stage-result success-card" aria-labelledby="sutko-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><h1 id="sutko-title" tabindex="-1">Most je odomknutý!</h1><div class="sutko-unlock"><span class="sutko-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div><img class="sutko-party-scene" src="assets/printable-scenes/p3-sutko.png" alt="Piko, Kvak, Iskra a Šutko sú spolu pri opravenom moste." width="2172" height="724"><p class="sutko-thanks">${esc(GAME.sutkoThanks)}</p><div class="sutko-message">${GAME.sutkoAudio?`<span data-sutko-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="sutko-audio-toggle" aria-controls="sutko-audio">▶ Prehrať Šutkovu správu</button></div><p id="sutko-audio-status" role="status">${GAME.sutkoAudioPlaceholder?'Testovacia nahrávka: Kvak.':'Správu môžete prehrať opakovane.'}</p>`:''}<button class="text-link" data-action="read-sutko-message">Čítať Šutkovu správu</button></div><div class="signal-reward"><strong>E</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Zapamätajte si písmeno E. Budete ho potrebovať neskôr.</small></div></div></div></section>`;
+    return `<section class="signal-screen sutko-screen sutko-connected signal-stage-result success-card" aria-labelledby="sutko-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><div class="sutko-result-heading"><h1 id="sutko-title" tabindex="-1">Most je odomknutý!</h1><div class="sutko-unlock"><span class="sutko-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div></div><div class="sutko-celebration"><img class="sutko-party-scene" src="assets/printable-scenes/p3-sutko.png" alt="Piko, Kvak, Iskra a Šutko sú spolu pri opravenom moste." width="2172" height="724"><p class="sutko-thanks">${esc(GAME.sutkoThanks)}</p></div><div class="sutko-message">${GAME.sutkoAudio?`<span data-sutko-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="sutko-audio-toggle" aria-controls="sutko-audio">▶ Prehrať Šutkovu správu</button></div><p id="sutko-audio-status" role="status">Ťuknutím spustíte správu${GAME.sutkoAudioPlaceholder?' · Testovacia nahrávka: Kvak.':'.'}</p>`:''}<button class="text-link" data-action="read-sutko-message">Čítať Šutkovu správu</button></div><div class="signal-reward"><strong>E</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Zapamätajte si písmeno E. Budete ho potrebovať neskôr.</small></div></div></div></section>`;
   }
   function readSutkoMessage(){showDialog(`<section id="sutko-transcript" class="kvak-message-reading"><h2>Šutkova správa</h2>${GAME.sutkoMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
   function selectSutkoCell(button){
@@ -135,12 +135,13 @@
     if(audio.error||audio.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)audio.load();
     audio.play().catch(error=>{if(!audio.isConnected||error.name==='AbortError')return;if(error.name==='NotAllowedError')audio.sutkoBlocked();else audio.sutkoFallback();});
   }
-  function bindSutkoAudio(autoplay=false){
+  function bindSutkoAudio(){
+    // The delayed reveal ends outside a user gesture; speech starts from the play button.
     const audio=app.querySelector('#sutko-audio'),button=app.querySelector('[data-action="sutko-audio-toggle"]'),status=app.querySelector('#sutko-audio-status');
     if(!audio||!button||!status)return;
     const events=new AbortController();audio.sutkoEvents=events;
     const listen=(name,handler)=>audio.addEventListener(name,handler,{signal:events.signal});
-    let failed=false,attempted=autoplay;
+    let failed=false,attempted=false;
     const idle=()=>{button.textContent=audio.ended||audio.sutkoReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať Šutkovu správu';};
     const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;audio.pause();idle();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Správu sa nepodarilo prehrať. Môžete si ju prečítať.';};
     listen('play',()=>{attempted=true;failed=false;audio.sutkoReplayReady=false;button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Šutkovu správu…';});
@@ -150,7 +151,6 @@
     listen('ended',()=>{audio.sutkoReplayReady=true;idle();status.textContent='Správu si môžete prehrať znova.';});
     listen('error',()=>{if(attempted&&audio.error)fallback();});audio.sutkoFallback=fallback;
     audio.sutkoBlocked=()=>{idle();status.textContent='Ťuknutím spustíte Šutkovu správu.';};
-    if(autoplay)playSutkoAudio(audio);
   }
   function playKvakAudio(audio){
     if(audio.error||audio.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)audio.load();
@@ -200,7 +200,7 @@
       if(Math.abs(delta)>1)app.scrollTop+=delta;
     });
   }
-  function render({autoplayKvak=false,autoplaySutko=false}={}){
+  function render({autoplayKvak=false}={}){
     clearTimeout(sutkoRevealTimer);sutkoRevealTimer=null;
     // Old saves on the removed phone stage resume at the next playable task.
     if(view==='player'&&state().stage===2&&state().completed.includes(1)){
@@ -242,7 +242,7 @@
       if(!retainedSutkoAudio){audio.id='sutko-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.setAttribute('aria-label','Šutkova hlasová správa');audio.src=GAME.sutkoAudio;}
       sutkoAudioSlot.replaceWith(audio);if(!retainedSutkoAudio)audio.load();
     }else retainedSutkoAudio?.remove();
-    bindSutkoAudio(autoplaySutko);
+    bindSutkoAudio();
     if(view==='prep'){app.querySelectorAll('[data-check]').forEach(el=>{el.checked=PREP_STORE.read(el.dataset.check);});updatePreparation();}
   }
   function start(){
@@ -314,7 +314,7 @@
     modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
-  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;sequence=[];render({autoplayKvak:n===1,autoplaySutko:n===3});goTop();}
+  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;sequence=[];render({autoplayKvak:n===1});goTop();}
   function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3)return;const valid=t.digital?raw===t.answer[0]:(state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a)));
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
