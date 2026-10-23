@@ -152,13 +152,13 @@ body[data-environment="designer"] .adult-help h3{font-size:17px;color:#2d5558;ma
 body[data-environment="designer"] .adult-help p{font-size:14px;line-height:1.8;color:#405b68;margin:0 0 12px}
 body[data-environment="designer"] .adult-help p:last-child{margin-bottom:0}
 body[data-environment="designer"] .adult-help .adult-safety{font-size:12px;color:#526b6b}
-body[data-environment="designer"] .gm-instructions .adult-help{padding:0!important;border:0;background:none;margin:0 0 20px}
-body[data-environment="designer"] .gm-instructions .gm-solution{border-top:1px solid #b5ceca;padding-top:17px}
+body[data-environment="designer"] .gm-instructions .adult-help{padding:0!important;border:0;background:none;margin:0}
+body[data-environment="designer"] .gm-instructions .gm-solution{border:0;padding:0;margin:12px 0 0;font-size:14px;line-height:1.8;color:#405b68}
 body[data-environment="designer"] .gm-instructions h4{font:700 14px/1.5 'DM Sans',sans-serif;color:#2d5558;margin:0 0 10px}
 .storyboard-sheet-actions{justify-content:flex-start;padding-top:6px;margin-bottom:0}
 @media(max-width:800px){body[data-environment="designer"] .site-header{height:auto;min-height:100px;padding-top:20px;padding-bottom:20px;gap:22px;flex-wrap:wrap}.storyboard-top-links{margin-left:0!important;justify-content:flex-start;gap:9px}.storyboard-top-links .btn{font-size:10px;white-space:normal}body[data-environment="designer"] .worksheet-review{grid-template-columns:1fr;gap:25px}.worksheet-image{max-width:460px}.kvak-message-controls{align-items:flex-start}.message-copy{padding:18px}.adult-help{padding:20px!important}}
-@media print{.storyboard-top-links,body[data-environment="designer"] .gm-instructions .adult-help{padding:0!important;border:0;background:none;margin:0 0 20px}
-body[data-environment="designer"] .gm-instructions .gm-solution{border-top:1px solid #b5ceca;padding-top:17px}
+@media print{.storyboard-top-links,body[data-environment="designer"] .gm-instructions .adult-help{padding:0!important;border:0;background:none;margin:0}
+body[data-environment="designer"] .gm-instructions .gm-solution{border:0;padding:0;margin:12px 0 0;font-size:14px;line-height:1.8;color:#405b68}
 body[data-environment="designer"] .gm-instructions h4{font:700 14px/1.5 'DM Sans',sans-serif;color:#2d5558;margin:0 0 10px}
 .storyboard-sheet-actions{display:none}}
 
@@ -172,8 +172,6 @@ body[data-environment="designer"] .message-copy .detail-grid{gap:22px}
 body[data-environment="designer"] .message-copy li{font:inherit;color:inherit}
 body[data-environment="designer"] .stage-introduction p{font:400 14px/1.8 'DM Sans',sans-serif;color:#405779;margin:0 0 24px}
 body[data-environment="designer"] .gm-instructions{margin-top:22px}
-body[data-environment="designer"] .intro-instructions .adult-help{margin:0}
-body[data-environment="designer"] .intro-instructions .intro-solution{border:0;padding:0;margin:12px 0 0;font-size:14px;line-height:1.8;color:#405b68}
 
 .storyboard .quest-story p{font:inherit;line-height:1.8;color:#3e5270;margin:0 0 16px}
 .storyboard-continuation{border-top:1px solid #b9c5d8;margin:28px 0;padding-top:22px}

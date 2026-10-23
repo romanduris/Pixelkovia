@@ -112,7 +112,7 @@
   for(const stage of window.GAME.stages)parentInstructions[stage.id].label=stage.label;
   function adultHelp(id='envelope', compact=false) {
     const entry=parentInstructions[id];
-    return `<section class="adult-help" data-stage="${esc(id)}" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}<p><strong>${id==='intro'?'Spustenie:':id==='envelope'?'Úkryt.':'Príprava.'}</strong> ${esc(entry.placement)}</p><p><strong>${id==='intro'?'Nápoveda:':'Nápoveda.'}</strong> ${esc(entry.hint)}</p>${entry.safety?`<p class="adult-safety">${esc(entry.safety)}</p>`:''}</section>`;
+    return `<section class="adult-help" data-stage="${esc(id)}" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}<p><strong>Spustenie:</strong> ${esc(entry.placement)}</p><p><strong>Nápoveda:</strong> ${esc(entry.hint)}</p>${entry.safety?`<p class="adult-safety">${esc(entry.safety)}</p>`:''}</section>`;
   }
   function solutionAnswer(stage) {
     if(stage.paperOnly)return stage.paperAnswer;
@@ -121,12 +121,11 @@
   }
   function stageSolution(id,compact=false) {
     const stage=GAME.stages.find(stage=>stage.id===id),answer=solutionAnswer(stage);
-    if(id==='intro')return `<p class="gm-solution intro-solution"><strong>Riešenie:</strong> ${esc(compact?'Prvá obálka je v kúpeľni.':stage.solution)}</p>`;
-    if(compact&&id!=='envelope')return `<p class="gm-solution guide-answer"><strong>${id==='intro'?'Cieľ':'Riešenie'}:</strong> ${esc(answer||(id==='intro'?'kúpeľňa':'Úspech tímu'))}.</p>`;
-    return `<div class="gm-solution" aria-label="Riešenie etapy"><h4>Riešenie</h4>${answer?`<strong class="storyboard-answer">${esc(answer)}</strong>`:''}<p>${esc(stage.solution)}</p></div>`;
+    const text=compact&&id!=='envelope'?(id==='intro'?'Prvá obálka je v kúpeľni.':`${answer||'Úspech tímu'}.`):stage.solution;
+    return `<p class="gm-solution${compact?' guide-answer':''}" aria-label="Riešenie etapy"><strong>Riešenie:</strong> ${esc(text)}</p>`;
   }
   function gameMasterInstructions(id,compact=false) {
-    return `<section class="storyboard-solution gm-instructions${id==='intro'?' intro-instructions':''}" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}${adultHelp(id,true)}${stageSolution(id,compact)}</section>`;
+    return `<section class="storyboard-solution gm-instructions" aria-label="Inštrukcie pre Game mastra">${compact?'':'<h3>Inštrukcie pre Game mastra</h3>'}${adultHelp(id,true)}${stageSolution(id,compact)}</section>`;
   }
   const bathroomSolution=()=>stageSolution('envelope');
   const bathroomInstructions=(compact=false)=>gameMasterInstructions('envelope',compact);
