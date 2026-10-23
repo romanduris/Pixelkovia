@@ -231,6 +231,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'no duplicate narrative or task page');
   }
   if(i===1)await page.goto(BASE+'/game.html?signal=sutko');
+  else if(i===3)await page.goto(BASE+'/game.html?signal=listok');
   else await page.locator('[data-action="next"]').click();
  }
  assert.equal(await page.locator('.finale').count(),1);entireJourney+=await readScene(page);

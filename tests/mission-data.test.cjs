@@ -60,4 +60,6 @@ assert.ok(!/topán|na stole|pásik|písmeno E/i.test(riddle),'Sutko gives a ridd
 assert.match(game.stages[4].parent,/do čistej suchej topánky/);
 assert.match(game.stages[3].parent,/P5[\s\S]*na stole/);
 assert.ok(prep.steps.some(step=>step.id==='shoes'));
+assert.ok(sheets.p4.includes('assets/listok-qr.svg'));
+assert.equal(new URL(game.listokQr).searchParams.get('signal'),'listok');
 console.log('PASS: shoe clue, separate P5 at the table, child terminology and spoiler-free Sutko riddle agree.');

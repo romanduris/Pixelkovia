@@ -288,7 +288,7 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .sutko-lock .signal-content{width:min(100%,800px);display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"party grid" "heading grid" "welcome grid" "instruction grid" "hint grid";gap:7px 24px;justify-items:center}
  .sutko-lock .quest-party{grid-area:party}.sutko-lock h1{grid-area:heading}.sutko-lock .sutko-welcome{grid-area:welcome}.sutko-lock #sutko-instruction{grid-area:instruction}.sutko-lock .sutko-grid{grid-area:grid}.sutko-lock .sutko-hint{grid-area:hint}
  .sutko-connected .signal-content{width:min(100%,800px);display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding:4px 0}
- .sutko-connected h1{grid-column:1/-1}.sutko-connected .sutko-unlock{grid-column:1;grid-row:2}.sutko-connected .sutko-party-scene{grid-column:1;grid-row:3}.sutko-connected .sutko-message{grid-column:2;grid-row:2/4}.sutko-connected .signal-reward{grid-column:1;grid-row:4/6}.sutko-connected [data-action="next"]{grid-column:2;grid-row:5}
+ .sutko-connected h1{grid-column:1/-1}.sutko-connected .sutko-unlock{grid-column:1;grid-row:2}.sutko-connected .sutko-party-scene{grid-column:1;grid-row:3}.sutko-connected .sutko-message{grid-column:2;grid-row:2/4}.sutko-connected .signal-reward{grid-column:1;grid-row:4/6}.sutko-connected .sutko-thanks{grid-column:2;grid-row:4}
 }
 @media(orientation:portrait) and (max-height:600px){
  .signal-screen.sutko-screen{padding-top:4px;padding-bottom:8px}
@@ -306,3 +306,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .sutko-grid.is-unlocking .sutko-cell[aria-pressed="false"]{opacity:.18}
 @keyframes sutko-nine-blink{0%,100%{opacity:1;box-shadow:0 0 14px #7ce8b677}50%{opacity:.3;box-shadow:none}}
 @media(prefers-reduced-motion:reduce){.sutko-grid.is-unlocking .sutko-cell[aria-pressed="true"]{animation:none}}
+
+.sutko-screen .sutko-thanks{max-width:440px;color:#d8e9f5;font-size:14px;line-height:1.45}
+@media(max-height:720px){.sutko-screen .sutko-thanks{font-size:12px}}

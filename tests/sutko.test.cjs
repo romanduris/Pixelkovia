@@ -78,7 +78,8 @@ async function fits(page,label){
    await page.setViewportSize({width,height});await fits(page,'result '+width+'×'+height);await page.screenshot({path:'/tmp/sutko-result-'+width+'-'+height+'.png'});
   }
   await page.reload();assert.equal(await page.locator('.sutko-connected').count(),1,'saved completion does not need repeating');
-  await page.locator('[data-action="next"]').click();assert.equal(await page.locator('.signal-content h1').textContent(),'Úloha 4 – Pri topánkach');
+  assert.equal(await page.locator('[data-action="next"]').count(),0);assert.equal(await page.locator('.sutko-thanks').textContent(),await page.evaluate(()=>GAME.sutkoThanks));
+  await page.goto(BASE+'/game.html?signal=listok');assert.equal(await page.locator('.signal-content h1').textContent(),'Úloha 4 – Pri topánkach');
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify({...saved,completed:[1,2,3]})),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');assert.equal(await page.locator('.sutko-connected').count(),1,'old completed task 3 remains valid');
   // Isolated StoryBoard tests never write the family's save or partial selections.
   const family=await page.evaluate(key=>localStorage.getItem(key),KEY);await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();await solve(page);await page.locator('[data-action="exit-test"]').click();assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),family);
@@ -113,8 +114,9 @@ async function fits(page,label){
    const button=page.locator('[data-action="sutko-audio-toggle"]');await button.click();assert.ok(await page.locator('audio').evaluate(audio=>audio.paused));
    const at=await page.locator('audio').evaluate(audio=>audio.currentTime);await button.click();await page.waitForFunction(at=>document.querySelector('#sutko-audio').currentTime>at,at);
    await page.locator('audio').evaluate(audio=>audio.playbackRate=4);await page.waitForFunction(()=>document.querySelector('#sutko-audio').ended);
+   await page.waitForFunction(()=>document.querySelector('[data-action="sutko-audio-toggle"]').textContent.includes('Prehrať znova'));
    assert.match(await button.textContent(),/Prehrať znova/);await button.click();await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return !audio.paused&&audio.currentTime<1;});
-   await button.click();await page.locator('[data-action="next"]').click();assert.equal(await page.locator('audio').count(),0);
+   await button.click();await page.locator('[data-action="home"]').click();assert.equal(await page.locator('audio').count(),0);
    assert.ok(await page.evaluate(()=>window.preloadedSutko.paused));
    // Blocked autoplay exposes a manual play action rather than losing the message.
    await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');

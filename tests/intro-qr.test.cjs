@@ -54,7 +54,7 @@ const KEY='zahada-v1-progress';
   assert.equal(await printed.locator('#p3 .worksheet-heading .worksheet-entry-qr').count(),0,'Sutko QR is below the paper puzzle');
   assert.ok(await printed.locator('#p3 .sutko-phone-panel .worksheet-entry-qr').isVisible());
   assert.match(await printed.locator('#p3 .worksheet-mission').innerText(),/všetky tri hodnoty[\s\S]*naskenujte QR/);
-  const sutkoPixels=await printed.locator('.worksheet-entry-qr img').evaluate(async img=>{
+  const sutkoPixels=await printed.locator('#p3 .worksheet-entry-qr img').evaluate(async img=>{
     await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
     const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);
     return Array.from(ctx.getImageData(0,0,392,392).data);
@@ -65,9 +65,21 @@ const KEY='zahada-v1-progress';
   await page.goto(sutkoScan);
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2]);
+  await printed.goto(BASE+'/printables.html?sheet=p4');
+  const listokPixels=await printed.locator('.listok-phone-panel .worksheet-entry-qr img').evaluate(async img=>{
+    await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
+    const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);return Array.from(ctx.getImageData(0,0,392,392).data);
+  });
+  const listok=jsQR(new Uint8ClampedArray(listokPixels),392,392);
+  assert.equal(listok?.data,await printed.evaluate(()=>GAME.listokQr));
+  const listokUrl=new URL(listok.data),listokScan=BASE+listokUrl.pathname+listokUrl.search;
+  await page.goto(listokScan);assert.equal(await page.locator('.sutko-lock').count(),1,'early scanning cannot bypass Sutko');
+  await page.evaluate(key=>localStorage.setItem(key,JSON.stringify({started:true,callDone:true,stage:3,completed:[1,2,3],hints:{}})),KEY);
+  await page.goto(listokScan);assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
+  assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2,3]);
   const advanced={started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{},messageWatched:true};
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:advanced});
-  await page.goto(sutkoScan);
+  await page.goto(sutkoScan);await page.goto(listokScan);
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),advanced);
 

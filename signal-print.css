@@ -265,3 +265,9 @@
 .sutko-phone-panel .worksheet-entry-qr{text-align:center}
 @media(max-width:500px){.sutko-phone-panel{grid-template-columns:minmax(0,1fr) 98px;gap:10px}}
 @media print{.sutko-phone-panel{grid-template-columns:minmax(0,1fr) 29mm;gap:4mm}.sutko-phone-panel>.sutko-phone-copy p{margin:0}}
+
+/* The next found clue opens its own phone task. */
+.listok-phone-panel{display:grid;grid-template-columns:minmax(0,1fr) 116px;align-items:center;gap:18px}
+.listok-phone-panel .worksheet-entry-qr{text-align:center}
+@media(max-width:500px){.listok-phone-panel{grid-template-columns:minmax(0,1fr) 98px;gap:10px}}
+@media print{.listok-phone-panel{grid-template-columns:minmax(0,1fr) 29mm;gap:4mm}.listok-phone-panel .worksheet-entry-qr img{width:22mm;height:22mm}.listok-phone-panel .worksheet-entry-qr small{font-size:5pt}}

@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const steps = [
-    {id:'printed', revision:'shoe-clue-v1', label:'Vytlačil som P1–P6 jednostranne na A4; P2 obsahuje oba kruhy.'},
+    {id:'printed', revision:'listok-qr-v1', label:'Vytlačil som P1–P6 jednostranne na A4; P2 obsahuje oba kruhy.'},
     {id:'supplies', legacy:1, label:'Pripravil som štyri obálky, dva samostatné obaly, ceruzku, pásku a detské nožnice.'},
     {id:'cut-p4', revision:'party-chair-v1', label:'Z P4 som vystrihol štyri pásiky; hornú časť s príbehom a obrázkami prikladám do obálky. P1 a kruhy P2 strihajú deti.'},
     {id:'envelope-1', label:'Pripravil som obálku Kúpeľňa: obsahuje iba celý P1.'},

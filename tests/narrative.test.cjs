@@ -40,7 +40,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
    assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
    await page.goto(BASE+'/game.html?signal=sutko');continue;
   }
-  if(index===3){await page.locator('.sutko-connected').waitFor();assert.equal(await page.locator('#sutko-transcript').count(),0);await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.equal(normal((await page.locator('#sutko-transcript p').allTextContents()).join(' ')),normal(stage.narrative.after.join(' ')));await page.locator('.dialog-close').click();assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*neskôr/);await page.locator('[data-action="next"]').click();continue;}
+  if(index===3){await page.locator('.sutko-connected').waitFor();assert.equal(await page.locator('#sutko-transcript').count(),0);await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.equal(normal((await page.locator('#sutko-transcript p').allTextContents()).join(' ')),normal(stage.narrative.after.join(' ')));await page.locator('.dialog-close').click();assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*neskôr/);assert.equal(await page.locator('[data-action="next"]').count(),0);await page.goto(BASE+'/game.html?signal=listok');continue;}
   await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
   if(index===4)assert.match(await after.innerText(),/OCHRANA AKTÍVNA/);

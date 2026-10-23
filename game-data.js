@@ -4,6 +4,8 @@ window.GAME = {
   "audio": "assets/KvakMessage.mp3",
   "video": "assets/PicoVideo.mp4",
   "kvakQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
+  "sutkoThanks": "Ďakujem vám, kamaráti! Ste skvelí. Pomáhate nám znovu spojiť celú partiu.",
+  "listokQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=listok",
   "sutkoQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=sutko",
   "stages": [
     {

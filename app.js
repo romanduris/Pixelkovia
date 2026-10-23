@@ -100,7 +100,7 @@
   function sutkoConnectionScreen(){
     app.classList.add('signal-mode');
     const sign=GAME.sutkoPuzzle.grid.flat().map(value=>`<i class="${GAME.sutkoPuzzle.values.includes(value)?'lit':''}"></i>`).join('');
-    return `<section class="signal-screen sutko-screen sutko-connected signal-stage-result success-card" aria-labelledby="sutko-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><h1 id="sutko-title" tabindex="-1">Most je odomknutý!</h1><div class="sutko-unlock"><span class="sutko-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div><img class="sutko-party-scene" src="assets/printable-scenes/p3-sutko.png" alt="Piko, Kvak, Iskra a Šutko sú spolu pri opravenom moste." width="2172" height="724"><div class="sutko-message">${GAME.sutkoAudio?`<span data-sutko-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="sutko-audio-toggle" aria-controls="sutko-audio">▶ Prehrať Šutkovu správu</button></div><p id="sutko-audio-status" role="status">${GAME.sutkoAudioPlaceholder?'Testovacia nahrávka: Kvak.':'Správu môžete prehrať opakovane.'}</p>`:''}<button class="text-link" data-action="read-sutko-message">Čítať Šutkovu správu</button></div><div class="signal-reward"><strong>E</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Zapamätajte si písmeno E. Budete ho potrebovať neskôr.</small></div></div><button class="btn" data-action="next">Pokračovať →</button></div></section>`;
+    return `<section class="signal-screen sutko-screen sutko-connected signal-stage-result success-card" aria-labelledby="sutko-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><h1 id="sutko-title" tabindex="-1">Most je odomknutý!</h1><div class="sutko-unlock"><span class="sutko-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div><img class="sutko-party-scene" src="assets/printable-scenes/p3-sutko.png" alt="Piko, Kvak, Iskra a Šutko sú spolu pri opravenom moste." width="2172" height="724"><p class="sutko-thanks">${esc(GAME.sutkoThanks)}</p><div class="sutko-message">${GAME.sutkoAudio?`<span data-sutko-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="sutko-audio-toggle" aria-controls="sutko-audio">▶ Prehrať Šutkovu správu</button></div><p id="sutko-audio-status" role="status">${GAME.sutkoAudioPlaceholder?'Testovacia nahrávka: Kvak.':'Správu môžete prehrať opakovane.'}</p>`:''}<button class="text-link" data-action="read-sutko-message">Čítať Šutkovu správu</button></div><div class="signal-reward"><strong>E</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Zapamätajte si písmeno E. Budete ho potrebovať neskôr.</small></div></div></div></section>`;
   }
   function readSutkoMessage(){showDialog(`<section id="sutko-transcript" class="kvak-message-reading"><h2>Šutkova správa</h2>${GAME.sutkoMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
   function selectSutkoCell(button){
@@ -408,7 +408,7 @@
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
-  const scannedSignal={kvak:1,sutko:3}[new URLSearchParams(location.search).get('signal')];
+  const scannedSignal={kvak:1,sutko:3,listok:4}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     if(progress.stage===0)progress.stage=1;
@@ -416,6 +416,7 @@
       if(!progress.completed.includes(2))progress.completed.push(2);
       progress.stage=Math.max(3,progress.stage);
     }
+    if(scannedSignal===4&&progress.completed.includes(3))progress.stage=Math.max(4,progress.stage);
     view='player';save();
   }
   render();
