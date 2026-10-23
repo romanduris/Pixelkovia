@@ -187,6 +187,32 @@ body[data-environment="designer"] .storyboard-heading{min-width:0}
 body[data-environment="designer"] .storyboard-heading .section-kicker{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0 0 5px}
 body[data-environment="designer"] .storyboard-heading h2{font-size:clamp(18px,2.1vw,30px);line-height:1.25;white-space:nowrap;margin:0}
 body[data-environment="designer"] .storyboard-head>.storyboard-test{margin:0;min-height:44px;padding:8px;font-size:12px;white-space:nowrap;justify-self:stretch}
+/* Keep all ten closed stages visible in a desktop window beside the editor. */
+@media screen and (min-width:701px){
+ body[data-environment="designer"]>.site-header{height:64px;gap:20px}
+ body[data-environment="designer"] .storyboard-brand{font-size:21px}
+ body[data-environment="designer"] .storyboard-brand .brand-sub{font-size:9px;margin-top:4px}
+ body[data-environment="designer"] .storyboard-top-links{gap:10px}
+ body[data-environment="designer"] .storyboard-top-links .btn{min-height:36px;padding:7px 12px;font-size:11px}
+ body[data-environment="designer"] .studio-header{align-items:center;gap:20px;padding:16px 0 12px}
+ body[data-environment="designer"] .studio-header .section-kicker{font-size:8px;margin:0}
+ body[data-environment="designer"] .studio-header h1{font-size:32px;line-height:1.2;margin:4px 0 0}
+ body[data-environment="designer"] .studio-header>.pixel-sprite{width:56px}
+ body[data-environment="designer"] .designer-bar{gap:10px;margin:12px 0}
+ body[data-environment="designer"] .designer-bar .btn{min-height:34px;padding:6px 12px;font-size:11px}
+ body[data-environment="designer"] .studio-timeline{padding-left:18px;margin:14px 0 20px 5px}
+ body[data-environment="designer"] .studio-timeline .storyboard.is-collapsed{padding:8px 16px;margin:0 0 8px}
+ body[data-environment="designer"] .studio-timeline .storyboard:last-child{margin-bottom:0}
+ body[data-environment="designer"] .studio-timeline .storyboard:before{left:-25px}
+ body[data-environment="designer"] .storyboard.is-collapsed:before{top:50%;transform:translateY(-50%)}
+ body[data-environment="designer"] .is-collapsed>.storyboard-head{grid-template-columns:36px 24px minmax(0,1fr) 54px;gap:12px}
+ body[data-environment="designer"] .is-collapsed .storyboard-toggle{width:36px;height:36px}
+ body[data-environment="designer"] .is-collapsed .storyboard-stage-icon{width:24px;height:28px;font-size:23px}
+ body[data-environment="designer"] .is-collapsed .storyboard-heading .section-kicker{font-size:8px;line-height:1.4;letter-spacing:.1em;margin-bottom:2px}
+ body[data-environment="designer"] .is-collapsed .storyboard-heading h2{font-size:20px;line-height:1.25}
+ body[data-environment="designer"] .is-collapsed .storyboard-head>.storyboard-test{min-height:36px;padding:6px;font-size:11px}
+ body[data-environment="designer"]>.site-footer{padding-block:14px}
+}
 @media(max-width:700px){
  body[data-environment="designer"] .storyboard{padding:16px 14px}
  body[data-environment="designer"] .storyboard-head{grid-template-columns:40px 22px minmax(0,1fr) 48px;gap:8px}
