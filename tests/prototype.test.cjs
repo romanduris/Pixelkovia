@@ -46,7 +46,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  });
  async function finishVideo(p){
    await p.locator('video').evaluate(v=>{v.playbackRate=16;v.play().catch(()=>{});});
-   await p.locator('[data-action="finish-call"]').waitFor({state:'visible'});
+   await p.waitForFunction(()=>document.querySelector('video')?.ended);
  }
  async function resizePlayerViewport(viewport){
    // Browser window resizing requires leaving real fullscreen first.
@@ -159,7 +159,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.message-opened').count(),1,'replay stays on message screen');
  await reloadAndResume(page);
  assert.equal(await page.locator('.message-opened').count(),1,'opened message restores after reload');
- await page.locator('[data-action="finish-call"]').click();
+ await page.goto(BASE+'/game.html?signal=kvak');
  assert.equal(await page.locator('.signal-restore').count(),1,'found envelope goes directly to QR destination');
  assert.equal(await page.locator('.task-main, .task-aside, .scan-entry').count(),0,'no intermediate task page');
  assert.equal(await page.locator('#answer').count(),1,'code input is immediately available');
@@ -343,6 +343,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: Kvak V4 six-digit chronological code, simulated QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete eight-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Kvak V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete eight-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

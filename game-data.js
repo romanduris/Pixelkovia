@@ -3,6 +3,7 @@ window.GAME = {
   "version": 4,
   "audio": "assets/KvakMessage.mpeg",
   "video": "assets/PicoVideo.mp4",
+  "kvakQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
   "stages": [
     {
       "id": "intro",
@@ -17,7 +18,7 @@ window.GAME = {
       "action": "Otvorte Pikovu správu a zistite, čo ďalej.",
       "task": "Otvorte Pikovu správu a zistite, čo ďalej. Správu môžete otvoriť opakovane.",
       "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
-      "mobile": "Celoobrazovkový displej → prichádzajúca správa → video alebo Prečítať správu → opakované otvorenie → Máme obálku.",
+      "mobile": "Celoobrazovkový displej → úvodná správa → video → Prehrať znova alebo Späť k správe. Pokračovanie iba naskenovaním QR na P1.",
       "solution": "Prvá obálka čaká v kúpeľni. Miesto prezradí iba Pikova videospráva; hráčsky text úkryt neprezrádza.",
       "hints": [
         "Skúste si Pikovo video prehrať ešte raz.",
@@ -66,7 +67,7 @@ window.GAME = {
       "action": "Vyberte z obálky 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
       "task": "Zoraďte záznamy od najstaršieho po najnovší: najskôr podľa dátumu, v rovnaký deň podľa presného času. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód.",
       "materials": "P1: jeden jednostranný pracovný list A4 s Kvakovým príbehom, návodom a šiestimi otočenými vystrihovacími signálmi. Ceruzka a detské nožnice.",
-      "mobile": "Simulovať naskenovanie QR → fullscreen Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mpeg. Písmeno S sa uloží bez automatického pokračovania.",
+      "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mpeg. Písmeno S sa uloží bez automatického pokračovania.",
       "solution": "13. 3. 20:05 → 7; 13. 3. 20:10 → 4; 13. 3. 20:15 → 1; 14. 6. 19:50 → 2; 15. 9. 08:35 → 9; 15. 12. 08:40 → 6. Kód 741296.",
       "hints": [
         "Najprv porovnajte mesiace, potom dni. Všetky záznamy vznikli v jednom roku.",
@@ -565,12 +566,6 @@ window.GAME = {
       "prompt": "[confused, startled] Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!\n\n[happy, relieved] Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!\n\n[grateful] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!\n\n[encouraging, energetic] Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Kvak! A ešte raz ďakujem, kamaráti!\n\nCharakter hlasu: Veselý, energický, trochu komický kačací hlas. Spočiatku zmätený, po obnovení spojenia nadšený, pri zmienke o zvláštnom signáli záhadný a na konci povzbudzujúci."
     }
   },
-  "pikoTextMessage": [
-    "Haló? Vidíte ma?",
-    "Ja som Piko!",
-    "Potrebujem pomoc!",
-    "Pozrite si moje video a zistite, kde je prvá obálka."
-  ],
   "pikoMessage": [
     "Haló? Vidíte ma?",
     "Ja som Piko!",

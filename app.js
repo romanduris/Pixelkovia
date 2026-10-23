@@ -177,40 +177,40 @@
   }
   function openCall(replay=false,withGesture=true){
     messageReturn=replay;
-    showMessage(replay||state().messageOpened,state().messageRead===true);
+    showMessage(replay||state().messageOpened);
     if(withGesture){
       if(!replay&&!state().messageOpened)enableSound();
       requestGameFullscreen();
     }
   }
-  function showMessage(opened=false,textMode=false){
+  function showMessage(opened=false){
     stopPings();modal.querySelector('video')?.pause();
     modal.classList.add('message-modal');
     modal.innerHTML=`<section class="message-screen ${opened?'message-opened':'message-incoming'}" aria-labelledby="message-title">
       <header class="message-status"><span><i class="status-dot"></i> PIXEL / MESSENGER</span><div class="message-status-actions">${document.fullscreenEnabled&&document.documentElement.requestFullscreen?'<button class="text-link game-fullscreen" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶ Celá obrazovka</button>':''}<button class="text-link" data-action="close">${messageReturn?'← Späť do hry':preview?'← Späť do storyboardu':'Pozastaviť'}</button></div></header>
-      ${opened&&textMode?`<div class="message-thread message-reading"><div class="message-sender">${sprite('piko')}<div><span class="section-kicker">${esc(GAME.stages[0].label)}</span><h1 id="message-title">Pikova správa</h1></div><span class="message-badge">TEXT</span></div><section class="message-transcript" aria-label="Pikov textový odkaz">${GAME.pikoTextMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section><div class="message-actions"><button class="btn" data-action="finish-call">${messageReturn?'Späť do hry →':'Máme obálku →'}</button><button class="btn secondary" data-action="replay-message">▷ Pozrieť video</button></div></div>`:opened?`<div class="message-thread"><div class="message-sender">${sprite('piko')}<div><span class="section-kicker">PRIJATÁ SPRÁVA</span><h1 id="message-title">Piko</h1></div><span class="message-badge">VIDEO</span></div>
+      ${opened?`<div class="message-thread"><div class="message-sender">${sprite('piko')}<div><span class="section-kicker">PRIJATÁ SPRÁVA</span><h1 id="message-title">Piko</h1></div><span class="message-badge">VIDEO</span></div>
         <div class="message-video-wrap"><div class="message-video-surface"><video id="piko-video" controls playsinline preload="metadata" aria-label="Videospráva od Pika"></video><button class="message-video-replay" data-action="replay-message" aria-label="Prehrať správu od Pika znova" hidden><span class="message-play-circle" aria-hidden="true">▶</span><span>Prehrať znova</span></button></div><p id="message-video-status" role="status" hidden></p></div>
         <p class="message-caption">${esc(GAME.stages[0].task)}</p>
-        <div class="message-actions"><button class="btn" data-action="replay-message">▷ Prehrať znova</button><button class="btn secondary" data-action="read-message">Prečítať správu</button><button class="btn secondary" data-action="finish-call" ${state().messageWatched||messageReturn?'':'hidden'}>${messageReturn?'Späť do hry →':'Máme obálku →'}</button></div>
+        <div class="message-actions"><button class="btn" data-action="replay-message">▷ Prehrať znova</button><button class="btn secondary" data-action="back-to-message">Späť k správe</button></div>
         </div>`:
-        `<div class="message-waiting message-introduction"><div class="message-sender">${sprite('piko')}<div><span class="section-kicker">${esc(GAME.stages[0].label)}</span><h1 id="message-title">Piko potrebuje pomoc</h1></div></div>${STORY_TEXT.html('intro')}<div class="message-actions"><button class="btn message-notification" data-action="accept-call">▶ Prehrať Pikovu správu</button><button class="text-link" data-action="read-message">Prečítať správu</button></div></div>
+        `<div class="message-waiting message-introduction"><div class="message-sender">${sprite('piko')}<div><span class="section-kicker">${esc(GAME.stages[0].label)}</span><h1 id="message-title">Piko potrebuje pomoc</h1></div></div>${STORY_TEXT.html('intro')}<div class="message-actions"><button class="btn message-notification" data-action="accept-call">▶ Prehrať Pikovu správu</button></div></div>
         <button class="text-link message-sound" data-action="message-sound" aria-pressed="false">♪ Zapnúť zvuk</button>`}
       <footer class="message-footer"><span class="message-home-bar" aria-hidden="true"></span></footer>
     </section>`;
     if(!modal.open)modal.showModal();
-    if(opened&&!textMode){
+    if(opened){
       const video=modal.querySelector('video'),status=modal.querySelector('#message-video-status');
       const replay=modal.querySelector('.message-video-replay');
       video.addEventListener('loadedmetadata',()=>{video.closest('.message-video-wrap').style.setProperty('--video-ratio',video.videoWidth/video.videoHeight);});
       video.addEventListener('play',()=>{replay.hidden=true;video.controls=true;});
-      video.addEventListener('ended',()=>{state().messageWatched=true;save();video.controls=false;replay.hidden=false;modal.querySelector('[data-action="finish-call"]').hidden=false;});
+      video.addEventListener('ended',()=>{state().messageWatched=true;save();video.controls=false;replay.hidden=false;});
       video.addEventListener('error',()=>{status.hidden=false;status.textContent='Správu sa nepodarilo načítať. Skúste ju prehrať znova alebo požiadajte dospelého pomocníka.';});
       video.src=GAME.video;
       video.play().catch(()=>{});
     }else if(!opened){
       pingTimer=setInterval(ping,4800);
     }
-    modal.querySelector(textMode?'[data-action="finish-call"]':opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
+    modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function completeTask(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();success=true;sequence=[];render({autoplayKvak:n===1});goTop();}
   function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly)return;const valid=t.digital?raw===t.answer[0]:(state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a)));
@@ -264,7 +264,7 @@
     if(a==='close'){const wasIntro=modal.classList.contains('message-modal')&&!messageReturn;closeModal();if(wasIntro){if(preview){preview=null;navigate('designer');}else{navigate('prep');}}}
     if(a==='game-fullscreen')requestGameFullscreen();
     if(a==='accept-call'){requestGameFullscreen();state().messageOpened=true;save();showMessage(true);}
-    if(a==='read-message'){state().messageOpened=true;state().messageRead=true;state().messageWatched=true;save();showMessage(true,true);}
+    if(a==='back-to-message'){state().messageOpened=false;save();showMessage(false);}
     if(a==='message-sound')enableSound();
     if(a==='replay-message'){
       requestGameFullscreen();
@@ -273,14 +273,9 @@
         const status=modal.querySelector('#message-video-status'),replay=modal.querySelector('.message-video-replay');
         status.hidden=true;if(video.error)video.load();video.currentTime=0;video.controls=true;replay.hidden=true;
         video.play().catch(()=>{replay.hidden=false;});
-      }else{showMessage(true,false);}
+      }else{showMessage(true);}
     }
     if(a==='reopen-message')openCall(true);
-    if(a==='finish-call'){
-      if(messageReturn){closeModal();return;}
-      if(!state().messageWatched)return;
-      closeModal();state().callDone=true;state().stage=1;save();success=false;render();goTop();
-    }
     if(a==='paper-found'&&view==='player'&&GAME.stages[state().stage].paperOnly&&!state().completed.includes(state().stage))completeTask();
     if(a==='verify-sequence')verify(sequence.join(','));
     if(a==='clear-sequence'){sequence=[];document.querySelector('#sequence').textContent='';document.querySelector('#sequence').setAttribute('aria-label','Vybrané symboly');document.querySelector('#feedback').textContent='';}
@@ -302,6 +297,12 @@
   modal.addEventListener('cancel',e=>{e.preventDefault();modal.querySelector('[data-action="close"]')?.click();});
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
+  // The printed QR opens the first signal without an on-screen continue action.
+  if(environment==='player' && SITE_CONFIG.access.mode==='test' && new URLSearchParams(location.search).get('signal')==='kvak'){
+    progress.started=true;progress.callDone=true;
+    if(progress.stage===0)progress.stage=1;
+    view='player';save();
+  }
   render();
   // Each entry opens its own environment. Gameplay resumes only after an explicit prepared test launch.
   if(location.hash){history.replaceState(null,'',location.pathname+location.search);}

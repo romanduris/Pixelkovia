@@ -101,9 +101,9 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.ok(layout.controls.bottom<=layout.retained.bottom&&layout.retained.bottom<layout.divider.top,'code and QR stay with the instructions above the cutting line');
   assert.ok(layout.cutouts.top>layout.divider.bottom,'all six cutouts remain below the cutting line');
   assert.ok(layout.footer.bottom<=layout.sheet.bottom,'the whole worksheet fits on one A4');
-  assert.ok(layout.qrLoaded,'dummy QR illustration is available in the printable');
+  assert.ok(layout.qrLoaded,'scannable QR is available in the printable');
   assert.equal(await printable.locator('.qr-mockup a').count(),0);
-  assert.ok((await printable.locator('.qr-mockup').innerText()).includes('NEFUNKČNÁ'));
+  assert.ok((await printable.locator('.qr-mockup').innerText()).includes('OTVORIŤ KVAKOV SIGNÁL'));
   await printable.close();
   // Bathroom and later tasks expose direct tests in their headers.
   const savedBeforeTest=await page.evaluate(()=>localStorage.getItem('zahada-v1-progress'));

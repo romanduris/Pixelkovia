@@ -1,4 +1,4 @@
-// A complete adventure must remain understandable and playable when all recordings fail.
+// The printed QR starts the written tasks even when recordings are unavailable.
 const assert=require('node:assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
@@ -14,13 +14,10 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  assert.ok(!/kúpeľ/i.test(await page.locator('dialog').innerText()),'place stays hidden until the message is opened');
  const intro=await page.evaluate(()=>GAME.stages[0].narrative.before.join(' '));
  assert.equal(normal(await page.locator('[data-story-stage="intro"]').innerText()),normal(intro));
- await page.locator('[data-action="read-message"]').click();
- assert.equal(await page.locator('dialog video,dialog audio').count(),0,'reading does not require loading media');
- assert.ok(!/kúpeľ/i.test(await page.locator('.message-reading').innerText()),'text keeps the first hiding place exclusive to the video');
+ assert.equal(await page.locator('[data-action="read-message"],[data-action="finish-call"]').count(),0);
  const narrative=await page.evaluate(()=>GAME.stages.map(stage=>({id:stage.id,label:stage.label,narrative:stage.narrative,answer:stage.answer,character:stage.character,paperOnly:stage.paperOnly})));
- assert.equal(normal(await page.locator('.message-transcript').innerText()),normal(await page.evaluate(()=>GAME.pikoTextMessage.join(' '))));
  await page.screenshot({path:'/tmp/narrative-intro-phone.png'});
- await page.locator('[data-action="finish-call"]').click();
+ await page.goto(BASE+'/game.html?signal=kvak');
  for(let index=1;index<=8;index++){
   const stage=narrative[index],before=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="before"]`);
   await before.waitFor();
@@ -44,7 +41,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  }
  await page.locator('.finale').waitFor();
  const saved=JSON.parse(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')));
- assert.deepEqual(saved.completed,[1,2,3,4,5,6,7,8]);assert.equal(saved.messageRead,true);assert.equal(saved.callDone,true);
+ assert.deepEqual(saved.completed,[1,2,3,4,5,6,7,8]);assert.equal(saved.callDone,true);
  // The numbered headings and story persist when resuming an older save without new fields.
  await page.evaluate(()=>{localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:2,completed:[1],hints:{2:1}}));});
  await page.goto(BASE+'/parent.html');await page.locator('[data-action="start"]').click();
@@ -83,5 +80,5 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   if(stage.id!=='finale')assert.equal(normal(await article.locator('.quest-story[data-story-phase="before"]').first().innerText()),normal(stage.narrative.before.join(' ')));
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: eight-task written adventure without working media, intro reading, plot reveals, numbered places, old-save compatibility, phone typography and exact shared printable/storyboard paragraphs.');
+ console.log('PASS: eight-task written adventure without working media, intro and QR entry, plot reveals, numbered places, old-save compatibility, phone typography and exact shared printable/storyboard paragraphs.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1)});
