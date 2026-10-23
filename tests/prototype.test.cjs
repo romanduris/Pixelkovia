@@ -149,7 +149,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.screenshot({path:'/tmp/piko-video-playing.png'});
  assert.ok(!(await page.locator('.message-screen').textContent()).includes('kúpeľ'));
  await finishVideo(page);
- assert.equal(await page.locator('.message-caption').textContent(),'Správa od Pika');
+ assert.equal(await page.locator('.message-caption').textContent(),await page.evaluate(()=>GAME.stages[0].task));
  assert.ok(await page.locator('.message-video-replay').isVisible(),'replay arrow remains on the video after it ends');
  await page.locator('video').evaluate(v=>{v.playbackRate=1;});
  await page.locator('.message-video-replay').click({position:{x:12,y:12}});

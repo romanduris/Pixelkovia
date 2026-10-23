@@ -76,7 +76,7 @@
   }
   function stageBody(s,i,fullScene){
     const sheet=sheetForStage[i];
-    const introduction=`<section class="stage-introduction">${STORY_TEXT.html(s)}<p>${esc(s.task)}</p></section>`;
+    const introduction=`<section class="stage-introduction">${STORY_TEXT.html(s)}${i===0?'':`<p>${esc(s.task)}</p>`}</section>`;
     return `${sheet?worksheetReview(sheet,s.id):introduction}${i===0?recordedMessage('piko'):i===1?recordedMessage('kvak'):stageStory(s,i,fullScene)}<section class="storyboard-continuation"><h3>Po vyriešení</h3>${STORY_TEXT.html(s,'after')}</section>${PRINT_MATERIALS.gameMasterInstructions(s.id)}${sheet?sheetActions(sheet):''}`;
   }
   function designer({sprite,fullScene}){return `<section class="studio-header"><div><span class="section-kicker">VÝVOJÁRSKE ZÁKULISIE / OBSAHUJE RIEŠENIA</span><h1 class="screen-heading" tabindex="-1">StoryBoard<span>Od prvého pípnutia<br>po posledný návrat.</span></h1><p>Scény, nahrávky, tlačoviny a prechody v poradí hry. Testovanie etáp nemení uložený postup rodiny.</p></div>${sprite('kubo')}</section><p class="prototype-access">Interný vývojový náhľad bez autentifikácie. Obsahuje správne odpovede; nejde o produkčne chránené prostredie.</p><nav class="designer-bar" aria-label="Interná navigácia"><a class="btn secondary small" href="parent.html" target="_blank" rel="noopener noreferrer">Customer page</a><a class="btn secondary small" href="atlas.html?internalPreview=1" target="_blank" rel="noopener noreferrer">Atlas Pixelkov</a><a class="btn secondary small" href="printables.html?internalPreview=1" target="_blank" rel="noopener noreferrer">Tlačové materiály</a></nav>

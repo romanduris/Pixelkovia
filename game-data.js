@@ -14,8 +14,8 @@ window.GAME = {
         0,
         0
       ],
-      "action": "Otvorte Pikovu správu ako video alebo si ju prečítajte. Zistite, kde máte hľadať obálku 1.",
-      "task": "Otvorte Pikovu správu ako video alebo si ju prečítajte. Zistite, kde čaká prvá obálka. Správu môžete otvoriť opakovane.",
+      "action": "Otvorte Pikovu správu a zistite, čo ďalej.",
+      "task": "Otvorte Pikovu správu a zistite, čo ďalej. Správu môžete otvoriť opakovane.",
       "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
       "mobile": "Celoobrazovkový displej → prichádzajúca správa → video alebo Prečítať správu → opakované otvorenie → Máme obálku.",
       "solution": "Prvá obálka čaká v kúpeľni. Miesto prezradí Pikova videospráva aj jej písaná alternatíva po otvorení správy.",
@@ -39,9 +39,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte, ja som Piko! Som malý modrý Pixelko a bývam v tajnom svete za svetielkami vašich obrazoviek. Máme tam domčeky z farebných bodiek a medzi nimi tenučké svietiace cestičky. Po nich chodievam za svojimi šiestimi kamarátmi. Každý z nás vie niečo iné a spolu si vieme poradiť skoro so všetkým.",
-          "Dnes ráno však všetko zablikalo. Naše cestičky zhasli a ja som svojich kamarátov prestal počuť. Neviem, kde zostali, a bez nich cestu domov neopravím. Sám neviem dobre počúvať slabé signály, rozsvietiť tmu ani postaviť pevný most. Práve preto ich potrebujem nájsť všetkých.",
-          "Prvá obálka je v kúpeľni! Zachytil som tam kúsky správy od Kvaka, môjho kamaráta s najlepším sluchom. Prosím, nájdite ju a pomôžte mu ozvať sa. Ja zostanem pri vašom telefóne. Budeme kamarátov hľadať spolu a každého, koho nájdeme, prizveme do našej partie."
+          "Ahojte, ja som Piko! Som malý modrý Pixelko zo sveta za svetielkami vašich obrazoviek. Máme domčeky z farebných bodiek a svietiace cestičky. Po nich chodím za šiestimi kamarátmi. Každý vie niečo iné a spolu si poradíme.",
+          "Dnes ráno cestičky zhasli a kamaráti sa odmlčali. Sám nezachytím slabé signály, nerozsvietim tmu ani nepostavím most medzi obrazovkami. Potrebujem zistiť, čo sa stalo, a všetkých nájsť.",
+          "Nahral som vám krátku správu. Skúste sa spojiť s Kvakom, mohol by nám pomôcť!"
         ],
         "after": [
           "Ďakujem, že mi chcete pomôcť! Ja zatiaľ počúvam pri telefóne. Vy sa pozrite do kúpeľne po prvej obálke; možno už čoskoro začujem svojho kamaráta Kvaka."
