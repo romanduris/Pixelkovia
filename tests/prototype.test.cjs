@@ -29,7 +29,7 @@ assert.equal(ordered.map(r=>r.digit).join(''),'741296');
 assert.notEqual(game.signalRecords.map(r=>r.digit).join(''),'741296','printed order is scrambled');
 assert.equal(new Set(ordered.map(r=>`${r.month}-${r.day}-${r.time}`)).size,6,'unique chronological order');
 assert.ok(Object.values(Object.groupBy(game.signalRecords,r=>r.date)).some(group=>group.length>=3),'three records require exact time comparison');
-assert.equal(game.audio,'assets/KvakMessage.mpeg');
+assert.equal(game.audio,'assets/KvakMessage.mp3');
 assert.ok(fs.existsSync(game.audio));
 assert.equal(game.stages[0].hints.length,3);
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
@@ -245,7 +245,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  // Old completion, absent MPEG, screen fallbacks and every phone width.
  const kvakContext=await browser.newContext();const kp=await kvakContext.newPage();const audioErrors=[];kp.on('pageerror',e=>audioErrors.push(e.message));
  await kp.addInitScript(()=>{Object.defineProperty(document,'fullscreenEnabled',{get(){return false;}});});
- await kp.route('**/assets/KvakMessage.mpeg',route=>route.fulfill({status:404,body:'Missing audio'}));
+ await kp.route('**/assets/KvakMessage.mp3',route=>route.fulfill({status:404,body:'Missing audio'}));
  await kp.goto(BASE);await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[1],hints:{1:1}})));await reloadAndResume(kp);
  assert.equal(await kp.locator('.signal-connected').count(),1,'legacy first completion remains completed');
  await kp.locator('[data-action="kvak-audio-toggle"]').click();await kp.locator('#kvak-transcript').waitFor();

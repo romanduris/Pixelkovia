@@ -1,7 +1,7 @@
 window.GAME = {
   "title": "Pixelkovia: Stratený signál",
   "version": 4,
-  "audio": "assets/KvakMessage.mpeg",
+  "audio": "assets/KvakMessage.mp3",
   "video": "assets/PicoVideo.mp4",
   "kvakQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
   "iskraQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=iskra",
@@ -68,7 +68,7 @@ window.GAME = {
       "action": "Vyberte z obálky 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
       "task": "Zoraďte záznamy od najstaršieho po najnovší. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód. Naskenujte QR kód a na otvorenej stránke skúste zadať svoj kód.",
       "materials": "P1: jeden jednostranný pracovný list A4 s Kvakovým príbehom, návodom a šiestimi otočenými vystrihovacími signálmi.",
-      "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mpeg. Písmeno S sa uloží bez automatického pokračovania. Deti si ho zapamätajú; ďalej pokračujú QR kódom z P2.",
+      "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mp3. Písmeno S sa uloží bez automatického pokračovania. Deti si ho zapamätajú; ďalej pokračujú QR kódom z P2.",
       "solution": "13. 3. 20:05 → 7; 13. 3. 20:10 → 4; 13. 3. 20:15 → 1; 14. 6. 19:50 → 2; 15. 9. 08:35 → 9; 15. 12. 08:40 → 6. Kód 741296.",
       "hints": [
         "Najprv porovnajte mesiace, potom dni. Všetky záznamy vznikli v jednom roku.",
