@@ -75,7 +75,7 @@ async function fits(page,label){
   await page.waitForFunction(()=>document.querySelector('audio').sutkoSound?.gain.gain.value===1);
   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.sutkoSound?.gain.gain.value===1),'the result releases the unlocked output');
   await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return audio&&!audio.paused&&audio.currentTime>0;});
-  assert.equal(await page.locator('#sutko-audio').getAttribute('src'),await page.evaluate(()=>GAME.audio),'Kvak recording temporarily stands in for Sutko');
+  assert.equal(await page.locator('#sutko-audio').getAttribute('src'),'assets/Sutko.mp3','the supplied Sutko recording is used');
   await page.locator('[data-action="sutko-audio-toggle"]').click();
   await page.locator('[data-action="read-sutko-message"]').click();
   assert.equal(normal((await page.locator('#sutko-transcript p').allTextContents()).join(' ')),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
@@ -96,7 +96,7 @@ async function fits(page,label){
   assert.match(await page.locator('#sutko-message-text').innerText(),/Lístok[\s\S]*cestovateľov/);
   assert.ok(!(await page.locator('#sutko-message-text').innerText()).includes('písmeno E'),'the clue is displayed separately from the spoken script');
   const tts=await page.locator('#sutko-message-tts pre').textContent();
-  assert.equal(tts.replace(/\[[^\]]+\]\s*/g,'').replace(/\s+/g,' ').trim(),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
+  assert.equal(tts,await page.evaluate(()=>GAME.voiceScripts.sutko.prompt),'TTS instructions remain verbatim, independent of the written transcript');
   await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();
   for(const index of indices)await page.locator('[data-cell="'+index+'"]').click();
   await page.locator('.sutko-grid.is-unlocking').waitFor();await page.evaluate(()=>window.canceledSutko=document.querySelector('audio'));await page.locator('[data-action="exit-test"]').click();
@@ -111,7 +111,7 @@ async function fits(page,label){
   const browser=await engine.launch();
   try{
    const context=await browser.newContext({...device});let requests=0,fail=false;
-   await context.route('**/assets/KvakMessage.mp3',route=>{requests++;return fail?route.fulfill({status:503,contentType:'text/plain',body:'Temporary failure'}):route.continue();});
+   await context.route('**/assets/Sutko.mp3',route=>{requests++;return fail?route.fulfill({status:503,contentType:'text/plain',body:'Temporary failure'}):route.continue();});
    const {page,errors}=await open(context);
    await page.waitForFunction(()=>document.querySelector('#sutko-audio')?.readyState>=3);
    assert.ok(await page.locator('audio').evaluate(audio=>audio.paused));
@@ -122,10 +122,10 @@ async function fits(page,label){
    await page.waitForFunction(()=>document.querySelector('audio').sutkoSound?.gain.gain.value===1);
    assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.sutkoSound?.context.state==='running'&&audio.sutkoSound.gain.gain.value===1&&!audio.loop),'the final tile unlocks automatic playback through the same element');
    await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return !audio.paused&&audio.currentTime>0;});
-   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.volume>0&&audio.duration>40&&!audio.error),'the actual recording is loaded');
+   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.volume>0&&audio.duration>25&&audio.duration<35&&!audio.error),'the actual recording is loaded');
    await page.waitForFunction(()=>{const samples=new Float32Array(sutkoAnalyser.fftSize);sutkoAnalyser.getFloatTimeDomainData(samples);return samples.some(value=>Math.abs(value)>.001);}); // Verify output samples, including WebKit's rerouted media, not just a playing flag.
    assert.ok(await page.evaluate(()=>sutkoRewindAt!==null&&sutkoRewindAt<1.5),'the reveal rewinds the recording to its beginning (allowing WebKit audio-graph read-ahead)');
-   await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('hovorí'));
+   await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('Hovorí Šutko'));
    assert.equal(requests,1,'preloaded audio is retained on completion');
    const button=page.locator('[data-action="sutko-audio-toggle"]');await button.click();assert.ok(await page.locator('audio').evaluate(audio=>audio.paused));
    const at=await page.locator('audio').evaluate(audio=>audio.currentTime);await button.click();await page.waitForFunction(at=>document.querySelector('#sutko-audio').currentTime>at,at);

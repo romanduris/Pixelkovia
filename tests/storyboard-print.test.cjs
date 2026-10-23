@@ -25,8 +25,8 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await page.locator('#sutko-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.sutko.prompt));
  assert.equal(normalize((await page.locator('#sutko-message-text>div>p').allTextContents()).join(' ')),normalize(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
  assert.equal(await sutko.locator('.studio-stage-details,.storyboard-continuation').count(),0);
- assert.equal(await sutko.locator('audio').getAttribute('src'),await page.evaluate(()=>GAME.audio));
- assert.ok((await sutko.locator('.script-status').textContent()).includes('Dočasná testovacia nahrávka: Kvak'));
+ assert.equal(await sutko.locator('audio').getAttribute('src'),'assets/Sutko.mp3');
+ assert.equal(await sutko.locator('.script-status').count(),0,'the supplied Sutko recording replaces the placeholder');
 
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');

@@ -529,10 +529,10 @@ window.GAME = {
     },
     "sutko": {
       "title": "ŠUTKO – správa po odomknutí mosta",
-      "duration": "cca 35–45 sekúnd",
+      "duration": "cca 29 sekúnd",
       "model": "ElevenLabs v3",
-      "direction": "Pokojný, hlbší a srdečný mužský hlas. Začiatok znie radostne a vďačne. Pri slove Počkajte krátka pauza, potom tiché dramatické napätie. Hádanku povedať zvedavo, pomalšie a s krátkymi pauzami, aby deti stihli premýšľať. Neprezrádzať miesto priamo.",
-      "prompt": "[relieved, warm, grateful] Podarilo sa! Zámok povolil a most drží! Ďakujem, kamaráti. Už môžeme bezpečne prejsť.\n\n[surprised, whispering, mysterious] Počkajte… za bránou sa ozval tichý šepot. Myslím, že je to Lístok! Zanechal nám indíciu, no musíte ju nájsť.\n\n[curious, conspiratorial, unhurried] Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov. Majú jazyk, ale nerozprávajú, a na cestu vyrazia iba s vašimi nohami. Jeden z nich ukrýva Lístkovo tajomstvo!"
+      "direction": "Pokojný, hlbší a srdečný mužský hlas. Začiatok znie radostne a vďačne. Pri slove Počkať krátka pauza, potom tiché dramatické napätie. Hádanku povedať zvedavo, pomalšie a s krátkymi pauzami, aby deti stihli premýšľať. Neprezrádzať miesto priamo.",
+      "prompt": "[relieved, proud, speaking firmly] Podarilo sa! Zámok povolil a most stále drží!\n[grateful, warm] Ďakujem vám, kamaráti! Už môžeme konečne bezpečne prejsť.\n[suddenly alert, quieter] Počkať... Za bránou sa ozval nejaký tichý šepot.\n[curious, speaking softly] Myslím, že je to Lístok.\n[thoughtful, slightly urgent] Zanechal nám indíciu, no musíme ju nájsť.\n[mysterious, slowly, emphasizing important words] Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov.\n[playful, cryptic, short pause] Majú jazyk, ale nerozprávajú , a na cestu vyrazia iba s vašimi nohami.\n[whispering, conspiratorial] Jeden z nich ukrýva Lístkovo tajomstvo."
     }
   },
   "pikoMessage": [
@@ -542,8 +542,8 @@ window.GAME = {
     "Indícia jedna… v kúpeľni! Rýchlo!",
     "Ah—"
   ],
-  "sutkoAudio": "assets/KvakMessage.mp3",
-  "sutkoAudioPlaceholder": true,
+  "sutkoAudio": "assets/Sutko.mp3",
+  "sutkoAudioPlaceholder": false,
   "sutkoPuzzle": {
     "grid": [
       [
