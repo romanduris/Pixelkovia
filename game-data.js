@@ -16,7 +16,7 @@ window.GAME = {
         0
       ],
       "action": "Otvorte Pikovu správu a zistite, čo ďalej.",
-      "task": "Otvorte Pikovu správu a zistite, čo ďalej. Správu môžete otvoriť opakovane.",
+      "task": "Posledná videospráva od Pika pred prerušením spojenia. Správu si môžete opakovane prehrať.",
       "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
       "mobile": "Celoobrazovkový displej → úvodná správa → video → Prehrať znova alebo Späť k správe. Pokračovanie iba naskenovaním QR na P1.",
       "solution": "Prvá obálka čaká v kúpeľni. Miesto prezradí iba Pikova videospráva; hráčsky text úkryt neprezrádza.",
