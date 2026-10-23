@@ -3,6 +3,13 @@
 (() => {
   'use strict';
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function storyboardIcon(stage){
+    const shapes={
+      envelope:'<path d="M4 3h3a5 5 0 0 1 5 5v1M8 13a4 4 0 0 1 8 0H8ZM8 17v1m4-1v1m4-1v1M6 21v-1m6 1v-1m6 1v-1"/>',
+      document:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 3v18M4 11h16M2 21h20"/>'
+    };
+    return shapes[stage.id]?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${shapes[stage.id]}</svg>`:esc(stage.icon);
+  }
   const materials=[
     {id:'p1',task:'01',title:'Kvakove rozhádzané signály',where:'Obálka Kúpeľňa',copy:'Celý list vložte do obálky. Šesť signálov vystrihujú až deti.',status:'Hotový list A4',character:'kvak'},
     {id:'p2',task:'02',title:'Iskrin dekódovací stroj',where:'Obálka 2 · pri okne',copy:'Celý list s dvoma kruhmi vložte do obálky. Deti rozlúštia odkaz na papieri bez overovania v telefóne.',status:'Pracovný podklad',character:'iskra'},
@@ -81,6 +88,6 @@
   }
   function designer({sprite,fullScene}){return `<section class="studio-header"><div><span class="section-kicker">VÝVOJÁRSKE ZÁKULISIE / OBSAHUJE RIEŠENIA</span><h1 class="screen-heading" tabindex="-1">StoryBoard<span>Od prvého pípnutia<br>po posledný návrat.</span></h1><p>Scény, nahrávky, tlačoviny a prechody v poradí hry. Testovanie etáp nemení uložený postup rodiny.</p></div>${sprite('kubo')}</section><p class="prototype-access">Interný vývojový náhľad bez autentifikácie. Obsahuje správne odpovede; nejde o produkčne chránené prostredie.</p><nav class="designer-bar" aria-label="Interná navigácia"><a class="btn secondary small" href="parent.html" target="_blank" rel="noopener noreferrer">Customer page</a><a class="btn secondary small" href="atlas.html?internalPreview=1" target="_blank" rel="noopener noreferrer">Atlas Pixelkov</a><a class="btn secondary small" href="printables.html?internalPreview=1" target="_blank" rel="noopener noreferrer">Tlačové materiály</a></nav>
     <nav class="stage-index" aria-label="Etapy storyboardu">${GAME.stages.map((s,i)=>`<a href="#gm-${s.id}">${esc(s.label.replace('Úloha ',''))}</a>`).join('')}</nav>
-    <div class="studio-timeline">${GAME.stages.map((s,i)=>{const label=PRINT_MATERIALS.parentInstructions[s.id].label;return `<article class="storyboard is-collapsed ${i===1?'bathroom-stage':''}" id="gm-${s.id}"><div class="storyboard-head"><button class="storyboard-toggle" data-action="toggle-storyboard" data-label="${esc(label)}" aria-expanded="false" aria-controls="gm-content-${s.id}" aria-label="Rozbaliť blok ${esc(label)}"><span aria-hidden="true">+</span></button><div class="storyboard-heading"><span class="section-kicker">${esc(s.title)} / ${s.time.reduce((a,b)=>a+b,0)} min${s.reward?' / indícia '+s.reward:''}</span><h2>${s.icon} ${esc(label)}</h2></div><button class="btn secondary small storyboard-test" data-action="test" data-stage="${i}">Otestovať</button></div><div class="storyboard-content" id="gm-content-${s.id}" hidden>${stageBody(s,i,fullScene)}</div></article>`;}).join('')}</div>`;}
+    <div class="studio-timeline">${GAME.stages.map((s,i)=>{const label=PRINT_MATERIALS.parentInstructions[s.id].label;return `<article class="storyboard is-collapsed ${i===1?'bathroom-stage':''}" id="gm-${s.id}"><div class="storyboard-head"><button class="storyboard-toggle" data-action="toggle-storyboard" data-label="${esc(label)}" aria-expanded="false" aria-controls="gm-content-${s.id}" aria-label="Rozbaliť blok ${esc(label)}"><span aria-hidden="true">+</span></button><span class="storyboard-stage-icon" aria-hidden="true">${storyboardIcon(s)}</span><div class="storyboard-heading"><span class="section-kicker">${esc(s.title)} / ${s.time.reduce((a,b)=>a+b,0)} min${s.reward?' / indícia '+s.reward:''}</span><h2>${esc(label)}</h2></div><button class="btn secondary small storyboard-test" data-action="test" data-stage="${i}">Test</button></div><div class="storyboard-content" id="gm-content-${s.id}" hidden>${stageBody(s,i,fullScene)}</div></article>`;}).join('')}</div>`;}
   window.SITE_CONTENT={sales,prep,designer,materials};
 })();

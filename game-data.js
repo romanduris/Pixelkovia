@@ -53,7 +53,7 @@ window.GAME = {
       "id": "envelope",
       "title": "Kvakove rozhádzané signály",
       "label": "Úloha 1 – Kúpeľňa",
-      "icon": "✉",
+      "icon": "🚿",
       "time": [
         1,
         2,
@@ -95,7 +95,7 @@ window.GAME = {
       "id": "document",
       "title": "Iskrin dekódovací stroj",
       "label": "Úloha 2 – Pri okne",
-      "icon": "◉",
+      "icon": "🪟",
       "time": [
         1,
         2,
