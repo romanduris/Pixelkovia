@@ -239,3 +239,67 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .message-reading .message-sender{margin-bottom:10px}
  .message-transcript p{font-size:15px;line-height:1.4;margin-bottom:6px}
 }
+
+/* Šutko: the paper values light a five-column, seven-row stone lock. */
+.signal-screen.sutko-screen{padding:8px max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.sutko-screen .signal-header{padding-bottom:4px}
+.sutko-screen .signal-header .section-kicker{font-size:8px}
+.sutko-screen .signal-content{width:min(100%,480px);display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0;margin:auto}
+.sutko-screen .signal-content h1{font-size:clamp(21px,5.5vw,30px)!important;line-height:1.2;margin:0}
+.sutko-screen .signal-content>.quest-party{margin:0}
+.sutko-screen .quest-party figcaption{display:none}
+.sutko-screen .party-lineup{gap:12px;flex-wrap:nowrap;align-items:center}
+.sutko-screen .party-person{min-width:0;font-size:11px;gap:4px}
+.sutko-screen .party-sprite,.sutko-screen .party-current .party-sprite{width:clamp(44px,9dvh,72px);height:clamp(44px,9dvh,72px);outline:none}
+.sutko-screen .signal-content p{font-size:14px;line-height:1.45;margin:0}
+.sutko-lock .sutko-welcome{max-width:430px}
+.sutko-screen #sutko-instruction{color:#edf1ff;max-width:420px}
+.sutko-screen #sutko-instruction small{display:block;font-size:11px;color:#a8bbd5;margin-top:4px}
+.sutko-grid{--cell-size:clamp(32px,5.7dvh,44px);display:grid;grid-template-columns:repeat(5,var(--cell-size));grid-template-rows:repeat(7,var(--cell-size));gap:4px;padding:10px;background:#0c1427;border:1px solid #576584;border-radius:12px;box-shadow:0 10px 40px #0003}
+.sutko-cell{display:grid;place-items:center;padding:0;border:1px solid #62718e;border-radius:5px;background:linear-gradient(#29364e,#1c273c);color:#e7edf8;font:600 20px/1 monospace;box-shadow:0 2px 0 #060d1c;transition:background .15s,color .15s,box-shadow .15s}
+.sutko-cell[aria-pressed="true"]{color:#14251f;background:#a7f2ce;border-color:#d4ffe8;box-shadow:0 0 10px #7ce8b655,inset 0 0 8px #dcffec}
+.sutko-screen .sutko-hint{min-height:32px;padding:4px 8px;font-size:11px}
+.sutko-unlock{display:flex;gap:12px;align-items:center;color:#a7f2ce;font:10px/1.4 monospace;letter-spacing:.08em}
+.sutko-unlock>span:last-child{display:flex;flex-direction:column;text-align:left}
+.sutko-unlock strong{font:600 30px/1.2 monospace;color:#dbffe8}
+.sutko-unlock-sign{display:grid;grid-template-columns:repeat(5,5px);grid-template-rows:repeat(7,5px);gap:2px}
+.sutko-unlock-sign i{background:#27394b;border-radius:1px}
+.sutko-unlock-sign i.lit{background:#a7f2ce;box-shadow:0 0 5px #a7f2ce66}
+.sutko-party-scene{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:contain;border:1px solid #405474;border-radius:10px;background:#fff}
+.sutko-message{width:100%}
+.sutko-written-message{text-align:left}
+.sutko-written-message p+p{margin-top:8px!important}
+.sutko-connected .signal-audio-controls .btn{width:100%;min-height:44px;font-size:13px}
+.sutko-screen #sutko-audio-status{font-size:11px;margin:4px 0;min-height:16px}
+.sutko-message>.text-link{font-size:11px;min-height:32px;padding:4px 8px}
+.sutko-connected .signal-reward{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:12px;width:100%;margin:0;padding:10px 12px;border:1px solid #647da8;border-radius:8px;background:#15233c;text-align:left}
+.sutko-connected .signal-reward strong{width:48px;height:48px;margin:0;font:32px/1 monospace}
+.sutko-connected .signal-reward span{font:9px/1.4 monospace;letter-spacing:.08em;color:#b9c9e1}
+.sutko-connected .signal-reward small{display:block;margin-top:4px;font-size:13px;line-height:1.4;color:#edf1ff}
+.sutko-screen .sutko-next-clue{font-size:12px;line-height:1.45;color:#b9c9e1}
+.sutko-screen .signal-content>[data-action="next"]{min-height:44px;padding:10px 14px;font-size:13px}
+@media(max-height:720px){
+ .sutko-screen .signal-content{gap:7px;padding:8px 0}
+ .sutko-screen .party-sprite,.sutko-screen .party-current .party-sprite{width:46px;height:46px}
+ .sutko-screen .signal-content p{font-size:12px;line-height:1.4}
+ .sutko-grid{--cell-size:32px;gap:3px;padding:8px}
+ .sutko-screen .sutko-hint{min-height:28px}
+ .sutko-party-scene{max-width:360px}
+ .sutko-connected .signal-reward{padding:8px 10px}
+ .sutko-written-message p+p{margin-top:5px!important}
+}
+@media(orientation:landscape) and (max-height:580px) and (min-width:640px){
+ .sutko-lock .signal-content{width:min(100%,800px);display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"party grid" "heading grid" "welcome grid" "instruction grid" "hint grid";gap:7px 24px;justify-items:center}
+ .sutko-lock .quest-party{grid-area:party}.sutko-lock h1{grid-area:heading}.sutko-lock .sutko-welcome{grid-area:welcome}.sutko-lock #sutko-instruction{grid-area:instruction}.sutko-lock .sutko-grid{grid-area:grid}.sutko-lock .sutko-hint{grid-area:hint}
+ .sutko-connected .signal-content{width:min(100%,800px);display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding:4px 0}
+ .sutko-connected h1{grid-column:1/-1}.sutko-connected .sutko-unlock{grid-column:1;grid-row:2}.sutko-connected .sutko-party-scene{grid-column:1;grid-row:3}.sutko-connected .sutko-message{grid-column:2;grid-row:2/4}.sutko-connected .signal-reward{grid-column:1;grid-row:4/6}.sutko-connected .sutko-next-clue{grid-column:2;grid-row:4}.sutko-connected [data-action="next"]{grid-column:2;grid-row:5}
+}
+@media(orientation:portrait) and (max-height:600px){
+ .signal-screen.sutko-screen{padding-top:4px;padding-bottom:8px}
+ .sutko-screen .signal-header .text-link{min-height:36px}
+ .sutko-screen .signal-content{gap:5px;padding:6px 0}
+ .sutko-screen .party-sprite,.sutko-screen .party-current .party-sprite{width:40px;height:40px}
+ .sutko-grid{padding:6px}
+ .sutko-party-scene{max-width:290px}
+ .sutko-screen .signal-content h1{font-size:20px!important}
+}

@@ -20,6 +20,13 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.ok(!/FYZICKÁ STOPA|Nasleduje obálka|Otestovať QR|KÓD NA OBNOVENIE SPOJENIA/.test(await bathroom.locator('.worksheet-text').innerText()));
  for(const target of ['kvak-message-text','kvak-message-tts']){assert.ok(await page.locator('#'+target).isHidden());const button=page.locator('[data-target="'+target+'"]');await button.click();assert.ok(await page.locator('#'+target).isVisible());assert.equal(await button.getAttribute('aria-expanded'),'true');await button.click();assert.ok(await page.locator('#'+target).isHidden());}
  assert.equal(await page.locator('#kvak-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.kvak.prompt));
+ const sutko=page.locator('#gm-symbols');await sutko.locator('.storyboard-toggle').click();
+ for(const suffix of ['text','tts']){const panel=page.locator('#sutko-message-'+suffix);assert.ok(await panel.isHidden());await page.locator('[data-target="sutko-message-'+suffix+'"]').click();assert.ok(await panel.isVisible());await page.locator('[data-target="sutko-message-'+suffix+'"]').click();}
+ assert.equal(await page.locator('#sutko-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.sutko.prompt));
+ assert.equal(normalize((await page.locator('#sutko-message-text>div>p').allTextContents()).join(' ')),normalize(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
+ assert.equal(await sutko.locator('audio,.studio-stage-details,.storyboard-continuation').count(),0);
+ assert.ok((await sutko.locator('.script-status').textContent()).includes('Nahrávka sa pripravuje'));
+
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');
  assert.equal(await printed.locator('.sheet').count(),8);assert.equal(await printed.locator('.sheet:visible').count(),8);
@@ -41,7 +48,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  }
  assert.equal(normalize(await page.locator('#gm-digital .worksheet-text').innerText()),normalize(await printed.locator('#p5 .note').innerText()),'Ryško shows his printed greeting');
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.locator('#p6 .card').textContent()),'final password shows the printed ordering card');
- for(const stage of await page.evaluate(()=>GAME.stages.slice(2).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
+ for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols').map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
   const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
   assert.ok(await panel.isHidden());await toggle.click();assert.ok(await panel.isVisible());
   const text=await panel.textContent();for(const line of stage.lines)assert.ok(text.includes(line),stage.id+': full authored story retained');

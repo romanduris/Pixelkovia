@@ -151,16 +151,16 @@ window.GAME = {
       ],
       "placeholder": "Výsledné číslo",
       "action": "Nájdite obálku označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte Šutkov list P3 a ceruzkou si poznačte hodnotu každého tvaru.",
-      "task": "Na karte platí △ + △ = 6, ○ + △ = 5 a □ + ○ = 6. Koľko je △ + ○ + □?",
-      "materials": "P3: tri rovnice a otázka. P4: štyri premiešané pásiky Lístkovho odkazu, pripravené na stole v obálke 3.",
-      "mobile": "QR z P3 → game.html?signal=sutko → Šutkova úloha. Pri vstupe sa papierová úloha 2 označí za prejdenú a zachová V. Overenie jedného čísla; potom pokyn otvoriť obálku 3 na stole.",
-      "solution": "△ = 3, ○ = 2, □ = 4. Súčet je 9.",
+      "task": "Na papieri zistite hodnoty trojuholníka, kruhu a štvorca. Naskenujte QR kód a v tabuľke označte všetky políčka s týmito číslami.",
+      "materials": "P3: tri rovnice s miestom na zapísanie hodnôt a QR kód. P4: štyri premiešané pásiky Lístkovho odkazu, pripravené na stole v obálke 3.",
+      "mobile": "QR z P3 → game.html?signal=sutko → tabuľka 5 stĺpcov × 7 riadkov. Pri vstupe sa papierová úloha 2 označí za prejdenú a zachová V. Označenie všetkých políčok s hodnotami troch tvarov odhalí 9, odomkne most a prinesie písmeno E.",
+      "solution": "△ = 3, ○ = 2, □ = 4. V tabuľke označte všetky políčka s číslami 2, 3 a 4 a žiadne ďalšie. Rozsvietené políčka vytvoria číslicu 9; most sa odomkne a tím získa písmeno E.",
       "hints": [
-        "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3.",
-        "Kruh má hodnotu 2 a štvorec 4. Sčítajte 3 + 2 + 4."
+        "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
+        "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
       "parent": "Po rozlúštení Iskrinho odkazu otvorte samostatnú obálku Úloha 3 s P3 pod sedadlom stoličky. Obálka 3 na stole obsahuje P4 a osobitne uzavretý P5 s označením Úloha 5 – otvoriť po zložení odkazu. P6 zostáva pod inou stoličkou v obálke 4 označenej Úloha 7. Pomôžte deťom odlepiť obálku; nábytok sa nepresúva.",
-      "transition": "Ďakujem! Už môžem podržať most pre vás aj pre kamarátov. Kvak počúva, Iskra nám svieti a ja udržím cestu pevnú. Lístkov odkaz nájdete v obálke 3 na stole; otvorte zatiaľ iba P4.",
+      "transition": "Ďalšia stopa čaká na stole. Otvorte obálku 3 a poskladajte Lístkove pásiky P4. Kubov plán P5 nechajte zatvorený na neskôr.",
       "character": "sutko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
@@ -170,11 +170,12 @@ window.GAME = {
         "before": [
           "Ahojte, ja som Šutko! Som kamenný Pixelko. Mám silné ruky a najradšej dávam pozor, aby sa moji kamaráti dostali bezpečne cez naše malé mosty. Pod nimi sa trbliecu tisíce svetelných bodiek. Vyzerajú ako hviezdy, ale ja sa pri prechádzaní radšej držím pevného zábradlia!",
           "Vďaka vám ku mne už dolieha Kvakovo volanie a vidím Iskrino svetlo. Teraz viem, kde čakajú moji kamaráti. Chcem sa k nim pridať a podržať most pre celú partiu, lenže jeho zámok mi zatiaľ nedovolí pohnúť závorou. Rozsvietili sa na ňom tri tvary: trojuholník, kruh a štvorec.",
-          "Každý tvar má vlastné číslo. V ďalšom riadku si ho stále pamätá, takže sa jeho hodnota nemení. Pomôžte mi zistiť čísla a spočítať poslednú trojicu. Výsledok zadajte do telefónu. Potom môžem skontrolovať závoru a udržať cestu pevnú, kým budeme hľadať ďalších kamarátov."
+          "Každý tvar má vlastné číslo a jeho hodnota sa nemení. Pomôžte mi zistiť všetky tri hodnoty a zapíšte ich pod rovnice. Potom naskenujte QR kód. Na otvorenej stránke rozsvieťte všetky políčka s číslami našich troch tvarov. Ukáže sa tajný znak, ktorý otvorí zámok!"
         ],
         "after": [
-          "Deväť, presne tak! Ďakujem, už môžem podržať most. Pridávam sa k Pikovi, Kvakovi a Iskre a posielam vám písmeno E. Kvak počúva, Iskra svieti a ja držím cestu. Každý robíme niečo iné, ale spolu sa už dostaneme ďalej.",
-          "Na konci mosta som našiel zatvorenú svetelnú bránu. Nie je rozbitá; svieti na nej starý nápis, ktorý ja neviem prečítať. Náš kamarát Lístok pozná takéto značky. Jeho odkaz čaká v obálke 3 na stole. Otvorte iba jeho pásiky P4. Kubov plán P5 si nechajte zatvorený na neskôr."
+          "Podarilo sa! Zámok povolil a konečne môžem podržať most!",
+          "Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.",
+          "Za vašu pomoc vám posielam písmeno E. Dobre si ho zapamätajte, ešte ho budeme potrebovať!"
         ]
       }
     },
@@ -562,6 +563,13 @@ window.GAME = {
       "duration": "cca 45–60 sekúnd",
       "model": "ElevenLabs v3",
       "prompt": "[confused, startled] Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!\n\n[happy, relieved] Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!\n\n[grateful] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!\n\n[encouraging, energetic] Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Kvak! A ešte raz ďakujem, kamaráti!\n\nCharakter hlasu: Veselý, energický, trochu komický kačací hlas. Spočiatku zmätený, po obnovení spojenia nadšený, pri zmienke o zvláštnom signáli záhadný a na konci povzbudzujúci."
+    },
+    "sutko": {
+      "title": "ŠUTKO – správa po odomknutí mosta",
+      "duration": "cca 20–25 sekúnd",
+      "model": "ElevenLabs v3",
+      "direction": "Pokojný, hlbší a srdečný mužský hlas. Šutko je silný kamenný kamarát, ktorý deťom dodáva istotu. Na začiatku úľava a radosť, potom vďačnosť. Písmeno E vysloviť zreteľne a nechať po ňom krátku pauzu. Záver je pokojný a povzbudzujúci.",
+      "prompt": "[relieved, happy] Podarilo sa! Zámok povolil a konečne môžem podržať most!\n\n[warm, grateful] Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.\n\n[gentle, clear, encouraging] Za vašu pomoc vám posielam písmeno E. Dobre si ho zapamätajte, ešte ho budeme potrebovať!"
     }
   },
   "pikoMessage": [
@@ -570,8 +578,72 @@ window.GAME = {
     "Potrebujem pomoc!",
     "Obálka jedna… v kúpeľni! Rýchlo!",
     "Ah—"
-  ]
+  ],
+  "sutkoAudio": null,
+  "sutkoPuzzle": {
+    "grid": [
+      [
+        2,
+        3,
+        4,
+        2,
+        3
+      ],
+      [
+        4,
+        1,
+        5,
+        6,
+        2
+      ],
+      [
+        3,
+        5,
+        1,
+        6,
+        4
+      ],
+      [
+        2,
+        4,
+        3,
+        2,
+        4
+      ],
+      [
+        1,
+        6,
+        5,
+        1,
+        3
+      ],
+      [
+        5,
+        1,
+        6,
+        5,
+        2
+      ],
+      [
+        4,
+        2,
+        3,
+        4,
+        2
+      ]
+    ],
+    "values": [
+      3,
+      2,
+      4
+    ],
+    "welcome": "Ďakujem, že nám pomáhate opraviť most! Jeho zámok ukrýva tajný znak. Poďme ho spolu rozsvietiť!",
+    "instruction": "Na papieri ste zistili hodnoty troch tvarov. Ťuknite na všetky políčka s týmito číslami.",
+    "toggleHint": "Opätovným ťuknutím výber zrušíte."
+  }
 };
+// The recording transcript and written result share the same authored message.
+window.GAME.sutkoMessage = window.GAME.stages.find(stage => stage.id === 'symbols').narrative.after;
 // Keep scene readers and previews on the same first-person story source.
 for (const stage of window.GAME.stages) {
   stage.story = stage.narrative.before.map(paragraph => [paragraph]);

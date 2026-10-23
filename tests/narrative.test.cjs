@@ -23,14 +23,15 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  for(let index=1;index<=8;index++){
   const stage=narrative[index],before=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="before"]`);
   if(stage.paperOnly){assert.equal(await before.count(),0,'Iskra has no phone page');assert.equal(stage.narrative.after.length,0);continue;}
-  if(index===1)assert.equal(await before.count(),0,'terminal leaves the story on paper');
+  if(index===1||index===3)assert.equal(await before.count(),0,'terminal leaves the story on paper');
   else {await before.waitFor();assert.equal(normal(await before.innerText()),normal(stage.narrative.before.join(' ')),stage.id+': readable setup');}
   assert.equal(await page.locator('.signal-content h1').innerText(),stage.label,'number and envelope place form the heading');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'phone has no horizontal overflow');
   assert.equal(await page.locator('.quest-party .party-person').count(),Math.min(index,6)+1,'party grows by one friend per task');
   if(index===3)await page.screenshot({path:'/tmp/narrative-sutko-phone.png'});
   if(index===4)assert.ok(!(await page.locator('.task-question').innerText()).includes('STÔL'),'do not print the solved strip sentence in the question');
-  if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
+  if(index===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();}
+  else if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
   else{await page.locator('#answer').fill(stage.answer[0]);await page.locator('.answer-form button').click();}
   const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);
   if(index===1){
@@ -39,6 +40,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
    assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
    await page.goto(BASE+'/game.html?signal=sutko');continue;
   }
+  if(index===3){assert.equal(normal(await page.locator('.sutko-written-message').innerText()),normal(stage.narrative.after.join(' ')));assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*neskôr/);await page.locator('[data-action="next"]').click();continue;}
   await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
   if(index===4)assert.match(await after.innerText(),/OCHRANA AKTÍVNA/);
@@ -64,8 +66,8 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   const layoutPage=await layout.newPage();
   layoutPage.on('pageerror',error=>errors.push(error.message));
   await layoutPage.goto(BASE+'/parent.html');await layoutPage.locator('[data-action="start"]').click();
-  const typography=await layoutPage.locator('.quest-story p').first().evaluate(node=>({size:parseFloat(getComputedStyle(node).fontSize),color:getComputedStyle(node).color}));
-  assert.ok(typography.size>=15);assert.equal(typography.color,'rgb(216, 227, 242)');
+  const typography=await layoutPage.locator('.sutko-welcome').first().evaluate(node=>({size:parseFloat(getComputedStyle(node).fontSize),color:getComputedStyle(node).color}));
+  assert.ok(typography.size>=12);assert.equal(typography.color,'rgb(185, 201, 225)');
   assert.ok(await layoutPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await layoutPage.screenshot({path:`/tmp/narrative-story-${width}.png`,fullPage:true});
   await layout.close();
@@ -73,7 +75,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  // Old completed paper tasks retain their letter and never require repeating the hunt.
  await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:2,completed:[1,2],hints:{}})));
  await page.goto(BASE+'/parent.html');await page.locator('[data-action="start"]').click();
- await page.locator('[data-action="notebook"]').click();assert.equal(await page.locator('.notebook-row').nth(1).locator('strong').innerText(),'V');await page.locator('.dialog-close').click();
+ assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).completed),[1,2]);assert.equal(await page.evaluate(()=>GAME.stages[2].reward),'V');
  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
  assert.equal(await page.locator('.quest-party .party-person').count(),4);
  // Every printed question uses the identical paragraph source as the live game.
@@ -83,7 +85,8 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  for(const stage of narrative){
   const article=page.locator('#gm-'+stage.id);assert.ok((await article.locator('h2').first().innerText()).includes(stage.label));
   await article.locator('.storyboard-toggle').click();
-  if(stage.id==='intro'||stage.paperOnly)assert.equal(await article.locator('.storyboard-continuation').count(),0,'intro ends at the video without a post-solution scene');
+  if(stage.id==='symbols'){assert.equal(normal((await article.locator('#sutko-message-text>div>p').allTextContents()).join(' ')),normal(stage.narrative.after.join(' ')));}
+  else if(stage.id==='intro'||stage.paperOnly)assert.equal(await article.locator('.storyboard-continuation').count(),0,'intro ends at the video without a post-solution scene');
   else assert.equal(normal(await article.locator('.quest-story[data-story-phase="after"]').innerText()),normal(stage.narrative.after.join(' ')));
   if(stage.id!=='finale')assert.equal(normal(await article.locator('.quest-story[data-story-phase="before"]').first().innerText()),normal(stage.narrative.before.join(' ')));
  }

@@ -63,8 +63,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await toggle.getAttribute('aria-expanded'),'true','keyboard expands the same stage');
    assert.ok(await block.locator('.storyboard-content').isVisible());
   }
-  assert.equal(await page.locator('[data-tts][hidden]').count(),2,'both TTS prompts start collapsed');
-  assert.equal(await page.locator('.script-copy[hidden]').count(),2,'both message transcripts start collapsed');
+  assert.equal(await page.locator('[data-tts][hidden]').count(),3,'all TTS prompts start collapsed');
+  assert.equal(await page.locator('.script-copy[hidden]').count(),3,'all message transcripts start collapsed');
   assert.equal(await page.locator('.storyboard-content>.gm-instructions').count(),10);
   assert.equal(await page.locator('#gm-envelope .adult-help').count(),1);
   assert.ok(await page.locator('#kvak-message-text').isHidden());assert.ok(await page.locator('#kvak-message-tts').isHidden());
@@ -81,7 +81,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await page.locator('#gm-envelope audio').getAttribute('src'),'assets/KvakMessage.mp3');
   assert.ok((await page.locator('#gm-intro .script-status').textContent()).includes('Prepis podľa dodaného zadania'));
   const scripts=await page.evaluate(()=>GAME.voiceScripts);
-  for(const id of ['piko','kvak'])assert.equal(await page.locator(`[data-tts="${id}"] pre`).textContent(),scripts[id].prompt,'verbatim production direction');
+  for(const id of ['piko','kvak','sutko'])assert.equal(await page.locator(`[data-tts="${id}"] pre`).textContent(),scripts[id].prompt,'verbatim production direction');
   assert.ok(scripts.piko.prompt.includes('[panicked, speaking quickly] Obálka jedna… v kúpeľni! Rýchlo!'));
   assert.ok(scripts.kvak.prompt.includes('[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!'));
   assert.equal(await page.locator('#gm-intro .script-copy>div>p').count(),5);
@@ -120,7 +120,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
    const answer=await page.evaluate(n=>GAME.stages[n].answer[0],n);
-   if(n===6){
+   if(n===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();}
+   else if(n===6){
     for(const symbol of answer.split(','))await page.locator(`[data-symbol="${symbol}"]`).click();
     await page.locator('[data-action="verify-sequence"]').click();
    }else{

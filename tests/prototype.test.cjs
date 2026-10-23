@@ -123,7 +123,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.gm-atlas').count(),0);
  assert.ok((await page.locator('#gm-cipher').textContent()).includes('OCHRANA AKTÍVNA.'));
  assert.equal(await page.locator('#gm-intro .gm-dramaturgy, #gm-envelope .gm-dramaturgy').count(),0,'first two duplicate scenarios are omitted');
- assert.equal(await page.locator('#gm-document .gm-dramaturgy').count(),1,'later dramaturgy stays available');
+ assert.equal(await page.locator('.gm-dramaturgy,.studio-stage-details').count(),0,'developer notes are removed from all stages');
  // GM stage previews remain isolated from real progress.
  await page.locator('[data-action="test"][data-stage="4"]').click();await noAtlas();
  await readScene(page);await page.locator('#answer').fill('stôl');await page.locator('.answer-form button').click();
@@ -187,9 +187,11 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.locator('[data-action="clear-sequence"]').click();await page.locator('[data-symbol="moon"]').click();
    await page.locator('[data-action="hint"]').click();assert.ok((await page.locator('#sequence').textContent()).includes('☾'));
    await page.locator('[data-symbol="sun"]').click();await page.locator('[data-symbol="star"]').click();await page.locator('[data-action="verify-sequence"]').click();
+  }else if(i===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
   }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
-  if(i<=6)assert.equal(await page.locator('.success-character').count(),1);
+  if(i<=6&&i!==3)assert.equal(await page.locator('.success-character').count(),1);
+  if(i===3)assert.equal(await page.locator('.sutko-party-scene').count(),1);
   if(i===4){await reloadAndResume(page);assert.equal(await page.locator('.success-card').count(),1,'reload preserves completed task confirmation');}
   const resolution=await readScene(page);entireJourney+=resolution;
   if(i===1){
