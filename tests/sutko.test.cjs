@@ -11,9 +11,21 @@ async function open(context){
  await page.goto(BASE+'/game.html');await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
  return {page,errors};
 }
-async function solve(page){
+async function solve(page,inspectAudio=false){
  const indices=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));
- for(const index of indices)await page.locator('[data-cell="'+index+'"]').click();
+ const touch=await page.evaluate(()=>navigator.maxTouchPoints>0);
+ for(const index of indices){const tile=page.locator('[data-cell="'+index+'"]');if(touch)await tile.tap();else await tile.click();}
+ if(inspectAudio){
+  const silent=await page.locator('audio').evaluate(audio=>{
+   const sound=audio.sutkoSound;
+   window.sutkoRewindAt=null;audio.addEventListener('seeked',()=>{sutkoRewindAt=audio.currentTime;});
+   window.sutkoAnalyser=sound.context.createAnalyser();
+   sound.gain.disconnect();sound.gain.connect(sutkoAnalyser);sutkoAnalyser.connect(sound.context.destination);
+   const samples=new Float32Array(sutkoAnalyser.fftSize);sutkoAnalyser.getFloatTimeDomainData(samples);
+   return sound.revealing&&sound.gain.gain.value===0&&samples.every(value=>value===0);
+  });
+  assert.ok(silent,'the final touch primes playback but the reveal produces no sound');
+ }
  await page.locator('.sutko-connected').waitFor();
 }
 async function fits(page,label){
@@ -50,7 +62,7 @@ async function fits(page,label){
   assert.equal(await page.locator('.sutko-grid.is-unlocking').count(),1,'the discovered nine stays in the original grid');
   assert.equal(await page.locator('.sutko-connected').count(),0);
   assert.equal(await page.locator('.sutko-cell:disabled').count(),35,'the finished grid cannot change while revealing');
-  assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.paused),'the message waits until the reveal ends');
+  assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.sutkoSound?.revealing&&audio.sutkoSound.gain.gain.value===0),'the message stays inaudible while the nine is visible');
   const blink=await page.locator('.sutko-cell[aria-pressed="true"]').first().evaluate(node=>getComputedStyle(node).animationName);assert.equal(blink,'sutko-nine-blink');
   await page.screenshot({path:'/tmp/sutko-nine-reveal.png'});
   await page.waitForTimeout(1500);assert.equal(await page.locator('.sutko-connected').count(),0,'do not switch immediately');
@@ -60,8 +72,8 @@ async function fits(page,label){
   assert.equal(await page.locator('.sutko-unlock-sign .lit').count(),21);
   assert.match(await page.locator('.sutko-party-scene').getAttribute('alt'),/Piko, Kvak, Iskra a Šutko/);
   assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*Zapamätajte[\s\S]*neskôr/);
-  assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.paused&&audio.currentTime===0),'the delayed reveal waits for a direct play gesture');
-  await page.locator('[data-action="sutko-audio-toggle"]').click();
+  await page.waitForFunction(()=>document.querySelector('audio').sutkoSound?.gain.gain.value===1);
+  assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.sutkoSound?.gain.gain.value===1),'the result releases the unlocked output');
   await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return audio&&!audio.paused&&audio.currentTime>0;});
   assert.equal(await page.locator('#sutko-audio').getAttribute('src'),await page.evaluate(()=>GAME.audio),'Kvak recording temporarily stands in for Sutko');
   await page.locator('[data-action="sutko-audio-toggle"]').click();
@@ -87,7 +99,8 @@ async function fits(page,label){
   assert.equal(tts.replace(/\[[^\]]+\]\s*/g,'').replace(/\s+/g,' ').trim(),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
   await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();
   for(const index of indices)await page.locator('[data-cell="'+index+'"]').click();
-  await page.locator('.sutko-grid.is-unlocking').waitFor();await page.locator('[data-action="exit-test"]').click();
+  await page.locator('.sutko-grid.is-unlocking').waitFor();await page.evaluate(()=>window.canceledSutko=document.querySelector('audio'));await page.locator('[data-action="exit-test"]').click();
+  assert.ok(await page.evaluate(()=>canceledSutko.paused&&canceledSutko.sutkoSound===null),'leaving during the reveal closes the silent output');
   await page.waitForTimeout(2700);assert.equal(await page.locator('.studio-header').count(),1,'leaving cancels the pending transition');
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),family,'leaving a reveal does not write into family progress');
   assert.deepEqual(errors,[]);await context.close();
@@ -103,26 +116,37 @@ async function fits(page,label){
    await page.waitForFunction(()=>document.querySelector('#sutko-audio')?.readyState>=3);
    assert.ok(await page.locator('audio').evaluate(audio=>audio.paused));
    await page.evaluate(()=>window.preloadedSutko=document.querySelector('#sutko-audio'));
-   await solve(page);assert.ok(await page.evaluate(()=>window.preloadedSutko===document.querySelector('#sutko-audio')));
-   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.paused&&audio.currentTime===0),'no timer-driven autoplay');
-   await page.locator('[data-action="sutko-audio-toggle"]').tap();
+   await page.evaluate(()=>{const audio=document.querySelector('audio'),play=audio.play.bind(audio);window.sutkoPlayCalls=0;audio.play=()=>{sutkoPlayCalls++;return play();};});
+   await solve(page,true);assert.ok(await page.evaluate(()=>window.preloadedSutko===document.querySelector('#sutko-audio')));
+   assert.equal(await page.evaluate(()=>sutkoPlayCalls),1,'the result keeps the gesture-started player running without another play call');
+   await page.waitForFunction(()=>document.querySelector('audio').sutkoSound?.gain.gain.value===1);
+   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.sutkoSound?.context.state==='running'&&audio.sutkoSound.gain.gain.value===1&&!audio.loop),'the final tile unlocks automatic playback through the same element');
    await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return !audio.paused&&audio.currentTime>0;});
-   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>!audio.muted&&audio.volume>0&&audio.duration>40&&!audio.error),'real recording is loaded and audible');
+   assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.volume>0&&audio.duration>40&&!audio.error),'the actual recording is loaded');
+   await page.waitForFunction(()=>{const samples=new Float32Array(sutkoAnalyser.fftSize);sutkoAnalyser.getFloatTimeDomainData(samples);return samples.some(value=>Math.abs(value)>.001);}); // Verify output samples, including WebKit's rerouted media, not just a playing flag.
+   assert.ok(await page.evaluate(()=>sutkoRewindAt!==null&&sutkoRewindAt<1.5),'the reveal rewinds the recording to its beginning (allowing WebKit audio-graph read-ahead)');
+   await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('hovorí'));
    assert.equal(requests,1,'preloaded audio is retained on completion');
    const button=page.locator('[data-action="sutko-audio-toggle"]');await button.click();assert.ok(await page.locator('audio').evaluate(audio=>audio.paused));
    const at=await page.locator('audio').evaluate(audio=>audio.currentTime);await button.click();await page.waitForFunction(at=>document.querySelector('#sutko-audio').currentTime>at,at);
    await page.locator('audio').evaluate(audio=>audio.playbackRate=16);await page.waitForFunction(()=>document.querySelector('#sutko-audio').ended);
    await page.waitForFunction(()=>document.querySelector('[data-action="sutko-audio-toggle"]').textContent.includes('Prehrať znova'));
-   assert.match(await button.textContent(),/Prehrať znova/);await page.locator('audio').evaluate(audio=>audio.playbackRate=1);await button.tap();await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return !audio.paused&&audio.currentTime<1;});
+   assert.match(await button.textContent(),/Prehrať znova/);await page.locator('audio').evaluate(audio=>audio.playbackRate=1);await button.tap();await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return !audio.paused&&audio.currentTime<1.5;});
    await button.click();await page.locator('[data-action="home"]').click();assert.equal(await page.locator('audio').count(),0);
-   assert.ok(await page.evaluate(()=>window.preloadedSutko.paused));
+   assert.ok(await page.evaluate(()=>window.preloadedSutko.paused&&window.preloadedSutko.sutkoSound===null),'leaving releases the primed output');
    // A denied first play remains retryable with the same explicit control.
    await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
    await page.evaluate(()=>{const audio=document.querySelector('#sutko-audio'),play=audio.play.bind(audio);let blocked=true;audio.play=()=>{if(blocked){blocked=false;return Promise.reject(new DOMException('Blocked','NotAllowedError'));}return play();};});
-   await solve(page);await page.locator('[data-action="sutko-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('Ťuknutím'));await page.locator('[data-action="sutko-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
-   // Network failure opens the exact same text; retry can recover.
-   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.locator('[data-action="sutko-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#sutko-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.match(await page.locator('#sutko-transcript').textContent(),/cestovateľov/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
-   assert.deepEqual(errors,[]);await context.close();console.log('PASS: '+engine.name()+' real mobile MP3 preload, explicit touch playback after reveal, pause/resume/replay, release, denied play and network retry.');
+   await solve(page);await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('Ťuknutím'));await page.locator('[data-action="sutko-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
+   // A denied audio-context unlock must leave the entire message ready at zero.
+   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
+   await page.evaluate(()=>{const Context=window.AudioContext;window.AudioContext=function(){const context=new Context(),resume=context.resume.bind(context);let blocked=true;context.resume=()=>{if(blocked){blocked=false;return Promise.reject(new DOMException('Blocked','NotAllowedError'));}return resume();};return context;};});
+   await solve(page);await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('Ťuknutím'));
+   assert.ok(await page.locator('audio').evaluate(audio=>audio.paused&&audio.currentTime===0),'a denied context does not consume the start of the message');
+   await page.locator('[data-action="sutko-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
+   // Network failure leaves the transcript available; retry can recover.
+   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#sutko-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.match(await page.locator('#sutko-transcript').textContent(),/cestovateľov/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
+   assert.deepEqual(errors,[]);await context.close();console.log('PASS: '+engine.name()+' real mobile MP3 preload, tap-unlocked automatic playback after reveal, pause/resume/replay, release, denied play and network retry.');
   }finally{await browser.close();}
  }
 })().catch(error=>{console.error(error);process.exit(1)});
