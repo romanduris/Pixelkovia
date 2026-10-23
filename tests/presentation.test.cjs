@@ -128,6 +128,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
     assert.equal(await page.locator('#answer').count(),1);
     await page.locator('#answer').fill(answer);await page.locator('.answer-form button').click();
    }
+   if(n===3)await page.locator('.sutko-connected').waitFor();
    assert.equal(await page.locator('.signal-stage-result').count(),1,'stage '+n+' completes');
    assert.equal(await page.locator('.scene-reader, .task-main, .task-aside').count(),0);
    assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'stage '+n+' preview is isolated');

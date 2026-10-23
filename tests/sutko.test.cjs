@@ -53,7 +53,16 @@ async function fits(page,label){
   for(const index of indices)await page.locator('[data-cell="'+index+'"]').click();
   assert.equal(await page.locator('.sutko-connected').count(),0);
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2]);
-  await page.locator('[data-cell="6"]').click();await page.locator('.sutko-connected').waitFor();
+  const revealedAt=Date.now();await page.locator('[data-cell="6"]').click();
+  assert.equal(await page.locator('.sutko-grid.is-unlocking').count(),1,'the discovered nine stays in the original grid');
+  assert.equal(await page.locator('.sutko-connected').count(),0);
+  assert.equal(await page.locator('.sutko-cell:disabled').count(),35,'the finished grid cannot change while revealing');
+  assert.ok(await page.locator('#sutko-audio').evaluate(audio=>audio.paused),'the message waits until the reveal ends');
+  const blink=await page.locator('.sutko-cell[aria-pressed="true"]').first().evaluate(node=>getComputedStyle(node).animationName);assert.equal(blink,'sutko-nine-blink');
+  await page.screenshot({path:'/tmp/sutko-nine-reveal.png'});
+  await page.waitForTimeout(1500);assert.equal(await page.locator('.sutko-connected').count(),0,'do not switch immediately');
+  await page.locator('.sutko-connected').waitFor();assert.ok(Date.now()-revealedAt>=2400,'the reveal lasts about 2.5 seconds');
+  assert.equal(await page.locator('#sutko-transcript,.sutko-written-message,.sutko-next-clue').count(),0,'speech stays behind its transcript control');
   assert.equal(await page.locator('.sutko-unlock-sign').getAttribute('aria-label'),'Odomykací znak: číslica 9');
   assert.equal(await page.locator('.sutko-unlock-sign .lit').count(),21);
   assert.match(await page.locator('.sutko-party-scene').getAttribute('alt'),/Piko, Kvak, Iskra a Šutko/);
@@ -76,9 +85,15 @@ async function fits(page,label){
   assert.equal(await page.getByRole('button',{name:'Vývojárske podklady',exact:true}).count(),0);
   await page.locator('#gm-symbols .storyboard-toggle').click();
   for(const suffix of ['text','tts']){await page.locator('[data-target="sutko-message-'+suffix+'"]').click();assert.ok(await page.locator('#sutko-message-'+suffix).isVisible());}
-  assert.ok(!(await page.locator('#sutko-message-text').innerText()).includes('Lístok'),'the recording keeps the shortened requested script');
+  assert.match(await page.locator('#sutko-message-text').innerText(),/Lístok[\s\S]*na stole/);
+  assert.ok(!(await page.locator('#sutko-message-text').innerText()).includes('písmeno E'),'the clue is displayed separately from the spoken script');
   const tts=await page.locator('#sutko-message-tts pre').textContent();
   assert.equal(tts.replace(/\[[^\]]+\]\s*/g,'').replace(/\s+/g,' ').trim(),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
+  await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();
+  for(const index of indices)await page.locator('[data-cell="'+index+'"]').click();
+  await page.locator('.sutko-grid.is-unlocking').waitFor();await page.locator('[data-action="exit-test"]').click();
+  await page.waitForTimeout(2700);assert.equal(await page.locator('.studio-header').count(),1,'leaving cancels the pending transition');
+  assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),family,'leaving a reveal does not write into family progress');
   assert.deepEqual(errors,[]);await context.close();
   console.log('PASS: exact 5×7 lock, reversible selections, saved progress, all four friends, sign 9, E, short message/TTS, next stage and isolated test; phone/desktop screens fit.');
  }finally{await browser.close();}
@@ -106,7 +121,7 @@ async function fits(page,label){
    await page.evaluate(()=>{const audio=document.querySelector('#sutko-audio'),play=audio.play.bind(audio);let blocked=true;audio.play=()=>{if(blocked){blocked=false;return Promise.reject(new DOMException('Blocked','NotAllowedError'));}return play();};});
    await solve(page);assert.match(await page.locator('#sutko-audio-status').textContent(),/Ťuknutím/);await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
    // Network failure opens the exact same text; retry can recover.
-   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.locator('#sutko-transcript').waitFor();assert.match(await page.locator('#sutko-transcript').textContent(),/písmeno E/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
+   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#sutko-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.match(await page.locator('#sutko-transcript').textContent(),/na stole/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
    assert.deepEqual(errors,[]);await context.close();console.log('PASS: '+engine.name()+' mobile audio preload, autoplay, pause/resume/replay, release, blocked autoplay and network retry.');
   }finally{await browser.close();}
  }

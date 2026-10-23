@@ -189,6 +189,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.locator('[data-symbol="sun"]').click();await page.locator('[data-symbol="star"]').click();await page.locator('[data-action="verify-sequence"]').click();
   }else if(i===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
   }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
+  if(i===3)await page.locator('.sutko-connected').waitFor();
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6&&i!==3)assert.equal(await page.locator('.success-character').count(),1);
   if(i===3)assert.equal(await page.locator('.sutko-party-scene').count(),1);

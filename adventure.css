@@ -267,8 +267,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .sutko-unlock-sign i.lit{background:#a7f2ce;box-shadow:0 0 5px #a7f2ce66}
 .sutko-party-scene{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:contain;border:1px solid #405474;border-radius:10px;background:#fff}
 .sutko-message{width:100%}
-.sutko-written-message{text-align:left}
-.sutko-written-message p+p{margin-top:8px!important}
 .sutko-connected .signal-audio-controls .btn{width:100%;min-height:44px;font-size:13px}
 .sutko-screen #sutko-audio-status{font-size:11px;margin:4px 0;min-height:16px}
 .sutko-message>.text-link{font-size:11px;min-height:32px;padding:4px 8px}
@@ -276,7 +274,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .sutko-connected .signal-reward strong{width:48px;height:48px;margin:0;font:32px/1 monospace}
 .sutko-connected .signal-reward span{font:9px/1.4 monospace;letter-spacing:.08em;color:#b9c9e1}
 .sutko-connected .signal-reward small{display:block;margin-top:4px;font-size:13px;line-height:1.4;color:#edf1ff}
-.sutko-screen .sutko-next-clue{font-size:12px;line-height:1.45;color:#b9c9e1}
 .sutko-screen .signal-content>[data-action="next"]{min-height:44px;padding:10px 14px;font-size:13px}
 @media(max-height:720px){
  .sutko-screen .signal-content{gap:7px;padding:8px 0}
@@ -286,13 +283,12 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .sutko-screen .sutko-hint{min-height:28px}
  .sutko-party-scene{max-width:360px}
  .sutko-connected .signal-reward{padding:8px 10px}
- .sutko-written-message p+p{margin-top:5px!important}
 }
 @media(orientation:landscape) and (max-height:580px) and (min-width:640px){
  .sutko-lock .signal-content{width:min(100%,800px);display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"party grid" "heading grid" "welcome grid" "instruction grid" "hint grid";gap:7px 24px;justify-items:center}
  .sutko-lock .quest-party{grid-area:party}.sutko-lock h1{grid-area:heading}.sutko-lock .sutko-welcome{grid-area:welcome}.sutko-lock #sutko-instruction{grid-area:instruction}.sutko-lock .sutko-grid{grid-area:grid}.sutko-lock .sutko-hint{grid-area:hint}
  .sutko-connected .signal-content{width:min(100%,800px);display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding:4px 0}
- .sutko-connected h1{grid-column:1/-1}.sutko-connected .sutko-unlock{grid-column:1;grid-row:2}.sutko-connected .sutko-party-scene{grid-column:1;grid-row:3}.sutko-connected .sutko-message{grid-column:2;grid-row:2/4}.sutko-connected .signal-reward{grid-column:1;grid-row:4/6}.sutko-connected .sutko-next-clue{grid-column:2;grid-row:4}.sutko-connected [data-action="next"]{grid-column:2;grid-row:5}
+ .sutko-connected h1{grid-column:1/-1}.sutko-connected .sutko-unlock{grid-column:1;grid-row:2}.sutko-connected .sutko-party-scene{grid-column:1;grid-row:3}.sutko-connected .sutko-message{grid-column:2;grid-row:2/4}.sutko-connected .signal-reward{grid-column:1;grid-row:4/6}.sutko-connected [data-action="next"]{grid-column:2;grid-row:5}
 }
 @media(orientation:portrait) and (max-height:600px){
  .signal-screen.sutko-screen{padding-top:4px;padding-bottom:8px}
@@ -303,3 +299,10 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .sutko-party-scene{max-width:290px}
  .sutko-screen .signal-content h1{font-size:20px!important}
 }
+
+/* Leave the discovered nine on the lock for 2.5 seconds before opening the bridge. */
+.sutko-grid.is-unlocking .sutko-cell:disabled{opacity:1;color:transparent;cursor:default;transition:none}
+.sutko-grid.is-unlocking .sutko-cell[aria-pressed="true"]{animation:sutko-nine-blink .8s ease-in-out 3}
+.sutko-grid.is-unlocking .sutko-cell[aria-pressed="false"]{opacity:.18}
+@keyframes sutko-nine-blink{0%,100%{opacity:1;box-shadow:0 0 14px #7ce8b677}50%{opacity:.3;box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.sutko-grid.is-unlocking .sutko-cell[aria-pressed="true"]{animation:none}}

@@ -173,9 +173,9 @@ window.GAME = {
           "Každý tvar má vlastné číslo a jeho hodnota sa nemení. Pomôžte mi zistiť všetky tri hodnoty a zapíšte ich pod rovnice. Potom naskenujte QR kód. Na otvorenej stránke rozsvieťte všetky políčka s číslami našich troch tvarov. Ukáže sa tajný znak, ktorý otvorí zámok!"
         ],
         "after": [
-          "Podarilo sa! Zámok povolil a konečne môžem podržať most!",
-          "Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.",
-          "Za vašu pomoc vám posielam písmeno E. Dobre si ho zapamätajte, ešte ho budeme potrebovať!"
+          "Podarilo sa! Zámok povolil a most drží! Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.",
+          "Počkajte… čo to svieti na konci mosta? Zamknutá brána! Je na nej zvláštny nápis. Takým značkám rozumie iba Lístok.",
+          "Jeho odkaz čaká na stole, ale rozsypal sa na pásiky. Nájdite ho a poskladajte! Musíme zistiť, ako otvoriť cestu domov!"
         ]
       }
     },
@@ -566,10 +566,10 @@ window.GAME = {
     },
     "sutko": {
       "title": "ŠUTKO – správa po odomknutí mosta",
-      "duration": "cca 20–25 sekúnd",
+      "duration": "cca 30–40 sekúnd",
       "model": "ElevenLabs v3",
-      "direction": "Pokojný, hlbší a srdečný mužský hlas. Šutko je silný kamenný kamarát, ktorý deťom dodáva istotu. Na začiatku úľava a radosť, potom vďačnosť. Písmeno E vysloviť zreteľne a nechať po ňom krátku pauzu. Záver je pokojný a povzbudzujúci.",
-      "prompt": "[relieved, happy] Podarilo sa! Zámok povolil a konečne môžem podržať most!\n\n[warm, grateful] Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.\n\n[gentle, clear, encouraging] Za vašu pomoc vám posielam písmeno E. Dobre si ho zapamätajte, ešte ho budeme potrebovať!"
+      "direction": "Pokojný, hlbší a srdečný mužský hlas. Šutko je silný kamenný kamarát, ktorý deťom dodáva istotu. Začiatok znie radostne a vďačne. Pri slove Počkajte krátka pauza, potom tichý dramatický úžas pri objavení zamknutej brány. Záver je povzbudzujúci a mierne naliehavý; nie vystrašený.",
+      "prompt": "[relieved, warm, grateful] Podarilo sa! Zámok povolil a most drží! Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.\n\n[surprised, quiet, mysterious] Počkajte… čo to svieti na konci mosta? Zamknutá brána! Je na nej zvláštny nápis. Takým značkám rozumie iba Lístok.\n\n[encouraging, slightly urgent] Jeho odkaz čaká na stole, ale rozsypal sa na pásiky. Nájdite ho a poskladajte! Musíme zistiť, ako otvoriť cestu domov!"
     }
   },
   "pikoMessage": [
