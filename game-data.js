@@ -10,7 +10,7 @@ window.GAME = {
       "id": "intro",
       "title": "Správa, ktorá nemala prísť",
       "label": "Úvod – Telefón",
-      "icon": "✉",
+      "icon": "✉️",
       "time": [
         4,
         0,
@@ -139,7 +139,7 @@ window.GAME = {
       "id": "symbols",
       "title": "Šutkov uzavretý priechod",
       "label": "Úloha 3 – Pod stoličkou",
-      "icon": "△",
+      "icon": "🪑",
       "time": [
         1,
         2,
@@ -182,7 +182,7 @@ window.GAME = {
       "id": "cipher",
       "title": "Lístkov roztrhaný odkaz",
       "label": "Úloha 4 – Stôl",
-      "icon": "▤",
+      "icon": "🧩",
       "time": [
         1,
         2,
@@ -225,7 +225,7 @@ window.GAME = {
       "id": "maze",
       "title": "Kubova cesta domov",
       "label": "Úloha 5 – Stôl",
-      "icon": "⌁",
+      "icon": "🗺️",
       "time": [
         1,
         1,
@@ -267,7 +267,7 @@ window.GAME = {
       "id": "digital",
       "title": "Ryškovo tajomstvo",
       "label": "Úloha 6 – Stôl",
-      "icon": "☾",
+      "icon": "🌙",
       "time": [
         2,
         0,
@@ -309,7 +309,7 @@ window.GAME = {
       "id": "search",
       "title": "Sľub Pixelkov",
       "label": "Úloha 7 – Pod stoličkou",
-      "icon": "⌕",
+      "icon": "🔎",
       "time": [
         1,
         4,
@@ -391,7 +391,7 @@ window.GAME = {
       "id": "finale",
       "title": "Tajomstvo zostáva doma",
       "label": "Finále – Domov",
-      "icon": "✧",
+      "icon": "✨",
       "time": [
         3,
         0,

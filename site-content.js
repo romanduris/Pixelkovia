@@ -4,11 +4,7 @@
   'use strict';
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function storyboardIcon(stage){
-    const shapes={
-      envelope:'<path d="M4 3h3a5 5 0 0 1 5 5v1M8 13a4 4 0 0 1 8 0H8ZM8 17v1m4-1v1m4-1v1M6 21v-1m6 1v-1m6 1v-1"/>',
-      document:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 3v18M4 11h16M2 21h20"/>'
-    };
-    return shapes[stage.id]?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${shapes[stage.id]}</svg>`:esc(stage.icon);
+    return esc(stage.icon);
   }
   const materials=[
     {id:'p1',task:'01',title:'Kvakove rozhádzané signály',where:'Obálka Kúpeľňa',copy:'Celý list vložte do obálky. Šesť signálov vystrihujú až deti.',status:'Hotový list A4',character:'kvak'},
