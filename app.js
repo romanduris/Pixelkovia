@@ -86,8 +86,9 @@
   }
   function signalHeader(back,label){return `<header class="signal-header"><button class="text-link" data-action="${back}">← ${preview?'Späť do storyboardu':'Prehľad hry'}</button><span class="section-kicker">PIXEL / ${label}</span><button class="text-link" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶</button></header>`;}
   function taskHints(){const n=state().stage,t=GAME.stages[n],h=Math.min(Number(state().hints[n])||0,t.hints.length);return `<div class="hint-box"><button class="text-link" data-action="hint" ${h===t.hints.length?'disabled':''}>◇ Potrebujeme nápovedu (${h}/${t.hints.length})</button><div id="hints" aria-live="polite">${t.hints.slice(0,h).map(x=>`<p>${esc(x)}</p>`).join('')}</div></div>`;}
-  function kvakRestoreScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-restore" aria-labelledby="restore-title">${signalHeader(preview?'exit-test':'home','OBNOVA LINKY')}<div class="signal-content">${STORY_TEXT.party('envelope')}<div class="eyebrow">${esc(GAME.stages[1].title)}</div><h1 id="restore-title" tabindex="-1">${esc(GAME.stages[1].label)}</h1>${STORY_TEXT.html('envelope')}<p>Našli ste šesť záznamov? Zadajte kód, ktorý vznikol ich správnym usporiadaním.</p><form class="answer-form signal-form"><label for="answer">Kód na obnovenie spojenia</label><input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" spellcheck="false" placeholder="••••••" aria-describedby="feedback" required><button class="btn" type="submit">OBNOVIŤ SPOJENIE</button></form><p class="feedback" id="feedback" role="status"></p></div><footer class="signal-footer">Záznamy zostávajú na papieri. Spojenie sa začína u vás.</footer></section>`;}
-  function kvakConnectionScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-connected success-card" aria-labelledby="connection-title">${signalHeader(preview?'exit-test':'home','SPOJENIE AKTÍVNE')}<div class="signal-content"><div class="eyebrow"><span class="status-dot"></span> LINKA 01 / OBNOVENÁ</div><h1 id="connection-title" tabindex="-1">SPOJENIE OBNOVENÉ!</h1><div class="signal-duo" aria-label="Piko a Kvak sú spolu na linke"><div class="signal-person">${sprite('piko','piko-listener')}<strong>Piko</strong><small>Na linke</small></div><div class="connection-line" aria-hidden="true"><span></span><i>✦</i><span></span></div><div class="signal-person kvak-speaker">${sprite('kvak','success-character')}<strong>Kvak</strong><small>Hlasová správa</small></div></div>${STORY_TEXT.html('envelope','after')}<p class="signal-intro">Kvakovu správu si môžete aj vypočuť.</p><audio id="kvak-audio" preload="none" src="${esc(GAME.audio)}" aria-label="Kvakova hlasová správa"></audio><div class="signal-audio-controls"><button class="btn" data-action="kvak-audio-toggle" aria-controls="kvak-audio">▶ Prehrať správu</button></div><p id="kvak-audio-status" role="status">Správu si môžete vypočuť, koľkokrát potrebujete.</p><details id="kvak-transcript" class="signal-transcript"><summary>Čítať Kvakovu správu</summary><div>${GAME.kvakMessage.map(l=>`<p>${esc(l)}</p>`).join('')}</div></details><div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>S</strong><small>Je uložená v tímovom zápisníku.</small></div><button class="btn" data-action="next">Máme ďalšiu obálku →</button><button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;}
+  function kvakRestoreScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-restore" aria-labelledby="restore-title">${signalHeader(preview?'exit-test':'home','OBNOVA LINKY')}<div class="signal-content">${STORY_TEXT.party('envelope')}<h1 id="restore-title" tabindex="-1">${esc(GAME.stages[1].label)}</h1><form class="answer-form signal-form"><label for="answer">Kód na obnovenie spojenia</label><input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" spellcheck="false" placeholder="••••••" aria-describedby="feedback" required><button class="btn" type="submit">OBNOVIŤ SPOJENIE</button></form><p class="feedback" id="feedback" role="status"></p></div></section>`;}
+  function kvakConnectionScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-connected success-card" aria-labelledby="connection-title">${signalHeader(preview?'exit-test':'home','SPOJENIE AKTÍVNE')}<div class="signal-content"><h1 id="connection-title" tabindex="-1">SPOJENIE OBNOVENÉ!</h1><div class="signal-duo" aria-label="Piko a Kvak sú spolu na linke"><div class="signal-person">${sprite('piko','piko-listener')}<strong>Piko</strong></div><div class="connection-line" aria-hidden="true"><span></span><i>✦</i><span></span></div><div class="signal-person kvak-speaker">${sprite('kvak','success-character')}<strong>Kvak</strong></div></div><p class="connection-message">Kvak! Ja vás počujem! Ďakujem, už som v spojení s Pikom.</p><audio id="kvak-audio" preload="none" src="${esc(GAME.audio)}" aria-label="Kvakova hlasová správa"></audio><div class="signal-audio-controls"><button class="btn" data-action="kvak-audio-toggle" aria-controls="kvak-audio">▶ Prehrať správu</button></div><p id="kvak-audio-status" role="status">Správu môžete prehrať opakovane.</p><button class="text-link kvak-transcript-link" data-action="read-kvak-message">Čítať Kvakovu správu</button><div class="signal-reward"><strong>S</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Dobre si zapamätajte písmeno S. Budete ho potrebovať neskôr.</small></div></div></div></section>`;}
+  function readKvakMessage(){showDialog(`<section id="kvak-transcript" class="kvak-message-reading"><h2>Kvakova správa</h2>${GAME.kvakMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
   function playKvakAudio(audio){
     if(audio.error)audio.load();
     audio.play().catch(error=>{
@@ -100,12 +101,12 @@
     const screen=audio.closest('.signal-screen'),status=app.querySelector('#kvak-audio-status'),button=app.querySelector('[data-action="kvak-audio-toggle"]');
     let failed=false;
     const idle=()=>{screen.classList.remove('is-speaking');button.textContent=audio.ended||audio.kvakReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať správu';};
-    const fallback=()=>{if(!audio.isConnected)return;failed=true;idle();button.textContent='↻ Skúsiť prehrať znova';app.querySelector('#kvak-transcript').open=true;status.textContent='Hlasovú správu sa nepodarilo prehrať. Kvakov celý odkaz si môžete prečítať nižšie a pokračovať v hre.';};
+    const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;idle();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Správu sa nepodarilo prehrať.';readKvakMessage();};
     audio.addEventListener('play',()=>{failed=false;audio.kvakReplayReady=false;screen.classList.add('is-speaking');button.textContent='Ⅱ Pozastaviť';status.textContent='Hovorí Kvak…';});
-    audio.addEventListener('pause',()=>{idle();if(failed)return;status.textContent=audio.ended?'Správa sa skončila. Môžete si ju prehrať znova.':'Správa je pozastavená. Pokračujte tým istým tlačidlom.';});
-    audio.addEventListener('ended',()=>{audio.kvakReplayReady=true;idle();status.textContent='Správa sa skončila. Môžete si ju prehrať znova.';});
+    audio.addEventListener('pause',()=>{idle();if(failed)return;status.textContent=audio.ended?'Správu si môžete prehrať znova.':'Správa je pozastavená.';});
+    audio.addEventListener('ended',()=>{audio.kvakReplayReady=true;idle();status.textContent='Správu si môžete prehrať znova.';});
     audio.addEventListener('error',fallback);audio.kvakFallback=fallback;
-    audio.kvakBlocked=()=>{idle();status.textContent='Ťuknutím na Prehrať správu spustíte Kvakov odkaz.';};
+    audio.kvakBlocked=()=>{idle();status.textContent='Ťuknutím spustíte Kvakovu správu.';};
     if(autoplay)playKvakAudio(audio);
   }
   let answerViewportFrame=0;
@@ -238,6 +239,7 @@
       if(content.hidden)content.querySelectorAll('video,audio').forEach(media=>media.pause());
       return;
     }
+    if(a==='read-kvak-message'){readKvakMessage();return;}
     if(a==='kvak-audio-toggle'){
       const audio=app.querySelector('#kvak-audio');
       if(audio){if(!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.kvakReplayReady)audio.currentTime=0;playKvakAudio(audio);}}
@@ -297,10 +299,12 @@
   modal.addEventListener('cancel',e=>{e.preventDefault();modal.querySelector('[data-action="close"]')?.click();});
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
-  // The printed QR opens the first signal without an on-screen continue action.
-  if(environment==='player' && SITE_CONFIG.access.mode==='test' && new URLSearchParams(location.search).get('signal')==='kvak'){
+  // Printed QR codes open their signal without an on-screen continue action.
+  const scannedSignal={kvak:1,iskra:2}[new URLSearchParams(location.search).get('signal')];
+  if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     if(progress.stage===0)progress.stage=1;
+    if(scannedSignal===2&&progress.completed.includes(1))progress.stage=Math.max(2,progress.stage);
     view='player';save();
   }
   render();

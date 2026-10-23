@@ -43,9 +43,25 @@ const KEY='zahada-v1-progress';
   assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
   assert.equal(await page.locator('dialog[open]').count(),0);
   await page.reload();await page.locator('.signal-restore').waitFor();
+  assert.equal(await page.locator('.quest-story').count(),0);
+  await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();
+  assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
+  assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
+  await printed.goto(BASE+'/printables.html?sheet=p2');
+  const iskraPixels=await printed.locator('.worksheet-entry-qr img').evaluate(async img=>{
+    await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
+    const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);
+    return Array.from(ctx.getImageData(0,0,392,392).data);
+  });
+  const iskra=jsQR(new Uint8ClampedArray(iskraPixels),392,392);
+  assert.equal(iskra?.data,await printed.evaluate(()=>GAME.iskraQr),'the P2 QR must decode to the next task');
+  const iskraUrl=new URL(iskra.data),iskraScan=BASE+iskraUrl.pathname+iskraUrl.search;
+  await page.goto(iskraScan);
+  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 2 – Pri okne');
+  assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1]);
   const advanced={started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{},messageWatched:true};
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:advanced});
-  await page.goto(scanUrl);
+  await page.goto(iskraScan);
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Stôl');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),advanced);
 
@@ -58,7 +74,8 @@ const KEY='zahada-v1-progress';
   const fresh=await browser.newContext(),freshPage=await fresh.newPage();
   await freshPage.goto(BASE+'/game.html?signal=unknown');
   assert.equal(await freshPage.locator('.signal-restore').count(),0);
-  await freshPage.goto(scanUrl);await freshPage.locator('.signal-restore').waitFor();
+  await freshPage.goto(iskraScan);await freshPage.locator('.signal-restore').waitFor();
+  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[],'P2 cannot skip the code');
   await fresh.close();
 
   for(const [width,height] of [[320,568],[390,844],[844,390]]){
@@ -77,6 +94,17 @@ const KEY='zahada-v1-progress';
     await preview.locator('[data-action="back-to-message"]').click();
     assert.equal(await preview.locator('.message-incoming').count(),1);
     assert.equal(await preview.evaluate(key=>localStorage.getItem(key),KEY),null,'isolated intro test preserves family progress');
+    await preview.goto(BASE+'/game.html?signal=kvak');
+    const terminalFits=()=>preview.locator('#app').evaluate(node=>node.scrollHeight<=node.clientHeight&&node.scrollWidth<=node.clientWidth);
+    assert.ok(await terminalFits(),`code terminal fits ${width}×${height}`);
+    const portraits=await preview.locator('.party-sprite').evaluateAll(nodes=>nodes.map(node=>[node.getBoundingClientRect().width,node.getBoundingClientRect().height]));
+    assert.deepEqual(portraits[0],portraits[1],'Piko and Kvak have equal portrait sizes');
+    await preview.locator('#answer').fill('000000');await preview.locator('.answer-form button').click();
+    assert.ok(await terminalFits(),`wrong-code feedback fits ${width}×${height}`);
+    await preview.locator('#answer').fill('741296');await preview.locator('.answer-form button').click();
+    await preview.locator('.signal-connected').waitFor();
+    assert.ok(await terminalFits(),`connection and S reminder fit ${width}×${height}`);
+    assert.equal(await preview.locator('[data-action="next"],[data-action="notebook"]').count(),0);
     await phone.close();
   }
   assert.deepEqual(errors,[]);

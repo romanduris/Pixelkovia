@@ -20,8 +20,8 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  await page.goto(BASE+'/game.html?signal=kvak');
  for(let index=1;index<=8;index++){
   const stage=narrative[index],before=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="before"]`);
-  await before.waitFor();
-  assert.equal(normal(await before.innerText()),normal(stage.narrative.before.join(' ')),stage.id+': readable setup');
+  if(index===1)assert.equal(await before.count(),0,'terminal leaves the story on paper');
+  else {await before.waitFor();assert.equal(normal(await before.innerText()),normal(stage.narrative.before.join(' ')),stage.id+': readable setup');}
   assert.equal(await page.locator('.signal-content h1').innerText(),stage.label,'number and envelope place form the heading');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'phone has no horizontal overflow');
   assert.equal(await page.locator('.quest-party .party-person').count(),Math.min(index,6)+1,'party grows by one friend per task');
@@ -31,7 +31,14 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   if(stage.paperOnly){assert.match(await page.locator('.signal-header').innerText(),/PAPIEROVÁ ÚLOHA/);assert.equal(await page.locator('#answer,.answer-form').count(),0);assert.ok(!(await page.locator('.signal-content').innerText()).includes('HĽADAJ POD STOLIČKAMI'),'destination must be decoded on paper');await page.locator('[data-action="paper-found"]').click();}
   else if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
   else{await page.locator('#answer').fill(stage.answer[0]);await page.locator('.answer-form button').click();}
-  const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);await after.waitFor();
+  const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);
+  if(index===1){
+   await page.locator('.signal-connected').waitFor();
+   assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
+   assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
+   await page.goto(BASE+'/game.html?signal=iskra');continue;
+  }
+  await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
   if(index===4)assert.match(await after.innerText(),/OCHRANA AKTÍVNA/);
   if(index===6)assert.match(await after.innerText(),/automaticky uzavrela/);

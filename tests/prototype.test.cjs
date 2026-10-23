@@ -68,7 +68,10 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  const noOverflow=async(p,label)=>assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label);
  async function readScene(p){
   let text='',turns=0;
-  if(await p.locator('.signal-connected').count())return p.locator('#kvak-transcript').textContent();
+  if(await p.locator('.signal-connected').count()){
+   if(!await p.locator('#kvak-transcript').isVisible())await p.locator('[data-action="read-kvak-message"]').click();
+   const transcript=await p.locator('#kvak-transcript').textContent();await p.locator('.dialog-close').click();return transcript;
+  }
   if(!await p.locator('.scene-panel').count())return '';
   while(true){
    text+='\n'+await p.locator('.scene-panel').textContent();
@@ -195,7 +198,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    assert.equal(new Set(positions).size,2,'official first and second atlas crops');
    assert.ok(resolution.includes('Kto mi lezie do signálu?!'));
    assert.ok(!resolution.includes('Pikov hlas'),'only Kvak speaks');
-   assert.ok(!(await page.locator('#kvak-transcript').getAttribute('open')),'transcript starts collapsed');
+   assert.equal(await page.locator('#kvak-transcript').isVisible(),false,'transcript dialog closes without expanding the main screen');
    assert.equal(await page.locator('.signal-audio-controls button').count(),1,'one control handles every playback state');
    await page.waitForFunction(()=>{const a=document.querySelector('#kvak-audio');return a&&!a.paused&&a.currentTime>0;});
    assert.equal(await page.locator('.is-speaking').count(),1,'correct code automatically starts Kvak');
@@ -223,7 +226,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    assert.equal(await page.locator('.signal-reward strong').textContent(),game.stages[i].reward);
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'no duplicate narrative or task page');
   }
-  await page.locator('[data-action="next"]').click();
+  if(i===1)await page.goto(BASE+'/game.html?signal=iskra');
+  else await page.locator('[data-action="next"]').click();
  }
  assert.equal(await page.locator('.finale').count(),1);entireJourney+=await readScene(page);
  assert.ok(entireJourney.includes('bezpečne vrátili'));
@@ -244,10 +248,10 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await kp.route('**/assets/KvakMessage.mpeg',route=>route.fulfill({status:404,body:'Missing audio'}));
  await kp.goto(BASE);await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[1],hints:{1:1}})));await reloadAndResume(kp);
  assert.equal(await kp.locator('.signal-connected').count(),1,'legacy first completion remains completed');
- await kp.locator('[data-action="kvak-audio-toggle"]').click();await kp.locator('#kvak-transcript[open]').waitFor();
+ await kp.locator('[data-action="kvak-audio-toggle"]').click();await kp.locator('#kvak-transcript').waitFor();
  assert.ok((await kp.locator('#kvak-audio-status').textContent()).includes('nepodarilo'));
  assert.ok((await kp.locator('#kvak-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
- await kp.locator('[data-action="next"]').click();assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[2].label);
+ await kp.goto(BASE+'/game.html?signal=iskra');assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[2].label);
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
   await kp.setViewportSize({width,height});await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[],hints:{}})));await reloadAndResume(kp);
   assert.equal(await kp.locator('.signal-restore').count(),1);await noOverflow(kp,`Kvak restore ${width}`);
@@ -283,7 +287,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.sheet:visible').count(),1,'player cannot see future worksheets');
  const sheet=page.locator('#p1');const text=await sheet.textContent();
  assert.ok(!text.includes('741296'),'no solution on worksheet');
- for(const copy of ['výborný sluch','Piko','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ KVAKOV SIGNÁL'])assert.ok(text.includes(copy),copy);
+ for(const copy of ['výborný sluch','Piko','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ KVAKOV SIGNÁL'])assert.ok(text.toLowerCase().includes(copy.toLowerCase()),copy);
  assert.equal(await sheet.locator('.signal-cutout').count(),6);assert.equal(await sheet.locator('.code-boxes span').count(),6);
  assert.equal(await sheet.locator('[role="img"][aria-label*="Kvak"]').count(),1);
  assert.equal(await sheet.locator('.kvak-print-mission li').count(),5);
