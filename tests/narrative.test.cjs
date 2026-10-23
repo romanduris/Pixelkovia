@@ -4,7 +4,9 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 const normal=text=>text.replace(/\s+/g,' ').trim();
 (async()=>{const browser=await chromium.launch({headless:true});try{
- const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage(),errors=[];
+ const context=await browser.newContext({viewport:{width:390,height:844}});
+ await context.addInitScript(()=>{HTMLElement.prototype.requestFullscreen=async()=>{};});
+ const page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
  await context.route(/\.(mp4|mpeg|mp3|wav)(\?.*)?$/i,route=>route.abort());
  await page.goto(BASE+'/parent.html');
@@ -20,23 +22,22 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  await page.goto(BASE+'/game.html?signal=kvak');
  for(let index=1;index<=8;index++){
   const stage=narrative[index],before=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="before"]`);
+  if(stage.paperOnly){assert.equal(await before.count(),0,'Iskra has no phone page');assert.equal(stage.narrative.after.length,0);continue;}
   if(index===1)assert.equal(await before.count(),0,'terminal leaves the story on paper');
   else {await before.waitFor();assert.equal(normal(await before.innerText()),normal(stage.narrative.before.join(' ')),stage.id+': readable setup');}
   assert.equal(await page.locator('.signal-content h1').innerText(),stage.label,'number and envelope place form the heading');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'phone has no horizontal overflow');
   assert.equal(await page.locator('.quest-party .party-person').count(),Math.min(index,6)+1,'party grows by one friend per task');
   if(index===3)await page.screenshot({path:'/tmp/narrative-sutko-phone.png'});
-  if(index===2)await page.screenshot({path:'/tmp/narrative-iskra-phone.png',fullPage:true});
   if(index===4)assert.ok(!(await page.locator('.task-question').innerText()).includes('STÔL'),'do not print the solved strip sentence in the question');
-  if(stage.paperOnly){assert.match(await page.locator('.signal-header').innerText(),/PAPIEROVÁ ÚLOHA/);assert.equal(await page.locator('#answer,.answer-form').count(),0);assert.ok(!(await page.locator('.signal-content').innerText()).includes('HĽADAJ POD STOLIČKAMI'),'destination must be decoded on paper');await page.locator('[data-action="paper-found"]').click();}
-  else if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
+  if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
   else{await page.locator('#answer').fill(stage.answer[0]);await page.locator('.answer-form button').click();}
   const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);
   if(index===1){
    await page.locator('.signal-connected').waitFor();
    assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
    assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
-   await page.goto(BASE+'/game.html?signal=iskra');continue;
+   await page.goto(BASE+'/game.html?signal=sutko');continue;
   }
   await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
@@ -52,8 +53,9 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  // The numbered headings and story persist when resuming an older save without new fields.
  await page.evaluate(()=>{localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:2,completed:[1],hints:{2:1}}));});
  await page.goto(BASE+'/parent.html');await page.locator('[data-action="start"]').click();
- assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 2 – Pri okne');
- assert.equal(await page.locator('[data-story-stage="document"]').count(),1);
+ assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
+ assert.equal(await page.locator('[data-story-stage="document"]').count(),0);
+ assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).completed),[1,2]);
  // Narrow screens and desktop use the same legible story; do not only check overflow.
  for(const [width,height] of [[320,640],[1440,1100]]){
   // Separate windows avoid Chromium's asynchronous native fullscreen exit when resizing.
@@ -71,9 +73,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  // Old completed paper tasks retain their letter and never require repeating the hunt.
  await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:2,completed:[1,2],hints:{}})));
  await page.goto(BASE+'/parent.html');await page.locator('[data-action="start"]').click();
- assert.equal(await page.locator('.signal-reward strong').innerText(),'V');
- assert.equal(await page.locator('[data-action="paper-found"]').count(),0);
- await page.locator('[data-action="next"]').click();
+ await page.locator('[data-action="notebook"]').click();assert.equal(await page.locator('.notebook-row').nth(1).locator('strong').innerText(),'V');await page.locator('.dialog-close').click();
  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
  assert.equal(await page.locator('.quest-party .party-person').count(),4);
  // Every printed question uses the identical paragraph source as the live game.
@@ -83,7 +83,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  for(const stage of narrative){
   const article=page.locator('#gm-'+stage.id);assert.ok((await article.locator('h2').first().innerText()).includes(stage.label));
   await article.locator('.storyboard-toggle').click();
-  if(stage.id==='intro')assert.equal(await article.locator('.storyboard-continuation').count(),0,'intro ends at the video without a post-solution scene');
+  if(stage.id==='intro'||stage.paperOnly)assert.equal(await article.locator('.storyboard-continuation').count(),0,'intro ends at the video without a post-solution scene');
   else assert.equal(normal(await article.locator('.quest-story[data-story-phase="after"]').innerText()),normal(stage.narrative.after.join(' ')));
   if(stage.id!=='finale')assert.equal(normal(await article.locator('.quest-story[data-story-phase="before"]').first().innerText()),normal(stage.narrative.before.join(' ')));
  }

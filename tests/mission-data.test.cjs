@@ -40,7 +40,7 @@ assert.equal(strips.length,4);assert.notEqual(strips.map(s=>s.order).join(''),'1
 assert.equal(strips.sort((a,b)=>a.order-b.order).map(s=>s.copy).join(' '),'STÔL SKRÝVA KUBOV PLÁN. TERAZ HO OTVORTE.');
 assert.ok(game.stages[4].answer.includes(strips[0].copy));
 // Old paper confirmations cannot silently attest the new worksheets, and game saves are retained.
-assert.equal(two.paperOnly,true);assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 zostáva pod inou stoličkou/);
+assert.equal(two.paperOnly,true);assert.equal(two.narrative.after.length,0);assert.equal(game.iskraQr,undefined);assert.ok(!/QR|telefón/i.test(sheets.p2));assert.ok(sheets.p3.includes('assets/sutko-qr.svg'));assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 zostáva pod inou stoličkou/);
 const saved=new Map([['zahada-v1-progress','existing-game'],['zahada-prep-0','1'],['zahada-prep-1','1'],['zahada-prep-2','1'],...['printed','cut-p2','envelope-2','symbols','table','supplies'].map(id=>['zahada-prep-v5-'+id,'1'])]);
 const prepContext={window:{},localStorage:{getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,value)}};
 vm.runInNewContext(fs.readFileSync('prep-store.js','utf8'),prepContext);const prep=prepContext.window.PREP_STORE;

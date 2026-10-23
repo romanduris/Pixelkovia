@@ -77,8 +77,8 @@
 .worksheet-entry-qr{position:absolute;top:0;right:0;display:grid;justify-items:center;gap:1px}
 .worksheet-entry-qr img{display:block;width:80px;height:80px}
 .worksheet-entry-qr small{font:8px/1.2 monospace}
-#p2 .worksheet-heading{min-height:94px;padding-right:94px}
-#p2 .worksheet-heading h2{max-width:100%}
+#p3 .worksheet-heading{min-height:94px;padding-right:94px}
+#p3 .worksheet-heading h2{max-width:100%}
 .worksheet-heading{position:relative;border-bottom:2px solid #233f65;padding-bottom:12px;margin-bottom:13px}
 .story-sheet h2{font:800 29px/1.1 monospace;color:#172e4d;letter-spacing:-.7px;text-transform:uppercase;margin:10px 0 2px;max-width:84%}
 .story-sheet h3{font:700 12px/1.3 monospace;letter-spacing:.3px;color:#172e4d;margin:0 0 8px}
@@ -239,9 +239,9 @@
  #p5 .worksheet-visual-row{margin:2mm 0}
  #p5 .worksheet-visual-row>.worksheet-mission{margin:0}
  #p2 .worksheet-heading,#p6 .worksheet-heading{margin-bottom:2mm}
- #p2 .worksheet-heading{min-height:20.5mm;padding-right:22mm;margin-bottom:1mm}
- #p2 .worksheet-entry-qr img{width:18mm;height:18mm}
- #p2 .worksheet-entry-qr small{font-size:5pt}
+ #p3 .worksheet-heading{min-height:20.5mm;padding-right:22mm;margin-bottom:1mm}
+ #p3 .worksheet-entry-qr img{width:18mm;height:18mm}
+ #p3 .worksheet-entry-qr small{font-size:5pt}
  #p2 .worksheet-visual-row{margin:1.5mm 0}
  #p2 .worksheet-story{padding-block:1.5mm}
  #p2 .worksheet-puzzle{padding:2mm;margin-bottom:2mm}

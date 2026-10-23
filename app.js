@@ -81,8 +81,8 @@
     const done=success||state().completed.includes(n);
     const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',5:'Zadajte tri číslice z nájdenej cesty.',6:'Zvoľte symboly v poradí z odkazu.',7:'Zadajte slovo zo sľubu Pixelkov.',8:'Zadajte spoločné návratové heslo.'}[n];
     const title=done?(t.character?'SPOJENIE OBNOVENÉ!':n===7?'SĽUB POTVRDENÝ':'NÁVRATOVÝ SIGNÁL PRIJATÝ'):t.label;
-    const controls=t.paperOnly?`<div class="paper-progress"><p>Rozlúštite odkaz na papieri a hľadajte podľa neho. Keď nájdete obálku označenú Úloha 3, pokračujte.</p><button class="btn" data-action="paper-found">Máme obálku Úloha 3 →</button></div>`:t.digital?`<div class="signal-symbols"><div class="symbol-buttons" role="group" aria-label="Výber symbolov">${['star','moon','sun'].map(k=>`<button class="symbol-btn" data-symbol="${k}" aria-label="${names[k]}">${symbols[k]}</button>`).join('')}</div><div id="sequence" class="sequence" role="status" aria-label="Vybrané symboly"></div><div class="button-row"><button class="btn" data-action="verify-sequence">Overiť poradie →</button><button class="text-link" data-action="clear-sequence">Vymazať výber ↺</button></div></div>`:`<form class="answer-form signal-form"><label for="answer">${n===8?'Návratové heslo':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${[3,5].includes(n)?'numeric':'text'}" ${n===5?'minlength="3" maxlength="3" pattern="[0-9]{3}"':'maxlength="40"'} autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
-    return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',t.paperOnly?(done?'OBÁLKA NÁJDENÁ':'PAPIEROVÁ ÚLOHA'):(done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE'))}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`<div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>${esc(t.reward)}</strong><small>Je uložená v tímovom zápisníku.</small></div>${STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${n===8?'Dokončiť bezpečný návrat':'Pokračovať'} →</button>`:`${STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p>${t.paperOnly?'':`<p class="answer-prompt">${prompt}</p>`}${controls}<p class="feedback" id="feedback" role="status"></p>${taskHints()}`}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
+    const controls=t.digital?`<div class="signal-symbols"><div class="symbol-buttons" role="group" aria-label="Výber symbolov">${['star','moon','sun'].map(k=>`<button class="symbol-btn" data-symbol="${k}" aria-label="${names[k]}">${symbols[k]}</button>`).join('')}</div><div id="sequence" class="sequence" role="status" aria-label="Vybrané symboly"></div><div class="button-row"><button class="btn" data-action="verify-sequence">Overiť poradie →</button><button class="text-link" data-action="clear-sequence">Vymazať výber ↺</button></div></div>`:`<form class="answer-form signal-form"><label for="answer">${n===8?'Návratové heslo':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${[3,5].includes(n)?'numeric':'text'}" ${n===5?'minlength="3" maxlength="3" pattern="[0-9]{3}"':'maxlength="40"'} autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
+    return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`<div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>${esc(t.reward)}</strong><small>Je uložená v tímovom zápisníku.</small></div>${STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${n===8?'Dokončiť bezpečný návrat':'Pokračovať'} →</button>`:`${STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${taskHints()}`}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
   }
   function signalHeader(back,label){return `<header class="signal-header"><button class="text-link" data-action="${back}">← ${preview?'Späť do storyboardu':'Prehľad hry'}</button><span class="section-kicker">PIXEL / ${label}</span><button class="text-link" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶</button></header>`;}
   function taskHints(){const n=state().stage,t=GAME.stages[n],h=Math.min(Number(state().hints[n])||0,t.hints.length);return `<div class="hint-box"><button class="text-link" data-action="hint" ${h===t.hints.length?'disabled':''}>◇ Potrebujeme nápovedu (${h}/${t.hints.length})</button><div id="hints" aria-live="polite">${t.hints.slice(0,h).map(x=>`<p>${esc(x)}</p>`).join('')}</div></div>`;}
@@ -138,6 +138,11 @@
     });
   }
   function render({autoplayKvak=false}={}){
+    // Old saves on the removed phone stage resume at the next playable task.
+    if(view==='player'&&state().stage===2&&state().completed.includes(1)){
+      if(!state().completed.includes(2))state().completed.push(2);
+      state().stage=3;success=false;save();
+    }
     resetAnswerViewport();
     app.classList.remove('signal-mode');
     const previousAudio=app.querySelector('#kvak-audio');
@@ -280,7 +285,7 @@
     if(a==='restart-adventure'){if(!internal || !SITE_CONFIG.access.canLaunch(PREP_STORE.ready()))return;preview=null;progress=fresh();success=false;sequence=[];start();}
     if(a==='home'){navigate('prep');}
     if(a==='stage'){state().stage=Number(b.dataset.stage);success=false;sequence=[];save();render();goTop();}
-    if(a==='test'){if(environment!=='designer' || SITE_CONFIG.access.mode!=='test')return;const n=Number(b.dataset.stage);preview={started:true,callDone:n!==0,stage:n,completed:Array.from({length:Math.max(0,n-1)},(_,i)=>i+1),hints:{}};view='player';success=false;sequence=[];if(n===0)openCall();else{requestGameFullscreen();render();goTop();}}
+    if(a==='test'){if(environment!=='designer' || SITE_CONFIG.access.mode!=='test')return;const n=Number(b.dataset.stage);if(!GAME.stages[n]||GAME.stages[n].paperOnly)return;preview={started:true,callDone:n!==0,stage:n,completed:Array.from({length:Math.max(0,n-1)},(_,i)=>i+1),hints:{}};view='player';success=false;sequence=[];if(n===0)openCall();else{requestGameFullscreen();render();goTop();}}
     if(a==='exit-test'){preview=null;navigate('designer');}
     if(a==='close'){const wasIntro=modal.classList.contains('message-modal')&&!messageReturn;closeModal();if(wasIntro){if(preview){preview=null;navigate('designer');}else{navigate('prep');}}}
     if(a==='game-fullscreen')requestGameFullscreen();
@@ -297,7 +302,6 @@
       }else{showMessage(true);}
     }
     if(a==='reopen-message')openCall(true);
-    if(a==='paper-found'&&view==='player'&&GAME.stages[state().stage].paperOnly&&!state().completed.includes(state().stage))completeTask();
     if(a==='verify-sequence')verify(sequence.join(','));
     if(a==='clear-sequence'){sequence=[];document.querySelector('#sequence').textContent='';document.querySelector('#sequence').setAttribute('aria-label','Vybrané symboly');document.querySelector('#feedback').textContent='';}
     if(a==='hint'){const s=state(),t=GAME.stages[s.stage];s.hints[s.stage]=Math.min((Number(s.hints[s.stage])||0)+1,t.hints.length);save();const input=document.querySelector('#answer')?.value;render();if(input)document.querySelector('#answer').value=input;if(t.digital){const el=document.querySelector('#sequence');el.textContent=sequence.map(k=>symbols[k]).join(' ');el.setAttribute('aria-label',sequence.map(k=>names[k]).join(', '));}document.querySelector('#hints').scrollIntoView({block:'nearest'});}
@@ -319,11 +323,14 @@
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
-  const scannedSignal={kvak:1,iskra:2}[new URLSearchParams(location.search).get('signal')];
+  const scannedSignal={kvak:1,sutko:3}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     if(progress.stage===0)progress.stage=1;
-    if(scannedSignal===2&&progress.completed.includes(1))progress.stage=Math.max(2,progress.stage);
+    if(scannedSignal===3&&progress.completed.includes(1)){
+      if(!progress.completed.includes(2))progress.completed.push(2);
+      progress.stage=Math.max(3,progress.stage);
+    }
     view='player';save();
   }
   render();

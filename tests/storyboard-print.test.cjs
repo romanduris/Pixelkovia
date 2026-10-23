@@ -36,7 +36,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
   const block=page.locator('#gm-'+id),toggle=block.locator('.storyboard-toggle');
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
   assert.equal(await block.locator('.storyboard-content>.gm-instructions').count(),1,id+': one shared Game master section');
-  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),1);
+  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),id==='document'?0:1);
   assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
  }
  assert.equal(normalize(await page.locator('#gm-digital .worksheet-text').innerText()),normalize(await printed.locator('#p5 .note').innerText()),'Ryško shows his printed greeting');
@@ -67,6 +67,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  const saved=JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}});
  await page.evaluate(saved=>localStorage.setItem('zahada-v1-progress',saved),saved);await page.reload();
  for(let stage=0;stage<10;stage++){
+  if(stage===2){assert.equal(await page.locator('#gm-document [data-action="test"]').count(),0);assert.equal(await page.locator('#gm-document .storyboard-continuation').count(),0);continue;}
   const button=page.locator(`.storyboard-head [data-action="test"][data-stage="${stage}"]`);
   assert.ok(await button.isVisible());assert.equal(await page.locator('.storyboard-content:visible').count(),0);
   await button.click();
@@ -87,5 +88,5 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom.png'});
  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom-phone.png'});
- assert.deepEqual(errors,[]);console.log('PASS: all ten isolated header tests including intro/bathroom/finale, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
+ assert.deepEqual(errors,[]);console.log('PASS: nine isolated header tests including intro/bathroom/finale, paper-only Iskra without a player test, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

@@ -6,6 +6,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
  const browser=await chromium.launch({headless:true});
  try{
   const context=await browser.newContext({viewport:{width:1440,height:1000}});
+  await context.addInitScript(()=>{HTMLElement.prototype.requestFullscreen=async()=>{};});
   const page=await context.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE);
@@ -56,7 +57,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await toggle.getAttribute('aria-expanded'),'false');
    assert.ok(!await block.locator('.storyboard-content').isVisible(),'whole stage content collapses');
    assert.ok(await block.locator('.storyboard-head h2').isVisible());
-   assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'testing stays available while the stage is collapsed');
+   if(await block.getAttribute('id')==='gm-document')assert.equal(await block.locator('[data-action="test"]').count(),0);
+   else assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'testing stays available while the stage is collapsed');
    await toggle.focus();await page.keyboard.press('Enter');
    assert.equal(await toggle.getAttribute('aria-expanded'),'true','keyboard expands the same stage');
    assert.ok(await block.locator('.storyboard-content').isVisible());
@@ -110,20 +112,21 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await page.locator('#gm-envelope .storyboard-head [data-action="test"]').count(),1);
   assert.ok(!(await page.locator('#gm-envelope').innerText()).includes('Nasleduje obálka 2'));
   // Later stage tests open only the interaction, not duplicate instruction pages.
-  for(let n=2;n<=8;n++){
+  assert.equal(await page.locator('#gm-document [data-action="test"]').count(),0,'paper Iskra has no player test');
+  assert.equal(await page.locator('#gm-document .storyboard-continuation').count(),0);
+  for(let n=3;n<=8;n++){
    await page.locator(`[data-action="test"][data-stage="${n}"]`).click();
    assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
    const answer=await page.evaluate(n=>GAME.stages[n].answer[0],n);
-   if(n===2){assert.equal(await page.locator('#answer,.answer-form').count(),0);await page.locator('[data-action="paper-found"]').click();}
-   else if(n===6){
+   if(n===6){
     for(const symbol of answer.split(','))await page.locator(`[data-symbol="${symbol}"]`).click();
     await page.locator('[data-action="verify-sequence"]').click();
    }else{
     assert.equal(await page.locator('#answer').count(),1);
     await page.locator('#answer').fill(answer);await page.locator('.answer-form button').click();
    }
-   assert.equal(await page.locator('.signal-stage-result').count(),1);
+   assert.equal(await page.locator('.signal-stage-result').count(),1,'stage '+n+' completes');
    assert.equal(await page.locator('.scene-reader, .task-main, .task-aside').count(),0);
    assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'stage '+n+' preview is isolated');
    await page.locator('.signal-header [data-action="exit-test"]').click();

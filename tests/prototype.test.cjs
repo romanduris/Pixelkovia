@@ -177,6 +177,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await reloadAndResume(page);assert.equal(await page.locator('#hints').count(),0);
  let entireJourney='';
  for(let i=1;i<=8;i++){
+  if(game.stages[i].paperOnly)continue;
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
   if(i===6){
@@ -186,7 +187,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.locator('[data-action="clear-sequence"]').click();await page.locator('[data-symbol="moon"]').click();
    await page.locator('[data-action="hint"]').click();assert.ok((await page.locator('#sequence').textContent()).includes('☾'));
    await page.locator('[data-symbol="sun"]').click();await page.locator('[data-symbol="star"]').click();await page.locator('[data-action="verify-sequence"]').click();
-  }else if(i===2){assert.equal(await page.locator('#answer').count(),0);await page.locator('[data-action="paper-found"]').click();}else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
+  }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6)assert.equal(await page.locator('.success-character').count(),1);
   if(i===4){await reloadAndResume(page);assert.equal(await page.locator('.success-card').count(),1,'reload preserves completed task confirmation');}
@@ -226,7 +227,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    assert.equal(await page.locator('.signal-reward strong').textContent(),game.stages[i].reward);
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'no duplicate narrative or task page');
   }
-  if(i===1)await page.goto(BASE+'/game.html?signal=iskra');
+  if(i===1)await page.goto(BASE+'/game.html?signal=sutko');
   else await page.locator('[data-action="next"]').click();
  }
  assert.equal(await page.locator('.finale').count(),1);entireJourney+=await readScene(page);
@@ -251,7 +252,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await kp.locator('[data-action="kvak-audio-toggle"]').click();await kp.locator('#kvak-transcript').waitFor();
  assert.ok((await kp.locator('#kvak-audio-status').textContent()).includes('nepodarilo'));
  assert.ok((await kp.locator('#kvak-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
- await kp.goto(BASE+'/game.html?signal=iskra');assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[2].label);
+ await kp.goto(BASE+'/game.html?signal=sutko');assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[3].label);
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
   await kp.setViewportSize({width,height});await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[],hints:{}})));await reloadAndResume(kp);
   assert.equal(await kp.locator('.signal-restore').count(),1);await noOverflow(kp,`Kvak restore ${width}`);

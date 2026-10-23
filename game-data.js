@@ -4,7 +4,7 @@ window.GAME = {
   "audio": "assets/KvakMessage.mp3",
   "video": "assets/PicoVideo.mp4",
   "kvakQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
-  "iskraQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=iskra",
+  "sutkoQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=sutko",
   "stages": [
     {
       "id": "intro",
@@ -68,14 +68,14 @@ window.GAME = {
       "action": "Vyberte z obálky 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
       "task": "Zoraďte záznamy od najstaršieho po najnovší. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód. Naskenujte QR kód a na otvorenej stránke skúste zadať svoj kód.",
       "materials": "P1: jeden jednostranný pracovný list A4 s Kvakovým príbehom, návodom a šiestimi otočenými vystrihovacími signálmi.",
-      "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mp3. Písmeno S sa uloží bez automatického pokračovania. Deti si ho zapamätajú; ďalej pokračujú QR kódom z P2.",
+      "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mp3. Písmeno S sa uloží bez automatického pokračovania. Deti si ho zapamätajú; ďalej pokračujú podľa Kvakovho odkazu k papierovej úlohe P2 pri okne.",
       "solution": "13. 3. 20:05 → 7; 13. 3. 20:10 → 4; 13. 3. 20:15 → 1; 14. 6. 19:50 → 2; 15. 9. 08:35 → 9; 15. 12. 08:40 → 6. Kód 741296.",
       "hints": [
         "Najprv porovnajte mesiace, potom dni. Všetky záznamy vznikli v jednom roku.",
         "Tri marcové záznamy majú rovnaký dátum. O ich poradí rozhodne presný čas: od skoršieho po neskorší."
       ],
       "parent": "Obálka 1 v kúpeľni obsahuje iba celý P1. Ústrižky vystrihujú až deti. P2 patrí do samostatnej obálky 2 pri okne. Farebná tlač je odporúčaná, čiernobiela na bielom papieri je plne hrateľná.",
-      "transition": "Vypočujte si Kvakov odkaz a zapamätajte si indíciu S. Keď nájdete P2, načítajte jeho QR kód a pokračujte Iskrinou úlohou.",
+      "transition": "Vypočujte si Kvakov odkaz a zapamätajte si indíciu S. Pri okne nájdite P2 a rozlúštite Iskrin odkaz na papieri.",
       "character": "kvak",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -110,14 +110,14 @@ window.GAME = {
       "action": "Nájdite obálku 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
       "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštenú vetu zapíšte do políčok na pracovnom liste a choďte podľa nej hľadať ďalšiu indíciu.",
       "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v obálke 2 pri okne. P3: samostatná obálka Úloha 3 prilepená zo spodnej strany sedadla stoličky.",
-      "mobile": "QR z P2 → papierová úloha bez zadávania a overovania odpovede. Až po nájdení obálky Úloha 3 deti ťuknú Máme obálku Úloha 3. Tým sa uloží V a sprístupní Šutko.",
-      "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú obálku Úloha 3 prilepenú zospodu sedadla. V telefóne sa neoveruje odpoveď.",
+      "mobile": "Čisto papierová úloha bez QR kódu, hráčskej stránky, potvrdenia a textu po vyriešení. Rozlúštená indícia vedie pod stoličky. Telefón sa použije až pri QR kóde na Šutkovom P3; vtedy sa zachová aj písmeno V.",
+      "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú obálku Úloha 3 prilepenú zospodu sedadla. Telefón sa v tejto úlohe nepoužíva.",
       "hints": [
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
       ],
       "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je pod inou stoličkou v uzavretej obálke 4 označenej Úloha 7 – otvoriť až po Ryškovom pozdrave.",
-      "transition": "Ďakujem, že ste rozlúštili môj odkaz a našli obálku Úloha 3 pod stoličkou! Moje V si odložte. Ja sa pridávam k Pikovi a Kvakovi; teraz spoločne pomôžeme Šutkovi.",
+      "transition": "Rozlúštená veta posiela deti hľadať ďalšiu indíciu pod stoličkami. Iskrina úloha sa končí na papieri, bez obrazovky po vyriešení.",
       "character": "iskra",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
@@ -129,10 +129,7 @@ window.GAME = {
           "Rozsvietila som kúsok cesty a našla som na nej odkaz od Šutka. Je to náš silný kamenný kamarát. Vie podržať most, po ktorom sa potrebujeme vrátiť domov. Ja vám môžem svietiť, ale most sama neudržím. Najprv teda musíme zistiť, kde na nás Šutko čaká.",
           "Písmená jeho odkazu sa pri rannom záhadnom bliknutí posunuli. Pomôže nám môj dekódovací stroj z dvoch papierových kruhov. Vystrihnite ich, nastavte podľa návodu a potom preložte celú správu."
         ],
-        "after": [
-          "Ďakujem! Rozlúštili ste môj odkaz a našli Šutkovu obálku pod stoličkou. Do zápisníka vám posielam V a pridávam sa k Pikovi a Kvakovi. Kvak nás dokáže počuť, ja nám zase posvietim. Už sa nám bude hľadať oveľa ľahšie!",
-          "Keď svietim na našu cestičku, vidím, že nezmizla celá. Niektoré kúsky sa ešte slabo ligocú ako drobné farebné koráliky. Možno ich spolu opravíme. Teraz otvorte obálku označenú Úloha 3, ktorú ste našli pod stoličkou. Pomôžme Šutkovi, aby sa mohol pridať aj on."
-        ]
+        "after": []
       },
       "paperOnly": true,
       "ciphertext": "KODGDM SRG VWROLFNDPL",
@@ -156,7 +153,7 @@ window.GAME = {
       "action": "Nájdite obálku označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte Šutkov list P3 a ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na karte platí △ + △ = 6, ○ + △ = 5 a □ + ○ = 6. Koľko je △ + ○ + □?",
       "materials": "P3: tri rovnice a otázka. P4: štyri premiešané pásiky Lístkovho odkazu, pripravené na stole v obálke 3.",
-      "mobile": "Overenie jedného čísla; potom pokyn otvoriť obálku 3 na stole.",
+      "mobile": "QR z P3 → game.html?signal=sutko → Šutkova úloha. Pri vstupe sa papierová úloha 2 označí za prejdenú a zachová V. Overenie jedného čísla; potom pokyn otvoriť obálku 3 na stole.",
       "solution": "△ = 3, ○ = 2, □ = 4. Súčet je 9.",
       "hints": [
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3.",

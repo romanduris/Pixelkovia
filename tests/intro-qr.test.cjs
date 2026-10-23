@@ -48,20 +48,23 @@ const KEY='zahada-v1-progress';
   assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
   assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
   await printed.goto(BASE+'/printables.html?sheet=p2');
-  const iskraPixels=await printed.locator('.worksheet-entry-qr img').evaluate(async img=>{
+  assert.equal(await printed.locator('#p2 .worksheet-entry-qr').count(),0,'Iskra has no QR');
+  assert.ok(!/QR/.test(await printed.locator('#p2').innerText()),'Iskra has no QR instructions');
+  await printed.goto(BASE+'/printables.html?sheet=p3');
+  const sutkoPixels=await printed.locator('.worksheet-entry-qr img').evaluate(async img=>{
     await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
     const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);
     return Array.from(ctx.getImageData(0,0,392,392).data);
   });
-  const iskra=jsQR(new Uint8ClampedArray(iskraPixels),392,392);
-  assert.equal(iskra?.data,await printed.evaluate(()=>GAME.iskraQr),'the P2 QR must decode to the next task');
-  const iskraUrl=new URL(iskra.data),iskraScan=BASE+iskraUrl.pathname+iskraUrl.search;
-  await page.goto(iskraScan);
-  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 2 – Pri okne');
-  assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1]);
+  const sutko=jsQR(new Uint8ClampedArray(sutkoPixels),392,392);
+  assert.equal(sutko?.data,await printed.evaluate(()=>GAME.sutkoQr),'the P3 QR must decode to Sutko');
+  const sutkoUrl=new URL(sutko.data),sutkoScan=BASE+sutkoUrl.pathname+sutkoUrl.search;
+  await page.goto(sutkoScan);
+  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
+  assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2]);
   const advanced={started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{},messageWatched:true};
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:advanced});
-  await page.goto(iskraScan);
+  await page.goto(sutkoScan);
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Stôl');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),advanced);
 
@@ -72,10 +75,12 @@ const KEY='zahada-v1-progress';
   assert.equal(await page.locator('[data-action="read-message"],[data-action="finish-call"]').count(),0);
 
   const fresh=await browser.newContext(),freshPage=await fresh.newPage();
+  await freshPage.goto(BASE+'/game.html?signal=iskra');
+  assert.equal(await freshPage.locator('[data-story-stage="document"]').count(),0,'the old Iskra URL has no task page');
   await freshPage.goto(BASE+'/game.html?signal=unknown');
   assert.equal(await freshPage.locator('.signal-restore').count(),0);
-  await freshPage.goto(iskraScan);await freshPage.locator('.signal-restore').waitFor();
-  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[],'P2 cannot skip the code');
+  await freshPage.goto(sutkoScan);await freshPage.locator('.signal-restore').waitFor();
+  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[],'P3 cannot skip Kvak’s code');
   await fresh.close();
 
   for(const [width,height] of [[320,568],[390,844],[844,390]]){
@@ -108,5 +113,5 @@ const KEY='zahada-v1-progress';
     await phone.close();
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: video ends the intro, replay/back only, printed QR decodes and starts Kvak, reload/old saves/advanced progress stay compatible, phone and landscape fit.');
+  console.log('PASS: video ends the intro, replay/back only, P1/P3 QRs decode and start Kvak/Sutko, Iskra stays offline, old URLs and advanced progress stay compatible, phone and landscape fit.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});
