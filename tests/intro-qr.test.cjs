@@ -68,7 +68,7 @@ const KEY='zahada-v1-progress';
   const advanced={started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{},messageWatched:true};
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:advanced});
   await page.goto(sutkoScan);
-  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Stôl');
+  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),advanced);
 
   // Legacy text-mode saves open the video, without bringing the removed option back.

@@ -78,14 +78,14 @@ async function fits(page,label){
    await page.setViewportSize({width,height});await fits(page,'result '+width+'×'+height);await page.screenshot({path:'/tmp/sutko-result-'+width+'-'+height+'.png'});
   }
   await page.reload();assert.equal(await page.locator('.sutko-connected').count(),1,'saved completion does not need repeating');
-  await page.locator('[data-action="next"]').click();assert.equal(await page.locator('.signal-content h1').textContent(),'Úloha 4 – Stôl');
+  await page.locator('[data-action="next"]').click();assert.equal(await page.locator('.signal-content h1').textContent(),'Úloha 4 – Pri topánkach');
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify({...saved,completed:[1,2,3]})),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');assert.equal(await page.locator('.sutko-connected').count(),1,'old completed task 3 remains valid');
   // Isolated StoryBoard tests never write the family's save or partial selections.
   const family=await page.evaluate(key=>localStorage.getItem(key),KEY);await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();await solve(page);await page.locator('[data-action="exit-test"]').click();assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),family);
   assert.equal(await page.getByRole('button',{name:'Vývojárske podklady',exact:true}).count(),0);
   await page.locator('#gm-symbols .storyboard-toggle').click();
   for(const suffix of ['text','tts']){await page.locator('[data-target="sutko-message-'+suffix+'"]').click();assert.ok(await page.locator('#sutko-message-'+suffix).isVisible());}
-  assert.match(await page.locator('#sutko-message-text').innerText(),/Lístok[\s\S]*na stole/);
+  assert.match(await page.locator('#sutko-message-text').innerText(),/Lístok[\s\S]*cestovateľov/);
   assert.ok(!(await page.locator('#sutko-message-text').innerText()).includes('písmeno E'),'the clue is displayed separately from the spoken script');
   const tts=await page.locator('#sutko-message-tts pre').textContent();
   assert.equal(tts.replace(/\[[^\]]+\]\s*/g,'').replace(/\s+/g,' ').trim(),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
@@ -121,7 +121,7 @@ async function fits(page,label){
    await page.evaluate(()=>{const audio=document.querySelector('#sutko-audio'),play=audio.play.bind(audio);let blocked=true;audio.play=()=>{if(blocked){blocked=false;return Promise.reject(new DOMException('Blocked','NotAllowedError'));}return play();};});
    await solve(page);assert.match(await page.locator('#sutko-audio-status').textContent(),/Ťuknutím/);await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
    // Network failure opens the exact same text; retry can recover.
-   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#sutko-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.match(await page.locator('#sutko-transcript').textContent(),/na stole/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
+   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.waitForFunction(()=>document.querySelector('#sutko-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#sutko-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-sutko-message"]').click();await page.locator('#sutko-transcript').waitFor();assert.match(await page.locator('#sutko-transcript').textContent(),/cestovateľov/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="sutko-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#sutko-audio').currentTime>0);
    assert.deepEqual(errors,[]);await context.close();console.log('PASS: '+engine.name()+' mobile audio preload, autoplay, pause/resume/replay, release, blocked autoplay and network retry.');
   }finally{await browser.close();}
  }

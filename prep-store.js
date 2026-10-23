@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const steps = [
-    {id:'printed', revision:'sutko-grid-v1', label:'Vytlačil som P1–P6 jednostranne na A4; P2 obsahuje oba kruhy.'},
+    {id:'printed', revision:'shoe-clue-v1', label:'Vytlačil som P1–P6 jednostranne na A4; P2 obsahuje oba kruhy.'},
     {id:'supplies', legacy:1, label:'Pripravil som štyri obálky, dva samostatné obaly, ceruzku, pásku a detské nožnice.'},
     {id:'cut-p4', revision:'party-chair-v1', label:'Z P4 som vystrihol štyri pásiky; hornú časť s príbehom a obrázkami prikladám do obálky. P1 a kruhy P2 strihajú deti.'},
     {id:'envelope-1', label:'Pripravil som obálku Kúpeľňa: obsahuje iba celý P1.'},
@@ -10,7 +10,8 @@
     {id:'envelope-2', revision:'party-chair-v1', label:'Pripravil som druhú obálku s celým Iskriným dekódovacím strojom P2.'},
     {id:'window', label:'Obálka 2 je pri okne na bezpečnom mieste na dosah detí.'},
     {id:'symbols', revision:'party-chair-v1', label:'Obálka Úloha 3 s P3 je prilepená zo spodnej strany sedadla stoličky.'},
-    {id:'table', revision:'party-chair-v1', label:'Obálka 3 je na stole: horná časť P4 s príbehom, štyri premiešané pásiky a osobitne uzavretý P5 označený „Úloha 5 – otvoriť po zložení odkazu“.'},
+    {id:'shoes', revision:'shoe-clue-v1', label:'Obálka (indícia) 3 s pripraveným P4 je ukrytá v čistej suchej topánke na dosah detí.'},
+    {id:'table', revision:'shoe-clue-v1', label:'Na stole je samostatne uzavretý P5 označený „Úloha 5 – otvoriť po zložení odkazu“.'},
     {id:'chair', revision:'party-chair-v1', label:'Obálka 4 s P6 je pod inou stoličkou než P3, označená „Úloha 7 – otvoriť až po Ryškovom pozdrave“.'},
     {id:'media', label:'Overil som čitateľnosť správ v telefóne; video a zvuk sú voliteľným doplnkom.'},
     {id:'phone', label:'Telefón je nabitý, pripravený a tím môže začať.'}

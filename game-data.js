@@ -18,12 +18,12 @@ window.GAME = {
       ],
       "action": "Otvorte Pikovu správu a zistite, čo ďalej.",
       "task": "Posledná videospráva od Pika pred prerušením spojenia. Správu si môžete opakovane prehrať.",
-      "materials": "Obálka 1 v kúpeľni; telefón s otvorenou hrou.",
+      "materials": "Indícia 1 v kúpeľni; telefón s otvorenou hrou.",
       "mobile": "Celoobrazovkový displej → úvodná správa → video → Prehrať znova alebo Späť k správe. Pokračovanie iba naskenovaním QR na P1.",
-      "solution": "Prvá obálka čaká v kúpeľni. Miesto prezradí iba Pikova videospráva; hráčsky text úkryt neprezrádza.",
+      "solution": "Prvá indícia čaká v kúpeľni. Miesto prezradí iba Pikova videospráva; hráčsky text úkryt neprezrádza.",
       "hints": [
         "Skúste si Pikovo video prehrať ešte raz.",
-        "Všimnite si najmä záver správy, kde Piko spomína prvú obálku.",
+        "Všimnite si najmä záver správy, kde Piko spomína prvú indíciu.",
         "Piko spomína kúpeľňu."
       ],
       "parent": "Obálku 1 iba s celým pracovným listom P1 ukryte v kúpeľni medzi uterákmi, do skrinky s uterákmi alebo na suchú dostupnú poličku. Nie medzi lieky a čistiace prostriedky, k elektrickým zariadeniam, do práčky ani sušičky. Miesto majú deti zistiť z Pikovej videosprávy. Nápovedy ponúkajte postupne.",
@@ -46,7 +46,7 @@ window.GAME = {
           "Nahral som vám krátku správu. Skúste sa spojiť s Kvakom, mohol by nám pomôcť!"
         ],
         "after": [
-          "Ďakujem, že mi chcete pomôcť! Ja zatiaľ počúvam pri telefóne. Nájdite prvú obálku podľa môjho videa; možno už čoskoro začujem svojho kamaráta Kvaka."
+          "Ďakujem, že mi chcete pomôcť! Ja zatiaľ počúvam pri telefóne. Nájdite prvú indíciu podľa môjho videa; možno už čoskoro začujem svojho kamaráta Kvaka."
         ]
       }
     },
@@ -65,7 +65,7 @@ window.GAME = {
         "741296"
       ],
       "placeholder": "Šesťmiestny kód",
-      "action": "Vyberte z obálky 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
+      "action": "Vyberte z indície 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
       "task": "Zoraďte záznamy od najstaršieho po najnovší. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód. Naskenujte QR kód a na otvorenej stránke skúste zadať svoj kód.",
       "materials": "P1: jeden jednostranný pracovný list A4 s Kvakovým príbehom, návodom a šiestimi otočenými vystrihovacími signálmi.",
       "mobile": "Naskenovať QR z P1 → game.html?signal=kvak → Obnova spojenia – Kvak → šesťmiestny kód 741296 → Piko a Kvak, jediná Kvakova hlasová správa z assets/KvakMessage.mp3. Písmeno S sa uloží bez automatického pokračovania. Deti si ho zapamätajú; ďalej pokračujú podľa Kvakovho odkazu k papierovej úlohe P2 pri okne.",
@@ -88,7 +88,7 @@ window.GAME = {
         ],
         "after": [
           "Kvak! Ja vás počujem! Ďakujem za pomoc. Už som na spojení s Pikom a do vášho zápisníka posielam písmeno S. Teraz sme na hľadanie dvaja Pixelkovia a váš ľudský tím. To je oveľa lepšie, než keď som tu počúval celkom sám!",
-          "Zachytil som ešte jedno tiché volanie. Myslím, že je to Iskra. Ona dokáže rozsvietiť aj tú najtmavšiu cestičku, lenže moje uši jej svetlo nenahradia. Potrebujeme ju nájsť. Ďalšia obálka čaká pri okne, tam, kde cez deň prichádza do vášho domu svetlo. Ja budem zatiaľ počúvať, či sa ozve aj niekto ďalší."
+          "Zachytil som ešte jedno tiché volanie. Myslím, že je to Iskra. Ona dokáže rozsvietiť aj tú najtmavšiu cestičku, lenže moje uši jej svetlo nenahradia. Potrebujeme ju nájsť. Ďalšia indícia čaká pri okne, tam, kde cez deň prichádza do vášho domu svetlo. Ja budem zatiaľ počúvať, či sa ozve aj niekto ďalší."
         ]
       }
     },
@@ -107,11 +107,11 @@ window.GAME = {
         "HLADAJ POD STOLICKAMI"
       ],
       "placeholder": "Rozlúštené miesto",
-      "action": "Nájdite obálku 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
+      "action": "Nájdite indíciu 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
       "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštenú vetu zapíšte do políčok na pracovnom liste a choďte podľa nej hľadať ďalšiu indíciu.",
-      "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v obálke 2 pri okne. P3: samostatná obálka Úloha 3 prilepená zo spodnej strany sedadla stoličky.",
+      "materials": "P2: Iskrin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v indícii 2 pri okne. P3: samostatná indícia Úloha 3 prilepená zo spodnej strany sedadla stoličky.",
       "mobile": "Čisto papierová úloha bez QR kódu, hráčskej stránky, potvrdenia a textu po vyriešení. Rozlúštená indícia vedie pod stoličky. Telefón sa použije až pri QR kóde na Šutkovom P3; vtedy sa zachová aj písmeno V.",
-      "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú obálku Úloha 3 prilepenú zospodu sedadla. Telefón sa v tejto úlohe nepoužíva.",
+      "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú indíciu Úloha 3 prilepenú zospodu sedadla. Telefón sa v tejto úlohe nepoužíva.",
       "hints": [
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
@@ -121,7 +121,7 @@ window.GAME = {
       "character": "iskra",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Iskrina úloha sa rieši na papieri. Šutkova obálka Úloha 3 je pod sedadlom stoličky; obálka 4 s P6 patrí pod inú stoličku a zostáva uzavretá do záveru."
+        "Iskrina úloha sa rieši na papieri. Šutkova indícia Úloha 3 je pod sedadlom stoličky; indícia 4 s P6 patrí pod inú stoličku a zostáva uzavretá do záveru."
       ],
       "narrative": {
         "before": [
@@ -150,21 +150,21 @@ window.GAME = {
         "9"
       ],
       "placeholder": "Výsledné číslo",
-      "action": "Nájdite obálku označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte Šutkov list P3 a ceruzkou si poznačte hodnotu každého tvaru.",
+      "action": "Nájdite indíciu označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte Šutkov list P3 a ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na papieri zistite hodnoty trojuholníka, kruhu a štvorca. Naskenujte QR kód a v tabuľke označte všetky políčka s týmito číslami.",
-      "materials": "P3: tri rovnice s miestom na zapísanie hodnôt a QR kód. P4: štyri premiešané pásiky Lístkovho odkazu, pripravené na stole v obálke 3.",
+      "materials": "P3: tri rovnice s miestom na zapísanie hodnôt a QR kód. P4: Lístkova indícia ukrytá v topánke; P5 zostáva samostatne na stole.",
       "mobile": "QR z P3 → game.html?signal=sutko → tabuľka 5 stĺpcov × 7 riadkov. Pri vstupe sa papierová úloha 2 označí za prejdenú a zachová V. Označenie všetkých políčok s hodnotami troch tvarov odhalí 9, odomkne most a prinesie písmeno E.",
       "solution": "△ = 3, ○ = 2, □ = 4. V tabuľke označte všetky políčka s číslami 2, 3 a 4 a žiadne ďalšie. Rozsvietené políčka vytvoria číslicu 9; most sa odomkne a tím získa písmeno E.",
       "hints": [
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
-      "parent": "Po rozlúštení Iskrinho odkazu otvorte samostatnú obálku Úloha 3 s P3 pod sedadlom stoličky. Obálka 3 na stole obsahuje P4 a osobitne uzavretý P5 s označením Úloha 5 – otvoriť po zložení odkazu. P6 zostáva pod inou stoličkou v obálke 4 označenej Úloha 7. Pomôžte deťom odlepiť obálku; nábytok sa nepresúva.",
-      "transition": "Ďalšia stopa čaká na stole. Otvorte obálku 3 a poskladajte Lístkove pásiky P4. Kubov plán P5 nechajte zatvorený na neskôr.",
+      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 nechajte samostatne uzavretý na stole s označením Úloha 5. P6 zostáva pod inou stoličkou v obálke (indícii) 4 označenej Úloha 7.",
+      "transition": "Lístkovu indíciu hľadajte pri dvojiciach cestovateľov, ktoré majú jazyk, no nerozprávajú. Na cestu vyrazia iba s vašimi nohami.",
       "character": "sutko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Iskrina úloha sa rieši na papieri. Šutkova obálka Úloha 3 je pod sedadlom stoličky; obálka 4 s P6 patrí pod inú stoličku a zostáva uzavretá do záveru."
+        "Iskrina úloha sa rieši na papieri. Šutkova indícia Úloha 3 je pod sedadlom stoličky; indícia 4 s P6 patrí pod inú stoličku a zostáva uzavretá do záveru."
       ],
       "narrative": {
         "before": [
@@ -173,17 +173,17 @@ window.GAME = {
           "Každý tvar má vlastné číslo a jeho hodnota sa nemení. Pomôžte mi zistiť všetky tri hodnoty a zapíšte ich pod rovnice. Potom naskenujte QR kód. Na otvorenej stránke rozsvieťte všetky políčka s číslami našich troch tvarov. Ukáže sa tajný znak, ktorý otvorí zámok!"
         ],
         "after": [
-          "Podarilo sa! Zámok povolil a most drží! Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.",
-          "Počkajte… čo to svieti na konci mosta? Zamknutá brána! Je na nej zvláštny nápis. Takým značkám rozumie iba Lístok.",
-          "Jeho odkaz čaká na stole, ale rozsypal sa na pásiky. Nájdite ho a poskladajte! Musíme zistiť, ako otvoriť cestu domov!"
+          "Podarilo sa! Zámok povolil a most drží! Ďakujem, kamaráti. Už môžeme bezpečne prejsť.",
+          "Počkajte… za bránou sa ozval tichý šepot. Myslím, že je to Lístok! Zanechal nám indíciu, no musíte ju nájsť.",
+          "Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov. Majú jazyk, ale nerozprávajú, a na cestu vyrazia iba s vašimi nohami. Jeden z nich ukrýva Lístkovo tajomstvo!"
         ]
       }
     },
     {
       "id": "cipher",
       "title": "Lístkov roztrhaný odkaz",
-      "label": "Úloha 4 – Stôl",
-      "icon": "🧩",
+      "label": "Úloha 4 – Pri topánkach",
+      "icon": "👟",
       "time": [
         1,
         2,
@@ -195,17 +195,17 @@ window.GAME = {
         "STÔL"
       ],
       "placeholder": "Miesto zo zloženého odkazu",
-      "action": "Z obálky 3 na stole vyberte hornú časť listu s príbehom a štyri vopred rozstrihané pásiky P4. Zoraďte ich podľa čísiel v rohoch od 1 po 4. Môžete ich spojiť papierovou páskou.",
-      "task": "Zoraďte štyri pásiky podľa čísiel v rohoch. Prečítajte zložený odkaz a do telefónu zadajte miesto, kde čaká Kubov plán. Až potom otvorte jeho samostatný obal.",
-      "materials": "P4: štyri premiešané pásiky Lístkovho odkazu. P5: Kubov plán zostáva v osobitne uzavretom obale na stole až do vyriešenia úlohy 4.",
+      "action": "Nájdite Lístkovu indíciu pri topánkach. Vyberte hornú časť listu P4 a štyri pripravené pásiky. Zoraďte ich podľa čísiel v rohoch od 1 po 4. Môžete ich spojiť papierovou páskou.",
+      "task": "Zoraďte štyri pásiky podľa čísiel v rohoch. Prečítajte zložený odkaz a do telefónu zadajte miesto, kde čaká Kubov plán. Až potom otvorte jeho samostatnú indíciu.",
+      "materials": "P4: Lístkova indícia pri topánkach. P5: Kubov plán zostáva samostatne uzavretý na stole až do vyriešenia úlohy 4.",
       "mobile": "Slovná odpoveď STÔL odomkne písmeno T a sprístupní Kubov plán P5 na stole.",
       "solution": "Pásiky v poradí 1–4 vytvoria STÔL / SKRÝVA / KUBOV PLÁN. / TERAZ HO OTVORTE. Odpoveď je STÔL; uznáva sa aj STOL.",
       "hints": [
         "Malé čísla v rohoch určujú poradie štyroch pásikov.",
         "Začnite pásikom s číslom 1. Veta sa začína slovom STÔL."
       ],
-      "parent": "Z P4 vystrihnite štyri pásiky, premiešajte a spolu s hornou časťou listu s príbehom a obrázkami vložte do obálky 3 na stole. P5 nechajte osobitne uzavretý s označením Úloha 5 – otvoriť po zložení odkazu.",
-      "transition": "STÔL ukázal miesto ďalšej stopy. Lístok varuje: nič neotvárajte nasilu. Na stole otvorte samostatný obal s Kubovým plánom P5 a nájdite bezpečnú cestu.",
+      "parent": "Hornú časť P4 a štyri premiešané pásiky vložte do obálky (indície) 3 a ukryte do čistej suchej topánky na dosah detí. P5 nechajte samostatne uzavretý na stole s označením Úloha 5 – otvoriť po zložení odkazu.",
+      "transition": "STÔL ukázal miesto ďalšej stopy. Lístok varuje: nič neotvárajte nasilu. Na stole otvorte samostatnú indíciu s Kubovým plánom P5 a nájdite bezpečnú cestu.",
       "character": "listok",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -218,7 +218,7 @@ window.GAME = {
         ],
         "after": [
           "Ďakujem! Môj odkaz už zase dáva zmysel a vám patrí písmeno T. Teraz som s Pikom, Kvakom, Iskrou a Šutkom. Našli sme sa vďaka vašej pomoci! A ja už viem, čo nám brána oznamuje: OCHRANA AKTÍVNA. Znamená to, že nás chráni a máme sa najprv všetci pripraviť na návrat.",
-          "Nemusíme ju búrať ani sa jej báť. Potrebujeme pevnú cestu až k nej, aby po nej prešiel každý kamarát. Otvorte teraz samostatný obal s Kubovým plánom P5 na stole. Kubo vie spájať aj také diely, s ktorými si moje papierové stránky vôbec neporadia!"
+          "Nemusíme ju búrať ani sa jej báť. Potrebujeme pevnú cestu až k nej, aby po nej prešiel každý kamarát. Otvorte teraz samostatnú indíciu s Kubovým plánom P5 na stole. Kubo vie spájať aj také diely, s ktorými si moje papierové stránky vôbec neporadia!"
         ]
       }
     },
@@ -237,7 +237,7 @@ window.GAME = {
         "246"
       ],
       "placeholder": "Tri číslice z cesty",
-      "action": "Otvorte samostatný obal P5 z obálky 3. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
+      "action": "Na stole nájdite samostatnú indíciu s Kubovým plánom P5. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
       "task": "Sledujte spojité potrubie až k jadru. Odbočky končia bez výstupu. Prečítajte tri čísla na úspešnej ceste v poradí od vstupu.",
       "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; poznámka o noci, dni a hviezde.",
       "mobile": "Trojmiestny kód otvorí digitálny ovládací panel.",
@@ -260,7 +260,7 @@ window.GAME = {
         ],
         "after": [
           "Dva, štyri, šesť! Klik, klak, posledné diely držia. Ďakujem, stavitelia! Do zápisníka vám pridávam L. Teraz už máme spoločnú cestu a sme na nej spolu s Pikom, Kvakom, Iskrou, Šutkom a Lístkom. Bez ich pomoci by som svoje diely nemal kam pripevniť.",
-          "Chýba nám ešte Ryško. Pri bráne vidím jeho malé oranžové svetielko. Ryško stráži naše tajomstvo a potrebuje spoznať, že sa blížia priatelia. Pod plán som vám napísal náš pozdrav. Zostaňte pri stole a použite ho pri ďalšej úlohe v telefóne; novú obálku teraz nehľadajte."
+          "Chýba nám ešte Ryško. Pri bráne vidím jeho malé oranžové svetielko. Ryško stráži naše tajomstvo a potrebuje spoznať, že sa blížia priatelia. Pod plán som vám napísal náš pozdrav. Zostaňte pri stole a použite ho pri ďalšej úlohe v telefóne; novú indíciu teraz nehľadajte."
         ]
       }
     },
@@ -289,7 +289,7 @@ window.GAME = {
         "Poradie je mesiac, slnko, hviezda."
       ],
       "parent": "Odhalenie príčiny sa zobrazí až po správnej sekvencii. Zdôraznite, že Ochranné pole všetkých chránilo a nikto nie je zranený.",
-      "transition": "Ďakujem za pozdrav! Teraz sme všetci na spojení. Posledný odkaz nájdete v obálke 4 označenej Úloha 7 pod inou stoličkou pri stole.",
+      "transition": "Ďakujem za pozdrav! Teraz sme všetci na spojení. Posledný odkaz nájdete v indícii označenej Úloha 7 pod inou stoličkou pri stole.",
       "character": "rysko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -302,7 +302,7 @@ window.GAME = {
         ],
         "after": [
           "To ste vy! Ďakujem za pozdrav, už vás počujem a konečne sa môžem pridať. Posielam vám O. Teraz sme tu všetci: ja, Piko, Kvak, Iskra, Šutko, Lístok aj Kubo. Vy ste nám pomohli znovu sa nájsť a každý kamarát pridal niečo, čo ostatní sami nedokážu.",
-          "Prezradím vám, čo sa stalo: keď ráno cesty zablikali, naša svetelná brána sa automaticky uzavrela. Chránila naše domčeky, aby ich nikto zvonku nezbadal. Teraz ju môžeme pripraviť na návrat. Najprv si však pripomenieme náš spoločný sľub. Obálka 4 označená Úloha 7 čaká pod inou stoličkou pri stole; túto stopu sme si nechali na záver."
+          "Prezradím vám, čo sa stalo: keď ráno cesty zablikali, naša svetelná brána sa automaticky uzavrela. Chránila naše domčeky, aby ich nikto zvonku nezbadal. Teraz ju môžeme pripraviť na návrat. Najprv si však pripomenieme náš spoločný sľub. Indícia označená Úloha 7 čaká pod inou stoličkou pri stole; túto stopu sme si nechali na záver."
         ]
       }
     },
@@ -321,9 +321,9 @@ window.GAME = {
         "SPOLU"
       ],
       "placeholder": "Slovo z piatich riadkov",
-      "action": "Nájdite obálku 4 pod sedadlom inej dostupnej stoličky pri stole než pri úlohe 3. Má označenie Úloha 7 – otvoriť až po Ryškovom pozdrave. Vyberte sľub Pixelkov a kartu poradia.",
+      "action": "Nájdite indíciu k úlohe 7 pod sedadlom inej dostupnej stoličky pri stole než pri úlohe 3. Má označenie Úloha 7 – otvoriť až po Ryškovom pozdrave. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
-      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; obálka 4.",
+      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; indícia k úlohe 7.",
       "mobile": "Overí slovo SPOLU a uloží kartu poradia do zápisníka.",
       "solution": "Prvé písmená viet tvoria SPOLU. Karta určuje poradie šiestich nazbieraných písmen podľa úloh.",
       "hints": [
@@ -339,7 +339,7 @@ window.GAME = {
         "before": [
           "Ahojte, tu som zase ja, Piko! Pozrite, koľko nás už stojí spolu na svietiacej ceste. Na začiatku som pri telefóne čakal celkom sám. Teraz počujem Kvaka, vidím Iskrino svetlo a vedľa mňa sú Šutko, Lístok, Kubo aj Ryško. Vy ste nás postupne našli a pomohli každému, kto niečo sám nezvládol.",
           "K domčeku už je to len cez poslednú bránu. Ja však neviem svietiť ako Iskra, podržať most ako Šutko ani opravovať spoje ako Kubo. Každý z nás potrebuje ostatných. Aj preto máme v našom svete jeden starý sľub: keď sa niekto stratí, kamaráti ho nenechajú samého.",
-          "Ten sľub nájdete na papieri z poslednej obálky. Prečítajte prvé písmeno každého z piatich riadkov, pekne zhora nadol. Vytvoria slovo, ktoré nám pripomenie, ako sa vrátime domov. Potvrďte ho v telefóne a kartu zo spodnej časti listu si odložte. Ešte nám pri poslednom kroku pomôže!"
+          "Ten sľub nájdete na papieri z poslednej indície. Prečítajte prvé písmeno každého z piatich riadkov, pekne zhora nadol. Vytvoria slovo, ktoré nám pripomenie, ako sa vrátime domov. Potvrďte ho v telefóne a kartu zo spodnej časti listu si odložte. Ešte nám pri poslednom kroku pomôže!"
         ],
         "after": [
           "SPOLU! Presne tak, ďakujem. Sám by som kamarátov nenašiel, ale s vami sme to dokázali. Teraz sa o návrat postaráme všetci. Každý si nájde svoje miesto pri ceste a ja skontrolujem, či nikto nechýba. Nikam sa neponáhľame; dôležité je, aby sme prešli celá partia.",
@@ -498,7 +498,7 @@ window.GAME = {
     "Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.",
     "Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.",
     "Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!",
-    "Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!",
+    "Nájdite ďalšiu indíciu tam, kde cez deň do vášho domu prichádza svetlo!",
     "Kvak! A ešte raz ďakujem, kamaráti!"
   ],
   "signalRecords": [
@@ -556,27 +556,29 @@ window.GAME = {
       "title": "PIKO – úvodná videospráva",
       "duration": "cca 7 sekúnd",
       "model": "ElevenLabs v3",
-      "prompt": "[curious, whispering] Haló? Vidíte ma?\n\n[surprised, excited] Ja som Piko!\n\n[worried, urgent] Potrebujem pomoc!\n\n[panicked, speaking quickly] Obálka jedna… v kúpeľni! Rýchlo!\n\n[connection breaking, voice fading] Ah—\n\nCharakter hlasu: Mladý, mierne vyššie položený mužský hlas. Zo začiatku zvedavý, potom prekvapený a na konci naliehavý až vystrašený. Posledné slová majú znieť ako prerušované spojenie."
+      "prompt": "[curious, whispering] Haló? Vidíte ma?\n\n[surprised, excited] Ja som Piko!\n\n[worried, urgent] Potrebujem pomoc!\n\n[panicked, speaking quickly] Indícia jedna… v kúpeľni! Rýchlo!\n\n[connection breaking, voice fading] Ah—\n\nCharakter hlasu: Mladý, mierne vyššie položený mužský hlas. Zo začiatku zvedavý, potom prekvapený a na konci naliehavý až vystrašený. Posledné slová majú znieť ako prerušované spojenie.",
+      "recordingStatus": "Text a TTS používajú nové názvoslovie. Existujúca nahrávka zatiaľ obsahuje staršie znenie."
     },
     "kvak": {
       "title": "KVAK – prvá správa po obnovení spojenia",
       "duration": "cca 45–60 sekúnd",
       "model": "ElevenLabs v3",
-      "prompt": "[confused, startled] Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!\n\n[happy, relieved] Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!\n\n[grateful] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!\n\n[encouraging, energetic] Nájdite ďalšiu obálku tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Kvak! A ešte raz ďakujem, kamaráti!\n\nCharakter hlasu: Veselý, energický, trochu komický kačací hlas. Spočiatku zmätený, po obnovení spojenia nadšený, pri zmienke o zvláštnom signáli záhadný a na konci povzbudzujúci."
+      "prompt": "[confused, startled] Kvak? Kvak! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Kvak! Toto musím povedať Pikovi!\n\n[happy, relieved] Jééj! Už ho vidím! Piko je tu! Konečne sme zase v spojení!\n\n[grateful] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, som zachytil zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že Iskra by nám mohla pomôcť. Ona vie nájsť aj to, čo ostatní nevidia.\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz… len sa nám roztrhal na kúsky!\n\n[encouraging, energetic] Nájdite ďalšiu indíciu tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Kvak! A ešte raz ďakujem, kamaráti!\n\nCharakter hlasu: Veselý, energický, trochu komický kačací hlas. Spočiatku zmätený, po obnovení spojenia nadšený, pri zmienke o zvláštnom signáli záhadný a na konci povzbudzujúci.",
+      "recordingStatus": "Text a TTS používajú nové názvoslovie. Existujúca nahrávka zatiaľ obsahuje staršie znenie."
     },
     "sutko": {
       "title": "ŠUTKO – správa po odomknutí mosta",
-      "duration": "cca 30–40 sekúnd",
+      "duration": "cca 35–45 sekúnd",
       "model": "ElevenLabs v3",
-      "direction": "Pokojný, hlbší a srdečný mužský hlas. Šutko je silný kamenný kamarát, ktorý deťom dodáva istotu. Začiatok znie radostne a vďačne. Pri slove Počkajte krátka pauza, potom tichý dramatický úžas pri objavení zamknutej brány. Záver je povzbudzujúci a mierne naliehavý; nie vystrašený.",
-      "prompt": "[relieved, warm, grateful] Podarilo sa! Zámok povolil a most drží! Ďakujem vám, kamaráti. Piko, Kvak aj Iskra už môžu bezpečne prejsť.\n\n[surprised, quiet, mysterious] Počkajte… čo to svieti na konci mosta? Zamknutá brána! Je na nej zvláštny nápis. Takým značkám rozumie iba Lístok.\n\n[encouraging, slightly urgent] Jeho odkaz čaká na stole, ale rozsypal sa na pásiky. Nájdite ho a poskladajte! Musíme zistiť, ako otvoriť cestu domov!"
+      "direction": "Pokojný, hlbší a srdečný mužský hlas. Začiatok znie radostne a vďačne. Pri slove Počkajte krátka pauza, potom tiché dramatické napätie. Hádanku povedať zvedavo, pomalšie a s krátkymi pauzami, aby deti stihli premýšľať. Neprezrádzať miesto priamo.",
+      "prompt": "[relieved, warm, grateful] Podarilo sa! Zámok povolil a most drží! Ďakujem, kamaráti. Už môžeme bezpečne prejsť.\n\n[surprised, whispering, mysterious] Počkajte… za bránou sa ozval tichý šepot. Myslím, že je to Lístok! Zanechal nám indíciu, no musíte ju nájsť.\n\n[curious, conspiratorial, unhurried] Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov. Majú jazyk, ale nerozprávajú, a na cestu vyrazia iba s vašimi nohami. Jeden z nich ukrýva Lístkovo tajomstvo!"
     }
   },
   "pikoMessage": [
     "Haló? Vidíte ma?",
     "Ja som Piko!",
     "Potrebujem pomoc!",
-    "Obálka jedna… v kúpeľni! Rýchlo!",
+    "Indícia jedna… v kúpeľni! Rýchlo!",
     "Ah—"
   ],
   "sutkoAudio": "assets/KvakMessage.mp3",
