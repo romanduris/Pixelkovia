@@ -143,7 +143,7 @@
     if(stageId==='code')return sheet.querySelector('.card').outerHTML;
     sheet.querySelector('.worksheet-heading .label')?.remove();
     sheet.querySelector('.worksheet-heading .print-wave')?.remove();
-    sheet.querySelectorAll('.sheet-avatar,.footer,.no-print,.worksheet-scene,svg,.circles').forEach(node=>node.remove());
+    sheet.querySelectorAll('.sheet-avatar,.footer,.no-print,.worksheet-scene,.worksheet-entry-qr,svg,.circles').forEach(node=>node.remove());
     return sheet.innerHTML;
   }
   function parentGuide() {
