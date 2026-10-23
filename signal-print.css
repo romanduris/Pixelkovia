@@ -104,9 +104,9 @@
 .worksheet-secret{margin:13px 0}
 .worksheet-answer{margin:13px 0;break-inside:avoid;background:#fff}
 .worksheet-answer h3{margin:0 0 5px}
-.decoded-letter-boxes{display:flex;flex-wrap:wrap;gap:8px 12px;padding:4px 0}
-.decoded-word{display:flex;gap:2px}
-.decoded-letter{display:block;width:clamp(18px,3vw,28px);height:clamp(18px,3vw,28px);border:1px solid #8096b1}
+.decoded-letter-boxes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 12px;padding:4px 0}
+.decoded-word{display:flex;flex:none;gap:2px}
+.decoded-letter{display:block;flex:none;width:clamp(20px,4vw,34px);height:clamp(20px,4vw,34px);border:1px solid #8096b1}
 .story-sheet .code{color:#172e4d;font:28px/1.4 monospace;letter-spacing:5px;border:1px solid #8096b1;padding:10px;margin:0}
 .symbol-puzzle .equations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0;font:30px/1.4 monospace;color:#172e4d}
 .equation-clue{border:1px solid #ced9e6;background:#fbfcfe;padding:12px 8px;text-align:center}
@@ -249,8 +249,8 @@
  #p2 .worksheet-answer{margin:0 0 2mm}
  #p2 .worksheet-answer h3{font-size:8pt;margin:0 0 .5mm}
  #p2 .decoded-letter-boxes{gap:4mm;padding:1mm 0}
- #p2 .decoded-word{gap:.7mm}
- #p2 .decoded-letter{width:7mm;height:7mm}
+ #p2 .decoded-word{gap:.4mm}
+ #p2 .decoded-letter{width:8.5mm;height:8.5mm}
  #p2 .circles svg:first-child{width:68mm}
  #p2 .circles svg:last-child{width:49.725mm}
  #p2 .footer{padding-top:1mm}
