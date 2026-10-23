@@ -39,6 +39,8 @@
 .parent-guide .gm-solution h4{font:700 10px/1.3 Arial,sans-serif;margin:0 0 3px;color:#244738}
 .parent-guide .storyboard-answer{display:block;font:700 14px/1.3 monospace;color:#244738;margin-bottom:3px}
 .parent-guide .gm-solution p:last-child{margin-bottom:0}
+.parent-guide p.intro-solution{padding:0;background:none;border:0;margin:0;color:inherit}
+.parent-guide .intro-solution strong{color:#234c71}
 .parent-guide .footer{position:static;display:flex;justify-content:space-between;gap:10px;border-top:1px solid #9aaec6;padding:8px 0 0;margin:13px 0 0;font:8px/1.4 monospace;color:#334d70}
 @media screen{header nav{flex-wrap:wrap}body:has(.parent-guide) .sheet:not(.kvak-sheet){scroll-margin-top:25px}}
 @media screen and (max-width:600px){.parent-guide{padding:20px}.parent-guide .guide-heading{align-items:flex-start}.parent-guide h2{font-size:23px}.guide-stamp{display:none}.parent-guide .guide-intro,.guide-stages{grid-template-columns:1fr}.parent-guide .guide-intro p,.parent-guide .adult-help p,.parent-guide p.gm-solution,.parent-guide .gm-solution p{font-size:14px;line-height:1.5}.guide-safety{display:block;font-size:12px}.guide-safety p{margin-top:4px}.guide-section-label{display:block}.guide-section-label span{display:block;margin:5px 0}.parent-guide .footer{flex-direction:column}.guide-stage{padding:12px}.parent-guide .guide-stage-heading h3{font-size:15px}}
@@ -67,6 +69,7 @@
   .parent-guide .gm-solution{padding:.8mm 1.5mm;margin:1mm 0 0}
   .parent-guide p.gm-solution{margin-bottom:0}
   .parent-guide .gm-solution h4{font-size:7pt;margin-bottom:.5mm}
+  .parent-guide p.intro-solution{padding:0;margin:0}
   .parent-guide .storyboard-answer{font-size:10pt;margin-bottom:.5mm}
   .parent-guide .footer{display:flex;font-size:5.5pt;margin-top:1.5mm;padding-top:1mm}
 }

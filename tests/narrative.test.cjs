@@ -76,7 +76,8 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  for(const stage of narrative){
   const article=page.locator('#gm-'+stage.id);assert.ok((await article.locator('h2').first().innerText()).includes(stage.label));
   await article.locator('.storyboard-toggle').click();
-  assert.equal(normal(await article.locator('.quest-story[data-story-phase="after"]').innerText()),normal(stage.narrative.after.join(' ')));
+  if(stage.id==='intro')assert.equal(await article.locator('.storyboard-continuation').count(),0,'intro ends at the video without a post-solution scene');
+  else assert.equal(normal(await article.locator('.quest-story[data-story-phase="after"]').innerText()),normal(stage.narrative.after.join(' ')));
   if(stage.id!=='finale')assert.equal(normal(await article.locator('.quest-story[data-story-phase="before"]').first().innerText()),normal(stage.narrative.before.join(' ')));
  }
  assert.deepEqual(errors,[]);
