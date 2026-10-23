@@ -187,7 +187,7 @@ body[data-environment="designer"] .storyboard-heading{min-width:0}
 body[data-environment="designer"] .storyboard-heading .section-kicker{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0 0 5px}
 body[data-environment="designer"] .storyboard-heading h2{font-size:clamp(18px,2.1vw,30px);line-height:1.25;white-space:nowrap;margin:0}
 body[data-environment="designer"] .storyboard-head>.storyboard-test{margin:0;min-height:44px;padding:8px;font-size:12px;white-space:nowrap;justify-self:stretch}
-/* Keep all ten closed stages visible in a desktop window beside the editor. */
+/* Keep all closed stages visible in a desktop window beside the editor. */
 @media screen and (min-width:701px){
  body[data-environment="designer"]>.site-header{height:64px;gap:20px}
  body[data-environment="designer"] .storyboard-brand{font-size:21px}

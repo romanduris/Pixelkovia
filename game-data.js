@@ -1,6 +1,6 @@
 window.GAME = {
   "title": "Pixelkovia: Stratený signál",
-  "version": 4,
+  "version": 5,
   "audio": "assets/KvakMessage.mp3",
   "video": "assets/PicoVideo.mp4",
   "kvakQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
@@ -118,7 +118,7 @@ window.GAME = {
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
       ],
-      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je pod inou stoličkou v uzavretej obálke 4 označenej Úloha 7 – otvoriť až po Ryškovom pozdrave.",
+      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je pod inou stoličkou v uzavretej obálke 4 označenej Úloha 6 – otvoriť po opravení Kubovej cesty.",
       "transition": "Rozlúštená veta posiela deti hľadať ďalšiu indíciu pod stoličkami. Iskrina úloha sa končí na papieri, bez obrazovky po vyriešení.",
       "character": "iskra",
       "dramaturgy": [
@@ -161,7 +161,7 @@ window.GAME = {
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
-      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 nechajte samostatne uzavretý na stole s označením Úloha 5. P6 zostáva pod inou stoličkou v obálke (indícii) 4 označenej Úloha 7.",
+      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 nechajte samostatne uzavretý na stole s označením Úloha 5. P6 zostáva pod inou stoličkou v obálke (indícii) 4 označenej Úloha 6.",
       "transition": "Lístkovu indíciu hľadajte pri dvojiciach cestovateľov, ktoré majú jazyk, no nerozprávajú. Na cestu vyrazia iba s vašimi nohami.",
       "character": "sutko",
       "dramaturgy": [
@@ -241,15 +241,15 @@ window.GAME = {
       "placeholder": "Tri číslice z cesty",
       "action": "Na stole nájdite samostatnú indíciu s Kubovým plánom P5. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
       "task": "Sledujte spojité potrubie až k jadru. Odbočky končia bez výstupu. Prečítajte tri čísla na úspešnej ceste v poradí od vstupu.",
-      "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; poznámka o noci, dni a hviezde.",
-      "mobile": "Trojmiestny kód otvorí digitálny ovládací panel.",
+      "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; smerovanie k poslednej indícii.",
+      "mobile": "Trojmiestny kód opraví Kubovu cestu. Potom sa pokračuje priamo sľubom Pixelkov v úlohe 6.",
       "solution": "Jediná cesta k jadru vedie cez 2 → 4 → 6, teda 246.",
       "hints": [
         "Slepé odbočky nepatria do kódu. Môžete začať aj pri jadre a ísť naspäť.",
         "Na správnej ceste sú čísla 2, 4 a 6."
       ],
       "parent": "Ide o jednoduchý pracovný potrubný plán, nie finálne ilustrované bludisko. Mechanika aj tlač sú funkčné; obtiažnosť treba otestovať.",
-      "transition": "„Moje písmeno je L!“ Kubo poskladá návratovú cestu. „Zostáva Ryško. Jeho pozdrav nájdete pod plánom.“",
+      "transition": "Kubo pridá L a cesta dosiahne Ryškovu bránu. Posledná indícia s úlohou 6 čaká pod inou stoličkou pri stole.",
       "character": "kubo",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -261,98 +261,57 @@ window.GAME = {
           "Pomôžte mi s papierovým plánom. Potrubie na obrázku ukazuje našu cestu: sledujte ho od vstupu až k jadru. Niektoré odbočky sa končia naslepo, tie preskočte. Tri čísla na správnej trase zadajte do telefónu. Ja podľa nich spojím diely tak, aby sme sa po ceste mohli vrátiť všetci."
         ],
         "after": [
-          "Dva, štyri, šesť! Klik, klak, posledné diely držia. Ďakujem, stavitelia! Do zápisníka vám pridávam L. Teraz už máme spoločnú cestu a sme na nej spolu s Pikom, Kvakom, Iskrou, Šutkom a Lístkom. Bez ich pomoci by som svoje diely nemal kam pripevniť.",
-          "Chýba nám ešte Ryško. Pri bráne vidím jeho malé oranžové svetielko. Ryško stráži naše tajomstvo a potrebuje spoznať, že sa blížia priatelia. Pod plán som vám napísal náš pozdrav. Zostaňte pri stole a použite ho pri ďalšej úlohe v telefóne; novú indíciu teraz nehľadajte."
-        ]
-      }
-    },
-    {
-      "id": "digital",
-      "title": "Ryškovo tajomstvo",
-      "label": "Úloha 6 – Stôl",
-      "icon": "🌙",
-      "time": [
-        2,
-        0,
-        5
-      ],
-      "reward": "O",
-      "answer": [
-        "moon,sun,star"
-      ],
-      "digital": true,
-      "action": "Položte pred seba poznámku z plánu P5. Teraz rieši celý tím spolu na telefóne.",
-      "task": "Stlačte symboly v poradí podľa poznámky: „Nočný pokoj. Denné svetlo. Večerná hviezda.“ Potom overte sekvenciu. Výber sa dá vymazať.",
-      "materials": "Poznámka na P5; nové materiály netreba.",
-      "mobile": "Tri tlačidlá mesiac, slnko a hviezda; viditeľná sekvencia, vymazanie a overenie.",
-      "solution": "Mesiac → slnko → hviezda. Pole sa preventívne uzavrelo, aby nikto neprezradil svet Pixelkov; treba obnoviť bezpečnú cestu pre všetkých.",
-      "hints": [
-        "Nočný pokoj predstavuje mesiac. Čo svieti cez deň?",
-        "Poradie je mesiac, slnko, hviezda."
-      ],
-      "parent": "Odhalenie príčiny sa zobrazí až po správnej sekvencii. Zdôraznite, že Ochranné pole všetkých chránilo a nikto nie je zranený.",
-      "transition": "Ďakujem za pozdrav! Teraz sme všetci na spojení. Posledný odkaz nájdete v indícii označenej Úloha 7 pod inou stoličkou pri stole.",
-      "character": "rysko",
-      "dramaturgy": [
-        "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
-      ],
-      "narrative": {
-        "before": [
-          "Ahojte, ja som Ryško! Som oranžový líščí Pixelko a strážim tajomstvo nášho sveta. Z našej strany obrazovky vidím drobné svetielka, ale z vašej strany vyzerajú len ako obyčajný obraz. Tak je to správne: naše domčeky a cestičky zostávajú bezpečne ukryté a my sa môžeme pokojne hrať.",
-          "Dnes ráno som videl, ako svetielka zablikali a kamaráti sa mi stratili z dohľadu. Teraz ku mne prichádza svetlo po ceste, ktorú Kubo opravil. Možno ste to vy s Pikom a ostatnými! Ešte vás dobre nepočujem. Potrebujem náš známy pozdrav, aby som vedel, že na druhej strane čakajú moji priatelia.",
-          "Kubo vám ho nechal pod svojím plánom. Prečítajte tri krátke vety a ku každej vyberte jeden symbol v telefóne. Dodržte poradie a odošlite mi pozdrav. Potom sa budem môcť pridať aj ja a vysvetlím vám, prečo sa naša brána zatvorila. Už mi chýbajú kamarátove hlasy!"
-        ],
-        "after": [
-          "To ste vy! Ďakujem za pozdrav, už vás počujem a konečne sa môžem pridať. Posielam vám O. Teraz sme tu všetci: ja, Piko, Kvak, Iskra, Šutko, Lístok aj Kubo. Vy ste nám pomohli znovu sa nájsť a každý kamarát pridal niečo, čo ostatní sami nedokážu.",
-          "Prezradím vám, čo sa stalo: keď ráno cesty zablikali, naša svetelná brána sa automaticky uzavrela. Chránila naše domčeky, aby ich nikto zvonku nezbadal. Teraz ju môžeme pripraviť na návrat. Najprv si však pripomenieme náš spoločný sľub. Indícia označená Úloha 7 čaká pod inou stoličkou pri stole; túto stopu sme si nechali na záver."
+          "Dva, štyri, šesť! Klik, klak, posledné diely držia. Ďakujem, stavitelia! Pridávam vám písmeno L. Teraz už máme spoločnú cestu a sme na nej spolu s Pikom, Kvakom, Iskrou, Šutkom a Lístkom. Bez ich pomoci by som svoje diely nemal kam pripevniť.",
+          "Na konci opravenej cesty už vidím Ryška, nášho strážcu skrytých ciest! Teraz nás konečne počuje. Čaká pri návratovej bráne a pripomenie nám náš spoločný sľub. Nájdite poslednú indíciu označenú Úloha 6 pod inou stoličkou pri stole. Túto stopu sme si nechali na záver."
         ]
       }
     },
     {
       "id": "search",
       "title": "Sľub Pixelkov",
-      "label": "Úloha 7 – Pod stoličkou",
+      "label": "Úloha 6 – Pod stoličkou",
       "icon": "🔎",
       "time": [
         1,
         4,
         2
       ],
-      "reward": "↗",
+      "reward": "O",
       "answer": [
         "SPOLU"
       ],
       "placeholder": "Slovo z piatich riadkov",
-      "action": "Nájdite indíciu k úlohe 7 pod sedadlom inej dostupnej stoličky pri stole než pri úlohe 3. Má označenie Úloha 7 – otvoriť až po Ryškovom pozdrave. Vyberte sľub Pixelkov a kartu poradia.",
+      "action": "Nájdite indíciu k úlohe 6 pod sedadlom inej dostupnej stoličky pri stole než pri úlohe 3. Má označenie Úloha 6 – otvoriť po opravení Kubovej cesty. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
-      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; indícia k úlohe 7.",
-      "mobile": "Overí slovo SPOLU a uloží kartu poradia do zápisníka.",
+      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; indícia k úlohe 6.",
+      "mobile": "Overí slovo SPOLU, pripojí Ryška a uloží jeho písmeno O aj kartu poradia do zápisníka.",
       "solution": "Prvé písmená viet tvoria SPOLU. Karta určuje poradie šiestich nazbieraných písmen podľa úloh.",
       "hints": [
-        "Piko zdôraznil začiatky. Pozrite sa na prvé písmeno každého riadka.",
+        "Ryško spomínal začiatky riadkov. Pozrite sa na prvé písmeno každého riadka.",
         "Písmená sú S, P, O, L, U."
       ],
-      "parent": "Obálku 4 s P6 prilepte pod inú stoličku než P3. Označte ju Úloha 7 – otvoriť až po Ryškovom pozdrave. Ak ju deti nájdu počas úlohy 2, nechajte ju zatvorenú. Dieťa nemá presúvať ťažký nábytok; pomôžte s odlepením obálky.",
-      "transition": "SPOLU. Domov sa vráti každý, aj Piko. Karta P6 určuje poradie písmen z úloh 1 až 6.",
+      "parent": "Obálku 4 s P6 prilepte pod inú stoličku než P3. Označte ju Úloha 6 – otvoriť po opravení Kubovej cesty. Ak ju deti nájdu počas úlohy 2, nechajte ju zatvorenú. Dieťa nemá presúvať ťažký nábytok; pomôžte s odlepením obálky.",
+      "transition": "Ryško pridá O. Šesť písmen z úloh 1 až 6 už stačí na posledný spoločný signál; poradie určí karta P6.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Ahojte, tu som zase ja, Piko! Pozrite, koľko nás už stojí spolu na svietiacej ceste. Na začiatku som pri telefóne čakal celkom sám. Teraz počujem Kvaka, vidím Iskrino svetlo a vedľa mňa sú Šutko, Lístok, Kubo aj Ryško. Vy ste nás postupne našli a pomohli každému, kto niečo sám nezvládol.",
-          "K domčeku už je to len cez poslednú bránu. Ja však neviem svietiť ako Iskra, podržať most ako Šutko ani opravovať spoje ako Kubo. Každý z nás potrebuje ostatných. Aj preto máme v našom svete jeden starý sľub: keď sa niekto stratí, kamaráti ho nenechajú samého.",
-          "Ten sľub nájdete na papieri z poslednej indície. Prečítajte prvé písmeno každého z piatich riadkov, pekne zhora nadol. Vytvoria slovo, ktoré nám pripomenie, ako sa vrátime domov. Potvrďte ho v telefóne a kartu zo spodnej časti listu si odložte. Ešte nám pri poslednom kroku pomôže!"
+          "Ahojte, ja som Ryško! Som červená panda a strážim skryté cesty nášho sveta. Kubo práve opravil cestu až ku mne a ja už počujem vás aj všetkých kamarátov. Konečne sme sa našli! Dávam pozor na naše domčeky a vždy čakám, kým príde aj posledný kamarát.",
+          "Teraz vám môžem povedať, čo sa ráno stalo. Keď cesty zablikali, naša svetelná brána sa automaticky uzavrela. Chránila domčeky, aby ich nikto zvonku nezbadal. Nikomu sa nič nestalo. Pred návratom si len potrebujeme pripomenúť náš sľub: kamaráta nikdy nenecháme samého.",
+          "Sľub nájdete na papieri z poslednej indície. Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Vytvoria slovo, ktoré nám pripomenie, ako sa vrátime domov. Potvrďte ho v telefóne a kartu poradia zo spodnej časti listu si odložte na posledný krok."
         ],
         "after": [
-          "SPOLU! Presne tak, ďakujem. Sám by som kamarátov nenašiel, ale s vami sme to dokázali. Teraz sa o návrat postaráme všetci. Každý si nájde svoje miesto pri ceste a ja skontrolujem, či nikto nechýba. Nikam sa neponáhľame; dôležité je, aby sme prešli celá partia.",
-          "Zostáva nám posledná spoločná správa pre bránu. Šesť kamarátov vám za pomoc poslalo šesť písmen. Na spodnej časti P6 je karta, podľa ktorej ich zoradíte. Zostaňte pri poslednom liste a pripravte si aj tímový zápisník v telefóne. Už sme naozaj blízko domova!"
+          "SPOLU! Presne tak. Ďakujem, kamaráti! Pridávam vám posledné písmeno O. Teraz sme tu všetci: ja, Piko, Kvak, Iskra, Šutko, Lístok aj Kubo. Každý vie niečo iné a vy ste nám pomohli znovu sa nájsť. Ja postrážim bránu a počkám, kým bezpečne prejde celá partia.",
+          "Šesť kamarátov vám za pomoc poslalo šesť písmen. Karta na spodnej časti P6 ukazuje ich poradie podľa úloh 1 až 6. Zostaňte pri poslednom liste a pripravte si aj tímový zápisník v telefóne. Piko vám pomôže poslať spoločný návratový signál. Domov sa vráti aj on!"
         ]
-      }
+      },
+      "character": "rysko"
     },
     {
       "id": "code",
       "title": "Heslo, ktoré spája",
-      "label": "Úloha 8 – Pod stoličkou",
+      "label": "Úloha 7 – Pod stoličkou",
       "icon": "⚡",
       "time": [
         1,
@@ -370,7 +329,7 @@ window.GAME = {
       "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
       "solution": "Úlohy 1–6 dali S, V, E, T, L, O → SVETLO.",
       "hints": [
-        "Použite len šesť písmen. Šípka a fajka nie sú súčasťou hesla.",
+        "Použite šesť písmen z úloh 1 až 6. Fajka za posledný krok nie je súčasťou hesla.",
         "V poradí úloh čítajte S – V – E – T – L – O."
       ],
       "parent": "Nechajte heslo vysloviť celý tím. Nie je tu skutočný časový limit ani riziko straty hry.",
@@ -401,7 +360,7 @@ window.GAME = {
         0
       ],
       "action": "Dajte si tímové plácnutie. Každý môže povedať, ktorá schopnosť Pixelkov pomohla partii a čím prispel on sám.",
-      "task": "Všetkých osem úloh je splnených. Pixelkovia sú spolu a ich svet je znovu ukrytý. Pomenujte svoj tím a povedzte si, čím pomohol každý z vás.",
+      "task": "Všetkých sedem úloh je splnených. Pixelkovia sú spolu a ich svet je znovu ukrytý. Pomenujte svoj tím a povedzte si, čím pomohol každý z vás.",
       "materials": "Voliteľný diplom záchrancov Pixelkov na tlačovej stránke. Žiadne ďalšie pomôcky netreba.",
       "mobile": "Finále obnoví skrytý svet Pixelkov; zostáva úplná mapa, zápisník a možnosť novej hry.",
       "solution": "Úspech tímu. Hra nemá prehratý koniec.",

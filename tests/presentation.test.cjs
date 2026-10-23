@@ -45,9 +45,9 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   await page.locator('.dialog-close').click();
   assert.ok(await page.locator('dialog audio').evaluate(a=>a.paused));
   await page.goto(BASE+'/storyboard.html');
-  assert.equal(await page.locator('.storyboard').count(),10);assert.equal(await page.locator('.gm-atlas').count(),0);
+  assert.equal(await page.locator('.storyboard').count(),9);assert.equal(await page.locator('.gm-atlas').count(),0);
   const blocks=page.locator('.studio-timeline>.storyboard');
-  assert.equal(await blocks.locator('.storyboard-toggle[aria-expanded="false"]').count(),10,'all stages start collapsed');
+  assert.equal(await blocks.locator('.storyboard-toggle[aria-expanded="false"]').count(),9,'all stages start collapsed');
   for(const block of await blocks.all()){
    const toggle=block.locator('.storyboard-toggle');
    assert.ok(!await block.locator('.storyboard-content').isVisible(),'stage content is initially hidden');
@@ -65,7 +65,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   }
   assert.equal(await page.locator('[data-tts][hidden]').count(),3,'all TTS prompts start collapsed');
   assert.equal(await page.locator('.script-copy[hidden]').count(),3,'all message transcripts start collapsed');
-  assert.equal(await page.locator('.storyboard-content>.gm-instructions').count(),10);
+  assert.equal(await page.locator('.storyboard-content>.gm-instructions').count(),9);
   assert.equal(await page.locator('#gm-envelope .adult-help').count(),1);
   assert.ok(await page.locator('#kvak-message-text').isHidden());assert.ok(await page.locator('#kvak-message-tts').isHidden());
   await page.locator('[data-target="kvak-message-tts"]').click();assert.ok(await page.locator('#kvak-message-tts').isVisible());
@@ -115,16 +115,13 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   // Later stage tests open only the interaction, not duplicate instruction pages.
   assert.equal(await page.locator('#gm-document [data-action="test"]').count(),0,'paper Iskra has no player test');
   assert.equal(await page.locator('#gm-document .storyboard-continuation').count(),0);
-  for(let n=3;n<=8;n++){
+  for(let n=3;n<=7;n++){
    await page.locator(`[data-action="test"][data-stage="${n}"]`).click();
    assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
    const answer=await page.evaluate(n=>GAME.stages[n].answer[0],n);
    if(n===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();}
-   else if(n===6){
-    for(const symbol of answer.split(','))await page.locator(`[data-symbol="${symbol}"]`).click();
-    await page.locator('[data-action="verify-sequence"]').click();
-   }else{
+   else{
     assert.equal(await page.locator('#answer').count(),1);
     await page.locator('#answer').fill(answer);await page.locator('.answer-form button').click();
    }

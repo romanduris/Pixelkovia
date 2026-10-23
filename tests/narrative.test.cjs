@@ -20,7 +20,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  const narrative=await page.evaluate(()=>GAME.stages.map(stage=>({id:stage.id,label:stage.label,narrative:stage.narrative,answer:stage.answer,character:stage.character,paperOnly:stage.paperOnly})));
  await page.screenshot({path:'/tmp/narrative-intro-phone.png'});
  await page.goto(BASE+'/game.html?signal=kvak');
- for(let index=1;index<=8;index++){
+ for(let index=1;index<=7;index++){
   const stage=narrative[index],before=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="before"]`);
   if(stage.paperOnly){assert.equal(await before.count(),0,'Iskra has no phone page');assert.equal(stage.narrative.after.length,0);continue;}
   if(index===1||index===3)assert.equal(await before.count(),0,'terminal leaves the story on paper');
@@ -29,9 +29,9 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'phone has no horizontal overflow');
   assert.equal(await page.locator('.quest-party .party-person').count(),Math.min(index,6)+1,'party grows by one friend per task');
   if(index===3)await page.screenshot({path:'/tmp/narrative-sutko-phone.png'});
+  if(index===6)assert.match(await before.innerText(),/automaticky uzavrela/);
   if(index===4)assert.ok(!(await page.locator('.task-question').innerText()).includes('STÔL'),'do not print the solved strip sentence in the question');
   if(index===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();}
-  else if(index===6){for(const symbol of stage.answer[0].split(','))await page.locator(`[data-symbol="${symbol}"]`).click();await page.locator('[data-action="verify-sequence"]').click();}
   else{await page.locator('#answer').fill(stage.answer[0]);await page.locator('.answer-form button').click();}
   const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);
   if(index===1){
@@ -44,14 +44,14 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
   if(index===4)assert.match(await after.innerText(),/OCHRANA AKTÍVNA/);
-  if(index===6)assert.match(await after.innerText(),/automaticky uzavrela/);
+  if(index===6)assert.match(await after.innerText(),/posledné písmeno O/);
   if(index===6)await page.screenshot({path:'/tmp/narrative-rysko-phone.png',fullPage:true});
   assert.ok(await page.locator('[data-action="next"]').isVisible());
   await page.locator('[data-action="next"]').click();
  }
  await page.locator('.finale').waitFor();
  const saved=JSON.parse(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')));
- assert.deepEqual(saved.completed,[1,2,3,4,5,6,7,8]);assert.equal(saved.callDone,true);
+ assert.deepEqual(saved.completed,[1,2,3,4,5,6,7]);assert.equal(saved.callDone,true);
  // The numbered headings and story persist when resuming an older save without new fields.
  await page.evaluate(()=>{localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:2,completed:[1],hints:{2:1}}));});
  await page.goto(BASE+'/parent.html');await page.locator('[data-action="start"]').click();
@@ -80,7 +80,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  assert.equal(await page.locator('.quest-party .party-person').count(),4);
  // Every printed question uses the identical paragraph source as the live game.
  const printed=await context.newPage();await printed.goto(BASE+'/printables.html');
- for(const stage of narrative.slice(1,9))assert.equal(normal(await printed.locator(`[data-story-stage="${stage.id}"]`).innerText()),normal(stage.narrative.before.join(' ')),stage.id+': printable story agrees');
+ for(const stage of narrative.slice(1,-1))assert.equal(normal(await printed.locator(`[data-story-stage="${stage.id}"]`).innerText()),normal(stage.narrative.before.join(' ')),stage.id+': printable story agrees');
  await page.goto(BASE+'/storyboard.html');
  for(const stage of narrative){
   const article=page.locator('#gm-'+stage.id);assert.ok((await article.locator('h2').first().innerText()).includes(stage.label));
@@ -91,5 +91,5 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   if(stage.id!=='finale')assert.equal(normal(await article.locator('.quest-story[data-story-phase="before"]').first().innerText()),normal(stage.narrative.before.join(' ')));
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: eight-task written adventure without working media, intro and QR entry, plot reveals, numbered places, old-save compatibility, phone typography and exact shared printable/storyboard paragraphs.');
+ console.log('PASS: seven-task written adventure without working media, intro and QR entry, plot reveals, numbered places, old-save compatibility, phone typography and exact shared printable/storyboard paragraphs.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1)});

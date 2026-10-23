@@ -19,7 +19,7 @@ assert.match(two.action,/vonkajšie D oproti vnútornému A/);
 assert.match(game.stages[4].action,/P4.*štyri.*pásiky/);
 assert.match(three.parent,/obálke \(indícii\) Úloha 3 pod sedadlom/);
 assert.match(three.parent,/P4[\s\S]*topánky[\s\S]*P5[\s\S]*na stole/);
-assert.match(game.stages[7].action,/indíciu k úlohe 7 pod sedadlom/);
+assert.match(game.stages[6].action,/indíciu k úlohe 6 pod sedadlom/);
 for(const location of ['medzi uterákmi','práčky','sušičky','elektrickým zariadeniam'])assert.ok(game.stages[0].parent.includes(location));
 for(const hint of game.stages[0].hints)assert.ok(hint.length>10);
 for(const label of ['Obálka (indícia) Kúpeľňa: iba celý P1','Obálka (indícia) 2: celý P2','Obálka (indícia) 3: celý pripravený P4','Obálka (indícia) 4: P6'])assert.ok(app.includes(label),label);

@@ -6,13 +6,13 @@ const context={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);
 const game=context.window.GAME;
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['STOL','STÔL'],['246'],['moon,sun,star'],['SPOLU'],['SVETLO']];
-assert.equal(game.stages.length,10);
-assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),60);
-assert.equal(new Set(game.stages.map(s=>s.id)).size,10);
+const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['STOL','STÔL'],['246'],['SPOLU'],['SVETLO']];
+assert.equal(game.stages.length,9);
+assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),53);
+assert.equal(new Set(game.stages.map(s=>s.id)).size,9);
 assert.equal(game.characters.length,7);
 assert.equal(new Set(game.stages.slice(1,7).map(s=>s.character)).size,6);
-assert.equal(JSON.stringify(game.stages.slice(1,9).map(s=>s.answer)),JSON.stringify(legacyAnswers),'paper route is updated; all numeric codes and final letters stay compatible');
+assert.equal(JSON.stringify(game.stages.slice(1,-1).map(s=>s.answer)),JSON.stringify(legacyAnswers),'paper route is updated; all numeric codes and final letters stay compatible');
 assert.equal(game.stages.slice(1,7).map(s=>s.reward).join(''),'SVETLO');
 assert.equal(game.call,game.stages[0].story,'one source for call and introductory storyboard');
 for(const s of game.stages){
@@ -23,7 +23,7 @@ for(const s of game.stages){
 for(const file of ['game-data.js','app.js','index.html','printables.html','atlas.html','README.md'])assert.ok(!/závoj/i.test(fs.readFileSync(file,'utf8')),`${file}: approved terminology`);
 assert.ok(!JSON.stringify(game.call).includes('Ochranné pole'),'no explanation in the incoming call');
 assert.ok(JSON.stringify(game.stages[4].resolution).includes('OCHRANA AKTÍVNA.'),'the authored twist is present');
-assert.ok(JSON.stringify(game.stages[8].resolution).includes('Piko. Poď.'),'Piko is included in the safe return');
+assert.ok(JSON.stringify(game.stages[7].resolution).includes('Piko. Poď.'),'Piko is included in the safe return');
 const ordered=[...game.signalRecords].sort((a,b)=>a.month-b.month||a.day-b.day||a.time.localeCompare(b.time));
 assert.equal(ordered.map(r=>r.digit).join(''),'741296');
 assert.notEqual(game.signalRecords.map(r=>r.digit).join(''),'741296','printed order is scrambled');
@@ -110,7 +110,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:1100});await noOverflow(page,`home with restart ${width}`);}
  await page.locator('[data-action="restart-adventure"]').click();
  assert.equal(await page.locator('.message-incoming').count(),1);
- assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress'))),{started:true,callDone:false,stage:0,completed:[],hints:{},scenePages:{}});
+ assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress'))),{progressVersion:2,started:true,callDone:false,stage:0,completed:[],hints:{},scenePages:{}});
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-prep-0')),'1','restart keeps parent preparation');
  await reloadAndResume(page);assert.equal(await page.locator('.message-incoming').count(),1,'explicit continue retains the restarted game');
  await page.locator('.message-status [data-action="close"]').click();
@@ -119,7 +119,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));
  await page.reload();
  await page.goto(BASE+'/storyboard.html');
- assert.equal(await page.locator('.storyboard').count(),10);
+ assert.equal(await page.locator('.storyboard').count(),9);
  assert.equal(await page.locator('.gm-atlas').count(),0);
  assert.ok((await page.locator('#gm-cipher').textContent()).includes('OCHRANA AKTÍVNA.'));
  assert.equal(await page.locator('#gm-intro .gm-dramaturgy, #gm-envelope .gm-dramaturgy').count(),0,'first two duplicate scenarios are omitted');
@@ -131,7 +131,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.locator('[data-action="exit-test"]').click();
  await page.locator('[data-action="test"][data-stage="0"]').click();await page.locator('.message-status [data-action="close"]').click();
- assert.equal(await page.locator('.storyboard').count(),10,'intro preview returns to GM');
+ assert.equal(await page.locator('.storyboard').count(),9,'intro preview returns to GM');
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.goto(BASE);
  await resume(page);
@@ -176,18 +176,11 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.signal-restore [data-action="hint"]').count(),0,'no hints on the initial code screen');
  await reloadAndResume(page);assert.equal(await page.locator('#hints').count(),0);
  let entireJourney='';
- for(let i=1;i<=8;i++){
+ for(let i=1;i<=7;i++){
   if(game.stages[i].paperOnly)continue;
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
-  if(i===6){
-   assert.ok(!(await page.locator('.signal-task').textContent()).includes('dve obrazovky rozžiarili'));
-   await page.locator('[data-symbol="sun"]').click();await page.locator('[data-action="verify-sequence"]').click();
-   assert.ok((await page.locator('#feedback').textContent()).includes('ešte nesedí'));
-   await page.locator('[data-action="clear-sequence"]').click();await page.locator('[data-symbol="moon"]').click();
-   await page.locator('[data-action="hint"]').click();assert.ok((await page.locator('#sequence').textContent()).includes('☾'));
-   await page.locator('[data-symbol="sun"]').click();await page.locator('[data-symbol="star"]').click();await page.locator('[data-action="verify-sequence"]').click();
-  }else if(i===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
+  if(i===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
   }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   if(i===3)await page.locator('.sutko-connected').waitFor();
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
@@ -243,7 +236,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await bonus.waitForLoadState();assert.ok(bonus.url().endsWith('/atlas.html'));
  assert.equal(await bonus.locator('.atlas-profile').count(),7);await bonus.close();
  await reloadAndResume(page);assert.equal(await page.locator('.atlas-cta').count(),1,'finished saved game retains bonus');
- await page.locator('[data-action="notebook"]').click();assert.equal(await page.locator('.notebook-row').count(),8);await page.locator('.dialog-close').click();
+ await page.locator('[data-action="notebook"]').click();assert.equal(await page.locator('.notebook-row').count(),7);await page.locator('.dialog-close').click();
  await page.locator('[data-action="reset"]').click();await page.locator('.dialog-close').click();assert.equal(await page.locator('.finale').count(),1);
  await page.locator('[data-action="reset"]').click();await page.locator('[data-action="confirm-reset"]').click();await noAtlas();
  await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
@@ -352,6 +345,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: Kvak V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete eight-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Kvak V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete seven-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

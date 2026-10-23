@@ -3,17 +3,25 @@
   const app = document.querySelector('#app');
   const modal = document.querySelector('#modal');
   const KEY = 'zahada-v1-progress';
+  const FINAL_STAGE=GAME.stages.length-1,TASK_COUNT=FINAL_STAGE-1,PROGRESS_VERSION=2;
   const environment = document.body.dataset.environment || 'sales';
   const internal = environment !== 'sales';
   if('scrollRestoration' in history)history.scrollRestoration='manual';
-  const fresh = () => ({started:false, callDone:false, stage:0, completed:[], hints:{}, scenePages:{}});
-  let progress = fresh(), view = environment === 'player' ? 'prep' : environment, preview = null, sequence = [], messageReturn = false, pingTimer = null, soundContext = null;
+  const fresh = () => ({progressVersion:PROGRESS_VERSION, started:false, callDone:false, stage:0, completed:[], hints:{}, scenePages:{}});
+  let progress = fresh(), view = environment === 'player' ? 'prep' : environment, preview = null, messageReturn = false, pingTimer = null, soundContext = null;
   let success = false;
   let sutkoRevealTimer = null;
   try {
-    const saved = JSON.parse(localStorage.getItem(KEY));
-    if (saved && Number.isInteger(saved.stage) && saved.stage >= 0 && saved.stage <= 9 && Array.isArray(saved.completed)) {
-      const completed = saved.completed.filter((n,i,a) => Number.isInteger(n) && n >= 1 && n <= 8 && a.indexOf(n) === i);
+    let saved = JSON.parse(localStorage.getItem(KEY));
+    if(saved&&saved.progressVersion===undefined&&Array.isArray(saved.completed)){
+      // V1 had a separate symbol task at 6. Shift later discoveries once.
+      if(!Number.isInteger(saved.stage)||saved.stage<0||saved.stage>9||!saved.completed.every((index,i)=>Number.isInteger(index)&&index===i+1&&index<=8))throw new Error('Invalid legacy progress');
+      const shift=index=>index>6?index-1:index;
+      const hints=Object.fromEntries(Object.entries(saved.hints||{}).filter(([key])=>Number(key)!==6).map(([key,value])=>[shift(Number(key)),value]));
+      saved={...saved,progressVersion:PROGRESS_VERSION,stage:shift(saved.stage),completed:saved.completed.filter(index=>index!==6).map(shift),hints};
+    }
+    if (saved && Number.isInteger(saved.stage) && saved.stage >= 0 && saved.stage <= FINAL_STAGE && Array.isArray(saved.completed)) {
+      const completed = saved.completed.filter((n,i,a) => Number.isInteger(n) && n >= 1 && n <= TASK_COUNT && a.indexOf(n) === i);
       // Stored progress must be a contiguous run; malformed data safely starts a new game.
       if (completed.every((n,i) => n === i+1) && (saved.stage === 0 || (saved.callDone && saved.stage <= completed.length + 1))) {
         progress = {...fresh(), ...saved, completed, hints:saved.hints && typeof saved.hints === 'object' ? saved.hints : {}};
@@ -25,13 +33,11 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const normalize = s => s.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').toUpperCase();
   const total = s => s.time.reduce((a,b)=>a+b,0);
-  const symbols = {moon:'☾',sun:'☀',star:'☆'};
-  const names = {moon:'Mesiac',sun:'Slnko',star:'Hviezda'};
-  const allTasks = GAME.stages.slice(1,9);
+  const allTasks = GAME.stages.slice(1,-1);
   function goTop(){app.scrollTop=0;window.scrollTo({top:0,behavior:'instant'});app.querySelector('h1')?.focus({preventScroll:true});}
   function navigate(next){
     if(!internal && next !== 'sales')return;
-    view=next;success=false;sequence=[];
+    view=next;success=false;
     if(internal && !preview && next === 'prep' && location.protocol !== 'file:')history.replaceState(null,'','parent.html');
     render();goTop();
   }
@@ -43,16 +49,16 @@
   function showDialog(html){modal.classList.remove('message-modal');modal.innerHTML=`<button class="dialog-close" data-action="close" aria-label="Zavrieť">×</button>${html}`;if(!modal.open) modal.showModal();}
   function mapHTML(compact=true){
     const s=state();
-    if(compact)return `<div class="compact-map" aria-label="Postup: ${s.completed.length} z 8 úloh">${allTasks.map((t,i)=>`<span class="map-node ${s.completed.includes(i+1)?'done':s.stage===i+1?'current':''}" title="${esc(t.title)}" aria-label="Úloha ${i+1}: ${s.completed.includes(i+1)?'splnená':s.stage===i+1?'aktuálna':'čaká'}">${s.completed.includes(i+1)?'✓':String(i+1).padStart(2,'0')}</span>`).join('')}</div>`;
-    return `<div class="chapter-grid">${allTasks.map((t,i)=>{const unlocked=s.callDone&&(i+1<=s.stage||s.completed.includes(i+1));return `<button class="chapter-card ${unlocked?'':'locked'} ${s.stage===i+1?'current':''}" ${unlocked?'':'disabled'} data-action="stage" data-stage="${i+1}"><span class="chapter-top"><span class="chapter-icon" aria-hidden="true">${t.icon}</span><span class="chapter-number">${String(i+1).padStart(2,'0')} / 08</span></span><h3>${t.title}</h3><p>${s.completed.includes(i+1)?'✓ Vyriešené':unlocked?'Pripravené na objavenie':'Čaká na odomknutie'} <span class="lock" aria-hidden="true">${unlocked?'↗':'·'}</span></p></button>`;}).join('')}</div>`;
+    if(compact)return `<div class="compact-map" aria-label="Postup: ${s.completed.length} z ${TASK_COUNT} úloh">${allTasks.map((t,i)=>`<span class="map-node ${s.completed.includes(i+1)?'done':s.stage===i+1?'current':''}" title="${esc(t.title)}" aria-label="Úloha ${i+1}: ${s.completed.includes(i+1)?'splnená':s.stage===i+1?'aktuálna':'čaká'}">${s.completed.includes(i+1)?'✓':String(i+1).padStart(2,'0')}</span>`).join('')}</div>`;
+    return `<div class="chapter-grid">${allTasks.map((t,i)=>{const unlocked=s.callDone&&(i+1<=s.stage||s.completed.includes(i+1));return `<button class="chapter-card ${unlocked?'':'locked'} ${s.stage===i+1?'current':''}" ${unlocked?'':'disabled'} data-action="stage" data-stage="${i+1}"><span class="chapter-top"><span class="chapter-icon" aria-hidden="true">${t.icon}</span><span class="chapter-number">${String(i+1).padStart(2,'0')} / ${String(TASK_COUNT).padStart(2,'0')}</span></span><h3>${t.title}</h3><p>${s.completed.includes(i+1)?'✓ Vyriešené':unlocked?'Pripravené na objavenie':'Čaká na odomknutie'} <span class="lock" aria-hidden="true">${unlocked?'↗':'·'}</span></p></button>`;}).join('')}</div>`;
   }
   const character = id => GAME.characters.find(c=>c.id===id);
   const sprite = (id,cls='') => {const c=character(id);return `<span class="pixel-sprite ${cls}" role="img" aria-label="${c.name}" style="--sprite-x:${c.tile%4*100/3}%;--sprite-y:${c.tile>=4?100:0}%"></span>`;};
-  function contactsHTML(includePiko=false){const s=state();return `<div class="contacts ${includePiko?'whole-party':''}" aria-label="Kontakty Pixelkov">${(includePiko?GAME.characters:GAME.characters.slice(1)).map(c=>{const task=GAME.stages.findIndex(t=>t.character===c.id),done=c.id==='piko'?s.stage===9:s.completed.includes(task);return `<div class="contact ${done?'connected':''}">${sprite(c.id)}<strong>${c.name}</strong><small>${s.stage===9?'Doma ✓':done?'Na linke ✓':'Bez signálu'}</small></div>`;}).join('')}</div>`;}
+  function contactsHTML(includePiko=false){const s=state();return `<div class="contacts ${includePiko?'whole-party':''}" aria-label="Kontakty Pixelkov">${(includePiko?GAME.characters:GAME.characters.slice(1)).map(c=>{const task=GAME.stages.findIndex(t=>t.character===c.id),done=c.id==='piko'?s.stage===FINAL_STAGE:s.completed.includes(task);return `<div class="contact ${done?'connected':''}">${sprite(c.id)}<strong>${c.name}</strong><small>${s.stage===FINAL_STAGE?'Doma ✓':done?'Na linke ✓':'Bez signálu'}</small></div>`;}).join('')}</div>`;}
   function lineHTML(line){const cls=line.startsWith('„')?'scene-dialogue':line===line.toUpperCase()&&/[A-ZÁČĎÉÍĽŇÓÔŔŠŤÚÝŽ]/.test(line)?'scene-signal':'scene-narration';return `<p class="${cls}">${esc(line)}</p>`;}
   const linesHTML = lines => lines.map(lineHTML).join('');
   function sceneIndex(t,phase){const panels=phase==='after'?t.resolution:t.story,key=`${t.id}:${phase}`,raw=state().scenePages?.[key];return Math.max(0,Math.min(panels.length-1,Number.isInteger(raw)?raw:0));}
-  function sceneReader(t,phase){const panels=phase==='after'?t.resolution:t.story;if(!panels.length)return '';const index=sceneIndex(t,phase);return `<section class="scene-reader" aria-label="${phase==='after'?'Po vyriešení úlohy':'Príbehová scéna'}"><div class="reader-heading"><span class="story-label">${phase==='after'?'Spojenie obnovené':'Príbeh pokračuje'}</span><span class="reader-count">${index+1} / ${panels.length}</span></div><div class="scene-panel" tabindex="-1">${linesHTML(panels[index])}</div><div class="reader-controls"><button class="text-link" data-action="scene-page" data-phase="${phase}" data-page="${index-1}" ${index===0?'disabled':''}>← Späť</button>${index<panels.length-1?`<button class="btn small" data-action="scene-page" data-phase="${phase}" data-page="${index+1}">Čítať ďalej →</button>`:`<span class="reader-end">${phase==='before'&&state().stage<9?'Teraz je na rade váš tím.':'✦ Koniec scény'}</span>`}</div></section>`;}
+  function sceneReader(t,phase){const panels=phase==='after'?t.resolution:t.story;if(!panels.length)return '';const index=sceneIndex(t,phase);return `<section class="scene-reader" aria-label="${phase==='after'?'Po vyriešení úlohy':'Príbehová scéna'}"><div class="reader-heading"><span class="story-label">${phase==='after'?'Spojenie obnovené':'Príbeh pokračuje'}</span><span class="reader-count">${index+1} / ${panels.length}</span></div><div class="scene-panel" tabindex="-1">${linesHTML(panels[index])}</div><div class="reader-controls"><button class="text-link" data-action="scene-page" data-phase="${phase}" data-page="${index-1}" ${index===0?'disabled':''}>← Späť</button>${index<panels.length-1?`<button class="btn small" data-action="scene-page" data-phase="${phase}" data-page="${index+1}">Čítať ďalej →</button>`:`<span class="reader-end">${phase==='before'&&state().stage<FINAL_STAGE?'Teraz je na rade váš tím.':'✦ Koniec scény'}</span>`}</div></section>`;}
   function fullScene(panels){return panels.map((lines,i)=>`<section class="gm-scene"><span class="section-kicker">OBRAZ ${i+1}</span>${linesHTML(lines)}</section>`).join('');}
   function atlasInvitation(t){return `<section class="atlas-invitation">${sprite('piko')}<span class="section-kicker">PIKOV DARČEK PRE VÁŠ TÍM</span>${t.invitation.map(line=>line==='[OBJAVIŤ TAJNÝ SVET PIXELKOV]'?'<a class="btn atlas-cta" href="atlas.html" target="_blank" rel="noopener">OBJAVIŤ TAJNÝ SVET PIXELKOV ↗</a>':lineHTML(line)).join('')}</section>`;}
   function landing(){return SITE_CONTENT.sales({sprite});}
@@ -75,16 +81,16 @@
     if(n===1&&(success||s.completed.includes(1)))return kvakConnectionScreen();
     if(n===1)return kvakRestoreScreen();
     if(n===3)return success||s.completed.includes(3)?sutkoConnectionScreen():sutkoLockScreen();
-    if(n===9)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${sceneReader(t,'before')}<div style="max-width:430px;margin:auto">${mapHTML()}</div>${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="notebook">Váš tímový zápisník ↗</button><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div></div></section>`;
+    if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${sceneReader(t,'before')}<div style="max-width:430px;margin:auto">${mapHTML()}</div>${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="notebook">Váš tímový zápisník ↗</button><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div></div></section>`;
     return taskInteractionScreen(t,n);
   }
   function taskInteractionScreen(t,n){
     app.classList.add('signal-mode');
     const done=success||state().completed.includes(n);
-    const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',5:'Zadajte tri číslice z nájdenej cesty.',6:'Zvoľte symboly v poradí z odkazu.',7:'Zadajte slovo zo sľubu Pixelkov.',8:'Zadajte spoločné návratové heslo.'}[n];
-    const title=done?(t.character?'SPOJENIE OBNOVENÉ!':n===7?'SĽUB POTVRDENÝ':'NÁVRATOVÝ SIGNÁL PRIJATÝ'):t.label;
-    const controls=t.digital?`<div class="signal-symbols"><div class="symbol-buttons" role="group" aria-label="Výber symbolov">${['star','moon','sun'].map(k=>`<button class="symbol-btn" data-symbol="${k}" aria-label="${names[k]}">${symbols[k]}</button>`).join('')}</div><div id="sequence" class="sequence" role="status" aria-label="Vybrané symboly"></div><div class="button-row"><button class="btn" data-action="verify-sequence">Overiť poradie →</button><button class="text-link" data-action="clear-sequence">Vymazať výber ↺</button></div></div>`:`<form class="answer-form signal-form"><label for="answer">${n===8?'Návratové heslo':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${[3,5].includes(n)?'numeric':'text'}" ${n===5?'minlength="3" maxlength="3" pattern="[0-9]{3}"':'maxlength="40"'} autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
-    return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`<div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>${esc(t.reward)}</strong><small>Je uložená v tímovom zápisníku.</small></div>${STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${n===8?'Dokončiť bezpečný návrat':'Pokračovať'} →</button>`:`${STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${taskHints()}`}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
+    const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',5:'Zadajte tri číslice z nájdenej cesty.',6:'Zadajte slovo zo sľubu Pixelkov.',7:'Zadajte spoločné návratové heslo.'}[n];
+    const title=done?(t.id==='search'?'SĽUB POTVRDENÝ':t.character?'SPOJENIE OBNOVENÉ!':'NÁVRATOVÝ SIGNÁL PRIJATÝ'):t.label;
+    const controls=`<form class="answer-form signal-form"><label for="answer">${t.id==='code'?'Návratové heslo':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${[3,5].includes(n)?'numeric':'text'}" ${n===5?'minlength="3" maxlength="3" pattern="[0-9]{3}"':'maxlength="40"'} autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
+    return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`<div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>${esc(t.reward)}</strong><small>Je uložená v tímovom zápisníku.</small></div>${STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${t.id==='code'?'Dokončiť bezpečný návrat':'Pokračovať'} →</button>`:`${STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${taskHints()}`}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
   }
   function signalHeader(back,label){return `<header class="signal-header"><button class="text-link" data-action="${back}">← ${preview?'Späť do storyboardu':'Prehľad hry'}</button><span class="section-kicker">PIXEL / ${label}</span><button class="text-link" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶</button></header>`;}
   function taskHints(){const n=state().stage,t=GAME.stages[n],h=Math.min(Number(state().hints[n])||0,t.hints.length);return `<div class="hint-box"><button class="text-link" data-action="hint" ${h===t.hints.length?'disabled':''}>◇ Potrebujeme nápovedu (${h}/${t.hints.length})</button><div id="hints" aria-live="polite">${t.hints.slice(0,h).map(x=>`<p>${esc(x)}</p>`).join('')}</div></div>`;}
@@ -300,7 +306,7 @@
     if(!preview && location.protocol !== 'file:')history.replaceState(null,'','game.html');
     view='player';state().started=true;save();
     if(!state().callDone)openCall();
-    else{requestGameFullscreen();if(state().stage===0)state().stage=state().completed.length===8?9:state().completed.length+1;save();render();goTop();}
+    else{requestGameFullscreen();if(state().stage===0)state().stage=state().completed.length===TASK_COUNT?FINAL_STAGE:state().completed.length+1;save();render();goTop();}
   }
   function ping(){
     if(!soundContext||soundContext.state!=='running'||document.hidden||!modal.open||!modal.querySelector('.message-incoming'))return;
@@ -364,17 +370,16 @@
     modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
-  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;sequence=[];render({autoplayKvak:n===1,autoplaySutko:n===3});goTop();}
-  function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3)return;const valid=t.digital?raw===t.answer[0]:(state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a)));
+  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayKvak:n===1,autoplaySutko:n===3});goTop();}
+  function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
   }
-  function notebook(){const s=state();showDialog(`<span class="section-kicker">VÁŠ ZÁCHRANNÝ ZÁPISNÍK</span><h2>Každá stopa sa počíta.</h2><p>${s.completed.length} z 8 úloh vyriešených.</p>${contactsHTML()}${mapHTML()}${allTasks.map((t,i)=>`<div class="notebook-row"><span>${esc(t.label)}</span><strong>${s.completed.includes(i+1)?t.reward:'·'}</strong></div>`).join('')}${s.completed.includes(7)?'<div class="notice">Karta poradia: písmená z úloh 1 → 2 → 3 → 4 → 5 → 6.</div>':'<p class="quiet">Každá vyriešená úloha uloží svoj objav sem.</p>'}`);}
+  function notebook(){const s=state();showDialog(`<span class="section-kicker">VÁŠ ZÁCHRANNÝ ZÁPISNÍK</span><h2>Každá stopa sa počíta.</h2><p>${s.completed.length} z ${TASK_COUNT} úloh vyriešených.</p>${contactsHTML()}${mapHTML()}${allTasks.map((t,i)=>`<div class="notebook-row"><span>${esc(t.label)}</span><strong>${s.completed.includes(i+1)?t.reward:'·'}</strong></div>`).join('')}${s.completed.includes(6)?'<div class="notice">Karta poradia: písmená z úloh 1 → 2 → 3 → 4 → 5 → 6.</div>':'<p class="quiet">Každá vyriešená úloha uloží svoj objav sem.</p>'}`);}
   document.addEventListener('click',e=>{
     const b=e.target.closest('button,a');if(!b)return;
     if(b.classList.contains('brand')){e.preventDefault();preview=null;navigate('sales');return;}
     if(b.dataset.view){preview=null;navigate(b.dataset.view);return;}
-    if(b.dataset.symbol){if(sequence.length<3){sequence.push(b.dataset.symbol);const el=document.querySelector('#sequence');el.textContent=sequence.map(k=>symbols[k]).join(' ');el.setAttribute('aria-label',sequence.map(k=>names[k]).join(', '));}return;}
     const a=b.dataset.action;if(!a)return;
     if(a==='toggle-copy'){
       const content=document.getElementById(b.dataset.target);if(!content)return;
@@ -417,10 +422,10 @@
     if(a==='purchase'){showDialog(SITE_CONFIG.purchaseHTML());return;}
     if(a==='preview-media'){const isPiko=b.dataset.media==='piko';showDialog(`<section class="media-preview ${isPiko?'piko-media-preview':''}"><span class="section-kicker">KONTROLA NAHRÁVKY</span><h2>${isPiko?'Pikova videospráva':'Kvakova hlasová správa'}</h2>${isPiko?`<video controls playsinline preload="metadata" src="${esc(GAME.video)}" aria-label="Náhľad Pikovej videosprávy"></video>`:`<audio controls preload="metadata" src="${esc(GAME.audio)}" aria-label="Náhľad Kvakovej hlasovej správy"></audio>`}${isPiko?`<p class="preview-message-instructions">${esc(GAME.stages[0].task)}</p>`:''}<p role="status" class="preview-media-status"></p></section>`);const media=modal.querySelector('video,audio');media.addEventListener('error',()=>{modal.querySelector('.preview-media-status').textContent='Nahrávku sa nepodarilo načítať. Text a podklady nájdete v StoryBoarde.';});media.play().catch(()=>{});return;}
     if(a==='start')start();
-    if(a==='restart-adventure'){if(!internal || !SITE_CONFIG.access.canLaunch(PREP_STORE.ready()))return;preview=null;progress=fresh();success=false;sequence=[];start();}
+    if(a==='restart-adventure'){if(!internal || !SITE_CONFIG.access.canLaunch(PREP_STORE.ready()))return;preview=null;progress=fresh();success=false;start();}
     if(a==='home'){navigate('prep');}
-    if(a==='stage'){state().stage=Number(b.dataset.stage);success=false;sequence=[];save();render();goTop();}
-    if(a==='test'){if(environment!=='designer' || SITE_CONFIG.access.mode!=='test')return;const n=Number(b.dataset.stage);if(!GAME.stages[n]||GAME.stages[n].paperOnly)return;preview={started:true,callDone:n!==0,stage:n,completed:Array.from({length:Math.max(0,n-1)},(_,i)=>i+1),hints:{}};view='player';success=false;sequence=[];if(n===0)openCall();else{requestGameFullscreen();render();goTop();}}
+    if(a==='stage'){state().stage=Number(b.dataset.stage);success=false;save();render();goTop();}
+    if(a==='test'){if(environment!=='designer' || SITE_CONFIG.access.mode!=='test')return;const n=Number(b.dataset.stage);if(!GAME.stages[n]||GAME.stages[n].paperOnly)return;preview={started:true,callDone:n!==0,stage:n,completed:Array.from({length:Math.max(0,n-1)},(_,i)=>i+1),hints:{}};view='player';success=false;if(n===0)openCall();else{requestGameFullscreen();render();goTop();}}
     if(a==='exit-test'){preview=null;navigate('designer');}
     if(a==='close'){const wasIntro=modal.classList.contains('message-modal')&&!messageReturn;closeModal();if(wasIntro){if(preview){preview=null;navigate('designer');}else{navigate('prep');}}}
     if(a==='game-fullscreen')requestGameFullscreen();
@@ -437,10 +442,8 @@
       }else{showMessage(true);}
     }
     if(a==='reopen-message')openCall(true);
-    if(a==='verify-sequence')verify(sequence.join(','));
-    if(a==='clear-sequence'){sequence=[];document.querySelector('#sequence').textContent='';document.querySelector('#sequence').setAttribute('aria-label','Vybrané symboly');document.querySelector('#feedback').textContent='';}
-    if(a==='hint'){const s=state(),t=GAME.stages[s.stage];s.hints[s.stage]=Math.min((Number(s.hints[s.stage])||0)+1,t.hints.length);save();const input=document.querySelector('#answer')?.value;render();if(input)document.querySelector('#answer').value=input;if(t.digital){const el=document.querySelector('#sequence');el.textContent=sequence.map(k=>symbols[k]).join(' ');el.setAttribute('aria-label',sequence.map(k=>names[k]).join(', '));}document.querySelector('#hints').scrollIntoView({block:'nearest'});}
-    if(a==='next'){state().stage=Math.min(9,state().stage+1);success=false;save();render();goTop();}
+    if(a==='hint'){const s=state(),t=GAME.stages[s.stage];s.hints[s.stage]=Math.min((Number(s.hints[s.stage])||0)+1,t.hints.length);save();const input=document.querySelector('#answer')?.value;render();if(input)document.querySelector('#answer').value=input;document.querySelector('#hints').scrollIntoView({block:'nearest'});}
+    if(a==='next'){state().stage=Math.min(FINAL_STAGE,state().stage+1);success=false;save();render();goTop();}
     if(a==='notebook')notebook();
     if(a==='print')window.print();
     if(a==='reset')showDialog(`<h2>Začať odznova?</h2><p>Vymaže sa uložený herný postup v tomto prehliadači. Príprava pre rodiča zostane zaškrtnutá.</p><div class="button-row"><button class="btn" data-action="confirm-reset">Áno, nová hra</button><button class="btn secondary" data-action="close">Pokračovať v aktuálnej</button></div>`);
