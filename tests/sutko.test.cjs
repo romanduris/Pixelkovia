@@ -14,7 +14,7 @@ function audioFixture(){
 async function open(context,recording=false){
  const errors=[],page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
  await page.addInitScript(()=>{HTMLElement.prototype.requestFullscreen=async()=>{};});
- if(recording)await context.route('**/game-data.js',async route=>{const response=await route.fetch();await route.fulfill({response,body:(await response.text()).replace('"sutkoAudio": null','"sutkoAudio": "assets/sutko-test.wav"')});});
+ if(recording)await context.route('**/game-data.js',async route=>{const response=await route.fetch();await route.fulfill({response,body:(await response.text()).replace(/"sutkoAudio": (?:null|"[^"]*")/,'"sutkoAudio": "assets/sutko-test.wav"')});});
  await page.goto(BASE+'/game.html');await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
  return {page,errors};
 }
@@ -58,8 +58,12 @@ async function fits(page,label){
   assert.equal(await page.locator('.sutko-unlock-sign .lit').count(),21);
   assert.match(await page.locator('.sutko-party-scene').getAttribute('alt'),/Piko, Kvak, Iskra a Šutko/);
   assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*Zapamätajte[\s\S]*neskôr/);
-  assert.equal(normal(await page.locator('.sutko-written-message').innerText()),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
-  assert.equal(await page.locator('audio,[data-action="sutko-audio-toggle"]').count(),0,'no missing recording is presented as a working player');
+  await page.waitForFunction(()=>{const audio=document.querySelector('#sutko-audio');return audio&&!audio.paused&&audio.currentTime>0;});
+  assert.equal(await page.locator('#sutko-audio').getAttribute('src'),await page.evaluate(()=>GAME.audio),'Kvak recording temporarily stands in for Sutko');
+  await page.locator('[data-action="sutko-audio-toggle"]').click();
+  await page.locator('[data-action="read-sutko-message"]').click();
+  assert.equal(normal((await page.locator('#sutko-transcript p').allTextContents()).join(' ')),normal(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
+  await page.locator('.dialog-close').click();
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2,3]);
   for(const [width,height] of [[320,568],[390,844],[844,390],[1440,1000]]){
    await page.setViewportSize({width,height});await fits(page,'result '+width+'×'+height);await page.screenshot({path:'/tmp/sutko-result-'+width+'-'+height+'.png'});

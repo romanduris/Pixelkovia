@@ -74,11 +74,9 @@
 /* P2–P6 follow P1: signal header, framed letter, mission and a distinct puzzle. */
 .story-sheet{font:13px/1.5 Arial,sans-serif;color:#142840;background:#fff;padding:30px;min-height:0;border-top:4px solid #35547d}
 .story-sheet .label{font:10px/1.4 monospace;letter-spacing:1px;color:#334d70}
-.worksheet-entry-qr{position:absolute;top:0;right:0;display:grid;justify-items:center;gap:1px}
-.worksheet-entry-qr img{display:block;width:80px;height:80px}
+.worksheet-entry-qr{display:grid;justify-items:center;gap:1px}
+.worksheet-entry-qr img{display:block;width:92px;height:92px}
 .worksheet-entry-qr small{font:8px/1.2 monospace}
-#p3 .worksheet-heading{min-height:94px;padding-right:94px}
-#p3 .worksheet-heading h2{max-width:100%}
 .worksheet-heading{position:relative;border-bottom:2px solid #233f65;padding-bottom:12px;margin-bottom:13px}
 .story-sheet h2{font:800 29px/1.1 monospace;color:#172e4d;letter-spacing:-.7px;text-transform:uppercase;margin:10px 0 2px;max-width:84%}
 .story-sheet h3{font:700 12px/1.3 monospace;letter-spacing:.3px;color:#172e4d;margin:0 0 8px}
@@ -239,8 +237,8 @@
  #p5 .worksheet-visual-row{margin:2mm 0}
  #p5 .worksheet-visual-row>.worksheet-mission{margin:0}
  #p2 .worksheet-heading,#p6 .worksheet-heading{margin-bottom:2mm}
- #p3 .worksheet-heading{min-height:20.5mm;padding-right:22mm;margin-bottom:1mm}
- #p3 .worksheet-entry-qr img{width:18mm;height:18mm}
+ #p3 .worksheet-heading{margin-bottom:1mm}
+ #p3 .worksheet-entry-qr img{width:22mm;height:22mm}
  #p3 .worksheet-entry-qr small{font-size:5pt}
  #p2 .worksheet-visual-row{margin:1.5mm 0}
  #p2 .worksheet-story{padding-block:1.5mm}
@@ -260,3 +258,10 @@
  #p6 .pledge-puzzle{padding-block:2mm}
  #p6 .card{padding-block:2mm}
 }
+
+/* The QR follows the three paper values, like Kvak's lower phone panel. */
+.sutko-phone-panel{display:grid;grid-template-columns:minmax(0,1fr) 116px;gap:18px;align-items:center;text-align:left}
+.sutko-phone-panel>.sutko-phone-copy,.sutko-phone-panel>.worksheet-entry-qr{font:inherit;white-space:normal}
+.sutko-phone-panel .worksheet-entry-qr{text-align:center}
+@media(max-width:500px){.sutko-phone-panel{grid-template-columns:minmax(0,1fr) 98px;gap:10px}}
+@media print{.sutko-phone-panel{grid-template-columns:minmax(0,1fr) 29mm;gap:4mm}.sutko-phone-panel>.sutko-phone-copy p{margin:0}}

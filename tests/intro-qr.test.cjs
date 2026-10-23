@@ -51,6 +51,9 @@ const KEY='zahada-v1-progress';
   assert.equal(await printed.locator('#p2 .worksheet-entry-qr').count(),0,'Iskra has no QR');
   assert.ok(!/QR/.test(await printed.locator('#p2').innerText()),'Iskra has no QR instructions');
   await printed.goto(BASE+'/printables.html?sheet=p3');
+  assert.equal(await printed.locator('#p3 .worksheet-heading .worksheet-entry-qr').count(),0,'Sutko QR is below the paper puzzle');
+  assert.ok(await printed.locator('#p3 .sutko-phone-panel .worksheet-entry-qr').isVisible());
+  assert.match(await printed.locator('#p3 .worksheet-mission').innerText(),/všetky tri hodnoty[\s\S]*naskenujte QR/);
   const sutkoPixels=await printed.locator('.worksheet-entry-qr img').evaluate(async img=>{
     await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
     const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);

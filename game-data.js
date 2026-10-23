@@ -579,7 +579,8 @@ window.GAME = {
     "Obálka jedna… v kúpeľni! Rýchlo!",
     "Ah—"
   ],
-  "sutkoAudio": null,
+  "sutkoAudio": "assets/KvakMessage.mp3",
+  "sutkoAudioPlaceholder": true,
   "sutkoPuzzle": {
     "grid": [
       [
