@@ -1,8 +1,9 @@
-// Generated from root game-data.js. Server source; never part of admin/public.
+// Existing server-run contract (eight stages). Identity titles updated without changing active-run mechanics.
+// The seven-task browser game is separate. Never regenerate this contract blindly.
 export const stages = [
   {
     "stage": 1,
-    "title": "Kvakove rozhádzané signály",
+    "title": "Mikyho rozhádzané signály",
     "answers": [
       "741296"
     ],
@@ -14,7 +15,7 @@ export const stages = [
   },
   {
     "stage": 2,
-    "title": "Iskrin dekódovací stroj",
+    "title": "Pixiin dekódovací stroj",
     "answers": [
       "OKNO",
       "POD OKNOM"
@@ -27,7 +28,7 @@ export const stages = [
   },
   {
     "stage": 3,
-    "title": "Šutkov uzavretý priechod",
+    "title": "Plugyho uzavretý priechod",
     "answers": [
       "9"
     ],
@@ -39,7 +40,7 @@ export const stages = [
   },
   {
     "stage": 4,
-    "title": "Lístkov roztrhaný odkaz",
+    "title": "Pingyho roztrhaný odkaz",
     "answers": [
       "STOL",
       "STÔL"
@@ -52,7 +53,7 @@ export const stages = [
   },
   {
     "stage": 5,
-    "title": "Kubova cesta domov",
+    "title": "Čipkova cesta domov",
     "answers": [
       "246"
     ],
@@ -64,7 +65,7 @@ export const stages = [
   },
   {
     "stage": 6,
-    "title": "Ryškovo tajomstvo",
+    "title": "Guardyho tajomstvo",
     "answers": [
       "moon,sun,star"
     ],

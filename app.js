@@ -10,9 +10,11 @@
   const fresh = () => ({progressVersion:PROGRESS_VERSION, started:false, callDone:false, stage:0, completed:[], hints:{}, scenePages:{}});
   let progress = fresh(), view = environment === 'player' ? 'prep' : environment, preview = null, messageReturn = false, pingTimer = null, soundContext = null;
   let success = false;
-  let sutkoRevealTimer = null;
+  let plugyRevealTimer = null;
   try {
     let saved = JSON.parse(localStorage.getItem(KEY));
+    // Only this legacy property is retained for already saved symbol selections.
+    if(saved && Object.hasOwn(saved,'sutkoCells')){if(!Object.hasOwn(saved,'plugyCells'))saved.plugyCells=saved.sutkoCells;delete saved.sutkoCells;}
     if(saved&&saved.progressVersion===undefined&&Array.isArray(saved.completed)){
       // V1 had a separate symbol task at 6. Shift later discoveries once.
       if(!Number.isInteger(saved.stage)||saved.stage<0||saved.stage>9||!saved.completed.every((index,i)=>Number.isInteger(index)&&index===i+1&&index<=8))throw new Error('Invalid legacy progress');
@@ -53,7 +55,7 @@
     return `<div class="chapter-grid">${allTasks.map((t,i)=>{const unlocked=s.callDone&&(i+1<=s.stage||s.completed.includes(i+1));return `<button class="chapter-card ${unlocked?'':'locked'} ${s.stage===i+1?'current':''}" ${unlocked?'':'disabled'} data-action="stage" data-stage="${i+1}"><span class="chapter-top"><span class="chapter-icon" aria-hidden="true">${t.icon}</span><span class="chapter-number">${String(i+1).padStart(2,'0')} / ${String(TASK_COUNT).padStart(2,'0')}</span></span><h3>${t.title}</h3><p>${s.completed.includes(i+1)?'✓ Vyriešené':unlocked?'Pripravené na objavenie':'Čaká na odomknutie'} <span class="lock" aria-hidden="true">${unlocked?'↗':'·'}</span></p></button>`;}).join('')}</div>`;
   }
   const character = id => GAME.characters.find(c=>c.id===id);
-  const sprite = (id,cls='') => {const c=character(id);return `<span class="pixel-sprite ${cls}" role="img" aria-label="${c.name}" style="--sprite-x:${c.tile%4*100/3}%;--sprite-y:${c.tile>=4?100:0}%"></span>`;};
+  const sprite = (id,cls='') => {const c=character(id);return `<span class="pixel-sprite ${cls}" role="img" aria-label="${c.name}" style="--character-image:url('${c.image}');--sprite-x:${c.tile%4*100/3}%;--sprite-y:${c.tile>=4?100:0}%"></span>`;};
   function contactsHTML(includePiko=false){const s=state();return `<div class="contacts ${includePiko?'whole-party':''}" aria-label="Kontakty Pixelkov">${(includePiko?GAME.characters:GAME.characters.slice(1)).map(c=>{const task=GAME.stages.findIndex(t=>t.character===c.id),done=c.id==='piko'?s.stage===FINAL_STAGE:s.completed.includes(task);return `<div class="contact ${done?'connected':''}">${sprite(c.id)}<strong>${c.name}</strong><small>${s.stage===FINAL_STAGE?'Doma ✓':done?'Na linke ✓':'Bez signálu'}</small></div>`;}).join('')}</div>`;}
   function lineHTML(line){const cls=line.startsWith('„')?'scene-dialogue':line===line.toUpperCase()&&/[A-ZÁČĎÉÍĽŇÓÔŔŠŤÚÝŽ]/.test(line)?'scene-signal':'scene-narration';return `<p class="${cls}">${esc(line)}</p>`;}
   const linesHTML = lines => lines.map(lineHTML).join('');
@@ -78,9 +80,9 @@
   function taskScreen(){const s=state(),n=s.stage,t=GAME.stages[n];
     if(n===0)return landing();
     const toolbar=`<div class="task-toolbar"><button class="text-link" ${preview?'data-action="exit-test"':'data-action="home"'}>← ${preview?'Späť do storyboardu':'Prehľad dobrodružstva'}</button><span class="time-pill">${preview?'TEST ETAPY · ':''}${t.label} · ~${total(t)} min</span>${s.callDone?'<button class="text-link" data-action="reopen-message">Pikova správa ▷</button>':''}</div>`;
-    if(n===1&&(success||s.completed.includes(1)))return kvakConnectionScreen();
-    if(n===1)return kvakRestoreScreen();
-    if(n===3)return success||s.completed.includes(3)?sutkoConnectionScreen():sutkoLockScreen();
+    if(n===1&&(success||s.completed.includes(1)))return mikyConnectionScreen();
+    if(n===1)return mikyRestoreScreen();
+    if(n===3)return success||s.completed.includes(3)?plugyConnectionScreen():plugyLockScreen();
     if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${sceneReader(t,'before')}<div style="max-width:430px;margin:auto">${mapHTML()}</div>${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="notebook">Váš tímový zápisník ↗</button><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div></div></section>`;
     return taskInteractionScreen(t,n);
   }
@@ -94,142 +96,142 @@
   }
   function signalHeader(back,label){return `<header class="signal-header"><button class="text-link" data-action="${back}">← ${preview?'Späť do storyboardu':'Prehľad hry'}</button><span class="section-kicker">PIXEL / ${label}</span><button class="text-link" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶</button></header>`;}
   function taskHints(){const n=state().stage,t=GAME.stages[n],h=Math.min(Number(state().hints[n])||0,t.hints.length);return `<div class="hint-box"><button class="text-link" data-action="hint" ${h===t.hints.length?'disabled':''}>◇ Potrebujeme nápovedu (${h}/${t.hints.length})</button><div id="hints" aria-live="polite">${t.hints.slice(0,h).map(x=>`<p>${esc(x)}</p>`).join('')}</div></div>`;}
-  function kvakRestoreScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-restore" aria-labelledby="restore-title">${signalHeader(preview?'exit-test':'home','OBNOVA LINKY')}<div class="signal-content">${STORY_TEXT.party('envelope')}<h1 id="restore-title" tabindex="-1">${esc(GAME.stages[1].label)}</h1><form class="answer-form signal-form"><label for="answer">Kód na obnovenie spojenia</label><input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" spellcheck="false" placeholder="••••••" aria-describedby="feedback" required><button class="btn" type="submit">OBNOVIŤ SPOJENIE</button></form><p class="feedback" id="feedback" role="status"></p><span data-kvak-audio-slot hidden></span></div></section>`;}
-  function kvakConnectionScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-connected success-card" aria-labelledby="connection-title">${signalHeader(preview?'exit-test':'home','SPOJENIE AKTÍVNE')}<div class="signal-content"><h1 id="connection-title" tabindex="-1">SPOJENIE OBNOVENÉ!</h1><div class="signal-duo" aria-label="Piko a Kvak sú spolu na linke"><div class="signal-person">${sprite('piko','piko-listener')}<strong>Piko</strong></div><div class="connection-line" aria-hidden="true"><span></span><i>✦</i><span></span></div><div class="signal-person kvak-speaker">${sprite('kvak','success-character')}<strong>Kvak</strong></div></div><p class="connection-message">Kvak! Ja vás počujem! Ďakujem, už som v spojení s Pikom.</p><span data-kvak-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="kvak-audio-toggle" aria-controls="kvak-audio">▶ Prehrať správu</button></div><p id="kvak-audio-status" role="status">Správu môžete prehrať opakovane.</p><button class="text-link kvak-transcript-link" data-action="read-kvak-message">Čítať Kvakovu správu</button><div class="signal-reward"><strong>S</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Dobre si zapamätajte písmeno S. Budete ho potrebovať neskôr.</small></div></div></div></section>`;}
-  function readKvakMessage(){showDialog(`<section id="kvak-transcript" class="kvak-message-reading"><h2>Kvakova správa</h2>${GAME.kvakMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
-  function sutkoCells(){return new Set((Array.isArray(state().sutkoCells)?state().sutkoCells:[]).filter(index=>Number.isInteger(index)&&index>=0&&index<GAME.sutkoPuzzle.grid.flat().length));}
-  function sutkoLockScreen(){
+  function mikyRestoreScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-restore" aria-labelledby="restore-title">${signalHeader(preview?'exit-test':'home','OBNOVA LINKY')}<div class="signal-content">${STORY_TEXT.party('envelope')}<h1 id="restore-title" tabindex="-1">${esc(GAME.stages[1].label)}</h1><form class="answer-form signal-form"><label for="answer">Kód na obnovenie spojenia</label><input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" spellcheck="false" placeholder="••••••" aria-describedby="feedback" required><button class="btn" type="submit">OBNOVIŤ SPOJENIE</button></form><p class="feedback" id="feedback" role="status"></p>${GAME.audio?'<span data-miky-audio-slot hidden></span>':''}</div></section>`;}
+  function mikyConnectionScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-connected success-card" aria-labelledby="connection-title">${signalHeader(preview?'exit-test':'home','SPOJENIE AKTÍVNE')}<div class="signal-content"><h1 id="connection-title" tabindex="-1">SPOJENIE OBNOVENÉ!</h1><div class="signal-duo" aria-label="Piko a Miky sú spolu na linke"><div class="signal-person">${sprite('piko','piko-listener')}<strong>Piko</strong></div><div class="connection-line" aria-hidden="true"><span></span><i>✦</i><span></span></div><div class="signal-person miky-speaker">${sprite('miky','success-character')}<strong>Miky</strong></div></div><p class="connection-message">Ja vás počujem! Ďakujem, konečne sme zase v spojení.</p>${GAME.audio?`<span data-miky-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="miky-audio-toggle" aria-controls="miky-audio">▶ Prehrať správu</button></div><p id="miky-audio-status" role="status">Správu môžete prehrať opakovane.</p>`:'<p class="message-text-status">Čaká vás odkaz s ďalšou indíciou.</p>'}<button class="${GAME.audio?'text-link':'btn'} miky-transcript-link" data-action="read-miky-message">${GAME.audio?'Čítať Mikyho správu':'Prečítať správu →'}</button><div class="signal-reward"><strong>S</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Dobre si zapamätajte písmeno S. Budete ho potrebovať neskôr.</small></div></div></div></section>`;}
+  function readMikyMessage(){showDialog(`<section id="miky-transcript" class="miky-message-reading"><h2>Mikyho správa</h2>${GAME.mikyMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
+  function plugyCells(){return new Set((Array.isArray(state().plugyCells)?state().plugyCells:[]).filter(index=>Number.isInteger(index)&&index>=0&&index<GAME.plugyPuzzle.grid.flat().length));}
+  function plugyLockScreen(){
     app.classList.add('signal-mode');
-    const puzzle=GAME.sutkoPuzzle,selected=sutkoCells();
-    return `<section class="signal-screen sutko-screen sutko-lock signal-task" aria-labelledby="sutko-title">${signalHeader(preview?'exit-test':'home','ŠUTKOV ZÁMOK')}<div class="signal-content">${STORY_TEXT.party('symbols')}<h1 id="sutko-title" tabindex="-1">${esc(GAME.stages[3].label)}</h1><p class="sutko-welcome">${esc(puzzle.welcome)}</p><p id="sutko-instruction">${esc(puzzle.instruction)} <small>${esc(puzzle.toggleHint)}</small></p><div class="sutko-grid" role="group" aria-label="Kamenný zámok: 5 stĺpcov a 7 riadkov" aria-describedby="sutko-instruction">${puzzle.grid.flat().map((value,index)=>`<button class="sutko-cell" data-action="sutko-cell" data-cell="${index}" aria-pressed="${selected.has(index)}" aria-label="${value}, riadok ${Math.floor(index/5)+1}, stĺpec ${index%5+1}">${value}</button>`).join('')}</div><button class="text-link sutko-hint" data-action="sutko-hint">Potrebujeme nápovedu</button>${GAME.sutkoAudio?'<span data-sutko-audio-slot hidden></span>':''}</div></section>`;
+    const puzzle=GAME.plugyPuzzle,selected=plugyCells();
+    return `<section class="signal-screen plugy-screen plugy-lock signal-task" aria-labelledby="plugy-title">${signalHeader(preview?'exit-test':'home','PLUGYHO ZÁMOK')}<div class="signal-content">${STORY_TEXT.party('symbols')}<h1 id="plugy-title" tabindex="-1">${esc(GAME.stages[3].label)}</h1><p class="plugy-welcome">${esc(puzzle.welcome)}</p><p id="plugy-instruction">${esc(puzzle.instruction)} <small>${esc(puzzle.toggleHint)}</small></p><div class="plugy-grid" role="group" aria-label="Digitálny zámok: 5 stĺpcov a 7 riadkov" aria-describedby="plugy-instruction">${puzzle.grid.flat().map((value,index)=>`<button class="plugy-cell" data-action="plugy-cell" data-cell="${index}" aria-pressed="${selected.has(index)}" aria-label="${value}, riadok ${Math.floor(index/5)+1}, stĺpec ${index%5+1}">${value}</button>`).join('')}</div><button class="text-link plugy-hint" data-action="plugy-hint">Potrebujeme nápovedu</button>${GAME.plugyAudio?'<span data-plugy-audio-slot hidden></span>':''}</div></section>`;
   }
-  function sutkoConnectionScreen(){
+  function plugyConnectionScreen(){
     app.classList.add('signal-mode');
-    const sign=GAME.sutkoPuzzle.grid.flat().map(value=>`<i class="${GAME.sutkoPuzzle.values.includes(value)?'lit':''}"></i>`).join('');
-    return `<section class="signal-screen sutko-screen sutko-connected signal-stage-result success-card" aria-labelledby="sutko-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><div class="sutko-result-heading"><h1 id="sutko-title" tabindex="-1">Most je odomknutý!</h1><div class="sutko-unlock"><span class="sutko-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div></div><div class="sutko-celebration"><img class="sutko-party-scene" src="assets/printable-scenes/p3-sutko.png" alt="Piko, Kvak, Iskra a Šutko sú spolu pri opravenom moste." width="2172" height="724"><p class="sutko-thanks">${esc(GAME.sutkoThanks)}</p></div><div class="sutko-message">${GAME.sutkoAudio?`<span data-sutko-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="sutko-audio-toggle" aria-controls="sutko-audio">▶ Prehrať Šutkovu správu</button></div><p id="sutko-audio-status" role="status">Ťuknutím spustíte správu${GAME.sutkoAudioPlaceholder?' · Testovacia nahrávka: Kvak.':'.'}</p>`:''}<button class="text-link" data-action="read-sutko-message">Čítať Šutkovu správu</button></div><div class="signal-reward"><strong>E</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Zapamätajte si písmeno E. Budete ho potrebovať neskôr.</small></div></div></div></section>`;
+    const sign=GAME.plugyPuzzle.grid.flat().map(value=>`<i class="${GAME.plugyPuzzle.values.includes(value)?'lit':''}"></i>`).join('');
+    return `<section class="signal-screen plugy-screen plugy-connected signal-stage-result success-card" aria-labelledby="plugy-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><div class="plugy-result-heading"><h1 id="plugy-title" tabindex="-1">Most je odomknutý!</h1><div class="plugy-unlock"><span class="plugy-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div></div><div class="plugy-celebration"><img class="plugy-party-scene" src="assets/printable-scenes/p3-plugy.png" alt="Piko, Miky, Pixi a Plugy sú spolu pri opravenom moste." width="1536" height="512"><p class="plugy-thanks">${esc(GAME.plugyThanks)}</p></div><div class="plugy-message">${GAME.plugyAudio?`<span data-plugy-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="plugy-audio-toggle" aria-controls="plugy-audio">▶ Prehrať Plugyho správu</button></div><p id="plugy-audio-status" role="status">Ťuknutím spustíte správu${GAME.plugyAudioPlaceholder?' · Testovacia nahrávka: Miky.':'.'}</p>`:'<p class="message-text-status">Za mostom čaká ďalší odkaz.</p>'}<button class="${GAME.plugyAudio?'text-link':'btn'}" data-action="read-plugy-message">${GAME.plugyAudio?'Čítať Plugyho správu':'Prečítať správu →'}</button></div><div class="signal-reward"><strong>E</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Zapamätajte si písmeno E. Budete ho potrebovať neskôr.</small></div></div></div></section>`;
   }
-  function readSutkoMessage(){showDialog(`<section id="sutko-transcript" class="kvak-message-reading"><h2>Šutkova správa</h2>${GAME.sutkoMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
-  function selectSutkoCell(button){
+  function readPlugyMessage(){showDialog(`<section id="plugy-transcript" class="miky-message-reading"><h2>Plugyho správa</h2>${GAME.plugyMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
+  function selectPlugyCell(button){
     if(view!=='player'||state().stage!==3||state().completed.includes(3))return;
-    const index=Number(button.dataset.cell),grid=GAME.sutkoPuzzle.grid.flat(),selected=sutkoCells();
+    const index=Number(button.dataset.cell),grid=GAME.plugyPuzzle.grid.flat(),selected=plugyCells();
     if(!Number.isInteger(index)||index<0||index>=grid.length)return;
     if(selected.has(index))selected.delete(index);else selected.add(index);
-    state().sutkoCells=[...selected];save();button.setAttribute('aria-pressed',String(selected.has(index)));
-    if(grid.every((value,index)=>selected.has(index)===GAME.sutkoPuzzle.values.includes(value)))revealSutkoSign();
+    state().plugyCells=[...selected];save();button.setAttribute('aria-pressed',String(selected.has(index)));
+    if(grid.every((value,index)=>selected.has(index)===GAME.plugyPuzzle.values.includes(value)))revealPlugySign();
   }
-  function revealSutkoSign(){
-    const screen=app.querySelector('.sutko-lock'),grid=screen?.querySelector('.sutko-grid'),revealState=state();
-    if(!grid||sutkoRevealTimer!==null)return;
-    primeSutkoAudio(app.querySelector('#sutko-audio'));
+  function revealPlugySign(){
+    const screen=app.querySelector('.plugy-lock'),grid=screen?.querySelector('.plugy-grid'),revealState=state();
+    if(!grid||plugyRevealTimer!==null)return;
+    primePlugyAudio(app.querySelector('#plugy-audio'));
     // Save the solved task now, so leaving or refreshing cannot lose the discovery.
     recordTaskCompletion();
     grid.classList.add('is-unlocking');grid.setAttribute('aria-label','Správny znak: číslica 9. Most sa odomyká.');
     grid.querySelectorAll('button').forEach(button=>{button.disabled=true;});
-    const status=screen.querySelector('.sutko-hint');
+    const status=screen.querySelector('.plugy-hint');
     status.disabled=true;status.textContent='Znak je správny. Most sa odomyká…';status.setAttribute('role','status');
-    sutkoRevealTimer=setTimeout(()=>{
-      sutkoRevealTimer=null;
+    plugyRevealTimer=setTimeout(()=>{
+      plugyRevealTimer=null;
       if(view==='player'&&state()===revealState&&state().stage===3&&screen.isConnected)completeTask();
     },2500);
   }
-  function sutkoHint(){
+  function plugyHint(){
     if(view!=='player'||state().stage!==3||state().completed.includes(3))return;
     const hints=GAME.stages[3].hints,count=Math.min((Number(state().hints[3])||0)+1,hints.length);
     state().hints[3]=count;save();
-    showDialog(`<section><h2>Pomoc so Šutkovým zámkom</h2>${hints.slice(0,count).map(hint=>`<p>${esc(hint)}</p>`).join('')}${count<hints.length?'<button class="btn" data-action="sutko-hint">Ďalšia nápoveda</button>':''}</section>`);
+    showDialog(`<section><h2>Pomoc so Plugyho zámkom</h2>${hints.slice(0,count).map(hint=>`<p>${esc(hint)}</p>`).join('')}${count<hints.length?'<button class="btn" data-action="plugy-hint">Ďalšia nápoveda</button>':''}</section>`);
   }
-  function primeSutkoAudio(audio){
+  function primePlugyAudio(audio){
     const AudioContext=window.AudioContext||window.webkitAudioContext;
-    if(!audio||!AudioContext||audio.sutkoSound)return;
+    if(!audio||!AudioContext||audio.plugySound)return;
     let context;
     try{
       // Both resume() and play() run in the final tile's trusted tap, before the timer.
       context=new AudioContext();
       const source=context.createMediaElementSource(audio),gain=context.createGain();
       gain.gain.value=0;source.connect(gain);gain.connect(context.destination);
-      const sound=audio.sutkoSound={context,source,gain,revealing:true,loop:audio.loop,error:null};
+      const sound=audio.plugySound={context,source,gain,revealing:true,loop:audio.loop,error:null};
       audio.loop=true; // Even short recordings stay active, silently, through the reveal.
       const failed=error=>{
         if(error.name==='AbortError')return;sound.error=error;
-        if(!sound.revealing&&audio.isConnected){audio.pause();if(error.name==='NotAllowedError')audio.sutkoBlocked();else audio.sutkoFallback();}
+        if(!sound.revealing&&audio.isConnected){audio.pause();if(error.name==='NotAllowedError')audio.plugyBlocked();else audio.plugyFallback();}
       };
       context.resume().catch(failed);
       if(audio.error||audio.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)audio.load();
       audio.play().catch(failed);
     }catch(_){context?.close().catch(()=>{});}
   }
-  function releaseSutkoAudio(audio){
-    const sound=audio?.sutkoSound;if(!sound)return;
+  function releasePlugyAudio(audio){
+    const sound=audio?.plugySound;if(!sound)return;
     audio.pause();audio.loop=sound.loop;sound.source.disconnect();sound.gain.disconnect();
-    sound.context.close().catch(()=>{});audio.sutkoSound=null;
+    sound.context.close().catch(()=>{});audio.plugySound=null;
   }
-  function startSutkoMessage(audio){
-    const sound=audio.sutkoSound;
+  function startPlugyMessage(audio){
+    const sound=audio.plugySound;
     if(sound){
       sound.revealing=false;audio.loop=sound.loop;
       if(sound.error||sound.context.state!=='running'){
         audio.pause();if(audio.readyState>=1)audio.currentTime=0;sound.gain.gain.value=1;
-        if(sound.error&&sound.error.name!=='NotAllowedError')audio.sutkoFallback();else audio.sutkoBlocked();return;
+        if(sound.error&&sound.error.name!=='NotAllowedError')audio.plugyFallback();else audio.plugyBlocked();return;
       }
-      const release=()=>{if(audio.isConnected&&audio.sutkoSound===sound){sound.gain.gain.value=1;audio.sutkoSync();}};
+      const release=()=>{if(audio.isConnected&&audio.plugySound===sound){sound.gain.gain.value=1;audio.plugySync();}};
       if(audio.readyState>=1&&audio.currentTime>0){
         // Keep the output silent until seeking has discarded the reveal's audio frames.
-        audio.addEventListener('seeked',release,{once:true,signal:audio.sutkoEvents.signal});audio.currentTime=0;
+        audio.addEventListener('seeked',release,{once:true,signal:audio.plugyEvents.signal});audio.currentTime=0;
       }else release();
-      if(!audio.paused){audio.sutkoSync();return;}
+      if(!audio.paused){audio.plugySync();return;}
     }
-    playSutkoAudio(audio);
+    playPlugyAudio(audio);
   }
-  function playSutkoAudio(audio){
-    const context=audio.sutkoSound?.context;
-    if(context&&context.state!=='running')context.resume().catch(()=>{if(audio.isConnected){audio.pause();audio.sutkoBlocked();}});
+  function playPlugyAudio(audio){
+    const context=audio.plugySound?.context;
+    if(context&&context.state!=='running')context.resume().catch(()=>{if(audio.isConnected){audio.pause();audio.plugyBlocked();}});
     if(audio.error||audio.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)audio.load();
-    audio.play().catch(error=>{if(!audio.isConnected||error.name==='AbortError')return;if(error.name==='NotAllowedError')audio.sutkoBlocked();else audio.sutkoFallback();});
+    audio.play().catch(error=>{if(!audio.isConnected||error.name==='AbortError')return;if(error.name==='NotAllowedError')audio.plugyBlocked();else audio.plugyFallback();});
   }
-  function bindSutkoAudio(autoplay=false){
-    const audio=app.querySelector('#sutko-audio'),button=app.querySelector('[data-action="sutko-audio-toggle"]'),status=app.querySelector('#sutko-audio-status');
+  function bindPlugyAudio(autoplay=false){
+    const audio=app.querySelector('#plugy-audio'),button=app.querySelector('[data-action="plugy-audio-toggle"]'),status=app.querySelector('#plugy-audio-status');
     if(!audio||!button||!status)return;
-    const events=new AbortController();audio.sutkoEvents=events;
+    const events=new AbortController();audio.plugyEvents=events;
     const listen=(name,handler)=>audio.addEventListener(name,handler,{signal:events.signal});
     let failed=false,attempted=false;
-    const idle=()=>{button.textContent=audio.ended||audio.sutkoReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať Šutkovu správu';};
-    const speaking=()=>{if(failed||audio.paused||audio.ended||audio.sutkoSound?.gain.gain.value===0)return;const text=GAME.sutkoAudioPlaceholder?'Testovacia nahrávka: hovorí Kvak…':'Hovorí Šutko…';if(status.textContent!==text)status.textContent=text;};
+    const idle=()=>{button.textContent=audio.ended||audio.plugyReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať Plugyho správu';};
+    const speaking=()=>{if(failed||audio.paused||audio.ended||audio.plugySound?.gain.gain.value===0)return;const text=GAME.plugyAudioPlaceholder?'Testovacia nahrávka: hovorí Miky…':'Hovorí Plugy…';if(status.textContent!==text)status.textContent=text;};
     const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;audio.pause();idle();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Správu sa nepodarilo prehrať. Môžete si ju prečítať.';};
-    listen('play',()=>{attempted=true;failed=false;audio.sutkoReplayReady=false;button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Šutkovu správu…';});
+    listen('play',()=>{attempted=true;failed=false;audio.plugyReplayReady=false;button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Plugyho správu…';});
     listen('playing',speaking);
-    listen('timeupdate',()=>{if(!failed&&!audio.paused&&!audio.ended&&audio.currentTime>0&&(!audio.sutkoSound||audio.sutkoSound.context.state==='running'))speaking();});
-    listen('waiting',()=>{status.textContent='Načítavam Šutkovu správu…';});
+    listen('timeupdate',()=>{if(!failed&&!audio.paused&&!audio.ended&&audio.currentTime>0&&(!audio.plugySound||audio.plugySound.context.state==='running'))speaking();});
+    listen('waiting',()=>{status.textContent='Načítavam Plugyho správu…';});
     listen('pause',()=>{if(failed||!audio.paused)return;idle();status.textContent=audio.ended?'Správu si môžete prehrať znova.':'Správa je pozastavená.';});
-    listen('ended',()=>{audio.sutkoReplayReady=true;idle();status.textContent='Správu si môžete prehrať znova.';});
-    listen('error',()=>{if(attempted&&audio.error)fallback();});audio.sutkoFallback=fallback;
-    audio.sutkoBlocked=()=>{failed=true;audio.pause();idle();status.textContent='Ťuknutím spustíte Šutkovu správu.';};
-    audio.sutkoSync=()=>{if(audio.paused){idle();status.textContent='Správa je pozastavená.';return;}button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Šutkovu správu…';if(audio.readyState>=2&&audio.currentTime>0)speaking();};
-    if(autoplay){attempted=true;startSutkoMessage(audio);}
+    listen('ended',()=>{audio.plugyReplayReady=true;idle();status.textContent='Správu si môžete prehrať znova.';});
+    listen('error',()=>{if(attempted&&audio.error)fallback();});audio.plugyFallback=fallback;
+    audio.plugyBlocked=()=>{failed=true;audio.pause();idle();status.textContent='Ťuknutím spustíte Plugyho správu.';};
+    audio.plugySync=()=>{if(audio.paused){idle();status.textContent='Správa je pozastavená.';return;}button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Plugyho správu…';if(audio.readyState>=2&&audio.currentTime>0)speaking();};
+    if(autoplay){attempted=true;startPlugyMessage(audio);}
   }
-  function playKvakAudio(audio){
+  function playMikyAudio(audio){
     if(audio.error||audio.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)audio.load();
     audio.play().catch(error=>{
       if(!audio.isConnected||error.name==='AbortError')return;
-      if(error.name==='NotAllowedError')audio.kvakBlocked();else audio.kvakFallback();
+      if(error.name==='NotAllowedError')audio.mikyBlocked();else audio.mikyFallback();
     });
   }
-  function bindKvakAudio(autoplay=false){
-    const audio=app.querySelector('#kvak-audio');if(!audio)return;
-    const screen=audio.closest('.signal-screen'),status=app.querySelector('#kvak-audio-status'),button=app.querySelector('[data-action="kvak-audio-toggle"]');
+  function bindMikyAudio(autoplay=false){
+    const audio=app.querySelector('#miky-audio');if(!audio)return;
+    const screen=audio.closest('.signal-screen'),status=app.querySelector('#miky-audio-status'),button=app.querySelector('[data-action="miky-audio-toggle"]');
     if(!button||!status)return;
-    const events=new AbortController();audio.kvakEvents=events;
+    const events=new AbortController();audio.mikyEvents=events;
     const listen=(name,handler)=>audio.addEventListener(name,handler,{signal:events.signal});
     let failed=false,attempted=autoplay;
-    const idle=()=>{screen.classList.remove('is-speaking');button.textContent=audio.ended||audio.kvakReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať správu';};
-    const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;audio.pause();idle();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Správu sa nepodarilo prehrať.';readKvakMessage();};
-    listen('play',()=>{attempted=true;failed=false;audio.kvakReplayReady=false;button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Kvakovu správu…';});
-    listen('playing',()=>{screen.classList.add('is-speaking');status.textContent='Hovorí Kvak…';});
-    listen('waiting',()=>{screen.classList.remove('is-speaking');status.textContent='Načítavam Kvakovu správu…';});
+    const idle=()=>{screen.classList.remove('is-speaking');button.textContent=audio.ended||audio.mikyReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať správu';};
+    const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;audio.pause();idle();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Správu sa nepodarilo prehrať. Môžete si ju prečítať.';};
+    listen('play',()=>{attempted=true;failed=false;audio.mikyReplayReady=false;button.textContent='Ⅱ Pozastaviť';status.textContent='Načítavam Mikyho správu…';});
+    listen('playing',()=>{screen.classList.add('is-speaking');status.textContent='Hovorí Miky…';});
+    listen('waiting',()=>{screen.classList.remove('is-speaking');status.textContent='Načítavam Mikyho správu…';});
     listen('pause',()=>{if(failed||!audio.paused)return;idle();status.textContent=audio.ended?'Správu si môžete prehrať znova.':'Správa je pozastavená.';});
-    listen('ended',()=>{audio.kvakReplayReady=true;idle();status.textContent='Správu si môžete prehrať znova.';});
-    listen('error',()=>{if(attempted&&audio.error)fallback();});audio.kvakFallback=fallback;
-    audio.kvakBlocked=()=>{idle();status.textContent='Ťuknutím spustíte Kvakovu správu.';};
-    if(autoplay)playKvakAudio(audio);
+    listen('ended',()=>{audio.mikyReplayReady=true;idle();status.textContent='Správu si môžete prehrať znova.';});
+    listen('error',()=>{if(attempted&&audio.error)fallback();});audio.mikyFallback=fallback;
+    audio.mikyBlocked=()=>{idle();status.textContent='Ťuknutím spustíte Mikyho správu.';};
+    if(autoplay)playMikyAudio(audio);
   }
   let answerViewportFrame=0;
   function resetAnswerViewport(){
@@ -254,8 +256,8 @@
       if(Math.abs(delta)>1)app.scrollTop+=delta;
     });
   }
-  function render({autoplayKvak=false,autoplaySutko=false}={}){
-    clearTimeout(sutkoRevealTimer);sutkoRevealTimer=null;
+  function render({autoplayMiky=false,autoplayPlugy=false}={}){
+    clearTimeout(plugyRevealTimer);plugyRevealTimer=null;
     // Old saves on the removed phone stage resume at the next playable task.
     if(view==='player'&&state().stage===2&&state().completed.includes(1)){
       if(!state().completed.includes(2))state().completed.push(2);
@@ -263,20 +265,20 @@
     }
     resetAnswerViewport();
     app.classList.remove('signal-mode');
-    const previousAudio=app.querySelector('#kvak-audio');
+    const previousAudio=app.querySelector('#miky-audio');
     const retainedAudio=view==='player'&&state().stage===1?previousAudio:null;
-    previousAudio?.kvakEvents?.abort();
-    const previousSutkoAudio=app.querySelector('#sutko-audio');
-    const retainedSutkoAudio=view==='player'&&state().stage===3?previousSutkoAudio:null;
-    previousSutkoAudio?.sutkoEvents?.abort();
+    previousAudio?.mikyEvents?.abort();
+    const previousPlugyAudio=app.querySelector('#plugy-audio');
+    const retainedPlugyAudio=view==='player'&&state().stage===3?previousPlugyAudio:null;
+    previousPlugyAudio?.plugyEvents?.abort();
     app.querySelectorAll('video,audio').forEach(media=>{
-      if(!(autoplaySutko&&media===retainedSutkoAudio&&media.sutkoSound?.revealing))media.pause();
+      if(!(autoplayPlugy&&media===retainedPlugyAudio&&media.plugySound?.revealing))media.pause();
     });
     // Keep the buffered element attached while replacing the code form with the result.
     if(retainedAudio)document.body.append(retainedAudio);
     else if(previousAudio){previousAudio.removeAttribute('src');previousAudio.load();}
-    if(retainedSutkoAudio)document.body.append(retainedSutkoAudio);
-    else if(previousSutkoAudio){releaseSutkoAudio(previousSutkoAudio);previousSutkoAudio.removeAttribute('src');previousSutkoAudio.load();}
+    if(retainedPlugyAudio)document.body.append(retainedPlugyAudio);
+    else if(previousPlugyAudio){releasePlugyAudio(previousPlugyAudio);previousPlugyAudio.removeAttribute('src');previousPlugyAudio.load();}
     document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(view==='player'?'prep':view)));
     if(internal && SITE_CONFIG.access.mode !== 'test'){
       app.innerHTML='<section class="portal-header"><div><h1>Prístup zatiaľ nie je dostupný</h1><p>Produkčná verzia vyžaduje serverové overenie nákupu. V tejto etape nie je implementované.</p></div></section>';return;
@@ -284,21 +286,21 @@
     document.querySelectorAll('.nav-purchase').forEach(button=>{button.textContent=SITE_CONFIG.purchase.label;});
     document.querySelectorAll('[data-management-link]').forEach(link=>{const url=SITE_CONFIG.managementUrl();link.hidden=!url;if(url)link.href=url;});
     app.innerHTML=view==='prep'?prep():view==='designer'?designer():view==='player'&&state().started&&state().stage>0?taskScreen():landing();
-    const audioSlot=app.querySelector('[data-kvak-audio-slot]');
+    const audioSlot=app.querySelector('[data-miky-audio-slot]');
     if(audioSlot){
       const audio=retainedAudio||document.createElement('audio');
-      if(!retainedAudio){audio.id='kvak-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.setAttribute('aria-label','Kvakova hlasová správa');audio.src=GAME.audio;}
+      if(!retainedAudio){audio.id='miky-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.setAttribute('aria-label','Mikyho hlasová správa');audio.src=GAME.audio;}
       audioSlot.replaceWith(audio);
       if(!retainedAudio)audio.load();
     }else retainedAudio?.remove();
-    bindKvakAudio(autoplayKvak);
-    const sutkoAudioSlot=app.querySelector('[data-sutko-audio-slot]');
-    if(sutkoAudioSlot){
-      const audio=retainedSutkoAudio||document.createElement('audio');
-      if(!retainedSutkoAudio){audio.id='sutko-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.setAttribute('aria-label','Šutkova hlasová správa');audio.src=GAME.sutkoAudio;}
-      sutkoAudioSlot.replaceWith(audio);if(!retainedSutkoAudio)audio.load();
-    }else if(retainedSutkoAudio){releaseSutkoAudio(retainedSutkoAudio);retainedSutkoAudio.remove();}
-    bindSutkoAudio(autoplaySutko);
+    bindMikyAudio(autoplayMiky);
+    const plugyAudioSlot=app.querySelector('[data-plugy-audio-slot]');
+    if(plugyAudioSlot){
+      const audio=retainedPlugyAudio||document.createElement('audio');
+      if(!retainedPlugyAudio){audio.id='plugy-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.setAttribute('aria-label','Plugyho hlasová správa');audio.src=GAME.plugyAudio;}
+      plugyAudioSlot.replaceWith(audio);if(!retainedPlugyAudio)audio.load();
+    }else if(retainedPlugyAudio){releasePlugyAudio(retainedPlugyAudio);retainedPlugyAudio.remove();}
+    bindPlugyAudio(autoplayPlugy);
     if(view==='prep'){app.querySelectorAll('[data-check]').forEach(el=>{el.checked=PREP_STORE.read(el.dataset.check);});updatePreparation();}
   }
   function start(){
@@ -370,7 +372,7 @@
     modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
-  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayKvak:n===1,autoplaySutko:n===3});goTop();}
+  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3});goTop();}
   function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
@@ -395,18 +397,18 @@
       if(content.hidden)content.querySelectorAll('video,audio').forEach(media=>media.pause());
       return;
     }
-    if(a==='read-kvak-message'){readKvakMessage();return;}
-    if(a==='sutko-cell'){selectSutkoCell(b);return;}
-    if(a==='sutko-hint'){sutkoHint();return;}
-    if(a==='read-sutko-message'){readSutkoMessage();return;}
-    if(a==='sutko-audio-toggle'){
-      const audio=app.querySelector('#sutko-audio');
-      if(audio){if(!audio.error&&!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.sutkoReplayReady)audio.currentTime=0;playSutkoAudio(audio);}}
+    if(a==='read-miky-message'){readMikyMessage();return;}
+    if(a==='plugy-cell'){selectPlugyCell(b);return;}
+    if(a==='plugy-hint'){plugyHint();return;}
+    if(a==='read-plugy-message'){readPlugyMessage();return;}
+    if(a==='plugy-audio-toggle'){
+      const audio=app.querySelector('#plugy-audio');
+      if(audio){if(!audio.error&&!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.plugyReplayReady)audio.currentTime=0;playPlugyAudio(audio);}}
       return;
     }
-    if(a==='kvak-audio-toggle'){
-      const audio=app.querySelector('#kvak-audio');
-      if(audio){if(!audio.error&&!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.kvakReplayReady)audio.currentTime=0;playKvakAudio(audio);}}
+    if(a==='miky-audio-toggle'){
+      const audio=app.querySelector('#miky-audio');
+      if(audio){if(!audio.error&&!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.mikyReplayReady)audio.currentTime=0;playMikyAudio(audio);}}
       return;
     }
     if(a==='scene-page'){
@@ -420,7 +422,7 @@
       document.querySelector('.scene-reader')?.scrollIntoView({block:'start',behavior:'instant'});return;
     }
     if(a==='purchase'){showDialog(SITE_CONFIG.purchaseHTML());return;}
-    if(a==='preview-media'){const isPiko=b.dataset.media==='piko';showDialog(`<section class="media-preview ${isPiko?'piko-media-preview':''}"><span class="section-kicker">KONTROLA NAHRÁVKY</span><h2>${isPiko?'Pikova videospráva':'Kvakova hlasová správa'}</h2>${isPiko?`<video controls playsinline preload="metadata" src="${esc(GAME.video)}" aria-label="Náhľad Pikovej videosprávy"></video>`:`<audio controls preload="metadata" src="${esc(GAME.audio)}" aria-label="Náhľad Kvakovej hlasovej správy"></audio>`}${isPiko?`<p class="preview-message-instructions">${esc(GAME.stages[0].task)}</p>`:''}<p role="status" class="preview-media-status"></p></section>`);const media=modal.querySelector('video,audio');media.addEventListener('error',()=>{modal.querySelector('.preview-media-status').textContent='Nahrávku sa nepodarilo načítať. Text a podklady nájdete v StoryBoarde.';});media.play().catch(()=>{});return;}
+    if(a==='preview-media'){const isPiko=b.dataset.media==='piko';showDialog(`<section class="media-preview ${isPiko?'piko-media-preview':''}"><span class="section-kicker">KONTROLA NAHRÁVKY</span><h2>${isPiko?'Pikova videospráva':'Mikyho hlasová správa'}</h2>${isPiko?`<video controls playsinline preload="metadata" src="${esc(GAME.video)}" aria-label="Náhľad Pikovej videosprávy"></video>`:`<audio controls preload="metadata" src="${esc(GAME.audio)}" aria-label="Náhľad Mikyho hlasovej správy"></audio>`}${isPiko?`<p class="preview-message-instructions">${esc(GAME.stages[0].task)}</p>`:''}<p role="status" class="preview-media-status"></p></section>`);const media=modal.querySelector('video,audio');media.addEventListener('error',()=>{modal.querySelector('.preview-media-status').textContent='Nahrávku sa nepodarilo načítať. Text a podklady nájdete v StoryBoarde.';});media.play().catch(()=>{});return;}
     if(a==='start')start();
     if(a==='restart-adventure'){if(!internal || !SITE_CONFIG.access.canLaunch(PREP_STORE.ready()))return;preview=null;progress=fresh();success=false;start();}
     if(a==='home'){navigate('prep');}
@@ -461,7 +463,8 @@
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
-  const scannedSignal={kvak:1,sutko:3,listok:4}[new URLSearchParams(location.search).get('signal')];
+  // Legacy printed QR payloads must keep working; new names are not storage keys.
+  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     if(progress.stage===0)progress.stage=1;

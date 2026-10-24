@@ -20,6 +20,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
       assert.ok(box.y >= 0 && box.y + box.height <= height,`hero purchase visible without scrolling at ${width}`);
       assert.ok((await cta.textContent()).includes('14,99 €'));
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      if(width>=1024)assert.ok((await page.locator('.hero-copy').boundingBox()).x<width/3,'artwork must not occupy a grid column and push copy over the characters');
       await page.screenshot({path:`/tmp/v5-funnel-${width}.png`});
     }
     await page.evaluate(() => localStorage.setItem('zahada-v1-progress', JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}})));

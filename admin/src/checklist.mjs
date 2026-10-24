@@ -22,7 +22,7 @@ export const checklist = [
   },
   {
     "id": "envelope-2",
-    "label": "Pripravil som druhú obálku s celým Iskriným dekódovacím strojom P2."
+    "label": "Pripravil som druhú obálku s celým Pixiiným dekódovacím strojom P2."
   },
   {
     "id": "window",
@@ -42,7 +42,7 @@ export const checklist = [
   },
   {
     "id": "media",
-    "label": "Overil som Pikovo video, Kvakovu hlasovú správu a hlasitosť telefónu."
+    "label": "Overil som Pikovo video a čitateľnosť textových správ na telefóne."
   },
   {
     "id": "phone",

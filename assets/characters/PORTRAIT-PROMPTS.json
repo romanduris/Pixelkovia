@@ -1,0 +1,49 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: background-extraction / identity-preserve. Input is the EDIT TARGET approved character portrait. Create a clean full-body production cutout of EXACTLY the same character with exactly the same anatomy, shape, face, clothing, colors, pixel-painterly texture and pose. Preserve precise identity, do not redesign or add any detail. Remove the ENTIRE navy scene background, circuit floor, ground shadow and ALL nameplate / name lettering at bottom. Keep only the character itself and tiny immediately adjacent meaningful light effects. Genuine transparent background with alpha, no white or checkerboard baked in. Fit the single full-body character as large as possible within a square canvas with 7 percent clear padding on all sides, feet fully visible. No names, no text, no nameplates, no watermark anywhere. For the USB character preserve its definitive absence of tail. For orange shield preserve teal necktie and cyan keyhole emblem. For blue coordinator preserve original cloud-shaped head and cyan >_ screen eyes, dark suit white shirt and teal tie.",
+  "characters": [
+    {
+      "id": "piko",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/pixelkovia-navrhy-abc/B/01-piko.png",
+      "output": "assets/characters/piko.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-c83bdcfe-75eb-4d6b-9c03-f10f0875c82f.png"
+    },
+    {
+      "id": "miky",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/pixelkovia-navrhy-abc/B/02-miky.png",
+      "output": "assets/characters/miky.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-51dd2aa0-e290-430b-b934-60a03753d547.png"
+    },
+    {
+      "id": "pixi",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/pixelkovia-navrhy-abc/B/03-pixi.png",
+      "output": "assets/characters/pixi.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-7b842fba-d22b-40f9-a4fd-ebc3fb5508de.png"
+    },
+    {
+      "id": "plugy",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/funnel-obyvacka-b-navrhy/04-plugy-bez-chvosta.png",
+      "output": "assets/characters/plugy.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-e5a39331-9748-4dbc-8f95-8c1809a4c7a3.png"
+    },
+    {
+      "id": "pingy",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/pixelkovia-navrhy-abc/B/05-pingy.png",
+      "output": "assets/characters/pingy.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-7795340a-f5a2-4804-9f70-762d3a85f283.png"
+    },
+    {
+      "id": "cipko",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/pixelkovia-navrhy-abc/B/06-cipko.png",
+      "output": "assets/characters/cipko.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-6295d9d9-7eb6-479f-bd79-adf99debdad8.png"
+    },
+    {
+      "id": "guardy",
+      "reference": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/pixelkovia-navrhy-abc/A/07-guardy.png",
+      "output": "assets/characters/guardy.png",
+      "source": "/home/codespace/.codex/generated_images/01a16c4b-cf3e-7d61-b9b5-b25a922f269a/exec-1089295e-a411-4ee8-b046-f78c5164860e.png"
+    }
+  ],
+  "heroRefinement": "Use case: identity-preserve / precise-object-edit. IMAGE 1 is the EDIT TARGET: the approved variant 2 funnel illustration, a normal human living room with blue twilight window, sofa and a cyan digital table in the foreground. IMAGE 2 is the approved FINAL orange shield protector identity. Change ONLY the orange shield character at the FAR RIGHT of image 1 to match image 2 exactly: warm orange ornate shield silhouette with peaked top, cream face, friendly eyes, TEAL BUSINESS TIE, large cyan KEYHOLE emblem (not padlock), stubby orange hands and feet, and a subtle protective cyan arc. Preserve his position/scale. Keep the entire rest of image 1 unchanged: ALL SIX other characters, original blue cloud-headed coordinator in black suit and teal tie with >_ screen expression, microphone, cream-framed yellow pixel, green glasses chip, mint envelope and CREAM USB character WITHOUT TAIL, all their poses, exactly seven characters, the wooden coffee table, cyan map, normal apartment furniture, blue outside window, lamp, colors, pixel painting, wide landscape dimensions. No names, lettering, labels, watermarks or typography anywhere. No tail on the USB character."
+}

@@ -16,7 +16,7 @@ const run=length=>Array.from({length},(_,i)=>i+1);
    const migrated=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY);
    assert.equal(migrated.progressVersion,2);assert.equal(migrated.stage,newStage);
    assert.deepEqual(migrated.completed,run(newCompleted));assert.deepEqual(migrated.hints,{5:1,6:1,7:2});
-   assert.deepEqual(migrated.sutkoCells,old.sutkoCells);assert.deepEqual(migrated.scenePages,old.scenePages);
+   assert.deepEqual(migrated.plugyCells,old.sutkoCells);assert.equal(Object.hasOwn(migrated,'sutkoCells'),false);assert.deepEqual(migrated.scenePages,old.scenePages);
    if(newStage===8){assert.equal(await page.locator('.finale .contact.connected').count(),7);}
    else assert.equal(await page.locator('.signal-content h1').innerText(),newCompleted===newStage?'SĽUB POTVRDENÝ':await page.evaluate(n=>GAME.stages[n].label,newStage));
    await page.reload();assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),migrated,'a migrated save is never shifted twice');

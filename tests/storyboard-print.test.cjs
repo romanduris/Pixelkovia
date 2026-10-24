@@ -18,20 +18,21 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await bathroom.locator('.storyboard-content>div').first().getAttribute('class'),'worksheet-review');
  assert.equal(await bathroom.locator('.storyboard-content>*').last().getAttribute('class'),'material-actions storyboard-sheet-actions');
  assert.ok(!/FYZICKÁ STOPA|Nasleduje obálka|Otestovať QR|KÓD NA OBNOVENIE SPOJENIA/.test(await bathroom.locator('.worksheet-text').innerText()));
- for(const target of ['kvak-message-text','kvak-message-tts']){assert.ok(await page.locator('#'+target).isHidden());const button=page.locator('[data-target="'+target+'"]');await button.click();assert.ok(await page.locator('#'+target).isVisible());assert.equal(await button.getAttribute('aria-expanded'),'true');await button.click();assert.ok(await page.locator('#'+target).isHidden());}
- assert.equal(await page.locator('#kvak-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.kvak.prompt));
- const sutko=page.locator('#gm-symbols');await sutko.locator('.storyboard-toggle').click();
- for(const suffix of ['text','tts']){const panel=page.locator('#sutko-message-'+suffix);assert.ok(await panel.isHidden());await page.locator('[data-target="sutko-message-'+suffix+'"]').click();assert.ok(await panel.isVisible());await page.locator('[data-target="sutko-message-'+suffix+'"]').click();}
- assert.equal(await page.locator('#sutko-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.sutko.prompt));
- assert.equal(normalize((await page.locator('#sutko-message-text>div>p').allTextContents()).join(' ')),normalize(await page.evaluate(()=>GAME.sutkoMessage.join(' '))));
- assert.equal(await sutko.locator('.studio-stage-details,.storyboard-continuation').count(),0);
- assert.equal(await sutko.locator('audio').getAttribute('src'),'assets/Sutko.mp3');
- assert.equal(await sutko.locator('.script-status').count(),0,'the supplied Sutko recording replaces the placeholder');
+ for(const target of ['miky-message-text','miky-message-tts']){assert.ok(await page.locator('#'+target).isHidden());const button=page.locator('[data-target="'+target+'"]');await button.click();assert.ok(await page.locator('#'+target).isVisible());assert.equal(await button.getAttribute('aria-expanded'),'true');await button.click();assert.ok(await page.locator('#'+target).isHidden());}
+ assert.equal(await page.locator('#miky-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.miky.prompt));
+ const plugy=page.locator('#gm-symbols');await plugy.locator('.storyboard-toggle').click();
+ for(const suffix of ['text','tts']){const panel=page.locator('#plugy-message-'+suffix);assert.ok(await panel.isHidden());await page.locator('[data-target="plugy-message-'+suffix+'"]').click();assert.ok(await panel.isVisible());await page.locator('[data-target="plugy-message-'+suffix+'"]').click();}
+ assert.equal(await page.locator('#plugy-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.plugy.prompt));
+ assert.equal(normalize((await page.locator('#plugy-message-text>div>p').allTextContents()).join(' ')),normalize(await page.evaluate(()=>GAME.plugyMessage.join(' '))));
+ assert.equal(await plugy.locator('.studio-stage-details,.storyboard-continuation').count(),0);
+ assert.equal(await plugy.locator('audio').getAttribute('src'),'assets/Sutko.mp3');
+ assert.match(await plugy.locator('.script-status').first().innerText(),/Nový dabing čaká na dodanie/);
+ assert.equal(await plugy.locator('.miky-message-controls audio').count(),0,'archived recording is not presented as new dubbing');
 
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');
  assert.equal(await printed.locator('.sheet').count(),8);assert.equal(await printed.locator('.sheet:visible').count(),8);
- assert.equal(normalize(await bathroom.locator('.worksheet-text').innerText()),normalize(await printed.locator('.kvak-print-story').innerText()+' '+await printed.locator('.kvak-print-mission').innerText()));
+ assert.equal(normalize(await bathroom.locator('.worksheet-text').innerText()),normalize(await printed.locator('.miky-print-story').innerText()+' '+await printed.locator('.miky-print-mission').innerText()));
  assert.equal(normalize((await bathroom.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator('#rodicovsky-navod .adult-help[data-stage="envelope"] p').allTextContents()).join(' ')));
  assert.equal(normalize(await bathroom.locator('.gm-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .guide-stage[data-stage="envelope"] .gm-solution').innerText()));
  assert.equal(await bathroom.locator('.storyboard-content>.gm-instructions').count(),1);
@@ -48,9 +49,9 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
   assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
  }
  assert.equal(await page.locator('#gm-digital').count(),0,'the separate symbol puzzle is removed');
- const iskra=page.locator('#gm-document');
- assert.equal(await iskra.locator('.storyboard-message').count(),0,'paper-only Iskra has no duplicate story block');
- assert.equal(normalize(await iskra.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Iskra story remains in the shared worksheet text');
+ const pixi=page.locator('#gm-document');
+ assert.equal(await pixi.locator('.storyboard-message').count(),0,'paper-only Pixi has no duplicate story block');
+ assert.equal(normalize(await pixi.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Pixi story remains in the shared worksheet text');
 
  assert.match(await printed.locator('#p5 .note').innerText(),/Úlohu 6/);
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.locator('#p6 .card').textContent()),'final password shows the printed ordering card');
@@ -89,7 +90,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
    assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
    await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();assert.match(await page.locator('#feedback').innerText(),/nesedí/);
    await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();await page.locator('.signal-connected').waitFor();
-   await page.locator('audio').evaluate(audio=>audio.pause());await page.locator('.signal-header [data-action="exit-test"]').click();
+   assert.equal(await page.locator('.signal-content audio').count(),0,'new dubbing is pending');await page.locator('.signal-header [data-action="exit-test"]').click();
   }else if(stage===8){await page.locator('.finale').waitFor();assert.equal(await page.locator('.finale [data-action="reset"]').count(),0,'finale test cannot reset family progress');await page.locator('.finale [data-action="exit-test"]').click();}
   else{await page.locator('.signal-task').waitFor();await page.locator('.signal-header [data-action="exit-test"]').click();}
   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),saved,'test '+stage+' preserves family progress');
@@ -101,5 +102,5 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom.png'});
  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom-phone.png'});
- assert.deepEqual(errors,[]);console.log('PASS: eight isolated header tests including intro/bathroom/finale, paper-only Iskra without a player test, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
+ assert.deepEqual(errors,[]);console.log('PASS: eight isolated header tests including intro/bathroom/finale, paper-only Pixi without a player test, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

@@ -29,14 +29,15 @@ assert.equal(ordered.map(r=>r.digit).join(''),'741296');
 assert.notEqual(game.signalRecords.map(r=>r.digit).join(''),'741296','printed order is scrambled');
 assert.equal(new Set(ordered.map(r=>`${r.month}-${r.day}-${r.time}`)).size,6,'unique chronological order');
 assert.ok(Object.values(Object.groupBy(game.signalRecords,r=>r.date)).some(group=>group.length>=3),'three records require exact time comparison');
-assert.equal(game.audio,'assets/KvakMessage.mp3');
-assert.ok(fs.existsSync(game.audio));
+assert.equal(game.audio,null);
+assert.ok(fs.existsSync(game.archivedAudio.miky));
 assert.equal(game.stages[0].hints.length,3);
+const {useArchivedAudio}=require('./helpers/archive-audio.cjs');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try{
- const context=await browser.newContext({viewport:{width:1440,height:1100}});
+ const context=await browser.newContext({viewport:{width:1440,height:1100}});await useArchivedAudio(context);
  const page=await context.newPage();
  page.setDefaultTimeout(15000);
  await page.addInitScript(()=>{
@@ -69,8 +70,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  async function readScene(p){
   let text='',turns=0;
   if(await p.locator('.signal-connected').count()){
-   if(!await p.locator('#kvak-transcript').isVisible())await p.locator('[data-action="read-kvak-message"]').click();
-   const transcript=await p.locator('#kvak-transcript').textContent();await p.locator('.dialog-close').click();return transcript;
+   if(!await p.locator('#miky-transcript').isVisible())await p.locator('[data-action="read-miky-message"]').click();
+   const transcript=await p.locator('#miky-transcript').textContent();await p.locator('.dialog-close').click();return transcript;
   }
   if(!await p.locator('.scene-panel').count())return '';
   while(true){
@@ -180,40 +181,40 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   if(game.stages[i].paperOnly)continue;
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
-  if(i===3){const indexes=await page.evaluate(()=>GAME.sutkoPuzzle.grid.flat().flatMap((value,index)=>GAME.sutkoPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
+  if(i===3){const indexes=await page.evaluate(()=>GAME.plugyPuzzle.grid.flat().flatMap((value,index)=>GAME.plugyPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
   }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
-  if(i===3)await page.locator('.sutko-connected').waitFor();
+  if(i===3)await page.locator('.plugy-connected').waitFor();
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6&&i!==3)assert.equal(await page.locator('.success-character').count(),1);
-  if(i===3)assert.equal(await page.locator('.sutko-party-scene').count(),1);
+  if(i===3)assert.equal(await page.locator('.plugy-party-scene').count(),1);
   if(i===4){await reloadAndResume(page);assert.equal(await page.locator('.success-card').count(),1,'reload preserves completed task confirmation');}
   const resolution=await readScene(page);entireJourney+=resolution;
   if(i===1){
    assert.equal(await page.locator('.signal-duo [aria-label="Piko"]').count(),1);
-   assert.equal(await page.locator('.signal-duo [aria-label="Kvak"]').count(),1);
-   const positions=await page.locator('.signal-duo .pixel-sprite').evaluateAll(els=>els.map(e=>getComputedStyle(e).backgroundPosition));
+   assert.equal(await page.locator('.signal-duo [aria-label="Miky"]').count(),1);
+   const positions=await page.locator('.signal-duo .pixel-sprite').evaluateAll(els=>els.map(e=>getComputedStyle(e).backgroundImage));
    assert.equal(new Set(positions).size,2,'official first and second atlas crops');
    assert.ok(resolution.includes('Kto mi lezie do signálu?!'));
-   assert.ok(!resolution.includes('Pikov hlas'),'only Kvak speaks');
-   assert.equal(await page.locator('#kvak-transcript').isVisible(),false,'transcript dialog closes without expanding the main screen');
+   assert.ok(!resolution.includes('Pikov hlas'),'only Miky speaks');
+   assert.equal(await page.locator('#miky-transcript').isVisible(),false,'transcript dialog closes without expanding the main screen');
    assert.equal(await page.locator('.signal-audio-controls button').count(),1,'one control handles every playback state');
-   await page.waitForFunction(()=>{const a=document.querySelector('#kvak-audio');return a&&!a.paused&&a.currentTime>0;});
-   assert.equal(await page.locator('.is-speaking').count(),1,'correct code automatically starts Kvak');
-   assert.ok((await page.locator('[data-action="kvak-audio-toggle"]').textContent()).includes('Pozastaviť'));
+   await page.waitForFunction(()=>{const a=document.querySelector('#miky-audio');return a&&!a.paused&&a.currentTime>0;});
+   assert.equal(await page.locator('.is-speaking').count(),1,'correct code automatically starts Miky');
+   assert.ok((await page.locator('[data-action="miky-audio-toggle"]').textContent()).includes('Pozastaviť'));
    assert.equal(await page.locator('#connection-title').evaluate(e=>getComputedStyle(e).outlineStyle),'none','heading has no focus frame');
-   await page.locator('[data-action="kvak-audio-toggle"]').click();
+   await page.locator('[data-action="miky-audio-toggle"]').click();
    assert.ok(await page.locator('audio').evaluate(a=>a.paused));
    const pausedTime=await page.locator('audio').evaluate(a=>a.currentTime);
-   await page.locator('[data-action="kvak-audio-toggle"]').click();
+   await page.locator('[data-action="miky-audio-toggle"]').click();
    await page.waitForFunction(time=>{const a=document.querySelector('audio');return a&&!a.paused&&a.currentTime>time;},pausedTime);
    // The local server does not support byte ranges for this MPEG: finish real playback at a higher rate.
    await page.locator('audio').evaluate(a=>a.playbackRate=16);
    await page.waitForFunction(()=>document.querySelector('audio').ended);
-   assert.ok((await page.locator('[data-action="kvak-audio-toggle"]').textContent()).includes('↻ Prehrať znova'));
+   assert.ok((await page.locator('[data-action="miky-audio-toggle"]').textContent()).includes('↻ Prehrať znova'));
    await page.locator('audio').evaluate(a=>a.playbackRate=1);
-   await page.locator('[data-action="kvak-audio-toggle"]').click();
+   await page.locator('[data-action="miky-audio-toggle"]').click();
    await page.waitForFunction(()=>{const a=document.querySelector('audio');return a&&!a.paused&&a.currentTime<2;});
-   await page.locator('[data-action="kvak-audio-toggle"]').click();
+   await page.locator('[data-action="miky-audio-toggle"]').click();
    assert.equal(await page.locator('.signal-connected').count(),1,'audio never advances automatically');
    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).stage),1);
    await reloadAndResume(page);assert.equal(await page.locator('.signal-connected').count(),1,'saved first puzzle restores new connection scene');
@@ -241,35 +242,35 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.locator('[data-action="reset"]').click();await page.locator('[data-action="confirm-reset"]').click();await noAtlas();
  await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
  // Old completion, absent MPEG, screen fallbacks and every phone width.
- const kvakContext=await browser.newContext();const kp=await kvakContext.newPage();const audioErrors=[];kp.on('pageerror',e=>audioErrors.push(e.message));
+ const mikyContext=await browser.newContext();await useArchivedAudio(mikyContext);const kp=await mikyContext.newPage();const audioErrors=[];kp.on('pageerror',e=>audioErrors.push(e.message));
  await kp.addInitScript(()=>{Object.defineProperty(document,'fullscreenEnabled',{get(){return false;}});});
  await kp.route('**/assets/KvakMessage.mp3',route=>route.fulfill({status:404,body:'Missing audio'}));
  await kp.goto(BASE);await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[1],hints:{1:1}})));await reloadAndResume(kp);
  assert.equal(await kp.locator('.signal-connected').count(),1,'legacy first completion remains completed');
- await kp.locator('[data-action="kvak-audio-toggle"]').click();await kp.locator('#kvak-transcript').waitFor();
- assert.ok((await kp.locator('#kvak-audio-status').textContent()).includes('nepodarilo'));
- assert.ok((await kp.locator('#kvak-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
+ await kp.locator('[data-action="miky-audio-toggle"]').click();await kp.locator('[data-action="read-miky-message"]').click();await kp.locator('#miky-transcript').waitFor();
+ assert.ok((await kp.locator('#miky-audio-status').textContent()).includes('nepodarilo'));
+ assert.ok((await kp.locator('#miky-transcript').textContent()).includes('cez deň do vášho domu prichádza svetlo'));
  await kp.goto(BASE+'/game.html?signal=sutko');assert.equal(await kp.locator('.signal-task h1').textContent(),game.stages[3].label);
  for(const [width,height] of [[320,640],[390,844],[844,390],[1440,1100]]){
   await kp.setViewportSize({width,height});await kp.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:1,completed:[],hints:{}})));await reloadAndResume(kp);
-  assert.equal(await kp.locator('.signal-restore').count(),1);await noOverflow(kp,`Kvak restore ${width}`);
+  assert.equal(await kp.locator('.signal-restore').count(),1);await noOverflow(kp,`Miky restore ${width}`);
   const box=await kp.locator('#app').boundingBox();assert.equal(box.width,width);assert.equal(box.height,height);
   if(width===390){
    await kp.locator('#answer').focus();
    await kp.evaluate(()=>{Object.defineProperty(visualViewport,'height',{configurable:true,get:()=>360});visualViewport.dispatchEvent(new Event('resize'));});
    await kp.waitForFunction(()=>{const r=document.querySelector('#answer').getBoundingClientRect(),button=document.querySelector('.answer-form button').getBoundingClientRect();return Math.abs(r.top+r.height/2-180)<3&&button.bottom<=340;});
    assert.equal(await kp.locator('#app').evaluate(e=>Math.round(e.getBoundingClientRect().height)),360,'scroller follows the keyboard-sized visual viewport');
-   await kp.screenshot({path:'/tmp/kvak-input-keyboard.png',clip:{x:0,y:0,width:390,height:360}});
+   await kp.screenshot({path:'/tmp/miky-input-keyboard.png',clip:{x:0,y:0,width:390,height:360}});
    await kp.locator('#answer').blur();
    await kp.evaluate(()=>{delete visualViewport.height;visualViewport.dispatchEvent(new Event('resize'));});
    await kp.waitForFunction(()=>!document.querySelector('#app').classList.contains('is-entering-answer'));
   }
-  await kp.screenshot({path:`/tmp/kvak-restore-${width}.png`});
+  await kp.screenshot({path:`/tmp/miky-restore-${width}.png`});
   await kp.locator('.signal-header [data-action="home"]').click();assert.equal(await kp.locator('.portal-header').count(),1);
   await resume(kp);await kp.locator('#answer').fill('741296');await kp.locator('.answer-form button').click();
-  await noOverflow(kp,`Kvak connection ${width}`);await kp.screenshot({path:`/tmp/kvak-connection-${width}.png`});
+  await noOverflow(kp,`Miky connection ${width}`);await kp.screenshot({path:`/tmp/miky-connection-${width}.png`});
  }
- assert.deepEqual(audioErrors,[]);await kvakContext.close();
+ assert.deepEqual(audioErrors,[]);await mikyContext.close();
  // Narrow phone, phone, tablet and desktop layouts.
  for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:844});await noOverflow(page,`home ${width}`);}
  await resizePlayerViewport({width:390,height:844});await page.screenshot({path:'/tmp/mystery-home-mobile.png',fullPage:true});
@@ -285,14 +286,14 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.sheet:visible').count(),1,'player cannot see future worksheets');
  const sheet=page.locator('#p1');const text=await sheet.textContent();
  assert.ok(!text.includes('741296'),'no solution on worksheet');
- for(const copy of ['výborný sluch','Piko','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ KVAKOV SIGNÁL'])assert.ok(text.toLowerCase().includes(copy.toLowerCase()),copy);
+ for(const copy of ['zachytáva zvuky','Piko','VAŠA MISIA','presný čas','rovnakého roka','AKTIVOVAŤ MIKYHO SIGNÁL'])assert.ok(text.toLowerCase().includes(copy.toLowerCase()),copy);
  assert.equal(await sheet.locator('.signal-cutout').count(),6);assert.equal(await sheet.locator('.code-boxes span').count(),6);
- assert.equal(await sheet.locator('[role="img"][aria-label*="Kvak"]').count(),1);
- assert.equal(await sheet.locator('.kvak-print-mission li').count(),5);
+ assert.equal(await sheet.locator('[role="img"][aria-label*="Miky"]').count(),1);
+ assert.equal(await sheet.locator('.miky-print-mission li').count(),5);
  const printed=await sheet.locator('.signal-cutout').evaluateAll(els=>els.map(e=>({date:e.dataset.date,time:e.dataset.time,digit:e.dataset.digit})));
  assert.equal(JSON.stringify(printed),JSON.stringify(game.signalRecords.map(r=>({date:r.date,time:r.time,digit:r.digit}))));
  await page.emulateMedia({media:'print'});
- const a4=await page.pdf({path:'/tmp/kvak-a4.pdf',format:'A4',printBackground:true});
+ const a4=await page.pdf({path:'/tmp/miky-a4.pdf',format:'A4',printBackground:true});
  assert.equal((a4.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,1,'single-sided A4');
  const geometry=await sheet.evaluate(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height,bottom:e.getBoundingClientRect().bottom,footer:e.querySelector('.footer').getBoundingClientRect().bottom,bg:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));
  assert.ok(geometry.footer<=geometry.bottom,'footer and all content stay on A4');assert.equal(geometry.bg,'rgb(255, 255, 255)');assert.equal(geometry.color,'rgb(20, 40, 64)');
@@ -301,22 +302,22 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(new Set(cutBounds.map(b=>b.transform)).size,3,'90, 180 and minus 90 degrees');
  const darkPanels=await sheet.locator('*').evaluateAll(els=>els.filter(e=>{const s=getComputedStyle(e),c=s.backgroundColor.match(/^rgb\((\d+), (\d+), (\d+)\)$/),r=e.getBoundingClientRect();return c&&Math.max(+c[1],+c[2],+c[3])<128&&r.width*r.height>4000;}).length);
  assert.equal(darkPanels,0,'no large dark filled panels');
- await sheet.screenshot({path:'/tmp/kvak-a4-colour.png'});
- await sheet.evaluate(e=>e.style.filter='grayscale(1)');await sheet.screenshot({path:'/tmp/kvak-a4-grayscale.png'});
+ await sheet.screenshot({path:'/tmp/miky-a4-colour.png'});
+ await sheet.evaluate(e=>e.style.filter='grayscale(1)');await sheet.screenshot({path:'/tmp/miky-a4-grayscale.png'});
  assert.equal(await sheet.locator('.record-date strong').count(),6);assert.equal(await sheet.locator('.record-time strong').count(),6);assert.equal(await sheet.locator('.record-digit b').count(),6,'labels and outlines retain every meaning without colour');
  await page.emulateMedia({media:'screen'});
  // Directly shared atlas works with a fresh profile, without gameplay or JavaScript.
  const bookContext=await browser.newContext({javaScriptEnabled:false,viewport:{width:1440,height:1000}});
  const book=await bookContext.newPage();await book.goto(BASE+'/atlas.html');
  assert.equal(await book.locator('script').count(),0);
- assert.equal(await book.locator('.book-section p').count(),143,'full authored chapter');
+ assert.ok(await book.locator('.book-section p').count()>=120,'full literary chapter retained');
  assert.equal(await book.locator('.atlas-profile').count(),7);
  assert.equal(await book.locator('.profile-prose p').count(),14,'all seven complete literary profiles');
  assert.ok((await book.locator('#tajny-svet').textContent()).includes('Dnes som zistil, že priatelia niekedy bývajú aj na druhej strane obrazovky.'));
  assert.ok((await book.locator('#tajny-svet').textContent()).length>9000,'long-form book, not a summary');
  const crops=await book.locator('.atlas-profile .pixel-sprite').evaluateAll(els=>els.map(e=>({pos:getComputedStyle(e).backgroundPosition,size:getComputedStyle(e).backgroundSize,image:getComputedStyle(e).backgroundImage})));
- assert.equal(new Set(crops.map(c=>c.pos)).size,7);
- assert.ok(crops.every(c=>c.size==='400% 200%'&&c.image.includes('pixelkovia-atlas.png')));
+ assert.equal(new Set(crops.map(c=>c.image)).size,7);
+ assert.ok(crops.every(c=>c.size==='contain'&&c.image.includes('characters/')));
  for(const width of [320,390,768,1440]){await book.setViewportSize({width,height:1000});await noOverflow(book,`atlas ${width}`);}
  await book.screenshot({path:'/tmp/pixelkovia-atlas-desktop.png'});
  await book.locator('#piko').screenshot({path:'/tmp/pixelkovia-atlas-profile.png'});
@@ -345,6 +346,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: Kvak V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete seven-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Miky V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete seven-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

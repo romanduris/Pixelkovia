@@ -6,8 +6,8 @@
     {id:'episode-1', name:'Pixelkovia: Stratený signál', priceCents:1499, pricing:{plannedRegularPriceCents:2999, referencePriceCents:null, campaign:null}, status:'coming-soon', description:'Celá prvá epizóda, tlačoviny, rodičovský návod, checklist a nápovedy.'},
     {id:'bedtime-book', name:'Tajný svet Pixelkov – rozprávková knižka', priceCents:499, status:'coming-soon', character:'piko', description:'Pracovný návrh: približne desať minút čítania pred spaním o svete Pixelkov, ich domovoch, vzniku a živote.'},
     {id:'piko-mission', name:'Piko – bonusová misia', priceCents:299, status:'coming-soon', character:'piko', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
-    {id:'listok-mission', name:'Lístok – bonusová misia', priceCents:299, status:'coming-soon', character:'listok', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
-    {id:'kvak-mission', name:'Kvak – bonusová misia', priceCents:299, status:'coming-soon', character:'kvak', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
+    {id:'listok-mission', name:'Pingy – bonusová misia', priceCents:299, status:'coming-soon', character:'pingy', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
+    {id:'kvak-mission', name:'Miky – bonusová misia', priceCents:299, status:'coming-soon', character:'miky', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
     {id:'complete', name:'Kompletné dobrodružstvo Pixelkov', priceCents:1999, status:'coming-soon', description:'Základná hra, rozprávková knižka a tri bonusové misie. Pracovná cena balíka nie je schválená na predaj.'}
   ];
   const product = id => products.find(p => p.id === id);

@@ -1,52 +1,34 @@
-# Pixelkovia — ilustračné podklady
+# Pixelkovia — digitálne ilustrácie V6.1
 
-Vytvorené vstavaným nástrojom image_gen podľa používateľovej obrazovej referencie. Prihlasovací panel referencie nie je súčasťou ilustrácií ani aplikácie. Obrázky slúžia ako samostatné podklady pod skutočným HTML rozhraním. Pôvodné fotografie z prvej verzie sú ponechané v repozitári, aktuálne rozhranie ich nepoužíva.
+Schválená sada B, Plugy bez chvosta, ochranca podľa poslednej používateľovej referencie. Hlavný obraz vychádza z obývačkového variantu 2. Piko zachováva pôvodnú obláčikovú hlavu, obrazovku s výrazom >_, oblek a tyrkysovú kravatu zo schváleného videa. Ilustrácie vznikli vstavaným image_gen, nie CLI.
 
-## assets/pixelkovia-room.png
+## Portréty
 
-Use case: illustration-story. Asset type: cinematic pixel art landscape background for a Slovak family mystery adventure game website. Input image is character and style reference only; IGNORE the login overlay entirely. Create a NEW wide 3:2 illustration in the same richly textured high-quality pixel art. Ordinary cozy family living room at blue twilight transformed by a mysterious glowing violet pixel doorway at RIGHT. Seven adorable companions matching reference: a small blue cloud-headed robot with dark face screen, cyan >_ eyes, dark suit and teal tie is the guide nearest right foreground, holding a small glowing communicator; beside him six tiny companions: white duck with teal bowtie, smiling amber flame, rounded gray rock, green sprout with two leaves, stack of purple cubes with little face, orange red panda with teal scarf. All friendly, expressive, chunky coherent sprites. Characters gathered along lower RIGHT two thirds of image near a wooden table with paper envelopes and a cipher wheel, portal glow, little cyan signal particles. LEFT HALF very dark and uncluttered negative space for real HTML headline, no prominent objects there. Dark ink navy, violet, cyan, warm amber lamp. Detailed charming indie mystery adventure art, crisp pixel edges and subtle dithering. No text, no letters, no UI, no login, no logos, no children, no humans, no horror. The image is artwork only, never a website screenshot.
+Sedem PNG v characters/ má skutočný alfa kanál. Nahrádzajú bývalé sprite výrezy v hre, knižke, rodičovskom návode a tlačovinách. Mená sú samostatný HTML text, nie súčasť artworku. Presné prompty, referencie a zdrojové cesty sú v characters/PORTRAIT-PROMPTS.json. Pôvodné generované súbory zostávajú v úložisku generátora; historické projektové ilustrácie v Git histórii.
 
-## assets/pixelkovia-atlas.png
+## Hlavná scéna
 
-Use case: illustration-story. Asset type: character portrait sprite atlas for family pixel-art mystery game. Reference image is visual reference of the SEVEN characters only, ignore its login interface. Produce a perfectly regular 4 column by 2 row GRID of 8 equal SQUARE tiles, overall 2:1 landscape image. Each tile has flat very dark ink navy #10152b background, no borders. Each character centered FULL BODY with clear padding, charming richly shaded crisp pixel art matching reference. Tiles in reading order: TOP LEFT blue cloud-headed robot guide Piko, cyan >_ screen face, black suit white shirt teal tie and tiny communicator. TOP 2: white little duck with orange bill and teal bow tie. TOP 3: cute orange amber flame with black dot eyes smiling, tiny feet. TOP 4: friendly rounded gray stone with little smile and feet. BOTTOM LEFT: green sprout creature round head with two leaves, happy face and little body. BOTTOM 2: three stacked purple voxel cubes with expressive small dark face and feet. BOTTOM 3: cute orange red panda, pale cheeks, pointed ears, striped tail and teal scarf. BOTTOM 4: small glowing cyan and violet pixel portal ring with golden star in center, no character. Each character large but WITHIN its own tile. Consistent scale, same eye height around tile center, dark purple/blue ambient light warm outlines, limited palette, no typography, no labels, no UI, no sheet header, no watermark. The atlas will be consumed through CSS background-size 400% 200%, so exact equal tile positions are critical.
+pixelkovia-room.png zobrazuje sedem kamarátov pri digitálnom stole v normálnej ľudskej obývačke. Guardy je oranžový štít s tyrkysovou kravatou a kľúčovou dierkou. Neobsahuje mená ani typografiu. Mobilná a desktopová adaptácia menia iba kompozíciu artworku pod existujúcim webovým textom; prompty sú v characters/HERO-PROMPTS.json.
 
-Atlas: 4 stĺpce × 2 riadky. Piko, Kvak, Iskra, Šutko / Lístok, Kubo, Ryško, dekoratívny priechod. Zobrazuje sa cez CSS background-position, bez úprav zdrojovej bitmapy.
+Rodinné fotografie family-signal-puzzle.png a family-cipher-puzzle.png neobsahujú pôvodné postavy. Zostávajú označenými ilustračnými vizualizáciami spoločného riešenia, nie fotografiami zákazníkov ani presným zobrazením finálnych materiálov.
 
-## Fonty
+## Tlačové a knižné scény
 
-Caveat je lokálne pribalený v assets/fonts/Caveat.ttf s licenciou OFL-Caveat.txt. Ostatné webové fonty majú systémovú zálohu. Herné mechaniky aj materiály fungujú bez siete.
-
-## Predajná prezentácia · ilustračné rodinné scény
-
-Vytvorené vstavaným nástrojom `image_gen` (nie CLI). Ide o ilustračné vizualizácie rodinnej aktivity, nie fotografie reálnych zákazníkov ani presné vyobrazenie finálnych tlačovín. Popisky na stránke to uvádzajú. Pôvodná titulná ilustrácia a oficiálne postavy zostali zachované.
-
-### assets/family-signal-puzzle.png
-
-Use case: photorealistic-natural. Asset type: illustrative lifestyle photograph for a Slovak at-home family mystery game sales page, landscape 3:2. Overhead editorial photograph of a warm wooden dining table in a cozy real family home. Only hands of two school-age children and one parent are visible, no faces. The children are collaboratively arranging six small white paper signal cards printed with dark navy thin outlines and tiny date-and-time-like marks, one hand moves a card, another points, pencil and a pale kraft paper envelope nearby, a white A4 instruction sheet with dark blue framing partly visible. A phone sits unobtrusively in upper corner with an abstract blue light, no readable UI. Tactile white paper, a little creative mess, genuine shared concentration and play. Warm natural window light, touches of deep navy and muted violet, premium candid family activity photography, realistic anatomically correct hands. No legible words or numerals, no visible solutions, no invented mascots, no branding, no watermark, no collage, no text overlay. Frame for a generous full-width website image.
-
-### assets/family-cipher-puzzle.png
-
-Use case: photorealistic-natural. Asset type: illustrative lifestyle photograph for a Slovak family mystery game product page, landscape 3:2. Close view at a 45-degree angle over a light wooden table in a cozy home: a child's hands carefully rotate two concentric hand-cut white paper cipher wheels while an adult hand steadies the outer wheel. Dark navy fine outlined alphabet-like small markings on the rings, no legible answer or word. Nearby a pencil, two folded white puzzle strips and a kraft paper envelope. Hands and practical paper craft are the main story, faces outside frame. Beautiful warm window light from left, quiet violet blue shadows, premium natural family activity photography. Realistic hands with accurate anatomy, ordinary accessible home materials, tangible and inviting. No readable text, no logos, no watermarks, no invented characters, no screens taking focus, no collage, no text overlay.
-
-### assets/kvak-sheet-preview.png a assets/printables/*.pdf
-
-Skutočný náhľad a jednostranové A4 PDF sú exportované z koreňového `printables.html` a jeho CSS cez `scripts/export-printables.cjs`. Nie sú generované obrazovou AI; zdrojom pravdy zostáva HTML/CSS. PDF P1–P6 a diplom sú pripravené na samostatné stiahnutie.
-
-### assets/kvak-qr-dummy.svg
-
-Ručne zostavená dekoratívna SVG maketa pre predstavu rozloženia P1. Neobsahuje zakódované dáta ani odkaz; nemá platnú štruktúru QR a je označená DEMO / NEFUNKČNÁ.
-
-## Spoločné príbehové ilustrácie na P1–P6
-
-Šesť nových scén v `assets/printable-scenes/` vzniklo vstavaným nástrojom `image_gen`, s existujúcim `pixelkovia-atlas.png` ako predlohou vzhľadu postáv. Nejde o zostavu pôvodných portrétov: postavičky majú nové pózy, gestá a spoločnú činnosť podľa príbehu. Biele pozadie obmedzuje veľké farebné plochy pri tlači. Obrázky neobsahujú riešenia ani čitateľné písmená a čísla.
-
-| Súbor | Scéna |
+| Súbor v printable-scenes/ | Obsah |
 | --- | --- |
-| `p1-kvak-piko.png` | Piko volá komunikátorom a Kvak načúva slabému spojeniu. Iba títo dvaja kamaráti. |
-| `p2-iskra.png` | Iskra svieti pri papierovom stroji, Piko a Kvak jej pomáhajú. |
-| `p3-sutko.png` | Šutko drží most, pri ňom sú Piko, Kvak a Iskra. |
-| `p4-listok.png` | Lístok číta knižku a s predchádzajúcimi štyrmi kamarátmi skúma presne štyri pásiky. Cielená druhá úprava odstránila nadbytočný piaty papier. |
-| `p5-kubo-rysko.png` | Kubo s partiou opravuje cestu a na jej konci sa ozýva posledný kamarát Ryško. PDF obsahuje úlohy 5 aj 6. |
-| `p6-spolocny-navrat.png` | Všetkých sedem Pixelkov spolu pripravuje návrat pri svetelnej bráne. |
+| p1-miky-piko.png | Mikrofón načúva a sprievodca obnovuje spojenie. Dve postavy. |
+| p2-pixi.png | Pixel svieti na dva papierové kruhy, mikrofón a sprievodca pomáhajú. |
+| p3-plugy.png | USB konektor a traja kamaráti obnovujú digitálny most. |
+| p4-pingy.png | Dátový posol a štyria kamaráti skladajú presne štyri prázdne pásiky. |
+| p5-cipko-guardy.png | Mikročip skúma plán s tromi uzlami; celá partia obnovuje cestu k ochrancovi. |
+| p6-spolocny-navrat.png | Sedem kamarátov sa vracia cez ochranný priechod, sprievodca posledný. |
 
-Úplné použité prompty vrátane cielenej opravy sú uložené v [printable-scenes/PROMPTS.json](printable-scenes/PROMPTS.json). Pôvodné výstupy zostali zachované v priečinku generátora; vybrané obrázky sú skopírované do repozitára. Horný portrét na každom liste je pôvodný výrez aktuálne hovoriaceho Pixelka, spoločná scéna má vlastný rámček vedľa misie.
+Scény majú biele pozadie a pomer približne 3 : 1. Neobsahujú mená, odpovede ani typografiu. Presné prompty a kontrola postáv sú v printable-scenes/PROMPTS.json. Tie isté obrázky používajú pracovné listy, príslušné herné výsledky aj knižné ilustrácie.
+
+miky-sheet-preview.png, náhľady v printables/ a všetky PDF sú skutočné exporty upraviteľného HTML/CSS cez scripts/export-printables.cjs, nie obrazovou AI vytvorené dokumenty. Textové mená a QR pochádzajú z dát a sú lokalizovateľné. Návod, P1–P6 a diplom majú každý jednu A4; balík má osem strán.
+
+## Médiá a font
+
+Schválené PicoVideo.mp4 a obe pôvodné zvukové nahrávky sú byte po byte zachované. Staré názvy sú nevyhnutné archívne cesty. Nové hlasové podklady nepoužívajú konkrétne mená a čakajú na nahratie.
+
+Caveat v fonts/Caveat.ttf zostáva pod licenciou fonts/OFL-Caveat.txt.

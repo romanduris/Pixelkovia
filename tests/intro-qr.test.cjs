@@ -36,7 +36,7 @@ const KEY='zahada-v1-progress';
   });
   const decoded=jsQR(new Uint8ClampedArray(pixels),392,392);
   assert.ok(decoded,'the printed QR must decode');
-  assert.equal(decoded.data,await printed.evaluate(()=>GAME.kvakQr));
+  assert.equal(decoded.data,await printed.evaluate(()=>GAME.mikyQr));
   const url=new URL(decoded.data),scanUrl=BASE+url.pathname+url.search;
   assert.equal(url.protocol,'https:');assert.equal(url.searchParams.get('signal'),'kvak');
   await page.goto(scanUrl);await page.locator('.signal-restore').waitFor();
@@ -48,38 +48,38 @@ const KEY='zahada-v1-progress';
   assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
   assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
   await printed.goto(BASE+'/printables.html?sheet=p2');
-  assert.equal(await printed.locator('#p2 .worksheet-entry-qr').count(),0,'Iskra has no QR');
-  assert.ok(!/QR/.test(await printed.locator('#p2').innerText()),'Iskra has no QR instructions');
+  assert.equal(await printed.locator('#p2 .worksheet-entry-qr').count(),0,'Pixi has no QR');
+  assert.ok(!/QR/.test(await printed.locator('#p2').innerText()),'Pixi has no QR instructions');
   await printed.goto(BASE+'/printables.html?sheet=p3');
-  assert.equal(await printed.locator('#p3 .worksheet-heading .worksheet-entry-qr').count(),0,'Sutko QR is below the paper puzzle');
-  assert.ok(await printed.locator('#p3 .sutko-phone-panel .worksheet-entry-qr').isVisible());
+  assert.equal(await printed.locator('#p3 .worksheet-heading .worksheet-entry-qr').count(),0,'Plugy QR is below the paper puzzle');
+  assert.ok(await printed.locator('#p3 .plugy-phone-panel .worksheet-entry-qr').isVisible());
   assert.match(await printed.locator('#p3 .worksheet-mission').innerText(),/všetky tri hodnoty[\s\S]*naskenujte QR/);
-  const sutkoPixels=await printed.locator('#p3 .worksheet-entry-qr img').evaluate(async img=>{
+  const plugyPixels=await printed.locator('#p3 .worksheet-entry-qr img').evaluate(async img=>{
     await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
     const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);
     return Array.from(ctx.getImageData(0,0,392,392).data);
   });
-  const sutko=jsQR(new Uint8ClampedArray(sutkoPixels),392,392);
-  assert.equal(sutko?.data,await printed.evaluate(()=>GAME.sutkoQr),'the P3 QR must decode to Sutko');
-  const sutkoUrl=new URL(sutko.data),sutkoScan=BASE+sutkoUrl.pathname+sutkoUrl.search;
-  await page.goto(sutkoScan);
+  const plugy=jsQR(new Uint8ClampedArray(plugyPixels),392,392);
+  assert.equal(plugy?.data,await printed.evaluate(()=>GAME.plugyQr),'the P3 QR must decode to Plugy');
+  const plugyUrl=new URL(plugy.data),plugyScan=BASE+plugyUrl.pathname+plugyUrl.search;
+  await page.goto(plugyScan);
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2]);
   await printed.goto(BASE+'/printables.html?sheet=p4');
-  const listokPixels=await printed.locator('.listok-phone-panel .worksheet-entry-qr img').evaluate(async img=>{
+  const pingyPixels=await printed.locator('.pingy-phone-panel .worksheet-entry-qr img').evaluate(async img=>{
     await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
     const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);return Array.from(ctx.getImageData(0,0,392,392).data);
   });
-  const listok=jsQR(new Uint8ClampedArray(listokPixels),392,392);
-  assert.equal(listok?.data,await printed.evaluate(()=>GAME.listokQr));
-  const listokUrl=new URL(listok.data),listokScan=BASE+listokUrl.pathname+listokUrl.search;
-  await page.goto(listokScan);assert.equal(await page.locator('.sutko-lock').count(),1,'early scanning cannot bypass Sutko');
+  const pingy=jsQR(new Uint8ClampedArray(pingyPixels),392,392);
+  assert.equal(pingy?.data,await printed.evaluate(()=>GAME.pingyQr));
+  const pingyUrl=new URL(pingy.data),pingyScan=BASE+pingyUrl.pathname+pingyUrl.search;
+  await page.goto(pingyScan);assert.equal(await page.locator('.plugy-lock').count(),1,'early scanning cannot bypass Plugy');
   await page.evaluate(key=>localStorage.setItem(key,JSON.stringify({started:true,callDone:true,stage:3,completed:[1,2,3],hints:{}})),KEY);
-  await page.goto(listokScan);assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
+  await page.goto(pingyScan);assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2,3]);
   const advanced={started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{},messageWatched:true};
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:advanced});
-  await page.goto(sutkoScan);await page.goto(listokScan);
+  await page.goto(plugyScan);await page.goto(pingyScan);
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),{progressVersion:2,...advanced});
 
@@ -90,12 +90,12 @@ const KEY='zahada-v1-progress';
   assert.equal(await page.locator('[data-action="read-message"],[data-action="finish-call"]').count(),0);
 
   const fresh=await browser.newContext(),freshPage=await fresh.newPage();
-  await freshPage.goto(BASE+'/game.html?signal=iskra');
-  assert.equal(await freshPage.locator('[data-story-stage="document"]').count(),0,'the old Iskra URL has no task page');
+  await freshPage.goto(BASE+'/game.html?signal=pixi');
+  assert.equal(await freshPage.locator('[data-story-stage="document"]').count(),0,'the old Pixi URL has no task page');
   await freshPage.goto(BASE+'/game.html?signal=unknown');
   assert.equal(await freshPage.locator('.signal-restore').count(),0);
-  await freshPage.goto(sutkoScan);await freshPage.locator('.signal-restore').waitFor();
-  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[],'P3 cannot skip Kvak’s code');
+  await freshPage.goto(plugyScan);await freshPage.locator('.signal-restore').waitFor();
+  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[],'P3 cannot skip Miky’s code');
   await fresh.close();
 
   for(const [width,height] of [[320,568],[390,844],[844,390]]){
@@ -118,7 +118,7 @@ const KEY='zahada-v1-progress';
     const terminalFits=()=>preview.locator('#app').evaluate(node=>node.scrollHeight<=node.clientHeight&&node.scrollWidth<=node.clientWidth);
     assert.ok(await terminalFits(),`code terminal fits ${width}×${height}`);
     const portraits=await preview.locator('.party-sprite').evaluateAll(nodes=>nodes.map(node=>[node.getBoundingClientRect().width,node.getBoundingClientRect().height]));
-    assert.deepEqual(portraits[0],portraits[1],'Piko and Kvak have equal portrait sizes');
+    assert.deepEqual(portraits[0],portraits[1],'Piko and Miky have equal portrait sizes');
     await preview.locator('#answer').fill('000000');await preview.locator('.answer-form button').click();
     assert.ok(await terminalFits(),`wrong-code feedback fits ${width}×${height}`);
     await preview.locator('#answer').fill('741296');await preview.locator('.answer-form button').click();
@@ -128,5 +128,5 @@ const KEY='zahada-v1-progress';
     await phone.close();
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: video ends the intro, replay/back only, P1/P3 QRs decode and start Kvak/Sutko, Iskra stays offline, old URLs and advanced progress stay compatible, phone and landscape fit.');
+  console.log('PASS: video ends the intro, replay/back only, P1/P3 QRs decode and start Miky/Plugy, Pixi stays offline, old URLs and advanced progress stay compatible, phone and landscape fit.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

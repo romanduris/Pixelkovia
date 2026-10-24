@@ -29,7 +29,7 @@ assert.ok(fs.readFileSync('scripts/prepare-static.mjs','utf8').includes('signal-
 assert.ok(!/obálk[ay] 1[^.]*rozstrihan/i.test(app));
 console.log('PASS: parent preparation, safe hiding places, envelope numbering, sealed later clues and current task logistics agree.');
 
-// The physical puzzles produce the same destinations, with Iskra decoding and Lístok sorting.
+// The physical puzzles produce the same destinations, with Pixi decoding and Pingy sorting.
 const sheets=ctx.window.PRINT_MATERIALS.sheets;
 const encoded=sheets.p2.match(/data-ciphertext="([^"]+)"/)[1],shift=Number(sheets.p2.match(/data-shift="([^"]+)"/)[1]);
 const decoded=[...encoded].map(letter=>/[A-Z]/.test(letter)?String.fromCharCode(65+(letter.charCodeAt(0)-65+shift+26)%26):letter).join('');
@@ -37,10 +37,10 @@ assert.equal(decoded,'HLADAJ POD STOLICKAMI');assert.ok(two.answer.includes(deco
 assert.ok(sheets.p2.includes('id="circles"'));assert.ok(!sheets.p4.includes('id="circles"'));
 const strips=[...sheets.p4.matchAll(/data-order="(\d)"[^>]*><span>\d<\/span>\s*([^<]+)/g)].map(match=>({order:Number(match[1]),copy:match[2].trim()}));
 assert.equal(strips.length,4);assert.notEqual(strips.map(s=>s.order).join(''),'1234');
-assert.equal(strips.sort((a,b)=>a.order-b.order).map(s=>s.copy).join(' '),'STÔL SKRÝVA KUBOV PLÁN. TERAZ HO OTVORTE.');
+assert.equal(strips.sort((a,b)=>a.order-b.order).map(s=>s.copy).join(' '),'STÔL SKRÝVA ČIPKOV PLÁN. TERAZ HO OTVORTE.');
 assert.ok(game.stages[4].answer.includes(strips[0].copy));
 // Old paper confirmations cannot silently attest the new worksheets, and game saves are retained.
-assert.equal(two.paperOnly,true);assert.equal(two.narrative.after.length,0);assert.equal(game.iskraQr,undefined);assert.ok(!/QR|telefón/i.test(sheets.p2));assert.ok(sheets.p3.includes('assets/sutko-qr.svg'));assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 zostáva pod inou stoličkou/);
+assert.equal(two.paperOnly,true);assert.equal(two.narrative.after.length,0);assert.equal(game.pixiQr,undefined);assert.ok(!/QR|naskenujte|zadajte[^.]*telefón/i.test(sheets.p2));assert.ok(sheets.p3.includes('assets/plugy-qr.svg'));assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 zostáva pod inou stoličkou/);
 const saved=new Map([['zahada-v1-progress','existing-game'],['zahada-prep-0','1'],['zahada-prep-1','1'],['zahada-prep-2','1'],...['printed','cut-p2','envelope-2','symbols','table','supplies'].map(id=>['zahada-prep-v5-'+id,'1'])]);
 const prepContext={window:{},localStorage:{getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,value)}};
 vm.runInNewContext(fs.readFileSync('prep-store.js','utf8'),prepContext);const prep=prepContext.window.PREP_STORE;
@@ -48,18 +48,18 @@ for(const id of ['printed','cut-p4','envelope-2','symbols','table'])assert.equal
 assert.equal(prep.read('supplies'),true);assert.equal(prep.ready(),false);
 for(const step of prep.steps)prep.write(step.id,true);prep.write('device-understood',true);assert.equal(prep.ready(),true);
 assert.equal(saved.get('zahada-v1-progress'),'existing-game');assert.equal(saved.get('zahada-prep-v5-cut-p2'),'1');
-console.log('PASS: Iskra decoder → HĽADAJ POD STOLIČKAMI; Lístok strips → STÔL; updated preparation requires confirmation and preserves saved games.');
+console.log('PASS: Pixi decoder → HĽADAJ POD STOLIČKAMI; Pingy strips → STÔL; updated preparation requires confirmation and preserves saved games.');
 
 // Child-facing clues stay distinct from physical packaging in the adult guide.
 for(const stage of game.stages)assert.ok(!/obálk/i.test(JSON.stringify(stage.narrative)),stage.id+': use indícia in the story');
 for(const [id,sheet] of Object.entries(sheets))assert.ok(!/obálk/i.test(sheet),id+': printable child copy uses indícia');
 for(const script of Object.values(game.voiceScripts))assert.ok(!/obálk/i.test(script.prompt));
-const riddle=game.sutkoMessage.join(' ');
+const riddle=game.plugyMessage.join(' ');
 assert.match(riddle,/cestovateľov[\s\S]*jazyk[\s\S]*nohami/);
-assert.ok(!/topán|na stole|pásik|písmeno E/i.test(riddle),'Sutko gives a riddle without naming the hiding place or next mechanic');
+assert.ok(!/topán|na stole|pásik|písmeno E/i.test(riddle),'Plugy gives a riddle without naming the hiding place or next mechanic');
 assert.match(game.stages[4].parent,/do čistej suchej topánky/);
 assert.match(game.stages[3].parent,/P5[\s\S]*na stole/);
 assert.ok(prep.steps.some(step=>step.id==='shoes'));
-assert.ok(sheets.p4.includes('assets/listok-qr.svg'));
-assert.equal(new URL(game.listokQr).searchParams.get('signal'),'listok');
-console.log('PASS: shoe clue, separate P5 at the table, child terminology and spoiler-free Sutko riddle agree.');
+assert.ok(sheets.p4.includes('assets/pingy-qr.svg'));
+assert.equal(new URL(game.pingyQr).searchParams.get('signal'),'listok');
+console.log('PASS: shoe clue, separate P5 at the table, child terminology and spoiler-free Plugy riddle agree.');
