@@ -83,11 +83,11 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
   .site-header nav{display:flex;gap:0;overflow:visible;margin-left:auto;min-width:0;padding:0;border:0}
   .site-header nav .nav-link{display:none}.site-header .nav-purchase{display:none}
   .environment-label{font-size:10px;display:block;max-width:135px}.environment-label .parent-tag{display:block;margin:5px 0 0;font-size:7px}
-  .sales-hero{display:block;min-height:760px;margin-top:14px;padding:24px 22px 260px;border-radius:10px}
-  .sales-hero .hero-background{inset:0;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center bottom;mask-image:none}
-  .sales-hero:before{inset:0;height:auto;background:linear-gradient(180deg,#080d21ef 0%,#080d21e8 45%,#080d21b8 65%,#080d2120 91%)}
+  .sales-hero{display:block;min-height:0;height:clamp(864px,245vw,1250px);margin-top:14px;padding:24px 22px 360px;border-radius:10px}
+  .sales-hero .hero-background{inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center bottom;mask-image:none}
+  .sales-hero:before{inset:0;height:auto;background:linear-gradient(180deg,#080d2170 0%,#080d2160 40%,#080d2130 55%,transparent 70%)}
   .sales-hero:after{background:linear-gradient(0deg,#080d2155,transparent 35%)}
-  .sales-hero .hero-copy{padding:0;max-width:none}
+  .sales-hero .hero-copy{position:static;padding:0;max-width:none}
   .sales-hero .eyebrow{font-size:8px;letter-spacing:.1em;margin-bottom:18px}
   .sales-hero h1.adventure-title{font-size:60px;line-height:.9;margin-bottom:8px}
   .sales-hero .title-caption{font-size:9px;margin:10px 0 18px}
@@ -97,7 +97,7 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
   .sales-hero .button-row{display:block}.sales-hero .button-row>.btn{width:100%;font-size:11px;padding:14px 10px;min-height:52px;gap:5px}
   .sales-hero .button-row>.text-link{display:none}
   .sales-hero .hero-copy>.quiet{font-size:10px;margin-top:12px}
-  .sales-hero .hero-meta{margin-top:18px;gap:14px;justify-content:space-between;flex-wrap:nowrap}
+  .sales-hero .hero-meta{position:absolute;bottom:58px;left:22px;right:22px;margin:0;gap:14px;justify-content:space-between;flex-wrap:nowrap}
   .sales-hero .hero-meta>span{font-size:16px;gap:5px}.sales-hero .hero-meta>span>span{font-size:8px}.sales-hero .hero-meta small{font-size:7px}
   .sales-hero .hero-scene{position:absolute;bottom:18px;left:16px;right:16px;height:auto;min-height:0;inset:auto 16px 18px}
   .sales-hero .incoming-card{display:none}.sales-hero .scene-caption{position:static;display:block;text-align:right;font-size:21px}
@@ -112,7 +112,7 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
   .bundle-card{grid-template-columns:1fr;gap:12px;padding:25px}.bundle-card h3{font-size:25px}.bundle-card>div:last-child{min-width:0}.bundle-card .extra-price{font-size:35px}.bundle-card .btn{font-size:12px}
   .purchase-preview h2{font-size:29px}.purchase-preview p{font-size:14px}.purchase-summary{padding:16px;font-size:13px}.sales-finale .btn{font-size:11px;gap:5px}
 }
-@media(max-width:360px){.sales-hero{padding:22px 16px 240px;min-height:790px}.sales-hero h1.adventure-title{font-size:54px}.hero-value{font-size:23px}.sales-hero .hero-copy>.hero-description{font-size:13px}.sales-hero .button-row>.btn{font-size:10px}.sales-hero .hero-meta{gap:7px}.sales-hero .hero-meta>span>span{font-size:7px}.hero-format{font-size:11px}.bundle-card{padding:20px}}
+@media(max-width:360px){.sales-hero{padding:22px 16px 350px;min-height:0}.sales-hero h1.adventure-title{font-size:54px}.hero-value{font-size:23px}.sales-hero .hero-copy>.hero-description{font-size:13px}.sales-hero .button-row>.btn{font-size:10px}.sales-hero .hero-meta{gap:7px;left:16px;right:16px}.sales-hero .hero-meta>span>span{font-size:7px}.hero-format{font-size:11px}.bundle-card{padding:20px}}
 @media(prefers-reduced-motion:reduce){.prep-progress progress::-webkit-progress-value{transition:none}}
 @media print{.download-choices,.device-notice,.extras-section,.environment-label{display:none}}
 
