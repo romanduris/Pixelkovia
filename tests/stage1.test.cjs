@@ -10,15 +10,22 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
     // No purchases, private navigation or legacy continue buttons leak into the funnel.
-    for (const [width,height] of [[320,640],[390,844],[768,1024],[1440,1000]]) {
+    for (const [width,height] of [[320,568],[375,667],[390,844],[430,932],[768,1024],[1440,1000]]) {
       await page.setViewportSize({width,height});
       await page.goto(BASE);
       assert.equal(await page.locator('a[href="parent.html"],a[href="game.html"],a[href="storyboard.html"],a[href*="printables"],a[href="atlas.html"],[data-view],[data-action="start"]').count(),0);
       assert.ok(!/29,99|19,99|Bežná cena|15–20/.test(await page.locator('body').innerText()));
-      const cta = page.locator('.sales-hero [data-action="purchase"]');
-      const box = await cta.boundingBox();
-      assert.ok(box.y >= 0 && box.y + box.height <= height,`hero purchase visible without scrolling at ${width}`);
-      assert.ok((await cta.textContent()).includes('14,99 €'));
+      assert.equal(await page.locator('.sales-hero [data-action="purchase"]').count(),0,'opening scene has no purchase button');
+      assert.ok(!/Escape.room/i.test(await page.locator('.sales-hero').innerText()));
+      assert.match(await page.locator('.hero-meta').innerText(),/15–60 MINÚT/);
+      if(width<=700){
+        for(const selector of ['.sales-hero','.hero-copy','.hero-meta']){
+          const box=await page.locator(selector).boundingBox();
+          assert.ok(box.y>=0&&box.y+box.height<=height,`${selector} fits first screen at ${width}×${height}`);
+        }
+        const copy=await page.locator('.hero-copy').boundingBox(),meta=await page.locator('.hero-meta').boundingBox();
+        assert.ok(copy.y+copy.height<meta.y,'readable copy and details leave room for the group scene');
+      }
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
       if(width>=1024)assert.ok((await page.locator('.hero-copy').boundingBox()).x<width/3,'artwork must not occupy a grid column and push copy over the characters');
       await page.screenshot({path:`/tmp/v5-funnel-${width}.png`});
@@ -120,6 +127,6 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     await legacy.close();
     assert.deepEqual(errors,[]);
     await context.close();
-    console.log('PASS: mobile hero CTA, funnel isolation, one honest purchase integration, unchanged saves, 13 mandatory preparation steps plus phone confirmation, launch guard, persistent local checklist, individual and bundled downloads, configured proposals, production denial, storage fallback and legacy preparation migration.');
+    console.log('PASS: opening mobile scene and text fit one screen without purchase CTA, funnel isolation, one honest purchase integration, unchanged saves, 13 mandatory preparation steps plus phone confirmation, launch guard, persistent local checklist, individual and bundled downloads, configured proposals, production denial, storage fallback and legacy preparation migration.');
   } finally {await browser.close();}
 })().catch(error => {console.error(error);process.exit(1);});

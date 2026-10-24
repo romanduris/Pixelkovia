@@ -39,7 +39,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 
 ## Kompatibilita a administrácia
 
-Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia, odpovede a písmená zostávajú zachované. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
+Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia, odpovede a písmená zostávajú zachované. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Ak QR smeruje na neskoršiu úlohu a prehliadač nemá potrebný postup, vstup najprv identifikuje správnu naskenovanú úlohu a vysvetlí chýbajúci postup; až na výslovné ťuknutie otvorí aktuálnu skoršiu úlohu. Nič neoznačí za vyriešené iba na základe takéhoto skenu. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
 
 Administrácia ponecháva historické obchodné kľúče produktov, pretože ich používajú objednávky a nákupné práva. Dopredná migrácia `0003_digital_identity_names.sql` mení iba viditeľné názvy. Historická migrácia zostáva historickým záznamom. Autentifikácia, ceny, platby a serverové relácie sa nemenia. Starší osem-etapový serverový kontrakt sa nesmie slepo regenerovať zo samostatného sedemúlohového browserového prototypu. Administrácia sa touto publikáciou statického Site nenasadzuje.
 

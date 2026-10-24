@@ -83,24 +83,24 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
   .site-header nav{display:flex;gap:0;overflow:visible;margin-left:auto;min-width:0;padding:0;border:0}
   .site-header nav .nav-link{display:none}.site-header .nav-purchase{display:none}
   .environment-label{font-size:10px;display:block;max-width:135px}.environment-label .parent-tag{display:block;margin:5px 0 0;font-size:7px}
-  .sales-hero{display:block;min-height:0;height:clamp(864px,245vw,1250px);margin-top:14px;padding:24px 22px 360px;border-radius:10px}
+  .sales-hero{display:block;min-height:0;height:calc(100svh - 28px);margin-top:14px;padding:20px 22px 0;border-radius:10px}
   .sales-hero .hero-background{inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center bottom;mask-image:none}
   .sales-hero:before{inset:0;height:auto;background:linear-gradient(180deg,#080d2170 0%,#080d2160 40%,#080d2130 55%,transparent 70%)}
   .sales-hero:after{background:linear-gradient(0deg,#080d2155,transparent 35%)}
   .sales-hero .hero-copy{position:static;padding:0;max-width:none}
-  .sales-hero .eyebrow{font-size:8px;letter-spacing:.1em;margin-bottom:18px}
-  .sales-hero h1.adventure-title{font-size:60px;line-height:.9;margin-bottom:8px}
-  .sales-hero .title-caption{font-size:9px;margin:10px 0 18px}
-  .hero-value{font-size:25px;line-height:1.18;margin-bottom:14px;max-width:360px}
+  .sales-hero .eyebrow{font-size:8px;letter-spacing:.1em;margin-bottom:12px}
+  .sales-hero h1.adventure-title{font-size:54px;line-height:.9;margin-bottom:8px}
+  .sales-hero .title-caption{font-size:9px;margin:10px 0 14px}
+  .hero-value{font-size:23px;line-height:1.18;margin-bottom:12px;max-width:360px}
   .sales-hero .hero-copy>.hero-description{font-size:13px;line-height:1.7;margin:0 0 12px;max-width:350px;color:#e1e4f3}
   .hero-format{font-size:11px;line-height:1.6;margin-bottom:18px;color:#c2e8e6;max-width:320px}
   .sales-hero .button-row{display:block}.sales-hero .button-row>.btn{width:100%;font-size:11px;padding:14px 10px;min-height:52px;gap:5px}
   .sales-hero .button-row>.text-link{display:none}
   .sales-hero .hero-copy>.quiet{font-size:10px;margin-top:12px}
-  .sales-hero .hero-meta{position:absolute;bottom:58px;left:22px;right:22px;margin:0;gap:14px;justify-content:space-between;flex-wrap:nowrap}
-  .sales-hero .hero-meta>span{font-size:16px;gap:5px}.sales-hero .hero-meta>span>span{font-size:8px}.sales-hero .hero-meta small{font-size:7px}
+  .sales-hero .hero-meta{position:absolute;bottom:22px;left:22px;right:22px;margin:0;gap:14px;justify-content:space-between;flex-wrap:nowrap}
+  .sales-hero .hero-meta>span{font-size:16px;gap:5px}.sales-hero .hero-meta>span>span{font-size:9px}.sales-hero .hero-meta small{font-size:8px}
   .sales-hero .hero-scene{position:absolute;bottom:18px;left:16px;right:16px;height:auto;min-height:0;inset:auto 16px 18px}
-  .sales-hero .incoming-card{display:none}.sales-hero .scene-caption{position:static;display:block;text-align:right;font-size:21px}
+  .sales-hero .incoming-card{display:none}.sales-hero .scene-caption{display:none}
   .sales-promise{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 0;font-size:10px}
   .benefits-grid{grid-template-columns:1fr;gap:14px;margin-top:25px}.benefits-grid article{padding:22px}.benefits-grid h3{font-size:20px;margin:12px 0}.benefits-grid p{font-size:13px}
   .offer-price{flex-wrap:wrap;gap:4px 20px}.offer-price strong{font-size:47px}.offer-card>.btn{font-size:10px;padding:15px 10px;gap:5px}
@@ -112,7 +112,7 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
   .bundle-card{grid-template-columns:1fr;gap:12px;padding:25px}.bundle-card h3{font-size:25px}.bundle-card>div:last-child{min-width:0}.bundle-card .extra-price{font-size:35px}.bundle-card .btn{font-size:12px}
   .purchase-preview h2{font-size:29px}.purchase-preview p{font-size:14px}.purchase-summary{padding:16px;font-size:13px}.sales-finale .btn{font-size:11px;gap:5px}
 }
-@media(max-width:360px){.sales-hero{padding:22px 16px 350px;min-height:0}.sales-hero h1.adventure-title{font-size:54px}.hero-value{font-size:23px}.sales-hero .hero-copy>.hero-description{font-size:13px}.sales-hero .button-row>.btn{font-size:10px}.sales-hero .hero-meta{gap:7px;left:16px;right:16px}.sales-hero .hero-meta>span>span{font-size:7px}.hero-format{font-size:11px}.bundle-card{padding:20px}}
+@media(max-width:360px){.sales-hero{padding:18px 16px 0;min-height:0}.sales-hero h1.adventure-title{font-size:54px}.hero-value{font-size:23px}.sales-hero .hero-copy>.hero-description{font-size:13px}.sales-hero .button-row>.btn{font-size:10px}.sales-hero .hero-meta{gap:7px;left:16px;right:16px}.sales-hero .hero-meta>span>span{font-size:9px}.hero-format{font-size:11px}.bundle-card{padding:20px}}
 @media(prefers-reduced-motion:reduce){.prep-progress progress::-webkit-progress-value{transition:none}}
 @media print{.download-choices,.device-notice,.extras-section,.environment-label{display:none}}
 
@@ -247,4 +247,27 @@ body[data-environment="designer"] .symbol-puzzle .plugy-phone-panel p{margin:0;l
 @media(max-width:370px){
  body[data-environment="designer"] .symbol-puzzle .equations{gap:6px}
  body[data-environment="designer"] .symbol-puzzle .equation-clue{padding:8px 4px}
+}
+
+/* Keep the complete opening scene and copy inside a short phone viewport. */
+@media(max-width:700px) and (max-height:700px){
+  .sales-hero{padding-top:16px}
+  .sales-hero .eyebrow{font-size:7px;margin-bottom:10px}
+  .sales-hero h1.adventure-title{font-size:42px;margin-bottom:6px}
+  .sales-hero .title-caption{font-size:8px;margin:8px 0 12px}
+  .sales-hero .hero-value{font-size:20px;line-height:1.15;margin-bottom:10px}
+  .sales-hero .hero-copy>.hero-description{font-size:12px;line-height:1.6;margin:0}
+  .sales-hero .hero-meta{bottom:14px}
+}
+
+@media(max-width:700px) and (orientation:landscape){.sales-hero{height:900px}}
+.qr-prerequisite .pixel-sprite{display:block;width:90px;margin:0 auto 20px}
+.qr-prerequisite .signal-content>p{max-width:540px;margin:16px auto;line-height:1.65}
+.qr-prerequisite .btn{margin-top:12px;white-space:normal}
+
+@media(max-width:360px){
+  .sales-hero .hero-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .sales-hero .hero-meta>span{min-width:0;font-size:12px;gap:4px;align-items:flex-start}
+  .sales-hero .hero-meta>span>span{white-space:nowrap}
+  .sales-hero .hero-meta small{white-space:normal;line-height:1.4}
 }

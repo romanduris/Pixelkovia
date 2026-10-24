@@ -9,7 +9,7 @@
   if('scrollRestoration' in history)history.scrollRestoration='manual';
   const fresh = () => ({progressVersion:PROGRESS_VERSION, started:false, callDone:false, stage:0, completed:[], hints:{}, scenePages:{}});
   let progress = fresh(), view = environment === 'player' ? 'prep' : environment, preview = null, messageReturn = false, pingTimer = null, soundContext = null;
-  let success = false;
+  let success = false, qrPrerequisite = null;
   let plugyRevealTimer = null;
   try {
     let saved = JSON.parse(localStorage.getItem(KEY));
@@ -39,7 +39,7 @@
   function goTop(){app.scrollTop=0;window.scrollTo({top:0,behavior:'instant'});app.querySelector('h1')?.focus({preventScroll:true});}
   function navigate(next){
     if(!internal && next !== 'sales')return;
-    view=next;success=false;
+    view=next;success=false;qrPrerequisite=null;
     if(internal && !preview && next === 'prep' && location.protocol !== 'file:')history.replaceState(null,'','parent.html');
     render();goTop();
   }
@@ -95,6 +95,11 @@
     return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`<div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>${esc(t.reward)}</strong><small>Je uložená v tímovom zápisníku.</small></div>${STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${t.id==='code'?'Dokončiť bezpečný návrat':'Pokračovať'} →</button>`:`${STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${taskHints()}`}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
   }
   function signalHeader(back,label){return `<header class="signal-header"><button class="text-link" data-action="${back}">← ${preview?'Späť do storyboardu':'Prehľad hry'}</button><span class="section-kicker">PIXEL / ${label}</span><button class="text-link" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶</button></header>`;}
+  function qrPrerequisiteScreen(){
+    app.classList.add('signal-mode');
+    const target=GAME.stages[qrPrerequisite],current=GAME.stages[state().stage];
+    return `<section class="signal-screen qr-prerequisite" aria-labelledby="qr-title">${signalHeader('home','NASKENOVANÁ ÚLOHA')}<div class="signal-content">${sprite(target.character)}<h1 id="qr-title" tabindex="-1">${esc(target.label)}</h1><p>QR kód je správny a patrí k úlohe ${qrPrerequisite}.</p><p>V tomto prehliadači však ešte nie je uložené vyriešenie predchádzajúcich úloh. Na pokračovanie čaká: <strong>${esc(current.label)}</strong>.</p><p>Ak ste ju už vyriešili, otvorte QR odkaz v tom istom prehliadači a na tom istom telefóne, v ktorom ste hrali. Postup sa medzi prehliadačmi neprenáša.</p><button class="btn" data-action="resume-scanned-game">Pokračovať v úlohe ${state().stage} →</button></div></section>`;
+  }
   function taskHints(){const n=state().stage,t=GAME.stages[n],h=Math.min(Number(state().hints[n])||0,t.hints.length);return `<div class="hint-box"><button class="text-link" data-action="hint" ${h===t.hints.length?'disabled':''}>◇ Potrebujeme nápovedu (${h}/${t.hints.length})</button><div id="hints" aria-live="polite">${t.hints.slice(0,h).map(x=>`<p>${esc(x)}</p>`).join('')}</div></div>`;}
   function mikyRestoreScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-restore" aria-labelledby="restore-title">${signalHeader(preview?'exit-test':'home','OBNOVA LINKY')}<div class="signal-content">${STORY_TEXT.party('envelope')}<h1 id="restore-title" tabindex="-1">${esc(GAME.stages[1].label)}</h1><form class="answer-form signal-form"><label for="answer">Kód na obnovenie spojenia</label><input id="answer" name="answer" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" spellcheck="false" placeholder="••••••" aria-describedby="feedback" required><button class="btn" type="submit">OBNOVIŤ SPOJENIE</button></form><p class="feedback" id="feedback" role="status"></p>${GAME.audio?'<span data-miky-audio-slot hidden></span>':''}</div></section>`;}
   function mikyConnectionScreen(){app.classList.add('signal-mode');return `<section class="signal-screen signal-connected success-card" aria-labelledby="connection-title">${signalHeader(preview?'exit-test':'home','SPOJENIE AKTÍVNE')}<div class="signal-content"><h1 id="connection-title" tabindex="-1">SPOJENIE OBNOVENÉ!</h1><div class="signal-duo" aria-label="Piko a Miky sú spolu na linke"><div class="signal-person">${sprite('piko','piko-listener')}<strong>Piko</strong></div><div class="connection-line" aria-hidden="true"><span></span><i>✦</i><span></span></div><div class="signal-person miky-speaker">${sprite('miky','success-character')}<strong>Miky</strong></div></div><p class="connection-message">Ja vás počujem! Ďakujem, konečne sme zase v spojení.</p>${GAME.audio?`<span data-miky-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="miky-audio-toggle" aria-controls="miky-audio">▶ Prehrať správu</button></div><p id="miky-audio-status" role="status">Správu môžete prehrať opakovane.</p>`:'<p class="message-text-status">Čaká vás odkaz s ďalšou indíciou.</p>'}<button class="${GAME.audio?'text-link':'btn'} miky-transcript-link" data-action="read-miky-message">${GAME.audio?'Čítať Mikyho správu':'Prečítať správu →'}</button><div class="signal-reward"><strong>S</strong><div><span>VAŠA ZÍSKANÁ INDÍCIA</span><small>Dobre si zapamätajte písmeno S. Budete ho potrebovať neskôr.</small></div></div></div></section>`;}
@@ -285,7 +290,7 @@
     }
     document.querySelectorAll('.nav-purchase').forEach(button=>{button.textContent=SITE_CONFIG.purchase.label;});
     document.querySelectorAll('[data-management-link]').forEach(link=>{const url=SITE_CONFIG.managementUrl();link.hidden=!url;if(url)link.href=url;});
-    app.innerHTML=view==='prep'?prep():view==='designer'?designer():view==='player'&&state().started&&state().stage>0?taskScreen():landing();
+    app.innerHTML=view==='prep'?prep():view==='designer'?designer():view==='player'&&qrPrerequisite?qrPrerequisiteScreen():view==='player'&&state().started&&state().stage>0?taskScreen():landing();
     const audioSlot=app.querySelector('[data-miky-audio-slot]');
     if(audioSlot){
       const audio=retainedAudio||document.createElement('audio');
@@ -431,6 +436,7 @@
     if(a==='exit-test'){preview=null;navigate('designer');}
     if(a==='close'){const wasIntro=modal.classList.contains('message-modal')&&!messageReturn;closeModal();if(wasIntro){if(preview){preview=null;navigate('designer');}else{navigate('prep');}}}
     if(a==='game-fullscreen')requestGameFullscreen();
+    if(a==='resume-scanned-game'){qrPrerequisite=null;render();goTop();}
     if(a==='accept-call'){requestGameFullscreen();state().messageOpened=true;save();showMessage(true);}
     if(a==='back-to-message'){state().messageOpened=false;save();showMessage(false);}
     if(a==='message-sound')enableSound();
@@ -473,6 +479,8 @@
       progress.stage=Math.max(3,progress.stage);
     }
     if(scannedSignal===4&&progress.completed.includes(3))progress.stage=Math.max(4,progress.stage);
+    // Identify the scanned sheet instead of silently showing an earlier task.
+    if(scannedSignal>progress.stage)qrPrerequisite=scannedSignal;
     view='player';save();
   }
   render();

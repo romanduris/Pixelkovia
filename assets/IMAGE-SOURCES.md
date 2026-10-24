@@ -12,7 +12,7 @@ pixelkovia-room.png zobrazuje sedem kamarátov pri digitálnom stole v normálne
 
 Rodinné fotografie family-signal-puzzle.png a family-cipher-puzzle.png neobsahujú pôvodné postavy. Zostávajú označenými ilustračnými vizualizáciami spoločného riešenia, nie fotografiami zákazníkov ani presným zobrazením finálnych materiálov.
 
-Mobilný funnel používa pixelkovia-room-mobile-tall.png: zvislé rozšírenie schválenej obývačky nad postavami aj pod stolom. Titulok, popis a tlačidlo sú upraviteľné HTML cez pokojnejšiu hornú časť scény, údaje o hre ležia pod stolom. Pôvodná hlavná aj desktopová ilustrácia zostávajú zachované. Obrázok vytvoril vstavaný image_gen; oba prompty a zdroj sú v characters/HERO-MOBILE-TALL-PROMPT.json.
+Mobilný funnel používa pixelkovia-room-mobile-tall.png: zvislé rozšírenie schválenej obývačky nad postavami aj pod stolom. Titulok a krátky popis sú upraviteľné HTML cez pokojnejšiu hornú časť scény, údaje o hre ležia pod stolom. Mobilná výška sa prispôsobuje viditeľnej obrazovke; horné rozšírenie sa podľa potreby oreže, aby partia so stolom aj text zostali na úvodnej obrazovke. Nákupné tlačidlo je až v ďalších častiach funnelu. Pôvodná hlavná aj desktopová ilustrácia zostávajú zachované. Obrázok vytvoril vstavaný image_gen; oba prompty a zdroj sú v characters/HERO-MOBILE-TALL-PROMPT.json.
 
 ## Tlačové a knižné scény
 
