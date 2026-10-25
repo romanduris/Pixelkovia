@@ -378,3 +378,9 @@
 @media print and (max-height:285mm){
  #printable-sheets>.sheet{zoom:.93;margin-inline:auto}
 }
+
+/* The names refer to the same shapes used in the map immediately below. */
+.delivery-terms{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-bottom:5px}
+.delivery-terms>span{display:inline-flex;align-items:center;gap:4px}
+.delivery-terms svg{display:block;flex-shrink:0}
+@media print{.delivery-terms{gap:1mm 3mm;margin-bottom:1mm}.delivery-terms>span{gap:1mm}}
