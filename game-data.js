@@ -210,7 +210,7 @@ window.GAME = {
       ],
       "placeholder": "Miesto z doručenej správy",
       "action": "Nájdite list P4 pri topánkach. Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
-      "task": "Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Podľa servisného kľúča doplňte symbol na bodkovanú čiaru každého z 12 prázdnych mostíkov. Potom od ŠTARTU sledujte šípky: symbol uzla určuje správny mostík. Cestu vyfarbujte a zapisujte písmená z kruhov, cez ktoré prejdete. Sedem písmen doplní vetu „Ďalšia indícia sa skrýva v tvojej…“.",
+      "task": "Uzol je veľký kruh. Mostík je cesta so šípkou medzi kruhmi. Opravte 12 mostíkov. Bodky na mostíku porovnajte s kľúčom. Dopíšte symbol na bodkovanú čiaru. Nájdite cestu. Od ŠTARTU sledujte šípky. Vyberajte mostík s rovnakým symbolom, aký má kruh, a cestu vyfarbujte. Prečítajte odkaz. Písmená z prejdených kruhov zapisujte po poradí do políčok. Kruhy bez písmena len prejdite.",
       "materials": "P4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička indície T. P5 ukryte pod vankúš v detskej posteli.",
       "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie P5; jeho QR otvorí úlohu 5.",
       "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Písmená na správnej ceste dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
@@ -226,13 +226,26 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Pingy, malý posol správ. Prenášam odkazy medzi kamarátmi, aby každý vedel, čo sa deje.",
-          "Výpadok poškodil našu sieť svetelných uzlov. Na niektorých mostíkoch zhasli značky a môj odkaz sa zasekol. Opravíte mostíky a pomôžete mi ho doručiť?"
+          "Ahojte! Ja som Pingy, malý posol správ. Prenášam odkazy medzi kamarátmi, aby každý vedel, čo sa deje. Výpadok poškodil našu sieť svetelných uzlov. Na niektorých mostíkoch zhasli značky a môj odkaz sa zasekol. Opravíte mostíky a pomôžete mi ho doručiť?"
         ],
         "after": []
       },
       "paperOnly": true,
-      "paperAnswer": "POSTELI"
+      "paperAnswer": "POSTELI",
+      "paperInstructions": [
+        {
+          "title": "Opravte 12 mostíkov.",
+          "text": "Bodky na mostíku porovnajte s kľúčom. Dopíšte symbol na bodkovanú čiaru."
+        },
+        {
+          "title": "Nájdite cestu.",
+          "text": "Od ŠTARTU sledujte šípky. Vyberajte mostík s rovnakým symbolom, aký má kruh, a cestu vyfarbujte."
+        },
+        {
+          "title": "Prečítajte odkaz.",
+          "text": "Písmená z prejdených kruhov zapisujte po poradí do políčok. Kruhy bez písmena len prejdite."
+        }
+      ]
     },
     {
       "id": "maze",
