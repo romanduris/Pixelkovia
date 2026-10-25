@@ -48,9 +48,8 @@ assert.equal(saved.get('zahada-v1-progress'),'existing-game');assert.equal(saved
 console.log('PASS: Pixi decoder → HĽADAJ POD STOLIČKAMI; delivery route → POSTELI; updated preparation requires confirmation and preserves saved games.');
 
 // Child-facing clues stay distinct from physical packaging in the adult guide.
-// P4 uses drawn envelope icons for collecting letters, distinct from physical packaging.
-for(const stage of game.stages)assert.ok(!/obálk/i.test(JSON.stringify(stage.narrative).replace(stage.id==='cipher'?'v obálkach':'__no_icon__','')),stage.id+': use indícia for physical clues');
-for(const [id,sheet] of Object.entries(sheets))assert.ok(!/obálk/i.test(sheet.replace(id==='p4'?/(?:v obálkach|pri obálke|z obálok)/g:/__no_icon__/g,'')),id+': printable child copy uses indícia for physical clues');
+for(const stage of game.stages)assert.ok(!/obálk/i.test(JSON.stringify(stage.narrative)),stage.id+': use indícia for physical clues');
+for(const [id,sheet] of Object.entries(sheets))assert.ok(!/obálk/i.test(sheet),id+': printable child copy uses indícia for physical clues');
 for(const script of Object.values(game.voiceScripts))assert.ok(!/obálk/i.test(script.prompt));
 const riddle=game.plugyMessage.join(' ');
 assert.match(riddle,/cestovateľov[\s\S]*jazyk[\s\S]*nohami/);

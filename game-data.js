@@ -210,15 +210,15 @@ window.GAME = {
       ],
       "placeholder": "Miesto z doručenej správy",
       "action": "Nájdite list P4 pri topánkach. Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
-      "task": "Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Podľa servisného kľúča doplňte symbol na bodkovanú čiaru každého z 12 prázdnych mostíkov. Potom od ŠTARTU sledujte šípky: symbol uzla určuje správny mostík. Cestu vyfarbujte a písmená zbierajte iba v uzloch s obálkou. Sedem písmen doplní vetu „Ďalšia indícia sa skrýva v tvojej…“.",
+      "task": "Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Podľa servisného kľúča doplňte symbol na bodkovanú čiaru každého z 12 prázdnych mostíkov. Potom od ŠTARTU sledujte šípky: symbol uzla určuje správny mostík. Cestu vyfarbujte a zapisujte písmená z kruhov, cez ktoré prejdete. Sedem písmen doplní vetu „Ďalšia indícia sa skrýva v tvojej…“.",
       "materials": "P4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička indície T. P5 ukryte pod vankúš v detskej posteli.",
       "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie P5; jeho QR otvorí úlohu 5.",
-      "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Obálky dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
+      "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Písmená na správnej ceste dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
       "hints": [
         "Uzol je veľký kruh a mostík je cesta medzi kruhmi. V prázdnom rámiku mostíka svieti jeden z troch bodov. V servisnom kľúči nájdite rovnakú polohu a na bodkovanú čiaru dokreslite symbol.",
-        "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte iba písmená z obálok, nie každý prejdený uzol."
+        "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte písmená z prejdených kruhov. Kruh bez písmena do odpovede nič nepridá."
       ],
-      "parent": "Celý P4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. P5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. P4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv opravia všetkých 12 mostíkov podľa trojbodového kľúča, potom vyfarbia cestu a zbierajú iba písmená pri obálkach.",
+      "parent": "Celý P4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. P5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. P4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv opravia všetkých 12 mostíkov podľa trojbodového kľúča, potom vyfarbia cestu a zapisujú písmená z prejdených kruhov.",
       "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s písmenom T si odložte. V detskej posteli pod vankúšom nájdite P5 a jeho QR kódom otvorte ďalšiu úlohu.",
       "character": "pingy",
       "dramaturgy": [
