@@ -1,13 +1,12 @@
 // Solve the lock with real taps and verify the optional recording on mobile engines.
 const assert=require('node:assert/strict');
 const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const {useArchivedAudio}=require('./helpers/archive-audio.cjs');
+const fs=require('node:fs');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 const KEY='zahada-v1-progress';
 const saved={started:true,callDone:true,stage:3,completed:[1,2],hints:{}};
 const normal=text=>text.replace(/\s+/g,' ').trim();
 async function open(context){
- await useArchivedAudio(context);
  const errors=[],page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
  await page.addInitScript(()=>{HTMLElement.prototype.requestFullscreen=async()=>{};});
  await page.goto(BASE+'/game.html');await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
@@ -77,7 +76,7 @@ async function fits(page,label){
   await page.waitForFunction(()=>document.querySelector('audio').plugySound?.gain.gain.value===1);
   assert.ok(await page.locator('#plugy-audio').evaluate(audio=>audio.plugySound?.gain.gain.value===1),'the result releases the unlocked output');
   await page.waitForFunction(()=>{const audio=document.querySelector('#plugy-audio');return audio&&!audio.paused&&audio.currentTime>0;});
-  assert.equal(await page.locator('#plugy-audio').getAttribute('src'),'assets/Sutko.mp3','the supplied Plugy recording is used');
+  assert.equal(await page.locator('#plugy-audio').getAttribute('src'),'assets/Plugy.mp3','the supplied Plugy recording is used');
   await page.locator('[data-action="plugy-audio-toggle"]').click();
   await page.locator('[data-action="read-plugy-message"]').click();
   assert.equal(normal((await page.locator('#plugy-transcript p').allTextContents()).join(' ')),normal(await page.evaluate(()=>GAME.plugyMessage.join(' '))));
@@ -88,7 +87,7 @@ async function fits(page,label){
   }
   await page.reload();assert.equal(await page.locator('.plugy-connected').count(),1,'saved completion does not need repeating');
   assert.equal(await page.locator('[data-action="next"]').count(),0);assert.equal(await page.locator('.plugy-thanks').textContent(),await page.evaluate(()=>GAME.plugyThanks));
-  await page.goto(BASE+'/game.html?signal=listok');assert.equal(await page.locator('.signal-content h1').textContent(),'Úloha 4 – Pri topánkach');
+  await page.goto(BASE+'/game.html?signal=listok');assert.equal(await page.locator('.signal-content h1').textContent(),'Pokračujte na papieri');
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify({...saved,completed:[1,2,3]})),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');assert.equal(await page.locator('.plugy-connected').count(),1,'old completed task 3 remains valid');
   // Isolated StoryBoard tests never write the family's save or partial selections.
   const family=await page.evaluate(key=>localStorage.getItem(key),KEY);await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();await solve(page);await page.locator('[data-action="exit-test"]').click();assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),family);
@@ -113,8 +112,9 @@ async function fits(page,label){
   const browser=await engine.launch();
   try{
    const context=await browser.newContext({...device});let requests=0,fail=false;
-   await context.route('**/assets/Sutko.mp3',route=>{requests++;return fail?route.fulfill({status:503,contentType:'text/plain',body:'Temporary failure'}):route.continue();});
+   await context.route('**/assets/Plugy.mp3',route=>{requests++;return fail?route.fulfill({status:503,contentType:'text/plain',body:'Temporary failure'}):route.continue();});
    const {page,errors}=await open(context);
+   const response=await page.request.get(BASE+'/assets/Plugy.mp3');assert.equal(response.status(),200);assert.match(response.headers()['content-type'],/^audio\/mpeg\b/);assert.deepEqual(Buffer.from(await response.body()),fs.readFileSync('assets/Plugy.mp3'),'browser receives the new shipped recording');
    await page.waitForFunction(()=>document.querySelector('#plugy-audio')?.readyState>=3);
    assert.ok(await page.locator('audio').evaluate(audio=>audio.paused));
    await page.evaluate(()=>window.preloadedPlugy=document.querySelector('#plugy-audio'));
@@ -124,7 +124,7 @@ async function fits(page,label){
    await page.waitForFunction(()=>document.querySelector('audio').plugySound?.gain.gain.value===1);
    assert.ok(await page.locator('#plugy-audio').evaluate(audio=>audio.plugySound?.context.state==='running'&&audio.plugySound.gain.gain.value===1&&!audio.loop),'the final tile unlocks automatic playback through the same element');
    await page.waitForFunction(()=>{const audio=document.querySelector('#plugy-audio');return !audio.paused&&audio.currentTime>0;});
-   assert.ok(await page.locator('#plugy-audio').evaluate(audio=>audio.volume>0&&audio.duration>25&&audio.duration<35&&!audio.error),'the actual recording is loaded');
+   assert.ok(await page.locator('#plugy-audio').evaluate(audio=>audio.volume>0&&audio.duration>25&&audio.duration<50&&!audio.error),'the actual recording is loaded');
    await page.waitForFunction(()=>{const samples=new Float32Array(plugyAnalyser.fftSize);plugyAnalyser.getFloatTimeDomainData(samples);return samples.some(value=>Math.abs(value)>.001);}); // Verify output samples, including WebKit's rerouted media, not just a playing flag.
    assert.ok(await page.evaluate(()=>plugyRewindAt!==null&&plugyRewindAt<1.5),'the reveal rewinds the recording to its beginning (allowing WebKit audio-graph read-ahead)');
    await page.waitForFunction(()=>document.querySelector('#plugy-audio-status').textContent.includes('Hovorí Plugy'));

@@ -25,9 +25,9 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await page.locator('#plugy-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.plugy.prompt));
  assert.equal(normalize((await page.locator('#plugy-message-text>div>p').allTextContents()).join(' ')),normalize(await page.evaluate(()=>GAME.plugyMessage.join(' '))));
  assert.equal(await plugy.locator('.studio-stage-details,.storyboard-continuation').count(),0);
- assert.equal(await plugy.locator('audio').getAttribute('src'),'assets/Sutko.mp3');
- assert.match(await plugy.locator('.script-status').first().innerText(),/Nový dabing čaká na dodanie/);
- assert.equal(await plugy.locator('.miky-message-controls audio').count(),0,'archived recording is not presented as new dubbing');
+ assert.equal(await plugy.locator('.recording-archive audio').getAttribute('src'),'assets/Sutko.mp3');
+ assert.match(await plugy.locator('.script-status').first().innerText(),/Nová nahrávka je zapojená/);
+ assert.equal(await plugy.locator('.miky-message-controls audio').getAttribute('src'),'assets/Plugy.mp3','new recording is separate from the archive');
 
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');

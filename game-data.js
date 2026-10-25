@@ -555,7 +555,7 @@ window.GAME = {
       "model": "ElevenLabs v3",
       "direction": "Pokojný, spoľahlivý a srdečný hlas; hádanku povedať pomalšie, miesto neprezradiť priamo.",
       "prompt": "[relieved, proud, speaking firmly] Podarilo sa! Zámok povolil a most stále drží!\n\n[grateful, warm] Ďakujem vám, kamaráti! Už môžeme konečne bezpečne prejsť.\n\n[suddenly alert, quieter] Počkať... Za bránou sa ozval nejaký tichý šepot.\n\n[curious, speaking softly] Myslím, že je to náš posol!\n\n[thoughtful, slightly urgent] Zanechal nám indíciu, no musíme ju nájsť.\n\n[mysterious, slowly, emphasizing important words] Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov.\n\n[playful, cryptic, short pause] Majú jazyk, ale nerozprávajú. Na cestu vyrazia iba s vašimi nohami.\n\n[whispering, conspiratorial] Jeden z nich ukrýva tajný odkaz!",
-      "recordingStatus": "Nový dabing čaká na dodanie. Hra používa tento text; pôvodná nahrávka je archivovaná."
+      "recordingStatus": "Nová nahrávka je zapojená v hre. Pôvodná nahrávka zostáva v archíve."
     }
   },
   "pikoMessage": [
@@ -565,7 +565,7 @@ window.GAME = {
     "Indícia jedna… v kúpeľni! Rýchlo!",
     "Ah—"
   ],
-  "plugyAudio": null,
+  "plugyAudio": "assets/Plugy.mp3",
   "plugyAudioPlaceholder": false,
   "plugyPuzzle": {
     "grid": [
@@ -644,8 +644,8 @@ window.GAME = {
       "status": "available"
     },
     "plugy": {
-      "expectedFile": "assets/PlugyMessage.mp3",
-      "status": "pending"
+      "expectedFile": "assets/Plugy.mp3",
+      "status": "available"
     }
   },
   "archivedAudio": {
