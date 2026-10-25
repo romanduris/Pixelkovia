@@ -48,6 +48,7 @@ Administrácia ponecháva historické obchodné kľúče produktov, pretože ich
 Autorské závislosti sa inštalujú mimo repozitára: Playwright s Chromium/WebKit, qrcode, jsqr a Python pypdf. `PLAYWRIGHT_MODULE` určuje absolútnu cestu k modulu. Lokálny server: `python3 -m http.server 8080`.
 
 ```sh
+PLAYWRIGHT_MODULE=/cesta/k/playwright JSQR_MODULE=/cesta/k/jsqr node tests/worksheet-readability.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/print-pagination.test.cjs
 node tests/paper-puzzles.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/paper-flow.test.cjs
@@ -75,3 +76,5 @@ Existujúci Site: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site
 ID aj publikum sú zachované. Build vzniká cez `node scripts/prepare-static.mjs`; `dist/` nie je zdrojom obsahu. Zmeny sa commitnú a pushnú do `origin/main`, potom sa publikuje existujúci Site. Trvalý odkaz funguje aj po vypnutí Codespace.
 
 Priama tlač webových listov zachováva samostatné strany aj pri voľbe kratšieho papiera Letter: celé rozloženie vrátane pätičky sa rovnomerne prispôsobí. A4 aj stiahnutý deväťstranový PDF balík zostávajú v pôvodnej mierke. Regresný test overuje kompletnú tlač s hlavičkami aj bez nich a samostatný list P2.
+
+Tlačové listy používajú spoločné typografické roly v `signal-print.css`: hlavné správy a pracovné pokyny 9 pt Arial, doplňujúce vysvetlenia 8 pt, hlavné nadpisy 21 pt. Menšie popisky a pätičky sú oddelené od hráčskych pokynov; samotné šifry, rovnice a získané písmená zostávajú zámerne výraznejšie. QR kódy na P1, P3 a P5 majú jednotne 32 × 32 mm vrátane bieleho okraja štyroch modulov. Generátor používa korekciu H; pôvodné URL sa nemenia. Test číta korekčnú úroveň priamo z formátových bitov vygenerovaných SVG, dekóduje aj vzorku s vymazanou plochou a porovnáva typografiu i rozmery v Chromium a WebKite.

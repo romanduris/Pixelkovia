@@ -1,7 +1,7 @@
 /* Jediná A4: tmavý text na bielom papieri, malé úsporné akcenty. */
 .miky-sheet{color:#142840;background:#fff;font:13px/1.5 Arial,sans-serif;padding:30px;min-height:0;border-top:4px solid #35547d}.miky-print-heading{position:relative;border-bottom:2px solid #233f65;padding-bottom:12px;margin-bottom:13px}.miky-sheet .label{color:#334d70;font:10px monospace;letter-spacing:1.5px}.miky-sheet h2{font:800 29px/1.1 monospace;color:#172e4d;letter-spacing:-.8px;margin:10px 0 2px}.print-wave{position:absolute;right:0;top:8px;color:#35547d;font:19px monospace}.miky-sheet h3{font:700 12px/1.3 monospace;letter-spacing:.3px;margin:0 0 8px;color:#172e4d}.miky-print-story{border:1px solid #9aaec6;border-left:4px solid #2e547a;padding:13px 15px;display:flow-root}.miky-print-story h3{font-size:16px}.miky-sheet p{margin:0 0 8px}.miky-sheet p:last-child{margin-bottom:0}.miky-print-story .miky-print-avatar{width:112px;height:112px;margin:0 0 6px 15px;border:1px solid #a0b0c5;border-radius:0;image-rendering:auto}.miky-print-mission{margin:13px 0;padding:12px 15px;border:1px solid #9aaec6;background:#f7fafc}.miky-print-mission h3{color:#234c71}.miky-print-mission ol{padding-left:20px;margin:0}.miky-print-mission li{padding-left:2px;margin:2px 0}.cutouts-heading{display:flex;justify-content:space-between;gap:10px;font:9px/1.4 monospace;letter-spacing:.2px;margin:12px 0 8px}.signal-cutouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.signal-cutout{height:166px;border:1.5px dashed #233f65;position:relative;display:grid;place-items:center;background:#fff;break-inside:avoid}.cut-mark{position:absolute;top:-9px;left:10px;background:white;padding:0 4px;font-size:15px;color:#172e4d}.cutout-content{width:142px;height:142px;transform:rotate(var(--rotation));display:grid;grid-template-columns:1fr 49px;grid-template-rows:22px 1fr 1fr;gap:3px;padding:10px;color:#142840;border:1px solid #c5d0df}.record-label{grid-column:1/-1;font:8px/1 monospace;letter-spacing:.2px;border-bottom:1px solid #9eafc7;align-content:center}.record-date,.record-time{display:flex;flex-direction:column;justify-content:center}.cutout-content small{font:7px/1.3 monospace;letter-spacing:.4px}.cutout-content strong{font:700 18px/1.3 monospace;white-space:nowrap}.record-digit{grid-column:2;grid-row:2/4;display:flex;flex-direction:column;justify-content:center;align-items:center;border-left:1px solid #9eafc7;padding-left:4px}.record-digit b{font:800 38px/1.2 monospace}.miky-print-controls{margin-top:14px;display:grid;grid-template-columns:1.05fr 1fr;gap:14px}.miky-code-panel,.miky-qr-panel{border:1px solid #8096b1;padding:12px}.miky-print-controls h3{font-size:10px;letter-spacing:0}.miky-print-controls p{font-size:10px;line-height:1.45}.code-boxes{display:flex;gap:5px;margin:10px 0}.code-boxes span{width:28px;height:32px;border:1.5px solid #233f65;background:white}.miky-qr-panel{display:flex;align-items:center;gap:10px}.qr-mockup{flex-shrink:0;width:76px;text-align:center;color:#142840}.qr-mockup img{display:block;width:72px;height:72px;margin:auto}.qr-mockup small{display:block;font:6px/1.4 monospace;letter-spacing:.1px;margin-top:2px}.miky-cut-divider{border-top:1.5px dashed #233f65;position:relative;margin:22px 0 15px;text-align:center}.miky-cut-divider span{display:inline-block;position:relative;top:-8px;background:white;padding:0 8px;font:8px/1.4 monospace;letter-spacing:.2px;color:#233f65}.miky-sheet .footer{position:static;display:block;margin-top:15px;font:8px monospace;color:#334d70}.sheet[hidden],header nav[hidden]{display:none!important}
 @media screen and (max-width:600px){.miky-sheet{padding:18px;font-size:12px}.miky-sheet h2{font-size:22px}.print-wave{font-size:10px}.miky-print-story .miky-print-avatar{width:85px;height:85px;margin-left:10px}.signal-cutouts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.signal-cutout{height:148px}.cutout-content{width:128px;height:128px;padding:7px;grid-template-columns:1fr 42px}.cutout-content strong{font-size:16px}.record-digit b{font-size:32px}.cutouts-heading{display:block}.cutouts-heading span{display:block;margin-top:4px}.miky-print-controls{grid-template-columns:1fr}.miky-sheet .footer{font-size:7px}}
-@media print{.miky-sheet{width:186mm;height:273mm;min-height:273mm;padding:5mm 4mm 3mm;margin:0;background:white;font-size:9pt;line-height:1.42;border:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.miky-print-heading{padding-bottom:3mm;margin-bottom:3mm}.miky-sheet h2{font-size:21pt;margin-top:2mm}.miky-sheet .label{font-size:7pt}.print-wave{font-size:12pt}.miky-print-story{padding:3mm}.miky-print-story h3{font-size:11pt}.miky-print-story .miky-print-avatar{width:27mm;height:27mm;margin-left:3mm}.miky-sheet p{margin-bottom:1.6mm}.miky-print-mission{margin:3mm 0;padding:2.5mm 3mm}.miky-print-mission h3{font-size:9pt;margin-bottom:1mm}.miky-print-mission li{margin:.5mm 0}.cutouts-heading{font-size:6.5pt;margin:2mm 0}.signal-cutouts{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm}.signal-cutout{height:43mm}.cutout-content{width:37mm;height:37mm;padding:2.5mm;grid-template-columns:1fr 12mm;grid-template-rows:5mm 1fr 1fr}.cutout-content strong{font-size:13pt}.cutout-content small{font-size:5.5pt}.record-label{font-size:5.5pt}.record-digit b{font-size:27pt}.miky-print-controls{margin-top:3mm;gap:3mm}.miky-code-panel,.miky-qr-panel{padding:2.5mm}.miky-print-controls h3{font-size:7pt;margin-bottom:2mm}.miky-print-controls p{font-size:7pt}.code-boxes{gap:1.2mm;margin:2mm 0}.code-boxes span{width:7mm;height:8mm}.miky-qr-panel{gap:2mm}.qr-mockup{width:20mm}.qr-mockup img{width:19mm;height:19mm}.qr-mockup small{font-size:4.5pt}.miky-cut-divider{margin:5mm 0 2mm}.miky-cut-divider span{top:-2mm;font-size:6pt;padding:0 2mm}.miky-retained{break-inside:avoid}.miky-sheet .footer{position:static;margin-top:3mm;font-size:6pt;color:#334d70}}
+@media print{.miky-sheet{width:186mm;height:273mm;min-height:273mm;padding:5mm 4mm 3mm;margin:0;background:white;font-size:9pt;line-height:1.42;border:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.miky-print-heading{padding-bottom:3mm;margin-bottom:3mm}.miky-sheet h2{font-size:21pt;margin-top:2mm}.miky-sheet .label{font-size:7pt}.print-wave{font-size:12pt}.miky-print-story{padding:3mm}.miky-print-story h3{font-size:11pt}.miky-print-story .miky-print-avatar{width:27mm;height:27mm;margin-left:3mm}.miky-sheet p{margin-bottom:1.6mm}.miky-print-mission{margin:3mm 0;padding:2.5mm 3mm}.miky-print-mission h3{font-size:9pt;margin-bottom:1mm}.miky-print-mission li{margin:.5mm 0}.cutouts-heading{font-size:6.5pt;margin:2mm 0}.signal-cutouts{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm}.signal-cutout{height:43mm}.cutout-content{width:37mm;height:37mm;padding:2.5mm;grid-template-columns:1fr 12mm;grid-template-rows:5mm 1fr 1fr}.cutout-content strong{font-size:13pt}.cutout-content small{font-size:5.5pt}.record-label{font-size:5.5pt}.record-digit b{font-size:27pt}.miky-print-controls{margin-top:3mm;gap:3mm}.miky-code-panel,.miky-qr-panel{padding:2.5mm}.miky-print-controls h3{font-size:7pt;margin-bottom:2mm}.miky-print-controls p{font-size:7pt}.code-boxes{gap:1.2mm;margin:2mm 0}.code-boxes span{width:7mm;height:8mm}.miky-qr-panel{gap:2mm}.qr-mockup{width:20mm}.qr-mockup img{width:var(--sheet-qr);height:var(--sheet-qr)}.qr-mockup small{font-size:4.5pt}.miky-cut-divider{margin:5mm 0 2mm}.miky-cut-divider span{top:-2mm;font-size:6pt;padding:0 2mm}.miky-retained{break-inside:avoid}.miky-sheet .footer{position:static;margin-top:3mm;font-size:6pt;color:#334d70}}
 
 /* Parent cheat sheet: preparation, safe hiding places and ten ordered cards. */
 .sheet[hidden]{display:none!important}
@@ -230,7 +230,7 @@
  .worksheet-scene-label{font-size:6.5pt}
  .worksheet-scene figcaption{font-size:7.5pt;line-height:1.35}
  #p1 .worksheet-scene img{height:30mm;aspect-ratio:auto;object-fit:cover;object-position:center}
- .miky-print-heading h2{max-width:calc(100% - 35mm);font-size:19pt}
+ .miky-print-heading h2{max-width:calc(100% - 35mm);font-size:var(--sheet-title)}
  .miky-code-panel,.miky-qr-panel{padding:2mm}
  .miky-print-controls{margin-top:2mm}
  .signal-cutout{height:41mm}
@@ -238,14 +238,14 @@
  #p5 .worksheet-visual-row>.worksheet-mission{margin:0}
  #p2 .worksheet-heading,#p6 .worksheet-heading{margin-bottom:2mm}
  #p3 .worksheet-heading{margin-bottom:1mm}
- #p3 .worksheet-entry-qr img{width:22mm;height:22mm}
- #p3 .worksheet-entry-qr small{font-size:5pt}
+ #p3 .worksheet-entry-qr img{width:var(--sheet-qr);height:var(--sheet-qr)}
+ #p3 .worksheet-entry-qr small{font-size:var(--sheet-caption)}
  #p2 .worksheet-visual-row{margin:1.5mm 0}
  #p2 .worksheet-story{padding-block:1.5mm}
  #p2 .worksheet-puzzle{padding:2mm;margin-bottom:2mm}
  #p2 .worksheet-secret,#p2 .worksheet-next,#p2 .instructions{margin-bottom:1.5mm}
  #p2 .worksheet-answer{margin:0 0 2mm}
- #p2 .worksheet-answer h3{font-size:8pt;margin:0 0 .5mm}
+ #p2 .worksheet-answer h3{font-size:9pt;margin:0 0 .5mm}
  #p2 .decoded-letter-boxes{gap:4mm;padding:1mm 0}
  #p2 .decoded-word{gap:.4mm}
  #p2 .decoded-letter{width:8.5mm;height:8.5mm}
@@ -292,7 +292,7 @@
 @media print{
  #p4 .worksheet-heading,#p7 .worksheet-heading{margin-bottom:2mm}
  #p4 .worksheet-story,#p7 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
- #p4 .worksheet-story p,#p7 .worksheet-story p{font-size:8.5pt;line-height:1.4}
+ #p4 .worksheet-story p,#p7 .worksheet-story p{font-size:var(--sheet-copy);line-height:1.4}
  #p4 .worksheet-mission{padding:2mm 3mm;margin:2mm 0}
  #p4 .delivery-map{width:100%;height:121mm;margin:1mm 0}
  .delivery-answer{padding:2mm 3mm;margin:2mm 0}
@@ -305,10 +305,10 @@
  .paper-screen h3{font-size:6.5pt;margin-bottom:1mm}
  .paper-screen svg{height:53mm}
  #p7 .worksheet-answer{margin:1mm 0 2mm}
- #p7 .worksheet-answer h3{font-size:8pt;margin:0 0 1mm}
+ #p7 .worksheet-answer h3{font-size:9pt;margin:0 0 1mm}
  #p5 .maze-phone-panel{padding:1mm 3mm;margin-bottom:1mm}
- #p5 .maze-phone-panel img{width:18mm;height:18mm}
- #p5 .maze-phone-panel p{font-size:8pt}
+ #p5 .maze-phone-panel img{width:var(--sheet-qr);height:var(--sheet-qr)}
+ #p5 .maze-phone-panel p{font-size:var(--sheet-copy)}
 }
 
 /* Two paper phases: repair the light bridges, then deliver the message. */
@@ -326,29 +326,51 @@
 @media(max-width:500px){.delivery-repair-key h3 small{display:block;margin:3px 0}.delivery-repair-key>div{gap:6px}.paper-reward{padding:10px;gap:10px}}
 @media print{
  #p4 .worksheet-heading{margin-bottom:1.5mm}
- #p4 .worksheet-heading h2{font-size:18pt}
+ #p4 .worksheet-heading h2{font-size:var(--sheet-title)}
  #p4 .worksheet-story{padding:1.5mm 3mm;margin-bottom:1mm}
- #p4 .worksheet-story p{font-size:8pt;line-height:1.35}
+ #p4 .worksheet-story p{font-size:var(--sheet-copy);line-height:1.35}
  #p4 .worksheet-visual-row{grid-template-columns:3fr 2fr;margin:2mm 0;gap:3mm}
  #p4 .worksheet-mission{margin:0;padding:2mm 3mm}
- #p4 .worksheet-mission p{font-size:8pt;line-height:1.4}
+ #p4 .worksheet-mission p{font-size:var(--sheet-copy);line-height:1.4}
  #p4 .worksheet-scene{padding:1mm;gap:1mm}
  #p4 .worksheet-scene img{height:24mm;object-fit:contain;aspect-ratio:auto}
  #p4 .worksheet-scene-label{font-size:5.5pt}
  #p4 .worksheet-scene figcaption{font-size:6.5pt}
  .delivery-repair-key{padding:1.5mm 3mm;margin:1mm 0}
  .delivery-repair-key h3{font-size:7pt;margin:0 0 1mm}
- .delivery-repair-key h3 small{font-size:7pt;margin-left:3mm}
+ .delivery-repair-key h3 small{font-size:var(--sheet-secondary);margin-left:3mm}
  .delivery-repair-key>div{gap:5mm}
  .delivery-repair-key svg{height:8mm}
- #p4 .delivery-map{height:108mm;margin:1mm 0}
+ #p4 .delivery-map{height:100mm;margin:1mm 0}
  #p4 .delivery-answer{padding:2mm 3mm;margin:1mm 0 2mm}
  #p4 .delivery-answer h3{font-size:10pt;margin:0 0 1mm}
- #p4 .delivery-answer>p{font-size:7pt;margin:1mm 0 0}
+ #p4 .delivery-answer>p{font-size:var(--sheet-secondary);margin:1mm 0 0}
  .paper-reward{grid-template-columns:12mm minmax(0,auto);gap:3mm;padding:2mm 3mm;border-radius:3mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
  .paper-reward>strong{width:12mm;height:12mm;font-size:24pt;border-radius:2mm}
  .paper-reward span{font-size:7pt}
- .paper-reward p{font-size:8pt;line-height:1.35;margin:1mm 0 0}
+ .paper-reward p{font-size:var(--sheet-copy);line-height:1.35;margin:1mm 0 0}
+}
+
+/* Shared text roles: equivalent information keeps the same size on every player sheet. */
+.miky-sheet,.story-sheet{--sheet-copy:13px;--sheet-secondary:11px;--sheet-caption:10px;--sheet-title:29px;--sheet-qr:121px}
+.miky-sheet .quest-story p,.story-sheet .quest-story p,
+.miky-print-mission li,.worksheet-mission p,.miky-print-controls p,
+.equation-result p,.maze-phone-panel p,.paper-reward p{font-size:var(--sheet-copy);line-height:1.42}
+.delivery-answer>p,.story-sheet .instructions,.delivery-repair-key h3 small{font-size:var(--sheet-secondary);line-height:1.4}
+.miky-print-controls h3,.worksheet-mission h3,.worksheet-next h3,.equation-result h3,.worksheet-answer h3,.delivery-repair-key h3{font-size:12px}
+.miky-sheet .qr-mockup,.story-sheet .worksheet-entry-qr{width:var(--sheet-qr);flex-shrink:0}
+.miky-sheet .qr-mockup img,.story-sheet .worksheet-entry-qr img{width:var(--sheet-qr);height:var(--sheet-qr);max-width:none;background:white}
+.miky-sheet .qr-mockup small,.story-sheet .worksheet-entry-qr small{font:10px/1.35 Arial,sans-serif;letter-spacing:0;text-align:center}
+.plugy-phone-panel{grid-template-columns:minmax(0,1fr) var(--sheet-qr)}
+@media print{
+ .miky-sheet,.story-sheet{--sheet-copy:9pt;--sheet-secondary:8pt;--sheet-caption:7pt;--sheet-title:21pt;--sheet-qr:32mm}
+ .miky-sheet .miky-print-controls h3,.story-sheet .worksheet-mission h3,.story-sheet .worksheet-next h3,.story-sheet .equation-result h3,.story-sheet .worksheet-answer h3,.delivery-repair-key h3{font-size:9pt}
+ .miky-sheet .miky-print-story h3,.story-sheet .worksheet-story h3{font-size:10pt}
+ .cutouts-heading strong{font-size:9pt}
+ .cutouts-heading span,.miky-cut-divider span{font-size:var(--sheet-secondary)}
+ .cutout-content small,.record-label{font-size:var(--sheet-caption)}
+ .miky-sheet .qr-mockup small,.story-sheet .worksheet-entry-qr small{font-size:var(--sheet-caption)}
+ .plugy-phone-panel{grid-template-columns:minmax(0,1fr) var(--sheet-qr);gap:4mm}
 }
 
 /* The print dialog may select Letter even though the worksheets request A4.
