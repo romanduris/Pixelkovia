@@ -183,20 +183,20 @@
   }
   function parentGuide() {
     const preparation={
-      envelope:['Kúpeľňa','Celý P1 ukryte medzi uteráky. Vystrihujú až deti.'],
-      document:['Pri okne','Celý P2 položte k zatvorenému oknu na dosah detí. Kruhy vystrihujú až deti.'],
-      symbols:['Pod stoličkou','P3 prilepte pod sedadlo stoličky.'],
-      cipher:['Pri topánkach','Celý P4 ukryte do čistej suchej topánky.'],
-      maze:['V posteli','P5 dajte pod vankúš v jednej z detských postelí.'],
-      search:['V chladničke','P6 a P7 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte „Úloha 6“.'],
-      code:['Spolu s P6','P7 priložte k P6; deti ho použijú po úlohe 6.']
+      envelope:['Kúpeľňa','Vytlačenú indíciu k P1 ukryte celú medzi uteráky. Vystrihujú až deti.'],
+      document:['Pri okne','Vytlačenú indíciu k P2 položte celú k zatvorenému oknu na dosah detí. Kruhy vystrihujú až deti.'],
+      symbols:['Pod stoličkou','Vytlačenú indíciu k P3 prilepte pod sedadlo stoličky.'],
+      cipher:['Pri topánkach','Vytlačenú indíciu k P4 ukryte celú do čistej suchej topánky.'],
+      maze:['V posteli','Vytlačenú indíciu k P5 dajte pod vankúš v jednej z detských postelí.'],
+      search:['V chladničke','Vytlačené indície k P6 a P7 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte „Úloha 6“.'],
+      code:['Spolu s indíciou k P6','Vytlačenú indíciu k P7 priložte k indícii k P6. Deti ju použijú po úlohe 6.']
     };
     const cards=GAME.stages.filter(stage=>preparation[stage.id]).map((stage,index)=>{
       const [location,setup]=preparation[stage.id];
       const answer=stage.id==='maze'?'7294 → CHLADNIČKA':stage.id==='symbols'?'△ = 3, ○ = 2, □ = 4 → v telefóne znak 9.':solutionAnswer(stage);
       return `<section class="guide-stage" data-stage="${esc(stage.id)}"><div class="guide-stage-heading"><span class="guide-step">P${index+1}</span><h3>${esc(location)}</h3></div><p class="guide-setup">${esc(setup)}</p><p class="gm-solution" aria-label="Riešenie etapy"><strong>Riešenie:</strong> ${esc(answer)}</p></section>`;
     });
-    return `<section class="sheet parent-guide" id="rodicovsky-navod"><header class="guide-heading"><div><div class="label">PIXELKOVIA / LEN PRE DOSPELÝCH</div><h2>Ťahák pre rodiča</h2><p>Príprava pred hrou a správne riešenia.</p></div></header><div class="guide-intro"><section><h3>Vytlačte</h3><p>P1–P7 jednostranne na A4, mierka 100 %. Farebne alebo čiernobielo. Listy vopred nestrihajte.</p></section><section><h3>Pripravte</h3><p>Telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a lepiacu pásku.</p></section><section><h3>Ukryte a spustite</h3><p>Listy ukryte podľa prehľadu nižšie. Spustite úvod hry v telefóne; video pošle deti do kúpeľne.</p></section></div><aside class="guide-safety"><strong>Úkryty</strong><p>Suché a na dosah detí, mimo elektriny, liekov a čistiacich prostriedkov.</p></aside><div class="guide-section-label"><span>KAM UKRYŤ LISTY A AKÉ SÚ ODPOVEDE</span></div><div class="guide-stages"><div class="guide-column">${cards.slice(0,4).join('')}</div><div class="guide-column">${cards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Riešenia si nechajte pre seba. Diplom je voliteľný.</span></footer></section>`;
+    return `<section class="sheet parent-guide" id="rodicovsky-navod"><header class="guide-heading"><div><div class="label">PIXELKOVIA / LEN PRE DOSPELÝCH</div><h2>Ťahák pre rodiča</h2><p>Príprava pred hrou a správne riešenia.</p></div></header><div class="guide-intro"><section><h3>Vytlačte</h3><p>Indície P1–P7 jednostranne na A4, mierka 100 %. Farebne alebo čiernobielo. Listy vopred nestrihajte.</p></section><section><h3>Pripravte</h3><p>Telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a lepiacu pásku.</p></section><section><h3>Ukryte a spustite</h3><p>Vytlačené indície ukryte podľa prehľadu nižšie. Spustite úvod hry v telefóne; video pošle deti do kúpeľne.</p></section></div><aside class="guide-safety"><strong>Úkryty</strong><p>Suché a na dosah detí, mimo elektriny, liekov a čistiacich prostriedkov.</p></aside><div class="guide-section-label"><span>KAM UKRYŤ VYTLAČENÉ INDÍCIE A AKÉ SÚ ODPOVEDE</span></div><div class="guide-stages"><div class="guide-column">${cards.slice(0,4).join('')}</div><div class="guide-column">${cards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Riešenia si nechajte pre seba. Diplom je voliteľný.</span></footer></section>`;
   }
   window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,stageSolution,gameMasterInstructions,bathroomSolution,bathroomInstructions,parentGuide};
 })();
