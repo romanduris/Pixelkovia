@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const steps = [
-    {id:'printed', revision:'light-nodes-v3', label:'Vytlačil som P1–P7 jednostranne na A4; P2 obsahuje oba kruhy.'},
+    {id:'printed', revision:'cipko-games-v4', label:'Vytlačil som P1–P7 jednostranne na A4; P2 obsahuje oba kruhy.'},
     {id:'supplies', legacy:1, label:'Pripravil som štyri obálky, dva samostatné obaly, ceruzku, pásku a detské nožnice.'},
     {id:'cut-p4', revision:'paper-puzzles-v2', label:'P4 a P7 som nechal celé, bez strihania. Pripravil som tmavú pastelku. P1 a kruhy P2 strihajú deti.'},
     {id:'envelope-1', label:'Pripravil som obálku Kúpeľňa: obsahuje iba celý P1.'},
@@ -11,8 +11,8 @@
     {id:'window', label:'Obálka 2 je pri okne na bezpečnom mieste na dosah detí.'},
     {id:'symbols', revision:'party-chair-v1', label:'Obálka Úloha 3 s P3 je prilepená zo spodnej strany sedadla stoličky.'},
     {id:'shoes', revision:'paper-puzzles-v2', label:'Obálka (indícia) 3 s pripraveným P4 je ukrytá v čistej suchej topánke na dosah detí.'},
-    {id:'table', revision:'paper-puzzles-v2', label:'P5 s QR je pod vankúšom v detskej posteli, označený „Úloha 5“.'},
-    {id:'chair', revision:'paper-puzzles-v2', label:'Obálka 4 s P6 a P7 je pod inou stoličkou než P3, označená „Úloha 6 – otvoriť po opravení Čipkovej cesty“.'},
+    {id:'table', revision:'cipko-games-v1', label:'P5 s QR je pod vankúšom v detskej posteli, označený „Úloha 5“.'},
+    {id:'chair', revision:'fridge-v1', label:'P6 a P7 sú v suchom uzavretom obale v chladničke na dosah detí, označené „Úloha 6“.'},
     {id:'media', label:'Overil som čitateľnosť správ v telefóne; video a zvuk sú voliteľným doplnkom.'},
     {id:'phone', label:'Telefón je nabitý, pripravený a tím môže začať.'}
   ].map(step => ({...step, required:true}));

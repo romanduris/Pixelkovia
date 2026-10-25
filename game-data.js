@@ -126,12 +126,12 @@ window.GAME = {
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
       ],
-      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je pod inou stoličkou v uzavretej obálke 4 označenej Úloha 6 – otvoriť po opravení Čipkovej cesty.",
+      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 a P7 sú v chladničke v suchom uzavretom obale označenom Úloha 6.",
       "transition": "Rozlúštená veta posiela deti hľadať ďalšiu indíciu pod stoličkami. Pixiina úloha sa končí na papieri, bez obrazovky po vyriešení.",
       "character": "pixi",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; indícia 4 s P6 patrí pod inú stoličku a zostáva uzavretá do záveru."
+        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; P6 a P7 patria do chladničky v suchom uzavretom obale označenom Úloha 6."
       ],
       "narrative": {
         "before": [
@@ -169,12 +169,12 @@ window.GAME = {
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
-      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 ukryte pod vankúš v detskej posteli. P6 a P7 zostávajú pod inou stoličkou v obálke (indícii) 4 označenej Úloha 6.",
+      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 ukryte pod vankúš v detskej posteli. P6 a P7 sú v chladničke v suchom uzavretom obale označenom Úloha 6.",
       "transition": "Pingyho indíciu hľadajte pri dvojiciach cestovateľov, ktoré majú jazyk, no nerozprávajú. Na cestu vyrazia iba s vašimi nohami.",
       "character": "plugy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; indícia 4 s P6 patrí pod inú stoličku a zostáva uzavretá do záveru."
+        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; P6 a P7 patria do chladničky v suchom uzavretom obale označenom Úloha 6."
       ],
       "narrative": {
         "before": [
@@ -249,50 +249,49 @@ window.GAME = {
     },
     {
       "id": "maze",
-      "title": "Čipko – bezpečná digitálna cesta",
+      "title": "Čipko – štyri opravy signálu",
       "label": "Úloha 5 – V posteli",
       "icon": "🗺️",
       "time": [
         1,
-        1,
-        4
+        4,
+        1
       ],
       "reward": "L",
       "answer": [
-        "246"
+        "CHLADNICKA"
       ],
-      "placeholder": "Tri číslice z cesty",
-      "action": "Pod vankúšom v detskej posteli nájdite samostatnú indíciu s plánom P5. Naskenujte jeho QR. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
-      "task": "Sledujte spojité potrubie až k jadru. Odbočky končia bez výstupu. Prečítajte tri čísla na úspešnej ceste v poradí od vstupu.",
-      "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; smerovanie k poslednej indícii. QR na P5 otvorí úlohu 5 po papierovej ceste doručovateľa.",
-      "mobile": "Trojmiestny kód opraví Čipkovu cestu. Potom sa pokračuje priamo sľubom Pixelkov v úlohe 6.",
-      "solution": "Jediná cesta k jadru vedie cez 2 → 4 → 6, teda 246.",
+      "placeholder": "Miesto z tajničky",
+      "action": "Pod vankúšom nájdite P5. Naskenujte QR a zahrajte štyri krátke hry. Získané číslice zapisujte po poradí na papier.",
+      "task": "Po každej hre získate číslicu. Na P5 vyhľadajte jej časť slova a doplňte tajničku. Výsledné miesto potvrďte v telefóne.",
+      "materials": "P5: štyri políčka na číslice, dekódovací kľúč a tajnička. QR otvára štyri hry v telefóne.",
+      "mobile": "Zbieranie pixelov, skladanie obrázka, pexeso a otáčanie potrubia postupne odhalia číslice 7, 2, 9, 4.",
+      "solution": "7 → CH, 2 → LAD, 9 → NIČ, 4 → KA. Tajnička: CHLADNIČKA.",
       "hints": [
-        "Slepé odbočky nepatria do kódu. Môžete začať aj pri jadre a ísť naspäť.",
-        "Na správnej ceste sú čísla 2, 4 a 6."
+        "Číslice z hier zapisujte zľava doprava. Každú nájdite v kľúči na P5.",
+        "Časti slova v poradí sú CH – LAD – NIČ – KA."
       ],
-      "parent": "P5 ukryte pod vankúš v detskej posteli. Označte ho Úloha 5. QR na P5 otvorí úlohu 5 a do zápisníka zachová písmeno T z papierovej úlohy 4. Plán má jedinú cestu s kódom 246.",
-      "transition": "Čipko pridá L a cesta dosiahne Guardyho bránu. Posledná indícia s úlohou 6 čaká pod inou stoličkou pri stole.",
+      "parent": "P5 ukryte pod vankúš v detskej posteli. P6 a P7 vložte do suchého uzavretého obalu v chladničke. Štyri hry dajú 7294 → CHLADNIČKA.",
+      "transition": "Čipko pridá L. P6 a P7 čakajú v chladničke.",
       "character": "cipko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Pomáham kamarátom vybrať bezpečnú digitálnu cestu. Vďaka doručenej správe ste našli môj plán.",
-          "Po výpadku sa niektoré spojenia pomiešali. Nechcem nikoho poslať do slepej uličky. Pomôžete mi nájsť trasu až k jadru?",
-          "Prstom sledujte potrubie od VSTUPU až k JADRU. Čísla v slepých odbočkách preskočte. Tri číslice na správnej ceste zadajte do telefónu v poradí od vstupu."
+          "Výpadok roztrúsil pixely a pomiešal našu cestu. Pomôžete mi so štyrmi malými opravami?",
+          "Naskenujte QR na tomto liste. Po každej hre zapíšte získanú číslicu do políčka. Podľa kľúča zložte tajničku a objavíte ďalší úkryt."
         ],
         "after": [
-          "Dva, štyri, šesť! Správna cesta je opäť pripravená. Ďakujem za pomoc a pridávam písmeno L.",
-          "Na jej konci čaká Guardy, náš digitálny ochranca. Nájdite poslednú indíciu označenú Úloha 6 pod inou stoličkou pri stole. Zostala nám na záver."
+          "Všetky štyri opravy sa podarili! Ďakujem a pridávam písmeno L.",
+          "Rozlúštili ste CHLADNIČKA. Nájdite v nej indíciu Úloha 6. Pri návratovej bráne už čaká náš ochranca."
         ]
       }
     },
     {
       "id": "search",
       "title": "Guardy – Ochranné pole",
-      "label": "Úloha 6 – Pod stoličkou",
+      "label": "Úloha 6 – V chladničke",
       "icon": "🔎",
       "time": [
         1,
@@ -304,7 +303,7 @@ window.GAME = {
         "SPOLU"
       ],
       "placeholder": "Slovo z piatich riadkov",
-      "action": "Nájdite indíciu k úlohe 6 pod sedadlom inej dostupnej stoličky pri stole než pri úlohe 3. Má označenie Úloha 6 – otvoriť po opravení Čipkovej cesty. Vyberte sľub Pixelkov a kartu poradia.",
+      "action": "Nájdite v chladničke indíciu označenú Úloha 6. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
       "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta poradia. Priložte P7 s poškodeným signálom na finále.",
       "mobile": "Overí slovo SPOLU, pripojí Guardyho a uloží jeho písmeno O aj kartu poradia do zápisníka.",
@@ -313,7 +312,7 @@ window.GAME = {
         "Guardy spomínal začiatky riadkov. Pozrite sa na prvé písmeno každého riadka.",
         "Písmená sú S, P, O, L, U."
       ],
-      "parent": "P6 aj P7 vložte do obálky 4 pod inú stoličku než P3. Označte Úloha 6 – otvoriť po opravení Čipkovej cesty. P7 použijú až po sľube. Pomôžte s odlepením; nábytok sa nepresúva.",
+      "parent": "P6 a P7 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. P7 použijú až po sľube.",
       "transition": "Ochranca pridá O. Potom otvorte P7: opravený signál odhalí spoločné návratové heslo.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -334,7 +333,7 @@ window.GAME = {
     {
       "id": "code",
       "title": "Poškodený návratový signál",
-      "label": "Úloha 7 – Pod stoličkou",
+      "label": "Úloha 7 – V chladničke",
       "icon": "⚡",
       "time": [
         1,
@@ -355,7 +354,7 @@ window.GAME = {
         "Vyfarbujte celé políčka, iba ak oba symboly tvoria niektorú dvojicu zo servisného kľúča. Poradie dvojice nehrá rolu.",
         "Čítajte obrazovky 1–6. Prvá odhalí S. Odhalené písmená porovnajte s indíciami z úloh 1–6."
       ],
-      "parent": "P7 priložte k P6 pod stoličku. Netreba strihať. Deti vyfarbia 6 obrazoviek a získajú SVETLO; potom heslo odošlú v telefóne. Čiernobiela tlač funguje. Nie je tu časový limit.",
+      "parent": "P7 priložte k P6 do chladničky. Netreba strihať. Deti vyfarbia 6 obrazoviek a získajú SVETLO; potom heslo odošlú v telefóne. Čiernobiela tlač funguje. Nie je tu časový limit.",
       "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -1238,6 +1237,62 @@ window.GAME = {
         ]
       ]
     }
+  },
+  "cipkoPuzzle": {
+    "digits": [
+      7,
+      2,
+      9,
+      4
+    ],
+    "key": [
+      [
+        0,
+        "KO"
+      ],
+      [
+        1,
+        "POL"
+      ],
+      [
+        2,
+        "LAD"
+      ],
+      [
+        3,
+        "VA"
+      ],
+      [
+        4,
+        "KA"
+      ],
+      [
+        5,
+        "DVE"
+      ],
+      [
+        6,
+        "SKRI"
+      ],
+      [
+        7,
+        "CH"
+      ],
+      [
+        8,
+        "RA"
+      ],
+      [
+        9,
+        "NIČ"
+      ]
+    ],
+    "parts": [
+      "CH",
+      "LAD",
+      "NIČ",
+      "KA"
+    ]
   }
 };
 

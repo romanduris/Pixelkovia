@@ -4,7 +4,7 @@ const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:pa
 const {spawnSync}=require('node:child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const footers=['GAME MASTER','ZÁCHRANNÝ SIGNÁL · P1','P2 / Indícia pri okne','P3 / Indícia pod stoličkou','P4 / Indícia pri topánkach','P5 / Indícia v posteli','P6 / Indícia pod stoličkou','POŠKODENÝ NÁVRATOVÝ SIGNÁL · P7','DIPLOM ZÁCHRANCOV PIXELKOV'];
+const footers=['ŤAHÁK PRE RODIČA','ZÁCHRANNÝ SIGNÁL · P1','P2 / Indícia pri okne','P3 / Indícia pod stoličkou','P4 / Indícia pri topánkach','P5 / Indícia v posteli','P6 / Indícia v chladničke','POŠKODENÝ NÁVRATOVÝ SIGNÁL · P7','DIPLOM ZÁCHRANCOV PIXELKOV'];
 function pages(file){
  const r=spawnSync('python3',['-c','import json,sys;from pypdf import PdfReader;print(json.dumps([p.extract_text() for p in PdfReader(sys.argv[1]).pages]))',file],{encoding:'utf8'});
  if(r.status!==0)throw new Error(r.stderr);return JSON.parse(r.stdout);

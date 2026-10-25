@@ -6,13 +6,13 @@ const context={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);
 const game=context.window.GAME;
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['POSTELI'],['246'],['SPOLU'],['SVETLO']];
+const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['POSTELI'],['CHLADNICKA'],['SPOLU'],['SVETLO']];
 assert.equal(game.stages.length,9);
 assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),58);
 assert.equal(new Set(game.stages.map(s=>s.id)).size,9);
 assert.equal(game.characters.length,7);
 assert.equal(new Set(game.stages.slice(1,7).map(s=>s.character)).size,6);
-assert.equal(JSON.stringify(game.stages.slice(1,-1).map(s=>s.answer)),JSON.stringify(legacyAnswers),'paper route is updated; all numeric codes and final letters stay compatible');
+assert.equal(JSON.stringify(game.stages.slice(1,-1).map(s=>s.answer)),JSON.stringify(legacyAnswers),'paper route is updated; current answers and final reward letters agree');
 assert.equal(game.stages.slice(1,7).map(s=>s.reward).join(''),'SVETLO');
 assert.equal(game.call,game.stages[0].story,'one source for call and introductory storyboard');
 for(const s of game.stages){
@@ -127,7 +127,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.gm-dramaturgy,.studio-stage-details').count(),0,'developer notes are removed from all stages');
  // GM stage previews remain isolated from real progress.
  await page.locator('[data-action="test"][data-stage="5"]').click();await noAtlas();
- await readScene(page);await page.locator('#answer').fill('246');await page.locator('.answer-form button').click();await page.locator('.success-card').waitFor();
+ await require('./helpers/cipko.cjs')(page,{touch:false});await page.locator('.success-card').waitFor();
  assert.equal(await page.locator('.success-card').count(),1);
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.locator('[data-action="exit-test"]').click();
@@ -183,7 +183,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
   if(i===3){const indexes=await page.evaluate(()=>GAME.plugyPuzzle.grid.flat().flatMap((value,index)=>GAME.plugyPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
-  }else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
+  }else if(i===5){await require('./helpers/cipko.cjs')(page,{touch:false});}else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   if(i===3)await page.locator('.plugy-connected').waitFor();
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6&&i!==3)assert.equal(await page.locator('.success-character').count(),1);

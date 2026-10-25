@@ -22,6 +22,13 @@ assert.equal(word,'POSTELI');assert.equal(game.stages[4].paperAnswer,word);
 assert.equal(game.stages[4].paperOnly,true);assert.equal(game.stages[4].narrative.after.length,0);
 assert.ok(!/QR|<form|data-order/.test(sheets.p4));assert.match(sheets.p4,/Ďalšia indícia sa skrýva v tvojej:/);
 assert.match(sheets.p5,/cipko-qr.svg/);assert.match(game.stages[5].parent,/pod vankúš/);
+// Phone rewards must decode through the actual paper key to the new destination.
+const cipko=game.cipkoPuzzle,key=new Map(cipko.key.map(([digit,part])=>[digit,part]));
+const destination=cipko.digits.map(digit=>key.get(digit)).join('');
+assert.equal(destination,'CHLADNIČKA');
+assert.equal(destination.normalize('NFD').replace(/[\u0300-\u036f]/g,''),game.stages[5].answer[0]);
+assert.ok(!sheets.p5.includes('CHLADNIČKA')&&!sheets.p5.includes('class="maze"'),'paper requires phone rewards instead of printing the answer or old maze');
+assert.match(game.stages[6].parent,/chladničky/);assert.match(game.stages[7].parent,/chladničky/);
 // Independently decode the printable symbol pairs into the six expected glyphs.
 const expected=['11111/10000/10000/11111/00001/00001/11111','10001/10001/10001/10001/10001/01010/00100','11111/10000/10000/11110/10000/10000/11111','11111/00100/00100/00100/00100/00100/00100','10000/10000/10000/10000/10000/10000/11111','01110/10001/10001/10001/10001/10001/01110'];
 const allowed=new Set(['○□','□○','△◇','◇△','+★','★+']);

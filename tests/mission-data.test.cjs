@@ -19,11 +19,11 @@ assert.match(two.action,/vonkajšie D oproti vnútornému A/);
 assert.match(game.stages[4].action,/P4.*12.*ŠTART/);
 assert.match(three.parent,/obálke \(indícii\) Úloha 3 pod sedadlom/);
 assert.match(three.parent,/P4[\s\S]*topánky[\s\S]*P5[\s\S]*posteli/);
-assert.match(game.stages[6].action,/indíciu k úlohe 6 pod sedadlom/);
+assert.match(game.stages[6].action,/v chladničke indíciu/);
 for(const location of ['medzi uterákmi','práčky','sušičky','elektrickým zariadeniam'])assert.ok(game.stages[0].parent.includes(location));
 for(const hint of game.stages[0].hints)assert.ok(hint.length>10);
 for(const label of ['Obálka (indícia) Kúpeľňa: iba celý P1','Obálka (indícia) 2: celý P2','Obálka (indícia) 3: celý pripravený P4','Obálka (indícia) 4: P6'])assert.ok(app.includes(label),label);
-for(const label of ['P2 / Indícia pri okne','P4 / Indícia pri topánkach','P5 / Indícia v posteli','P6 / Indícia pod stoličkou'])assert.ok(print.includes(label),label);
+for(const label of ['P2 / Indícia pri okne','P4 / Indícia pri topánkach','P5 / Indícia v posteli','P6 / Indícia v chladničke'])assert.ok(print.includes(label),label);
 assert.ok(!JSON.stringify(game.stages.slice(3)).includes('obálke 2 na stole'));
 assert.ok(fs.readFileSync('scripts/prepare-static.mjs','utf8').includes('signal-print.css'));
 assert.ok(!/obálk[ay] 1[^.]*rozstrihan/i.test(app));
@@ -37,7 +37,7 @@ assert.equal(decoded,'HLADAJ POD STOLICKAMI');assert.ok(two.answer.includes(deco
 assert.ok(sheets.p2.includes('id="circles"'));assert.ok(!sheets.p4.includes('id="circles"'));
 assert.match(sheets.p4,/delivery-map/);assert.equal(game.stages[4].paperAnswer,'POSTELI');
 // Old paper confirmations cannot silently attest the new worksheets, and game saves are retained.
-assert.equal(two.paperOnly,true);assert.equal(two.narrative.after.length,0);assert.equal(game.pixiQr,undefined);assert.ok(!/QR|naskenujte|zadajte[^.]*telefón/i.test(sheets.p2));assert.ok(sheets.p3.includes('assets/plugy-qr.svg'));assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 a P7 zostávajú pod inou stoličkou/);
+assert.equal(two.paperOnly,true);assert.equal(two.narrative.after.length,0);assert.equal(game.pixiQr,undefined);assert.ok(!/QR|naskenujte|zadajte[^.]*telefón/i.test(sheets.p2));assert.ok(sheets.p3.includes('assets/plugy-qr.svg'));assert.equal(three.label,'Úloha 3 – Pod stoličkou');assert.match(three.parent,/P6 a P7 sú v chladničke/);
 const saved=new Map([['zahada-v1-progress','existing-game'],['zahada-prep-0','1'],['zahada-prep-1','1'],['zahada-prep-2','1'],...['printed','cut-p2','envelope-2','symbols','table','supplies'].map(id=>['zahada-prep-v5-'+id,'1'])]);
 const prepContext={window:{},localStorage:{getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,value)}};
 vm.runInNewContext(fs.readFileSync('prep-store.js','utf8'),prepContext);const prep=prepContext.window.PREP_STORE;

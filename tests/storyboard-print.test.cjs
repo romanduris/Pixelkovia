@@ -33,27 +33,27 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');
  assert.equal(await printed.locator('.sheet').count(),9);assert.equal(await printed.locator('.sheet:visible').count(),9);
  assert.equal(normalize(await bathroom.locator('.worksheet-text').innerText()),normalize(await printed.locator('.miky-print-story').innerText()+' '+await printed.locator('.miky-print-mission').innerText()));
- assert.equal(normalize((await bathroom.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator('#rodicovsky-navod .adult-help[data-stage="envelope"] p').allTextContents()).join(' ')));
- assert.equal(normalize(await bathroom.locator('.gm-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .guide-stage[data-stage="envelope"] .gm-solution').innerText()));
+ assert.equal(await printed.locator('#rodicovsky-navod .adult-help').count(),0,'parent cheat sheet omits hints');
+ assert.match(await printed.locator('#rodicovsky-navod .guide-stage[data-stage="envelope"] .gm-solution').innerText(),/741296/);
  assert.equal(await bathroom.locator('.storyboard-content>.gm-instructions').count(),1);
  assert.equal(await bathroom.locator('.storyboard-content>.adult-help').count(),0);
  assert.match(await bathroom.locator('.gm-instructions>h3').innerText(),/Inštrukcie pre Game mastra/);
  assert.ok(!/Celý list P1|vložte do obálky|previažte/.test(await bathroom.locator('.gm-instructions').innerText()));
  assert.equal(await printed.locator('.sheet').first().getAttribute('id'),'rodicovsky-navod');
- assert.equal(await printed.locator('.guide-stage').count(),9);
+ assert.equal(await printed.locator('.guide-stage').count(),7);
  for(const id of await page.evaluate(()=>GAME.stages.map(stage=>stage.id))){
   const block=page.locator('#gm-'+id),toggle=block.locator('.storyboard-toggle');
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
   assert.equal(await block.locator('.storyboard-content>.gm-instructions').count(),1,id+': one shared Game master section');
   assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),['document','cipher'].includes(id)?0:1);
-  assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
+  if(!['intro','finale'].includes(id))assert.ok(await printed.locator(`.guide-stage[data-stage="${id}"] .guide-setup`).count(),id+': concise parent setup exists');
  }
  assert.equal(await page.locator('#gm-digital').count(),0,'the separate symbol puzzle is removed');
  const pixi=page.locator('#gm-document');
  assert.equal(await pixi.locator('.storyboard-message').count(),0,'paper-only Pixi has no duplicate story block');
  assert.equal(normalize(await pixi.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Pixi story remains in the shared worksheet text');
 
- assert.match(await printed.locator('#p5 .note').innerText(),/Úlohu 6/);
+ assert.match(await printed.locator('#p5 .note').innerText(),/Úloha 6/);
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.evaluate(()=>{const box=document.createElement('div');box.innerHTML=PRINT_MATERIALS.summary('p7','code');return box.textContent;})),'final password shows the printed ordering card');
  for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols'&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
   const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
@@ -62,8 +62,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
   await toggle.click();assert.ok(await panel.isHidden());
  }
  const guideText=await printed.locator('#rodicovsky-navod').innerText();
- assert.match(guideText,/farebne.*krajšie/);assert.match(guideText,/čiernobielou/);assert.match(guideText,/obálok alebo škatuľiek/);assert.match(guideText,/mašľou či gumičkou/);
- assert.match(guideText,/video si môžu prehrať aj viackrát/);
+ assert.match(guideText,/Farebne alebo čiernobielo/);assert.match(guideText,/chladničke/);assert.ok(!guideText.includes('Nápoveda:'));
  assert.equal(await page.locator('#gm-intro video').count(),0,'intro uses a video button');
  assert.ok(await page.locator('#gm-intro .video-message-button svg').isVisible());
  for(const id of ['piko-message-text','piko-message-tts']){assert.ok(await page.locator('#'+id).isHidden());await page.locator(`[data-target="${id}"]`).click();assert.ok(await page.locator('#'+id).isVisible());await page.locator(`[data-target="${id}"]`).click();}

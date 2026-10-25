@@ -410,3 +410,28 @@
  .delivery-guide .delivery-repair-key svg{height:7mm}
  #p4 .delivery-guide .worksheet-scene img{height:33mm;aspect-ratio:4/5}
 }
+
+.cipko-paper-digits,.cipko-paper-answer{display:flex;justify-content:center;gap:18px;margin:14px 0 22px;text-align:center}
+.cipko-paper-digits span,.cipko-paper-answer span{font:700 10px monospace;display:block;margin-bottom:7px}
+.cipko-paper-digits b{display:block;width:42px;height:42px;border:1px solid #456a74}
+.cipko-paper-key{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0 22px}
+.cipko-paper-key>div{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px;border:1px solid #9aaec6;font:18px monospace}
+.cipko-paper-key strong{color:#234c71}
+.cipko-paper-answer>div>div{display:flex;gap:3px}
+.cipko-paper-answer b{display:block;width:27px;height:36px;border:1px solid #456a74}
+@media print{
+ #p5 .worksheet-visual-row{margin:2mm 0;gap:3mm}
+ #p5 .worksheet-story{padding:2mm 3mm;margin:2mm 0}
+ #p5 .worksheet-story p{font-size:var(--sheet-copy);line-height:1.4}
+ #p5 .worksheet-scene img{height:24mm}
+ #p5 .worksheet-mission{padding:2mm 3mm}
+ .cipko-workbook{padding:3mm;margin:3mm 0}
+ .cipko-paper-digits,.cipko-paper-answer{gap:5mm;margin:2mm 0 4mm}
+ .cipko-paper-digits b{width:10mm;height:10mm}
+ .cipko-paper-digits span,.cipko-paper-answer span{font-size:7pt;margin-bottom:1mm}
+ .cipko-paper-key{gap:2mm;margin:2mm 0 4mm}
+ .cipko-paper-key>div{gap:2mm;padding:2mm 1mm;font-size:12pt}
+ .cipko-paper-answer b{width:7mm;height:9mm}
+ #p5 .worksheet-next{padding:2mm 3mm;margin:2mm 0}
+ #p5 .worksheet-next p{font-size:var(--sheet-copy)}
+}
