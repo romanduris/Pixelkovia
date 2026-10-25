@@ -226,7 +226,7 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Pingy, malý posol správ. Prenášam odkazy medzi kamarátmi, aby každý vedel, čo sa deje. Výpadok poškodil našu sieť svetelných uzlov. Na niektorých mostíkoch zhasli značky a môj odkaz sa zasekol. Opravíte mostíky a pomôžete mi ho doručiť?"
+          "Ahojte! Ja som Pingy, malý posol správ. Cez svetelné uzly prenášam odkazy, aby sa naši kamaráti v digitálnom svete nestratili. Keď ste opravili most, konečne som vás začul aj ja! Pri výpadku však na niektorých mostíkoch zhasli značky a môj posledný odkaz zostal uväznený uprostred siete. Práve on nám má prezradiť, kde čaká kamarát, ktorý pozná cestu k návratovej bráne. Chcem, aby sme k nemu dorazili všetci spolu. Opravíte poškodené spojenia a pomôžete mi odkaz doručiť? Tentoraz budem cestovať spolu s vami."
         ],
         "after": []
       },
@@ -277,8 +277,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Výpadok roztrúsil pixely a pomiešal našu cestu. Pomôžete mi so štyrmi malými opravami?",
-          "Naskenujte QR na tomto liste. Po každej hre zapíšte získanú číslicu do políčka. Po štvrtej hre pokračujte na papieri a pomocou kľúča odhaľte ďalší úkryt."
+          "Pomáham kamarátom nájsť bezpečné cesty medzi obrazovkami. Váš doručený odkaz ku mne konečne dorazil! Už viem, že sme sa po výpadku opäť našli. Pred nami je však posledný úsek k návratovej bráne, pri ktorej čaká náš ochranca.",
+          "Na ceste zostali rozhádzané pixely, pomiešané dieliky a prerušené potrubia. Pripravil som štyri malé opravy. Keď ich zvládneme, budeme môcť pokračovať všetci spolu a nikto nezablúdi.",
+          "Naskenujte QR. Za každú opravu získate číslicu. Po štvrtej hre sa vráťte k tomuto listu a odhaľte ďalší úkryt. Počkám, kým budeme pripravení všetci!"
         ],
         "after": [
           "Štyri hry sú hotové! Získali ste číslice 7, 2, 9, 4.",

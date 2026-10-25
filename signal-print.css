@@ -453,3 +453,16 @@
  .cipko-paper-answer{flex-wrap:wrap;gap:12px}
  .maze-phone-panel,.guardy-phone-panel{flex-direction:column;align-items:stretch}
 }
+
+/* Give the longer story room while preserving puzzle and primary text sizes. */
+#p5 .worksheet-scene-label{display:none}
+@media print{
+ #p4 .delivery-guide{padding-block:1.5mm}
+ #p4 .delivery-guide>h3{margin-bottom:1mm}
+ #p4 .delivery-guide li{margin-bottom:1.5mm}
+ #p4 .delivery-guide li:last-child{margin-bottom:0}
+ #p4 .delivery-guide .delivery-terms{margin-bottom:1.5mm}
+ #p5 .worksheet-visual-row{margin-block:1mm}
+ #p5 .worksheet-scene{padding:1.5mm}
+ #p5 .cipko-workbook{margin-block:2.5mm}
+}
