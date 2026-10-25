@@ -14,22 +14,22 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 - `app.js`: oddelený funnel, príprava, hranie, uložený postup a izolované testy zo storyboardu. `cipko-game.js` obsahuje štyri dotykové hry úlohy 5.
 - `site-content.js`, `site-config.js`: prezentácia, materiály, príprava, storyboard a katalóg. Ceny a nákupné pravidlá sa nemenia.
 - `atlas.html`: deväť literárnych kapitol, sedem úplných profilov a nové ilustrácie. Funguje aj bez JavaScriptu; hráč dostane odkaz až po finále.
-- `print-materials.js`, `printables.html`, `signal-print.css`: upraviteľný zdroj všetkých PDF aj zhodného storyboardu. Každý list má jednu A4. Balík má deväť strán: rodičovský návod prvý, P1–P7, diplom.
+- `print-materials.js`, `printables.html`, `signal-print.css`: upraviteľný zdroj všetkých PDF aj zhodného storyboardu. Každý list má jednu A4. Balík má deväť strán: rodičovský návod prvý, úloh 1–7, diplom.
 
 ## Zachované hádanky
 
 | Krok | Riešenie |
 | --- | --- |
 | Úvod | Prvé miesto odhalí iba schválené video, písaný úvod ho neprezrádza. |
-| P1, kúpeľňa | Šesť dátumových záznamov → 741296, S, ďalšia indícia pri okne. |
-| P2, okno | D → A, KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Iba papier, bez QR; V sa zachová pri vstupe na P3. |
-| P3, pod stoličkou | △ 3, ○ 2, □ 4; tabuľka 5 × 7 odhalí 9, E, hádanka smeruje k topánkam. |
-| P4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. P5 pod vankúšom v detskej posteli. |
-| P5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. P6 je v chladničke; P7 je samostatne pod gaučom. |
-| P6, chladnička | QR otvorí úlohu 6; akrostich SPOLU → O. Ochranné pole partiu chráni, nie je nepriateľom. |
-| P7, pod gaučom | Vyfarbovanie správnych dvojíc na šiestich obrazovkách → SVETLO; potvrdenie v telefóne. Vráti sa všetkých sedem, Piko posledný. |
+| Úloha 1, kúpeľňa | Šesť dátumových záznamov → 741296, S, ďalšia indícia pri okne. |
+| Úloha 2, okno | D → A, KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Iba papier, bez QR; V sa zachová pri vstupe na liste k úlohe 3. |
+| Úloha 3, pod stoličkou | △ 3, ○ 2, □ 4; tabuľka 5 × 7 odhalí 9, E, hádanka smeruje k topánkam. |
+| Úloha 4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. Úloha 5 pod vankúšom v detskej posteli. |
+| Úloha 5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. List k úlohe 6 je v chladničke; List k úlohe 7 je samostatne pod gaučom. |
+| Úloha 6, chladnička | QR otvorí úlohu 6; akrostich SPOLU → O. Ochranné pole partiu chráni, nie je nepriateľom. |
+| Úloha 7, pod gaučom | Vyfarbovanie správnych dvojíc na šiestich obrazovkách → SVETLO; potvrdenie v telefóne. Vráti sa všetkých sedem, Piko posledný. |
 
-Úkryty sú suché a dostupné bez presúvania nábytku; okno sa neotvára. P1 a kruhy P2 strihajú deti, P4 a P7 zostávajú celé. Čiernobiela tlač je plne hrateľná.
+Úkryty sú suché a dostupné bez presúvania nábytku; okno sa neotvára. List úlohy 1 a kruhy z úlohy 2 strihajú deti, Úloha 4 a Úloha 7 zostávajú celé. Čiernobiela tlač je plne hrateľná.
 
 ## Video a dabing
 
@@ -39,7 +39,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 
 ## Kompatibilita a administrácia
 
-Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia a písmená zostávajú zachované. Už dokončený P5 zostáva splnený; rozpracovaný P5 používa náročnejšie hry. Po poslednej hre sa automaticky uloží písmeno L; obrazovka ukáže iba číslice 7294 a pokyn pokračovať na papieri, bez zadávania miesta. P6 má samostatný QR `signal=guardy` na ďalšiu úlohu. Stav každej hry sa ukladá do `cipko` v existujúcom postupe. Verzia 2 zachová dohrané minihry zo staršej verzie; aktuálna rozpracovaná plocha sa prispôsobí novému počtu dielikov. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Nový P4 nemá QR; nájdený P5 obsahuje nový QR `signal=cipko`. Ten zaznamená papierový krok 4 a písmeno T bez zadávania odpovede; QR na P3 rovnako zachová papierové písmeno V z P2. Starý vstup P4 zobrazí pokyn pokračovať na papieri. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Každý platný QR otvorí priamo svoju úlohu bez overovania predchádzajúcich dokončení. Už vyriešené úlohy aj rozpracované hry sa zachovajú; uložené dokončenia môžu mať medzery. V prehľade sa po spustení dajú otvoriť všetky úlohy. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
+Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia a písmená zostávajú zachované. Už dokončený Úloha 5 zostáva splnený; rozpracovaný Úloha 5 používa náročnejšie hry. Po poslednej hre sa automaticky uloží písmeno L; obrazovka ukáže iba číslice 7294 a pokyn pokračovať na papieri, bez zadávania miesta. Úloha 6 má samostatný QR `signal=guardy` na ďalšiu úlohu. Stav každej hry sa ukladá do `cipko` v existujúcom postupe. Verzia 2 zachová dohrané minihry zo staršej verzie; aktuálna rozpracovaná plocha sa prispôsobí novému počtu dielikov. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Nový List k úlohe 4 nemá QR; nájdený Úloha 5 obsahuje nový QR `signal=cipko`. Ten zaznamená papierový krok 4 a písmeno T bez zadávania odpovede; QR na liste k úlohe 3 rovnako zachová papierové písmeno V z listu k úlohe 2. Starý vstup Úloha 4 zobrazí pokyn pokračovať na papieri. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Každý platný QR otvorí priamo svoju úlohu bez overovania predchádzajúcich dokončení. Už vyriešené úlohy aj rozpracované hry sa zachovajú; uložené dokončenia môžu mať medzery. V prehľade sa po spustení dajú otvoriť všetky úlohy. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
 
 Administrácia ponecháva historické obchodné kľúče produktov, pretože ich používajú objednávky a nákupné práva. Dopredná migrácia `0003_digital_identity_names.sql` mení iba viditeľné názvy. Historická migrácia zostáva historickým záznamom. Autentifikácia, ceny, platby a serverové relácie sa nemenia. Starší osem-etapový serverový kontrakt sa nesmie slepo regenerovať zo samostatného sedemúlohového browserového prototypu. Administrácia sa touto publikáciou statického Site nenasadzuje.
 
@@ -77,8 +77,8 @@ Existujúci Site: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site
 
 ID aj publikum sú zachované. Build vzniká cez `node scripts/prepare-static.mjs`; `dist/` nie je zdrojom obsahu. Zmeny sa commitnú a pushnú do `origin/main`, potom sa publikuje existujúci Site. Trvalý odkaz funguje aj po vypnutí Codespace.
 
-Priama tlač webových listov zachováva samostatné strany aj pri voľbe kratšieho papiera Letter: celé rozloženie vrátane pätičky sa rovnomerne prispôsobí. A4 aj stiahnutý deväťstranový PDF balík zostávajú v pôvodnej mierke. Regresný test overuje kompletnú tlač s hlavičkami aj bez nich a samostatný list P2.
+Priama tlač webových listov zachováva samostatné strany aj pri voľbe kratšieho papiera Letter: celé rozloženie vrátane pätičky sa rovnomerne prispôsobí. A4 aj stiahnutý deväťstranový PDF balík zostávajú v pôvodnej mierke. Regresný test overuje kompletnú tlač s hlavičkami aj bez nich a samostatný list Úloha 2.
 
-Tlačové listy používajú spoločné typografické roly v `signal-print.css`: hlavné správy a pracovné pokyny 9 pt Arial, doplňujúce vysvetlenia 8 pt, hlavné nadpisy 21 pt. Menšie popisky a pätičky sú oddelené od hráčskych pokynov; samotné šifry, rovnice a získané písmená zostávajú zámerne výraznejšie. QR kódy na P1, P3 a P5 majú jednotne 32 × 32 mm vrátane bieleho okraja štyroch modulov. Generátor používa korekciu H; pôvodné URL sa nemenia. Test číta korekčnú úroveň priamo z formátových bitov vygenerovaných SVG, dekóduje aj vzorku s vymazanou plochou a porovnáva typografiu i rozmery v Chromium a WebKite.
+Tlačové listy používajú spoločné typografické roly v `signal-print.css`: hlavné správy a pracovné pokyny 9 pt Arial, doplňujúce vysvetlenia 8 pt, hlavné nadpisy 21 pt. Menšie popisky a pätičky sú oddelené od hráčskych pokynov; samotné šifry, rovnice a získané písmená zostávajú zámerne výraznejšie. QR kódy na listoch k úlohám 1, 3 a 5 majú jednotne 32 × 32 mm vrátane bieleho okraja štyroch modulov. Generátor používa korekciu H; pôvodné URL sa nemenia. Test číta korekčnú úroveň priamo z formátových bitov vygenerovaných SVG, dekóduje aj vzorku s vymazanou plochou a porovnáva typografiu i rozmery v Chromium a WebKite.
 
-Podklady pre Pikovu záverečnú nahrávku a voliteľné video bez hovorenia (25 s) sú v [docs/finale-podklady.md](docs/finale-podklady.md) aj v storyboarde pri finále. Kým nie sú dodané médiá, hra zobrazuje celú rozlúčku ako text bez ďalšej úlohy. Označenia P1–P7 sú určené iba rodičovi, nie detským pokynom.
+Podklady pre Pikovu záverečnú nahrávku a voliteľné video bez hovorenia (25 s) sú v [docs/finale-podklady.md](docs/finale-podklady.md) aj v storyboarde pri finále. Kým nie sú dodané médiá, hra zobrazuje celú rozlúčku ako text bez ďalšej úlohy. Úlohy majú jednotné označenia Úloha 1–7; v štvorčekoch rodičovského ťaháka sú skrátené na U1–U7.

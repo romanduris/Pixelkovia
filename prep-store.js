@@ -2,17 +2,17 @@
 (() => {
   'use strict';
   const steps = [
-    {id:'printed', revision:'cipko-paper-finish-v5', label:'Vytlačil som P1–P7 jednostranne na A4; P2 obsahuje oba kruhy.'},
+    {id:'printed', revision:'cipko-paper-finish-v5', label:'Vytlačil som pracovné listy úloh 1–7 jednostranne na A4; Úloha 2 obsahuje oba kruhy.'},
     {id:'supplies', legacy:1, label:'Pripravil som telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a pásku.'},
-    {id:'cut-p4', revision:'paper-puzzles-v2', label:'P4 a P7 som nechal celé, bez strihania. Pripravil som tmavú pastelku. P1 a kruhy P2 strihajú deti.'},
-    {id:'envelope-1', label:'Indícia k P1 obsahuje celý list, bez strihania.'},
-    {id:'bathroom', label:'Indícia k P1 je medzi uterákmi na suchom dostupnom mieste.'},
-    {id:'envelope-2', revision:'party-chair-v1', label:'Indícia k P2 obsahuje oba nestrihané kruhy.'},
-    {id:'window', label:'Indícia k P2 je pri zatvorenom okne na dosah detí.'},
-    {id:'symbols', revision:'party-chair-v1', label:'Indícia k P3 je prilepená pod sedadlom stoličky.'},
-    {id:'shoes', revision:'paper-puzzles-v2', label:'Indícia k P4 je v čistej suchej topánke.'},
-    {id:'table', revision:'cipko-games-v1', label:'P5 s QR je pod vankúšom v detskej posteli, označený „Úloha 5“.'},
-    {id:'chair', revision:'fridge-sofa-v2', label:'Indícia k P6 je v suchom uzavretom obale v chladničke, označená „Úloha 6“. Indícia k P7 je samostatne pod gaučom na dosah ruky.'},
+    {id:'cut-p4', revision:'paper-puzzles-v2', label:'Listy úloh 4 a 7 som nechal celé, bez strihania. Pripravil som tmavú pastelku. List úlohy 1 a kruhy z úlohy 2 strihajú deti.'},
+    {id:'envelope-1', label:'Indícia k úlohe 1 obsahuje celý list, bez strihania.'},
+    {id:'bathroom', label:'Indícia k úlohe 1 je medzi uterákmi na suchom dostupnom mieste.'},
+    {id:'envelope-2', revision:'party-chair-v1', label:'Indícia k úlohe 2 obsahuje oba nestrihané kruhy.'},
+    {id:'window', label:'Indícia k úlohe 2 je pri zatvorenom okne na dosah detí.'},
+    {id:'symbols', revision:'party-chair-v1', label:'Indícia k úlohe 3 je prilepená pod sedadlom stoličky.'},
+    {id:'shoes', revision:'paper-puzzles-v2', label:'Indícia k úlohe 4 je v čistej suchej topánke.'},
+    {id:'table', revision:'cipko-games-v1', label:'List s QR k úlohe 5 je pod vankúšom v detskej posteli.'},
+    {id:'chair', revision:'fridge-sofa-v2', label:'Indícia k úlohe 6 je v suchom uzavretom obale v chladničke, označená „Úloha 6“. Indícia k úlohe 7 je samostatne pod gaučom na dosah ruky.'},
     {id:'media', label:'Overil som čitateľnosť správ v telefóne; video a zvuk sú voliteľným doplnkom.'},
     {id:'phone', label:'Telefón je nabitý, pripravený a tím môže začať.'}
   ].map(step => ({...step, required:true}));

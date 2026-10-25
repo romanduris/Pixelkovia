@@ -97,7 +97,7 @@ Prvé úspešné dokončenie nastaví pevnú hranicu `first_completed_at + 24 ho
 | `createOrder()` | Serverová funkcia testovaná pre budúce overené platobné webhooky; nie je verejný platobný endpoint |
 | E-mailový poskytovateľ, doručovanie, odhlásenie, personalizované PDF | Koncepty a DB pripravené; nevykonávajú sa |
 | Klientské sledovanie na existujúcom webe | Nie je zapnuté; interné náhľady a staré hrania neposielajú falošné udalosti |
-| QR odkazy | Model počíta so spoločnými QR a bezpečnou serverovou reláciou; pôvodná maketa P1 sa nemení |
+| QR odkazy | Model počíta so spoločnými QR a bezpečnou serverovou reláciou; pôvodná maketa Úloha 1 sa nemení |
 
 Prepojenie aktuálnej Site s budúcou zákazníckou cookie vyžaduje samostatne navrhnutý same-origin gateway/doménu. Budúci zákaznícky hostname/gateway musí mať zákaznícke overenie oddelené od ochrany admin hosta. Nepovoľujeme všeobecný CORS ani treťostranné cookies ako skratku.
 
