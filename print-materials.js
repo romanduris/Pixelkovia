@@ -82,7 +82,7 @@
   }
   for(const [id,stageId] of Object.entries(sheetStages)) {
     const scene=illustratedScenes[id];
-    const illustration=`<figure class="worksheet-scene" data-scene="${scene.file}"><div class="worksheet-scene-label">SPOLU V PRÍBEHU</div><img src="assets/printable-scenes/${scene.file}.png" alt="${scene.alt}" width="1536" height="512"><figcaption>${scene.caption}</figcaption></figure>`;
+    const illustration=`<figure class="worksheet-scene" data-scene="${scene.file}"><div class="worksheet-scene-label">SPOLU V PRÍBEHU</div><img src="assets/printable-scenes/${scene.file}.png" alt="${scene.alt}" width="${id==='p4'?1122:1536}" height="${id==='p4'?1402:512}"><figcaption>${scene.caption}</figcaption></figure>`;
     let html=sheets[id].replace(window.STORY_TEXT.party(stageId),speakerPortrait(stageId));
     const mission=id==='p1'?/<div class="miky-print-mission">[\s\S]*?<\/ol><\/div>/:/<section class="worksheet-mission">[\s\S]*?<\/section>/;
     html=html.replace(mission,match=>id==='p4'?deliveryGuide(illustration):`<div class="worksheet-visual-row">${match}${illustration}</div>`);

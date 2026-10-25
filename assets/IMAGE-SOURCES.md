@@ -37,4 +37,4 @@ Caveat v fonts/Caveat.ttf zostáva pod licenciou fonts/OFL-Caveat.txt.
 
 ## Oprava svetelných uzlov — P4
 
-`printable-scenes/p4-svetelne-uzly.png`: nová ilustrácia cez vstavaný image_gen, odvodená od schválenej skupiny piatich postáv. Spoločne opravujú svetelné uzly a mostíky. Bez textu, mien a riešenia; Plugy nemá chvost. Presný prompt je uložený v `printable-scenes/PROMPTS.json`. Pôvodná ilustrácia štyroch pásikov zostáva archívnym assetom.
+`printable-scenes/p4-svetelne-uzly.png`: nová ilustrácia cez vstavaný image_gen, odvodená od schválenej skupiny piatich postáv. Kompozícia na výšku (4 : 5) zoskupuje postavy nad sebou pri oprave svetelných uzlov a mostíkov. Bez textu, mien a riešenia; Plugy nemá chvost. Presný prompt je uložený v `printable-scenes/PROMPTS.json`. Pôvodná ilustrácia štyroch pásikov zostáva archívnym assetom.
