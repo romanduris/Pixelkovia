@@ -310,3 +310,43 @@
  #p5 .maze-phone-panel img{width:18mm;height:18mm}
  #p5 .maze-phone-panel p{font-size:8pt}
 }
+
+/* Two paper phases: repair the light bridges, then deliver the message. */
+.light-node .route-symbol{font-size:16px}
+.delivery-repair-key{border:1px solid #9aaec6;padding:9px 12px;margin:10px 0;background:#f7fafc;break-inside:avoid}
+.delivery-repair-key h3{font:700 11px/1.4 monospace;margin:0 0 4px;color:#234c71}
+.delivery-repair-key h3 small{font:11px/1.4 Arial,sans-serif;letter-spacing:0;margin-left:10px;color:#263c4d}
+.delivery-repair-key>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.delivery-repair-key svg{display:block;width:100%;height:32px;background:white;border:1px solid #c5d1dc;border-radius:5px}
+.delivery-answer>p{font:12px/1.4 Arial,sans-serif;margin:8px 0 0}
+.paper-reward{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:center;padding:13px 16px;border:1px solid #9b8155;border-radius:12px;background:linear-gradient(110deg,#2d2c38,#17233a 70%);color:#edf1ff;break-inside:avoid}
+.paper-reward>strong{display:grid;place-items:center;width:52px;height:52px;border:1px solid #b79a64;border-radius:9px;background:#302f3a;color:#ffd494;font:700 34px/1 monospace}
+.paper-reward span{display:block;color:#e9c992;font:700 10px/1.4 monospace;letter-spacing:1px}
+.paper-reward p{font:13px/1.45 Arial,sans-serif;margin:5px 0 0;color:#edf1ff}
+@media(max-width:500px){.delivery-repair-key h3 small{display:block;margin:3px 0}.delivery-repair-key>div{gap:6px}.paper-reward{padding:10px;gap:10px}}
+@media print{
+ #p4 .worksheet-heading{margin-bottom:1.5mm}
+ #p4 .worksheet-heading h2{font-size:18pt}
+ #p4 .worksheet-story{padding:1.5mm 3mm;margin-bottom:1mm}
+ #p4 .worksheet-story p{font-size:8pt;line-height:1.35}
+ #p4 .worksheet-visual-row{grid-template-columns:3fr 2fr;margin:2mm 0;gap:3mm}
+ #p4 .worksheet-mission{margin:0;padding:2mm 3mm}
+ #p4 .worksheet-mission p{font-size:8pt;line-height:1.4}
+ #p4 .worksheet-scene{padding:1mm;gap:1mm}
+ #p4 .worksheet-scene img{height:24mm;object-fit:contain;aspect-ratio:auto}
+ #p4 .worksheet-scene-label{font-size:5.5pt}
+ #p4 .worksheet-scene figcaption{font-size:6.5pt}
+ .delivery-repair-key{padding:1.5mm 3mm;margin:1mm 0}
+ .delivery-repair-key h3{font-size:7pt;margin:0 0 1mm}
+ .delivery-repair-key h3 small{font-size:7pt;margin-left:3mm}
+ .delivery-repair-key>div{gap:5mm}
+ .delivery-repair-key svg{height:8mm}
+ #p4 .delivery-map{height:108mm;margin:1mm 0}
+ #p4 .delivery-answer{padding:2mm 3mm;margin:1mm 0 2mm}
+ #p4 .delivery-answer h3{font-size:10pt;margin:0 0 1mm}
+ #p4 .delivery-answer>p{font-size:7pt;margin:1mm 0 0}
+ .paper-reward{grid-template-columns:12mm minmax(0,1fr);gap:3mm;padding:2mm 3mm;border-radius:3mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .paper-reward>strong{width:12mm;height:12mm;font-size:24pt;border-radius:2mm}
+ .paper-reward span{font-size:7pt}
+ .paper-reward p{font-size:8pt;line-height:1.35;margin:1mm 0 0}
+}

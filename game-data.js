@@ -196,7 +196,7 @@ window.GAME = {
     },
     {
       "id": "cipher",
-      "title": "Pingy – cesta doručovateľa",
+      "title": "Pingy – poškodené svetelné uzly",
       "label": "Úloha 4 – Pri topánkach",
       "icon": "👟",
       "time": [
@@ -209,26 +209,25 @@ window.GAME = {
         "POSTELI"
       ],
       "placeholder": "Miesto z doručenej správy",
-      "action": "Nájdite list P4 pri topánkach. Od stanice ŠTART sledujte šípky a pri každej stanici vyberte spoj so zhodným symbolom.",
-      "task": "Na každej stanici porovnajte jej symbol so symbolmi na odchádzajúcich spojoch. Choďte len v smere šípok po spoji s rovnakým symbolom. Písmeno každej novej stanice zapíšte do ďalšieho políčka. Sedem písmen doplní vetu „Ďalšia indícia sa skrýva v tvojej…“.",
-      "materials": "P4: papierová cesta doručovateľa, sedem políčok na miesto a písmeno T. P5 ukryte pod vankúš v detskej posteli.",
+      "action": "Nájdite list P4 pri topánkach. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
+      "task": "Najprv podľa polohy rozsvieteného bodu doplňte symbol do všetkých 12 prázdnych mostíkov. Potom od ŠTARTU sledujte šípky: symbol uzla určuje správny mostík. Cestu vyfarbujte a písmená zbierajte iba v uzloch s obálkou. Sedem písmen doplní vetu „Ďalšia indícia sa skrýva v tvojej…“.",
+      "materials": "P4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička indície T. P5 ukryte pod vankúš v detskej posteli.",
       "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie P5; jeho QR otvorí úlohu 5.",
-      "solution": "Zo ŠTARTU sledujte zhodné symboly v smere šípok. Navštívené stanice dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
+      "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Obálky dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
       "hints": [
-        "Symbol na stanici určuje správny odchádzajúci spoj. Šípky ukazujú smer; ostatné spoje ignorujte.",
-        "Prvé dve navštívené stanice dávajú P a O. Zapisujte po jednom písmene až po CIEĽ."
+        "Na každom prázdnom mostíku svieti jeden z troch bodov. V servisnom kľúči nájdite rovnakú polohu a dokreslite priradený symbol.",
+        "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte iba písmená z obálok, nie každý prejdený uzol."
       ],
-      "parent": "Celý P4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. P5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. P4 nemá QR a nič sa neoveruje v telefóne.",
-      "transition": "Papierová správa odhalí POSTELI a pridá písmeno T. V detskej posteli pod vankúšom nájdite P5 a jeho QR kódom otvorte ďalšiu úlohu.",
+      "parent": "Celý P4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. P5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. P4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv opravia všetkých 12 mostíkov podľa trojbodového kľúča, potom vyfarbia cestu a zbierajú iba písmená pri obálkach.",
+      "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s písmenom T si odložte. V detskej posteli pod vankúšom nájdite P5 a jeho QR kódom otvorte ďalšiu úlohu.",
       "character": "pingy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Som doručovateľ správ. Po výpadku sa mi pomiešali cesty a ďalšiu stopu viem doručiť iba s vašou pomocou.",
-          "Začnite pri ŠTARTE. Na stanici si všimnite symbol a vyberte odchádzajúci spoj s rovnakým symbolom. Choďte iba v smere šípok. Písmeno každej novej stanice zapíšte do ďalšieho políčka, až kým nedôjdete do CIEĽA.",
-          "Doplňte vetu pod mapou a choďte podľa nej hľadať. Telefón teraz nepotrebujete. Za doručenie správy vám nechávam písmeno T; zapíšte si ho k ostatným indíciám."
+          "Výpadok poškodil našu sieť svetelných uzlov. Na niektorých mostíkoch zhasli značky a moja správa sa zasekla. Pomôžete nám ju doručiť?",
+          "Najprv obnovte chýbajúce značky podľa servisného kľúča. Potom rozsvieťte správnu cestu cez uzly a pozbierajte kúsky správy v obálkach. Ukážu vám, kde čaká ďalšia indícia."
         ],
         "after": []
       },
@@ -657,114 +656,138 @@ window.GAME = {
           "x": 1,
           "y": 0,
           "symbol": "△",
-          "letter": "P"
+          "letter": ""
         },
         {
           "x": 2,
           "y": 0,
           "symbol": "□",
-          "letter": "K"
+          "letter": "P"
         },
         {
           "x": 3,
           "y": 0,
           "symbol": "○",
-          "letter": "M"
+          "letter": "K"
         },
         {
           "x": 4,
           "y": 0,
           "symbol": "△",
-          "letter": "D"
+          "letter": "A"
+        },
+        {
+          "x": 5,
+          "y": 0,
+          "symbol": "□",
+          "letter": "R"
         },
         {
           "x": 0,
           "y": 1,
-          "symbol": "□",
+          "symbol": "△",
           "letter": "O"
         },
         {
           "x": 1,
           "y": 1,
-          "symbol": "○",
-          "letter": "O"
+          "symbol": "□",
+          "letter": ""
         },
         {
           "x": 2,
           "y": 1,
-          "symbol": "△",
-          "letter": "S"
+          "symbol": "○",
+          "letter": ""
         },
         {
           "x": 3,
           "y": 1,
+          "symbol": "△",
+          "letter": ""
+        },
+        {
+          "x": 4,
+          "y": 1,
           "symbol": "□",
+          "letter": "E"
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "symbol": "○",
+          "letter": "N"
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "symbol": "□",
+          "letter": ""
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "symbol": "○",
+          "letter": "S"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "symbol": "△",
+          "letter": ""
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "symbol": "□",
+          "letter": "T"
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "symbol": "○",
+          "letter": ""
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "symbol": "△",
+          "letter": "U"
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "symbol": "○",
+          "letter": "D"
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "symbol": "△",
+          "letter": "O"
+        },
+        {
+          "x": 2,
+          "y": 3,
+          "symbol": "□",
+          "letter": "M"
+        },
+        {
+          "x": 3,
+          "y": 3,
+          "symbol": "○",
           "letter": "A"
         },
         {
           "x": 4,
-          "y": 1,
-          "symbol": "○",
-          "letter": "B"
-        },
-        {
-          "x": 0,
-          "y": 2,
+          "y": 3,
           "symbol": "△",
-          "letter": "N"
-        },
-        {
-          "x": 1,
-          "y": 2,
-          "symbol": "□",
-          "letter": "C"
-        },
-        {
-          "x": 2,
-          "y": 2,
-          "symbol": "○",
-          "letter": "T"
-        },
-        {
-          "x": 3,
-          "y": 2,
-          "symbol": "△",
-          "letter": "E"
-        },
-        {
-          "x": 4,
-          "y": 2,
-          "symbol": "□",
           "letter": "L"
         },
         {
-          "x": 0,
-          "y": 3,
-          "symbol": "○",
-          "letter": "U"
-        },
-        {
-          "x": 1,
-          "y": 3,
-          "symbol": "△",
-          "letter": "H"
-        },
-        {
-          "x": 2,
+          "x": 5,
           "y": 3,
           "symbol": "□",
-          "letter": "Y"
-        },
-        {
-          "x": 3,
-          "y": 3,
-          "symbol": "○",
-          "letter": "L"
-        },
-        {
-          "x": 4,
-          "y": 3,
-          "symbol": "△",
           "letter": "I"
         }
       ],
@@ -772,161 +795,201 @@ window.GAME = {
         {
           "from": 0,
           "to": 1,
-          "symbol": "○"
+          "repairSlot": 0
         },
         {
           "from": 0,
-          "to": 5,
-          "symbol": "□"
+          "to": 6,
+          "symbol": "△"
         },
         {
           "from": 1,
           "to": 2,
-          "symbol": "□"
+          "symbol": "△"
         },
         {
           "from": 1,
-          "to": 6,
-          "symbol": "△"
+          "to": 7,
+          "repairSlot": 0
         },
         {
           "from": 2,
           "to": 3,
-          "symbol": "△"
+          "repairSlot": 1
         },
         {
           "from": 2,
-          "to": 7,
-          "symbol": "△"
+          "to": 8,
+          "repairSlot": 2
         },
         {
           "from": 3,
           "to": 4,
-          "symbol": "△"
+          "repairSlot": 1
         },
         {
           "from": 3,
-          "to": 8,
-          "symbol": "△"
+          "to": 9,
+          "repairSlot": 2
         },
         {
           "from": 4,
-          "to": 9,
+          "to": 5,
           "symbol": "○"
         },
         {
-          "from": 5,
-          "to": 6,
-          "symbol": "○"
-        },
-        {
-          "from": 5,
+          "from": 4,
           "to": 10,
-          "symbol": "○"
+          "symbol": "□"
+        },
+        {
+          "from": 5,
+          "to": 11,
+          "symbol": "△"
+        },
+        {
+          "from": 7,
+          "to": 6,
+          "symbol": "□"
         },
         {
           "from": 6,
+          "to": 12,
+          "repairSlot": 1
+        },
+        {
+          "from": 8,
           "to": 7,
           "symbol": "○"
         },
         {
-          "from": 6,
-          "to": 11,
-          "symbol": "□"
-        },
-        {
           "from": 7,
-          "to": 8,
-          "symbol": "□"
-        },
-        {
-          "from": 7,
-          "to": 12,
+          "to": 13,
           "symbol": "△"
         },
         {
           "from": 8,
           "to": 9,
-          "symbol": "△"
+          "symbol": "□"
         },
         {
           "from": 8,
-          "to": 13,
+          "to": 14,
           "symbol": "△"
         },
         {
           "from": 9,
-          "to": 14,
-          "symbol": "△"
+          "to": 10,
+          "repairSlot": 1
+        },
+        {
+          "from": 15,
+          "to": 9,
+          "repairSlot": 2
         },
         {
           "from": 10,
           "to": 11,
-          "symbol": "○"
+          "symbol": "△"
         },
         {
           "from": 10,
-          "to": 15,
-          "symbol": "○"
-        },
-        {
-          "from": 11,
-          "to": 12,
-          "symbol": "○"
-        },
-        {
-          "from": 11,
           "to": 16,
-          "symbol": "○"
+          "symbol": "□"
         },
         {
-          "from": 12,
-          "to": 13,
-          "symbol": "○"
-        },
-        {
-          "from": 12,
+          "from": 11,
           "to": 17,
           "symbol": "□"
         },
         {
+          "from": 12,
+          "to": 13,
+          "repairSlot": 2
+        },
+        {
+          "from": 12,
+          "to": 18,
+          "symbol": "○"
+        },
+        {
           "from": 13,
           "to": 14,
+          "symbol": "○"
+        },
+        {
+          "from": 13,
+          "to": 19,
           "symbol": "□"
         },
         {
-          "from": 13,
-          "to": 18,
-          "symbol": "△"
+          "from": 14,
+          "to": 15,
+          "repairSlot": 1
         },
         {
           "from": 14,
-          "to": 19,
-          "symbol": "△"
+          "to": 20,
+          "symbol": "□"
         },
         {
           "from": 15,
           "to": 16,
+          "symbol": "○"
+        },
+        {
+          "from": 15,
+          "to": 21,
           "symbol": "△"
         },
         {
           "from": 16,
           "to": 17,
+          "symbol": "□"
+        },
+        {
+          "from": 16,
+          "to": 22,
           "symbol": "○"
         },
         {
           "from": 17,
-          "to": 18,
+          "to": 23,
           "symbol": "○"
         },
         {
           "from": 18,
           "to": 19,
-          "symbol": "○"
+          "symbol": "□"
+        },
+        {
+          "from": 19,
+          "to": 20,
+          "symbol": "□"
+        },
+        {
+          "from": 20,
+          "to": 21,
+          "symbol": "△"
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "symbol": "△"
+        },
+        {
+          "from": 22,
+          "to": 23,
+          "repairSlot": 1
         }
       ],
       "start": 0,
-      "finish": 19
+      "finish": 23,
+      "repairKey": [
+        "○",
+        "△",
+        "□"
+      ]
     },
     "signal": {
       "validPairs": [

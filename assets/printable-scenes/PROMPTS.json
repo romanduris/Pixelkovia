@@ -117,6 +117,22 @@
         "plugyNoTail": true,
         "notes": "Piko follows last; seven friends remain together."
       }
+    },
+    {
+      "file": "p4-svetelne-uzly.png",
+      "prompt": "Use case: illustration-story. Create a NEW final illustration for an A4 Slovak children's printable puzzle. The referenced image is a STRICT CHARACTER IDENTITY and STYLE reference ONLY; replace the old four-paper-strip activity entirely. Preserve all five exact friendly living electronic characters, one each: blue scalloped cloud head with dark screen face cyan terminal eyes, dark suit white shirt teal tie; ivory microphone with dark mesh grille and teal arms/support and cream teal feet; ivory living envelope with mint green triangular flap, hands and mint feet; warm yellow square pixel face with ivory frame and gold screws; ivory living USB plug with exposed metal connector, blue flexible arms and legs, orange gloves and cream shoes, absolutely NO CABLE TAIL and NO extra connector. No other characters, no shield, no green chip. Same lovely softly painted 2D pixel storybook style, not 3D or voxel. Scene: the five friends gather and lean cooperatively over ONE pale cyan glowing flat circuit-map surface on the ground. The envelope character at center is reconnecting one broken small luminous bridge between ROUND LIGHT NODES; cloud guide points to another interrupted link, microphone listens, yellow pixel illuminates a node, USB friend helps reconnect the edge. The map contains only a small abstract network of luminous circular nodes and broken/repaired glowing paths, absolutely no alphabet characters or numbers. Optimistic thoughtful teamwork. Wide panoramic 3:1 composition, all full bodies visible, generous pure WHITE background and minimal pale cyan grounding shadow suitable for printing, scene fills width. No old rectangular paper strips, no scenery, no fortress, no train or train station. NO TEXT WHATSOEVER, no names, nameplates, captions, letters, digits, labels, speech bubbles, watermarks, QR codes or puzzle answers.",
+      "references": [
+        "assets/printable-scenes/p4-pingy.png"
+      ],
+      "generatedSource": "/home/codespace/.codex/generated_images/01a171e7-6046-75d0-bfe8-f4a9cb2e4399/exec-c947cb45-9fc9-4df3-9cf8-03abb38eb263.png",
+      "validation": {
+        "characters": 5,
+        "textFree": true,
+        "whiteBackground": true,
+        "fullBody": true,
+        "plugyNoTail": true,
+        "notes": "Piko, Miky, Pixi, Plugy and Pingy repair a glowing circuit network. No strips, names or answer."
+      }
     }
   ]
 }

@@ -10,7 +10,7 @@
     {id:'p1',task:'01',title:'Mikyho rozhádzané signály',where:'Indícia Kúpeľňa',copy:'Celý list pripravte ako jednu indíciu. Šesť signálov vystrihujú až deti.',status:'Hotový list A4',character:'miky'},
     {id:'p2',task:'02',title:'Pixiin dekódovací stroj',where:'Indícia 2 · pri okne',copy:'Oba kruhy nechajte na celom liste. Deti rozlúštia indíciu na papieri bez overovania v telefóne.',status:'Pracovný podklad',character:'pixi'},
     {id:'p3',task:'03',title:'Plugyho symboly',where:'Indícia 3 · pod stoličkou',copy:'Prilepte pod sedadlo stoličky a označte „Úloha 3“. Nájdete ju podľa Pixiinho odkazu.',status:'Pracovný podklad',character:'plugy'},
-    {id:'p4',task:'04',title:'Cesta doručovateľa',where:'Indícia pri topánkach',copy:'Celý P4 bez strihania ukryte do čistej suchej topánky. Hrá sa iba na papieri.',status:'Pracovný podklad',character:'pingy'},
+    {id:'p4',task:'04',title:'Poškodené svetelné uzly',where:'Indícia pri topánkach',copy:'Celý P4 bez strihania ukryte do čistej suchej topánky. Deti najprv opravia mostíky a potom doručia správu. Hrá sa iba na papieri.',status:'Pracovný podklad',character:'pingy'},
     {id:'p5',task:'05',title:'Čipkova cesta domov',where:'Samostatná indícia · posteľ',copy:'P5 ukryte pod vankúš v detskej posteli. Jeho QR otvorí úlohu 5.',status:'Pracovný podklad',character:'cipko'},
     {id:'p6',task:'06',title:'Sľub Pixelkov',where:'Indícia 6 · pod stoličkou',copy:'Prilepte pod inú stoličku než P3. Označte „Úloha 6 – otvoriť po opravení Čipkovej cesty“.',status:'Pracovný podklad',character:'guardy'},
     {id:'p7',task:'07',title:'Poškodený signál',where:'Pri P6 · pod stoličkou',copy:'Priložte k P6. Vyfarbovaním správnych dvojíc deti obnovia návratové heslo.',status:'Hotový list A4',character:'piko'}

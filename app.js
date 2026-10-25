@@ -89,7 +89,7 @@
   }
   function paperDeliveryScreen(){
     app.classList.add('signal-mode');
-    return `<section class="signal-screen"><div class="signal-content">${sprite('pingy')}<h1 tabindex="-1">Pokračujte na papieri</h1><p>Pri topánkach vás čaká list P4 s cestou doručovateľa. Vyriešte ju ceruzkou a choďte podľa doručenej správy hľadať.</p><p>Telefón zatiaľ odložte. Ďalšiu úlohu otvoríte QR kódom na nájdenom liste P5.</p><p>Písmeno T z listu P4 si odložte k ostatným indíciám.</p><button class="text-link" data-action="${preview?'exit-test':'home'}">← Prehľad hry</button></div></section>`;
+    return `<section class="signal-screen"><div class="signal-content">${sprite('pingy')}<h1 tabindex="-1">Pokračujte na papieri</h1><p>Pri topánkach vás čaká list P4 s poškodenými svetelnými uzlami. Opravte mostíky, rozsvieťte cestu a choďte podľa doručenej správy hľadať.</p><p>Telefón zatiaľ odložte. Ďalšiu úlohu otvoríte QR kódom na nájdenom liste P5.</p><p>Písmeno T z listu P4 si odložte k ostatným indíciám.</p><button class="text-link" data-action="${preview?'exit-test':'home'}">← Prehľad hry</button></div></section>`;
   }
   function taskInteractionScreen(t,n){
     app.classList.add('signal-mode');

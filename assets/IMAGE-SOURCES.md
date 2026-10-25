@@ -27,10 +27,14 @@ Mobilný funnel používa pixelkovia-room-mobile-tall.png: zvislé rozšírenie 
 
 Scény majú biele pozadie a pomer približne 3 : 1. Neobsahujú mená, odpovede ani typografiu. Presné prompty a kontrola postáv sú v printable-scenes/PROMPTS.json. Tie isté obrázky používajú pracovné listy, príslušné herné výsledky aj knižné ilustrácie.
 
-miky-sheet-preview.png, náhľady v printables/ a všetky PDF sú skutočné exporty upraviteľného HTML/CSS cez scripts/export-printables.cjs, nie obrazovou AI vytvorené dokumenty. Textové mená a QR pochádzajú z dát a sú lokalizovateľné. Návod, P1–P6 a diplom majú každý jednu A4; balík má osem strán.
+miky-sheet-preview.png, náhľady v printables/ a všetky PDF sú skutočné exporty upraviteľného HTML/CSS cez scripts/export-printables.cjs, nie obrazovou AI vytvorené dokumenty. Textové mená a QR pochádzajú z dát a sú lokalizovateľné. Návod, P1–P7 a diplom majú každý jednu A4; balík má deväť strán.
 
 ## Médiá a font
 
 Schválené PicoVideo.mp4 a obe pôvodné zvukové nahrávky sú byte po byte zachované. Staré názvy sú nevyhnutné archívne cesty. Nové hlasové podklady nepoužívajú konkrétne mená a čakajú na nahratie.
 
 Caveat v fonts/Caveat.ttf zostáva pod licenciou fonts/OFL-Caveat.txt.
+
+## Oprava svetelných uzlov — P4
+
+`printable-scenes/p4-svetelne-uzly.png`: nová ilustrácia cez vstavaný image_gen, odvodená od schválenej skupiny piatich postáv. Spoločne opravujú svetelné uzly a mostíky. Bez textu, mien a riešenia; Plugy nemá chvost. Presný prompt je uložený v `printable-scenes/PROMPTS.json`. Pôvodná ilustrácia štyroch pásikov zostáva archívnym assetom.

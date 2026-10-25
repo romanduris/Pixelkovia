@@ -24,7 +24,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 | P1, kúpeľňa | Šesť dátumových záznamov → 741296, S, ďalšia indícia pri okne. |
 | P2, okno | D → A, KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Iba papier, bez QR; V sa zachová pri vstupe na P3. |
 | P3, pod stoličkou | △ 3, ○ 2, □ 4; tabuľka 5 × 7 odhalí 9, E, hádanka smeruje k topánkam. |
-| P4, topánka | Cesta doručovateľa → POSTELI, T. Iba papier, bez QR a overovania. P5 pod vankúšom v detskej posteli. |
+| P4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. P5 pod vankúšom v detskej posteli. |
 | P5, posteľ | Hlavná cesta 2 → 4 → 6 → kód 246, L; posledná indícia pod inou stoličkou. |
 | P6, iná stolička | Akrostich SPOLU → O. Ochranné pole partiu chráni, nie je nepriateľom. |
 | P7, poškodený signál | Vyfarbovanie správnych dvojíc na šiestich obrazovkách → SVETLO; potvrdenie v telefóne. Vráti sa všetkých sedem, Piko posledný. |
