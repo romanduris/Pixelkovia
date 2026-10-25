@@ -318,8 +318,8 @@
 .delivery-repair-key h3 small{font:11px/1.4 Arial,sans-serif;letter-spacing:0;margin-left:10px;color:#263c4d}
 .delivery-repair-key>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .delivery-repair-key svg{display:block;width:100%;height:32px;background:white;border:1px solid #c5d1dc;border-radius:5px}
-.delivery-answer>p{font:12px/1.4 Arial,sans-serif;margin:8px 0 0}
-.paper-reward{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:center;padding:13px 16px;border:1px solid #9b8155;border-radius:12px;background:linear-gradient(110deg,#2d2c38,#17233a 70%);color:#edf1ff;break-inside:avoid}
+.delivery-answer>p{font:12px/1.4 Arial,sans-serif;margin:8px 0 0;text-align:center}
+.paper-reward{display:grid;grid-template-columns:52px minmax(0,auto);gap:14px;align-items:center;justify-content:center;text-align:center;padding:13px 16px;border:1px solid #9b8155;border-radius:12px;background:linear-gradient(110deg,#2d2c38,#17233a 70%);color:#edf1ff;break-inside:avoid}
 .paper-reward>strong{display:grid;place-items:center;width:52px;height:52px;border:1px solid #b79a64;border-radius:9px;background:#302f3a;color:#ffd494;font:700 34px/1 monospace}
 .paper-reward span{display:block;color:#e9c992;font:700 10px/1.4 monospace;letter-spacing:1px}
 .paper-reward p{font:13px/1.45 Arial,sans-serif;margin:5px 0 0;color:#edf1ff}
@@ -345,7 +345,7 @@
  #p4 .delivery-answer{padding:2mm 3mm;margin:1mm 0 2mm}
  #p4 .delivery-answer h3{font-size:10pt;margin:0 0 1mm}
  #p4 .delivery-answer>p{font-size:7pt;margin:1mm 0 0}
- .paper-reward{grid-template-columns:12mm minmax(0,1fr);gap:3mm;padding:2mm 3mm;border-radius:3mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .paper-reward{grid-template-columns:12mm minmax(0,auto);gap:3mm;padding:2mm 3mm;border-radius:3mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
  .paper-reward>strong{width:12mm;height:12mm;font-size:24pt;border-radius:2mm}
  .paper-reward span{font-size:7pt}
  .paper-reward p{font-size:8pt;line-height:1.35;margin:1mm 0 0}
