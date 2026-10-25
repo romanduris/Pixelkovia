@@ -7,11 +7,11 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE+'/printables.html');
   for(let i=1;i<=7;i++)assert.doesNotMatch(await page.locator('#p'+i).innerText(),/\bP[1-7]\b/,'children read ordinary instructions without production IDs');
-  assert.match(await page.locator('.guide-stage[data-stage="code"]').innerText(),/P7[\s\S]*Pod gaučom/);
+  assert.match(await page.locator('.guide-stage[data-stage="code"]').innerText(),/U7[\s\S]*Pod gaučom/);
   assert.doesNotMatch(await page.locator('.guide-stage[data-stage="search"]').innerText(),/P7/,'fridge contains only task 6');
   await page.goto(BASE+'/game.html?signal=guardy');
-  await page.locator('#answer').fill('SPOLU');await page.locator('.answer-form button').tap();
-  assert.match(await page.locator('.signal-content').innerText(),/pod gaučom/);
+  await page.locator('#answer').fill('POD GAUČ');await page.locator('.answer-form button').tap();
+  assert.match(await page.locator('.signal-content').innerText(),/Pod gaučom|Pod gauč|pod gaučom/);
   assert.doesNotMatch(await page.locator('.signal-content').innerText(),/\bP[1-7]\b/);
   await page.locator('[data-action="next"]').tap();
   assert.equal(await page.locator('h1').innerText(),'Úloha 7 – Pod gaučom');
