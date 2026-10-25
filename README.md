@@ -35,7 +35,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 
 `assets/PicoVideo.mp4` a obe pôvodné MP3 zostávajú byte po byte nezmenené. Storyboard oddeľuje archívne nahrávky od nových textov.
 
-**Nový dabing čaká na dodanie** pre Mikyho a Plugyho. `GAME.audio` a `GAME.plugyAudio` sú preto `null`; hra ponúka výrazné tlačidlo na prečítanie správy so všetkými potrebnými indíciami. `GAME.recordings` určuje očakávané nové súbory. Po dodaní sa nastaví cesta a preverí prehrávanie v dotykovom Chrome aj WebKite. Prehrávač zachováva prednačítanie, gesto, automatický štart pri úspechu, pauzu, pokračovanie, opakovanie a retry. Chyba sama neotvára prepis ani nemení postup.
+**Mikyho nová nahrávka je zapojená** cez `GAME.audio = assets/Miky.mp3`; pôvodný súbor zostáva v archíve. Správa sa prehrá po správnom kóde, má pauzu, pokračovanie, opakovanie a dostupný prepis. Plugyho `GAME.plugyAudio` zostáva `null`, kým sa jeho nahrávka nezapojí. `GAME.recordings` určuje stav jednotlivých nahrávok. Mikyho testy používajú priamo dodané MP3 v dotykovom Chrome aj WebKite. Prehrávač zachováva prednačítanie, gesto, automatický štart pri úspechu, pauzu, pokračovanie, opakovanie a retry. Chyba sama neotvára prepis ani nemení postup.
 
 ## Kompatibilita a administrácia
 

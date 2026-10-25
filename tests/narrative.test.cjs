@@ -40,7 +40,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
    await page.locator('.signal-connected').waitFor();
    assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
    assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
-   assert.equal(await page.locator('.signal-content audio').count(),0,'pending dubbing does not create a broken player');
+   assert.equal(await page.locator('.signal-content audio').getAttribute('src'),'assets/Miky.mp3','new recording stays available with text fallback');
    await page.locator('[data-action="read-miky-message"]').click();
    assert.match(await page.locator('#miky-transcript').innerText(),/cez deň do vášho domu prichádza svetlo/,'text-only play gives the next physical clue');
    await page.locator('.dialog-close').click();

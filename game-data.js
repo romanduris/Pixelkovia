@@ -1,7 +1,7 @@
 window.GAME = {
   "title": "Pixelkovia: Stratený signál",
   "version": 6,
-  "audio": null,
+  "audio": "assets/Miky.mp3",
   "video": "assets/PicoVideo.mp4",
   "mikyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
   "plugyThanks": "Ďakujem vám, kamaráti! Ste skvelí. Pomáhate nám znovu spojiť celú partiu.",
@@ -547,7 +547,7 @@ window.GAME = {
       "model": "ElevenLabs v3",
       "direction": "Zvedavý a energický hlas malého mikrofónu; počúva a zachytáva zvuky.",
       "prompt": "[confused, startled] Haló?! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Toto musím povedať nášmu sprievodcovi!\n\n[happy, relieved] Jééj! Už ho vidím! Konečne sme zase v spojení!\n\n[grateful, warm] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, zachytil som zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že naša kamarátka by nám mohla pomôcť. Stará sa o svetlo a farby obrazoviek. Nájde aj to, čo ostatní nevidia!\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz, ale pri prerušení spojenia sa poškodil.\n\n[encouraging, energetic] Nájdite ďalšiu indíciu tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Ešte raz vám ďakujem, kamaráti!",
-      "recordingStatus": "Nový dabing čaká na dodanie. Hra používa tento text; pôvodná nahrávka je archivovaná."
+      "recordingStatus": "Nová nahrávka je zapojená v hre. Pôvodná nahrávka zostáva v archíve."
     },
     "plugy": {
       "title": "Správa po odomknutí mosta",
@@ -640,8 +640,8 @@ window.GAME = {
   ],
   "recordings": {
     "miky": {
-      "expectedFile": "assets/MikyMessage.mp3",
-      "status": "pending"
+      "expectedFile": "assets/Miky.mp3",
+      "status": "available"
     },
     "plugy": {
       "expectedFile": "assets/PlugyMessage.mp3",

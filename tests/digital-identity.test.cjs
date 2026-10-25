@@ -3,8 +3,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const context={window:{}};vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);const game=context.window.GAME;
 assert.deepEqual(Array.from(game.characters,c=>c.name),['Piko','Miky','Pixi','Plugy','Pingy','Čipko','Guardy']);
 assert.deepEqual(Array.from(game.stages.slice(1,7),s=>s.reward),['S','V','E','T','L','O']);
-assert.equal(game.audio,null);assert.equal(game.plugyAudio,null,'do not present archival recordings as new voices');
-for(const id of ['miky','plugy'])assert.equal(game.recordings[id].status,'pending');
+assert.equal(game.audio,'assets/Miky.mp3');assert.equal(game.plugyAudio,null,'do not present archival recordings as new voices');
+assert.equal(game.recordings.miky.status,'available');assert.equal(game.recordings.miky.expectedFile,game.audio);assert.equal(game.recordings.plugy.status,'pending');
 const names=/(?:piko|pika|pikom|pikov|pikovi|miky|mikym|mikyho|pixi|plugy|plugym|plugyho|pingy|pingym|pingyho|čipk|guardy|guardym|guardyho|kvak|šutk|iskr|lístk|lístok|kubo|kubov|ryšk)/iu;
 for(const [id,script] of Object.entries(game.voiceScripts))assert.ok(!names.test(script.prompt),id+': recordable script is independent of character names');
 for(const id of ['miky','plugy'])assert.ok(!names.test(game[id+'Message'].join(' ')),id+': transcript matches name-free dubbing');
@@ -22,4 +22,4 @@ for(const [file,hash] of [
 ])assert.equal(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),hash,file+': original media bytes are preserved');
 const obsolete=/(?:Kvak|Šutk|Iskr|Lístok|Lístk|Kubo|Kubov|Ryšk)/u;
 for(const file of ['atlas.html','site-content.js','print-materials.js','story-text.js','prep-store.js','admin/src/game-rules.mjs','admin/src/checklist.mjs','admin/public/admin.js'])assert.ok(!obsolete.test(fs.readFileSync(file,'utf8')),file+': no obsolete visible names');
-console.log('PASS: seven digital identities, name-free recording scripts, real alpha portraits, pending dubbing, unchanged QR payloads and byte-identical original media.');
+console.log('PASS: seven digital identities, name-free recording scripts, real alpha portraits, new Miky recording and pending Plugy dubbing, unchanged QR payloads and byte-identical original media.');

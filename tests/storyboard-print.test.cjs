@@ -53,7 +53,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await pixi.locator('.storyboard-message').count(),0,'paper-only Pixi has no duplicate story block');
  assert.equal(normalize(await pixi.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Pixi story remains in the shared worksheet text');
 
- assert.match(await printed.locator('#p5 .note').innerText(),/Úloha 6/);
+ assert.match(await printed.locator('#p5 .note').innerText(),/do úkrytu, ktorý ste práve odhalili/);
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.evaluate(()=>{const box=document.createElement('div');box.innerHTML=PRINT_MATERIALS.summary('p7','code');return box.textContent;})),'final password shows the printed ordering card');
  for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols'&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
   const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
@@ -89,7 +89,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
    assert.equal(await page.locator('#answer').getAttribute('maxlength'),'6');
    await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();assert.match(await page.locator('#feedback').innerText(),/nesedí/);
    await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();await page.locator('.signal-connected').waitFor();
-   assert.equal(await page.locator('.signal-content audio').count(),0,'new dubbing is pending');await page.locator('.signal-header [data-action="exit-test"]').click();
+   assert.equal(await page.locator('.signal-content audio').getAttribute('src'),'assets/Miky.mp3');await page.locator('.signal-header [data-action="exit-test"]').click();
   }else if(stage===8){await page.locator('.finale').waitFor();assert.equal(await page.locator('.finale [data-action="reset"]').count(),0,'finale test cannot reset family progress');await page.locator('.finale [data-action="exit-test"]').click();}
   else{await page.locator('.signal-task').waitFor();await page.locator('.signal-header [data-action="exit-test"]').click();}
   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),saved,'test '+stage+' preserves family progress');

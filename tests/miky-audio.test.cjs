@@ -3,7 +3,6 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const {useArchivedAudio}=require('./helpers/archive-audio.cjs');
 const KEY='zahada-v1-progress';
 const engines={chromium,webkit};
 (async()=>{
@@ -13,7 +12,7 @@ const engines={chromium,webkit};
   try{
    const contextOptions={...devices[engine==='webkit'?'iPhone 13':'Pixel 7']};
    async function phone(){
-    const context=await browser.newContext(contextOptions);await useArchivedAudio(context);
+    const context=await browser.newContext(contextOptions);
     if(process.env.SITE_ACCESS_TOKEN){
      await context.route(new URL(BASE).origin+'/**',route=>route.continue({headers:{...route.request().headers(),'OAI-Sites-Authorization':'Bearer '+process.env.SITE_ACCESS_TOKEN}}));
     }
@@ -35,9 +34,9 @@ const engines={chromium,webkit};
    }
    const normal=await phone(),p=normal.page;
    await p.goto(BASE+'/game.html?signal=kvak');
-   const media=await p.request.get(BASE+'/assets/KvakMessage.mp3',{headers:process.env.SITE_ACCESS_TOKEN?{'OAI-Sites-Authorization':'Bearer '+process.env.SITE_ACCESS_TOKEN}:{}});
+   const media=await p.request.get(BASE+'/assets/Miky.mp3',{headers:process.env.SITE_ACCESS_TOKEN?{'OAI-Sites-Authorization':'Bearer '+process.env.SITE_ACCESS_TOKEN}:{}});
    assert.equal(media.status(),200);assert.match(media.headers()['content-type'],/^audio\/mpeg\b/,'MP3 must be served as audio on the actual server');
-   assert.equal((await media.body()).length,fs.statSync('assets/KvakMessage.mp3').size);
+   assert.deepEqual(Buffer.from(await media.body()),fs.readFileSync('assets/Miky.mp3'),'browser receives the actual new recording');
    await p.locator('#answer').fill('000000');await p.locator('button[type="submit"]').tap();
    assert.ok(await p.locator('#miky-audio').evaluate(a=>a.paused&&a.currentTime===0),'preloading never plays the message before a correct code');
    await p.locator('#answer').fill('741296');await p.locator('button[type="submit"]').tap();
@@ -65,7 +64,7 @@ const engines={chromium,webkit};
    // A slow download must happen while children solve the paper puzzle, then be reused.
    const warm=await phone();let downloads=0,startRequest,release;
    const started=new Promise(resolve=>startRequest=resolve),gate=new Promise(resolve=>release=resolve);
-   await warm.context.route('**/assets/KvakMessage.mp3',async route=>{
+   await warm.context.route('**/assets/Miky.mp3',async route=>{
     downloads++;startRequest();await gate;
     const headers={...route.request().headers()};
     if(process.env.SITE_ACCESS_TOKEN)headers['OAI-Sites-Authorization']='Bearer '+process.env.SITE_ACCESS_TOKEN;
@@ -106,7 +105,7 @@ const engines={chromium,webkit};
    await blocked.page.locator('[data-action="miky-audio-toggle"]').tap();await playing(blocked.page,.1);
    assert.deepEqual(blocked.errors,[]);await blocked.context.close();
    const retry=await phone();let requests=0,recovered=false;
-   await retry.context.route('**/assets/KvakMessage.mp3',route=>{
+   await retry.context.route('**/assets/Miky.mp3',route=>{
     requests++;if(!recovered)return route.fulfill({status:503,contentType:'text/plain',body:'Temporary failure'});
     const headers={...route.request().headers()};
     if(process.env.SITE_ACCESS_TOKEN)headers['OAI-Sites-Authorization']='Bearer '+process.env.SITE_ACCESS_TOKEN;

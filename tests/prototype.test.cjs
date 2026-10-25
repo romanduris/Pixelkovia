@@ -29,7 +29,7 @@ assert.equal(ordered.map(r=>r.digit).join(''),'741296');
 assert.notEqual(game.signalRecords.map(r=>r.digit).join(''),'741296','printed order is scrambled');
 assert.equal(new Set(ordered.map(r=>`${r.month}-${r.day}-${r.time}`)).size,6,'unique chronological order');
 assert.ok(Object.values(Object.groupBy(game.signalRecords,r=>r.date)).some(group=>group.length>=3),'three records require exact time comparison');
-assert.equal(game.audio,null);
+assert.equal(game.audio,'assets/Miky.mp3');
 assert.ok(fs.existsSync(game.archivedAudio.miky));
 assert.equal(game.stages[0].hints.length,3);
 const {useArchivedAudio}=require('./helpers/archive-audio.cjs');

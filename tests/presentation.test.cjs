@@ -40,8 +40,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   }
   const downloadEvent=page.waitForEvent('download');await page.locator('a[download][href="assets/printables/p1.pdf"]').click();
   assert.equal((await downloadEvent).suggestedFilename(),'p1.pdf');
-  assert.equal(await page.locator('[data-media="miky"]').count(),0,'pending dubbing has no broken player');
-  assert.match(await page.locator('.media-check').innerText(),/Nový dabing čaká na dodanie/);
+  assert.equal(await page.locator('[data-media="miky"]').count(),1,'new recording has a preview control');
+  assert.match(await page.locator('.media-check').innerText(),/Otestovať Mikyho zvuk/);
   await page.goto(BASE+'/storyboard.html');
   assert.equal(await page.locator('.storyboard').count(),9);assert.equal(await page.locator('.gm-atlas').count(),0);
   const blocks=page.locator('.studio-timeline>.storyboard');
@@ -76,7 +76,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.ok(!await page.locator('[data-tts="piko"] pre').isVisible());
   assert.equal(await page.locator('[data-tts="piko"] h4').first().textContent(),'ElevenLabs v3 · cca 7 sekúnd');
   assert.equal(await page.locator('#gm-intro video').count(),0);
-  assert.equal(await page.locator('#gm-envelope audio').getAttribute('src'),'assets/KvakMessage.mp3');
+  assert.equal(await page.locator('#gm-envelope .miky-message-controls audio').getAttribute('src'),'assets/Miky.mp3');
+  assert.equal(await page.locator('#gm-envelope .recording-archive audio').getAttribute('src'),'assets/KvakMessage.mp3');
   assert.ok((await page.locator('#gm-intro .script-status').textContent()).includes('Schválené pôvodné video'));
   const scripts=await page.evaluate(()=>GAME.voiceScripts);
   for(const id of ['piko','miky','plugy'])assert.equal(await page.locator(`[data-tts="${id}"] pre`).textContent(),scripts[id].prompt,'verbatim production direction');
@@ -120,12 +121,13 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
    const answer=await page.evaluate(n=>GAME.stages[n].answer[0],n);
    if(n===3){const indexes=await page.evaluate(()=>GAME.plugyPuzzle.grid.flat().flatMap((value,index)=>GAME.plugyPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();}
+   else if(n===5){await require('./helpers/cipko.cjs')(page,{touch:false});}
    else{
     assert.equal(await page.locator('#answer').count(),1);
     await page.locator('#answer').fill(answer);await page.locator('.answer-form button').click();
    }
    if(n===3)await page.locator('.plugy-connected').waitFor();
-   assert.equal(await page.locator('.signal-stage-result').count(),1,'stage '+n+' completes');
+   assert.equal(await page.locator(n===5?'.cipko-finished':'.signal-stage-result').count(),1,'stage '+n+' completes');
    assert.equal(await page.locator('.scene-reader, .task-main, .task-aside').count(),0);
    assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),savedBeforeTest,'stage '+n+' preview is isolated');
    await page.locator('.signal-header [data-action="exit-test"]').click();
