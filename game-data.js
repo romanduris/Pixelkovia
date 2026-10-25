@@ -196,7 +196,7 @@ window.GAME = {
     },
     {
       "id": "cipher",
-      "title": "Pingy – poškodené svetelné uzly",
+      "title": "Pingy – doručte stratenú správu",
       "label": "Úloha 4 – Pri topánkach",
       "icon": "👟",
       "time": [
@@ -226,8 +226,8 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Výpadok poškodil našu sieť svetelných uzlov. Na niektorých mostíkoch zhasli značky a moja správa sa zasekla. Pomôžete nám ju doručiť?",
-          "Najprv obnovte chýbajúce značky podľa servisného kľúča. Potom rozsvieťte správnu cestu cez uzly a pozbierajte kúsky správy v obálkach. Ukážu vám, kde čaká ďalšia indícia."
+          "Ahojte! Ja som Pingy, malý posol správ. Prenášam odkazy medzi kamarátmi, aby každý vedel, čo sa deje.",
+          "Výpadok poškodil našu sieť svetelných uzlov. Na niektorých mostíkoch zhasli značky a môj odkaz sa zasekol. Opravíte mostíky a pomôžete mi ho doručiť?"
         ],
         "after": []
       },
