@@ -27,7 +27,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 | Úloha 4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. Úloha 5 pod vankúšom v detskej posteli. |
 | Úloha 5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. List k úlohe 6 je v chladničke; List k úlohe 7 je samostatne pod gaučom. |
 | Úloha 6, chladnička | Deväť poškodených pečatí, sedem doplnkových vzorov, dve falošné pečate. Číslice platných pečatí v poradí opráv 1–7 → 5817264. Úkryt pod gaučom prezradí až Guardyho správa po overení. Ochranné pole partiu chráni, nie je nepriateľom. |
-| Úloha 7, pod gaučom | Vyfarbovanie hviezd ★ na jedinej obrazovke 3 × 5 → posledné písmeno O. Spolu s písmenami z úloh 1–5 vytvorí SVETLO; potvrdenie v návratovej bráne. Vráti sa všetkých sedem, Piko posledný. |
+| Úloha 7, pod gaučom | Tri obrazovky 5 × 7: presné dvojice ○★ a △□ odhalia O, K, O. Opakujúce sa O je posledná indícia. Spolu s písmenami z úloh 1–5 vytvorí SVETLO; potvrdenie v návratovej bráne. Vráti sa všetkých sedem, Piko posledný. |
 
 Úkryty sú suché a dostupné bez presúvania nábytku; okno sa neotvára. List úlohy 1 a kruhy z úlohy 2 strihajú deti, Úloha 4 a Úloha 7 zostávajú celé. Čiernobiela tlač je plne hrateľná.
 

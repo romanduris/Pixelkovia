@@ -45,12 +45,18 @@ assert.ok(!sheets.p6.includes('POD GAUČ'),'the hiding place is only revealed af
 assert.equal((sheets.p6.match(/class="seal-row"/g)||[]).length,9);
 // Independently decode the single-symbol grids into the six expected glyphs.
 const signal=game.paperPuzzles.signal;
-assert.equal(signal.target,'★');assert.equal(signal.screens.length,1);
-const cells=signal.screens[0];assert.equal(cells.length,15);
-assert.equal(cells.map(symbol=>symbol==='★'?'1':'0').join('').match(/.{3}/g).join('/'),'111/101/101/101/111');
-assert.equal((sheets.p7.match(/<rect /g)||[]).length,15);assert.ok(!sheets.p7.includes('SVETLO'),'no plaintext final password on player sheet');
+assert.equal(signal.columns,5);assert.equal(signal.rows,7);assert.equal(signal.screens.length,3);
+assert.deepEqual(Array.from(signal.validPairs),['○★','△□']);
+const expected=['01110/10001/10001/10001/10001/10001/01110','10001/10010/10100/11000/10100/10010/10001','01110/10001/10001/10001/10001/10001/01110'];
+const allowed=new Set(signal.validPairs);
+assert.ok(!allowed.has('★○')&&!allowed.has('□△'),'reversed pairs must stay white');
+for(const [n,cells] of signal.screens.entries()){
+ assert.equal(cells.length,35);
+ assert.equal(cells.map(pair=>allowed.has(pair)?'1':'0').join('').match(/.{5}/g).join('/'),expected[n]);
+}
+assert.equal((sheets.p7.match(/<rect /g)||[]).length,105);assert.ok(!sheets.p7.includes('SVETLO'),'no plaintext final password on player sheet');
 assert.equal(game.stages[6].reward,'');assert.equal(game.stages[7].finalLetter,'O');
 assert.equal(game.stages[7].answer[0],'SVETLO');
 assert.deepEqual([...Array.from(game.stages.slice(1,6),s=>s.reward),game.stages[7].finalLetter],['S','V','E','T','L','O']);
 assert.equal(Object.keys(sheets).join(','),'p1,p2,p3,p4,p5,p6,p7,diplom');
-console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine seals → 5817264, single grid → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');
+console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine seals → 5817264, three pair grids → O K O → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');

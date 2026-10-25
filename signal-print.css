@@ -519,10 +519,10 @@
 .final-password-slots>div{display:grid;justify-items:center;gap:5px}
 .final-password-slots span{font:9px monospace}
 .final-password-slots b{display:block;width:34px;height:34px;border:1px solid #456a74;background:white}
-#p7 .paper-signal-screens{grid-template-columns:1fr;max-width:115px;margin:18px auto}
+#p7 .paper-signal-screens{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;width:100%;gap:20px;margin:18px auto}
 @media print{
  #p6 .seal-digit{font-size:14pt}
- #p7 .paper-signal-screens{width:30mm;max-width:30mm;margin:4mm auto}
+ #p7 .paper-signal-screens{width:166mm;max-width:166mm;gap:6mm;margin:4mm auto}#p7 .paper-screen svg{height:62mm}
  .final-password-slots{gap:3mm;margin:3mm 0}
  .final-password-slots span{font-size:7pt}
  .final-password-slots b{width:9mm;height:9mm}
@@ -534,3 +534,5 @@
 .seal-party-scene{min-width:0;margin:0}
 @media print{#p6 .seal-rows-body{gap:5mm}#p6 .seal-party-scene{padding:2mm}#p6 .seal-party-scene img{height:auto;aspect-ratio:3/1;object-fit:contain}}
 @media screen and (max-width:600px){.seal-rows-body{grid-template-columns:1fr;gap:16px}}
+
+@media screen and (max-width:600px){#p7 .paper-signal-screens{grid-template-columns:1fr;max-width:210px;gap:22px}}
