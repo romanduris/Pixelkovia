@@ -83,10 +83,8 @@ const KEY='zahada-v1-progress';
   assert.equal(pingy?.data,await printed.evaluate(()=>GAME.pingyQr));
   const pingyUrl=new URL(pingy.data),pingyScan=BASE+pingyUrl.pathname+pingyUrl.search;
   await page.goto(pingyScan);
-  assert.match(await page.locator('.qr-prerequisite').innerText(),/QR kód je správny a patrí k úlohe 4/);
-  assert.equal(await page.locator('.plugy-lock').count(),0,'early QR identifies its target instead of silently rendering another task');
-  await page.locator('[data-action="resume-scanned-game"]').click();
-  assert.equal(await page.locator('.plugy-lock').count(),1,'early scanning cannot bypass Plugy');
+  assert.equal(await page.locator('.qr-prerequisite').count(),0);
+  assert.match(await page.locator('h1').innerText(),/Pokračujte na papieri/);
   await page.evaluate(key=>localStorage.setItem(key,JSON.stringify({started:true,callDone:true,stage:3,completed:[1,2,3],hints:{}})),KEY);
   await page.goto(pingyScan);assert.equal(await page.locator('.signal-content h1').innerText(),'Pokračujte na papieri');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2,3]);
@@ -115,12 +113,9 @@ const KEY='zahada-v1-progress';
   await freshPage.goto(BASE+'/game.html?signal=unknown');
   assert.equal(await freshPage.locator('.signal-restore').count(),0);
   await freshPage.goto(plugyScan);
-  assert.match(await freshPage.locator('.qr-prerequisite').innerText(),/QR kód je správny a patrí k úlohe 3/);
-  assert.match(await freshPage.locator('#qr-title').innerText(),/Úloha 3/);
-  assert.equal(await freshPage.locator('.signal-restore').count(),0,'fresh scan does not masquerade as the bathroom QR');
-  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[],'P3 cannot skip Miky’s code');
-  await freshPage.locator('[data-action="resume-scanned-game"]').click();
-  await freshPage.locator('.signal-restore').waitFor();
+  assert.equal(await freshPage.locator('.plugy-lock').count(),1);
+  assert.equal(await freshPage.locator('.qr-prerequisite').count(),0);
+  assert.deepEqual(await freshPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[2],'only the paper-only letter is recorded');
   await fresh.close();
 
   for(const [width,height] of [[320,568],[390,844],[844,390]]){

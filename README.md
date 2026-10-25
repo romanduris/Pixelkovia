@@ -39,7 +39,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 
 ## Kompatibilita a administrácia
 
-Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia a písmená zostávajú zachované. Už dokončený P5 zostáva splnený; rozpracovaný P5 používa nové hry a odpoveď CHLADNIČKA. Stav každej hry sa ukladá do `cipko` v existujúcom postupe. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Nový P4 nemá QR; nájdený P5 obsahuje nový QR `signal=cipko`. Ten po dokončenej úlohe 3 zaznamená papierový krok 4 a písmeno T bez zadávania odpovede. Starý vstup P4 zobrazí pokyn pokračovať na papieri. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Ak QR smeruje na neskoršiu úlohu a prehliadač nemá potrebný postup, vstup najprv identifikuje správnu naskenovanú úlohu a vysvetlí chýbajúci postup; až na výslovné ťuknutie otvorí aktuálnu skoršiu úlohu. Nič neoznačí za vyriešené iba na základe takéhoto skenu. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
+Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia a písmená zostávajú zachované. Už dokončený P5 zostáva splnený; rozpracovaný P5 používa nové hry a odpoveď CHLADNIČKA. Stav každej hry sa ukladá do `cipko` v existujúcom postupe. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Nový P4 nemá QR; nájdený P5 obsahuje nový QR `signal=cipko`. Ten zaznamená papierový krok 4 a písmeno T bez zadávania odpovede; QR na P3 rovnako zachová papierové písmeno V z P2. Starý vstup P4 zobrazí pokyn pokračovať na papieri. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Každý platný QR otvorí priamo svoju úlohu bez overovania predchádzajúcich dokončení. Už vyriešené úlohy aj rozpracované hry sa zachovajú; uložené dokončenia môžu mať medzery. V prehľade sa po spustení dajú otvoriť všetky úlohy. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
 
 Administrácia ponecháva historické obchodné kľúče produktov, pretože ich používajú objednávky a nákupné práva. Dopredná migrácia `0003_digital_identity_names.sql` mení iba viditeľné názvy. Historická migrácia zostáva historickým záznamom. Autentifikácia, ceny, platby a serverové relácie sa nemenia. Starší osem-etapový serverový kontrakt sa nesmie slepo regenerovať zo samostatného sedemúlohového browserového prototypu. Administrácia sa touto publikáciou statického Site nenasadzuje.
 
@@ -55,6 +55,7 @@ PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/cipko.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/paper-flow.test.cjs
 node tests/mission-data.test.cjs
 node tests/digital-identity.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/qr-entry.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/progress-migration.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/narrative.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/storyboard-print.test.cjs
