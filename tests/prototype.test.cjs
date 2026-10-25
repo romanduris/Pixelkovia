@@ -238,7 +238,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await bonus.waitForLoadState();assert.ok(bonus.url().endsWith('/atlas.html'));
  assert.equal(await bonus.locator('.atlas-profile').count(),7);await bonus.close();
  await reloadAndResume(page);assert.equal(await page.locator('.atlas-cta').count(),1,'finished saved game retains bonus');
- await page.locator('[data-action="notebook"]').click();assert.equal(await page.locator('.notebook-row').count(),7);await page.locator('.dialog-close').click();
+ assert.equal(await page.locator('[data-action="notebook"]').count(),0);
  await page.locator('[data-action="reset"]').click();await page.locator('.dialog-close').click();assert.equal(await page.locator('.finale').count(),1);
  await page.locator('[data-action="reset"]').click();await page.locator('[data-action="confirm-reset"]').click();await noAtlas();
  await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);

@@ -72,7 +72,7 @@ async function fits(page,label){
   assert.equal(await page.locator('.plugy-unlock-sign').getAttribute('aria-label'),'Odomykací znak: číslica 9');
   assert.equal(await page.locator('.plugy-unlock-sign .lit').count(),21);
   assert.match(await page.locator('.plugy-party-scene').getAttribute('alt'),/Piko, Miky, Pixi a Plugy/);
-  assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*Zapamätajte[\s\S]*neskôr/);
+  assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*Zapamätajte[\s\S]*môžete telefón odložiť/);
   await page.waitForFunction(()=>document.querySelector('audio').plugySound?.gain.gain.value===1);
   assert.ok(await page.locator('#plugy-audio').evaluate(audio=>audio.plugySound?.gain.gain.value===1),'the result releases the unlocked output');
   await page.waitForFunction(()=>{const audio=document.querySelector('#plugy-audio');return audio&&!audio.paused&&audio.currentTime>0;});

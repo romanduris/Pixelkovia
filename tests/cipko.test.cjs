@@ -19,6 +19,16 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   }
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no phone overflow');
   await page.screenshot({path:`/tmp/cipko-${engine.name()}-round-${round}.png`});
+  assert.equal(await page.locator('[data-action="notebook"]').count(),0);
+  if(round===3){
+   const first=await page.locator('.cipko-pipe').first().boundingBox(),last=await page.locator('.cipko-pipe').nth(2).boundingBox();
+   for(const [port,tile,edge] of [['.cipko-inlet',first,'left'],['.cipko-outlet',last,'right']]){
+    const stub=await page.locator(port+' i').boundingBox();
+    assert.ok(Math.abs(stub.y+stub.height/2-tile.y-tile.height/2)<1,'fixed pipe port aligns with first-row tile');
+    assert.ok(Math.abs(edge==='left'?stub.x+stub.width-tile.x:stub.x-tile.x-tile.width)<1,'port touches grid edge');
+   }
+   assert.match(await page.locator('.cipko-outlet').innerText(),/VÝSTUP.*\nJADRO/);
+  }
   if(round===1){
    const from=page.locator('[data-kind="select"][data-index="2"]'),to=page.locator('[data-kind="slot"][data-index="2"]');
    if(engine===chromium){

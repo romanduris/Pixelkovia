@@ -26,9 +26,9 @@ const run=length=>Array.from({length},(_,i)=>i+1);
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:{progressVersion:2,started:true,callDone:true,stage:7,completed:run(6),hints:{}}});
   await resumeSaved();
   assert.match(await page.locator('h1').innerText(),/Úloha 7/);
-  await page.locator('[data-action="notebook"]').click();
-  assert.deepEqual(await page.locator('.notebook-row strong').allTextContents(),['S','V','E','T','L','O','·']);
-  await page.locator('.dialog-close').click();await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').click();
+  assert.equal(await page.locator('[data-action="notebook"]').count(),0);
+  assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),run(6));
+  await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').click();
   await page.locator('[data-action="next"]').click();assert.equal(await page.locator('.finale .contact.connected').count(),7);
   assert.deepEqual(errors,[]);console.log('PASS: old tasks 5–9 migrate without loss, removed task resumes at the pledge, hints shift once, new saves stay stable, SVETLO and all seven friends reach the finale.');
  }finally{await browser.close();}

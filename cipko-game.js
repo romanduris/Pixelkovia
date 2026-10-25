@@ -20,10 +20,10 @@
   function digitsHTML(c){return `<ol class="cipko-digits" aria-label="Získané číslice">${GAME.cipkoPuzzle.digits.map((n,i)=>`<li><small>${i+1}. hra</small><strong>${i<c.round||(i===c.round&&c.won)?n:'·'}</strong></li>`).join('')}</ol>`;}
   const piece=(i)=>`<span class="cipko-piece" style="--piece-x:${i%3*50}%;--piece-y:${Math.floor(i/3)*50}%" aria-hidden="true"></span>`;
   function pipe(c){
-    return `<div class="cipko-pipe-labels"><span>VSTUP →</span><span>→ JADRO</span></div><div class="cipko-pipes">${c.turns.map((rotation,i)=>{
+    return `<div class="cipko-pipe-board"><div class="cipko-port cipko-inlet"><span>VSTUP →</span><i></i></div><div class="cipko-port cipko-outlet"><span>VÝSTUP →<br>JADRO</span><i></i></div><div class="cipko-pipes">${c.turns.map((rotation,i)=>{
       const svg=`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="${pipeElbows.has(i)?'M40 0V40H80':'M0 40H80'}" transform="rotate(${rotation*90} 40 40)"/></svg>`;
       return button('pipe',i,svg,`class="cipko-pipe movable" aria-label="Otočiť potrubie ${i+1}"`);
-    }).join('')}</div>`;
+    }).join('')}</div></div>`;
   }
   function render(state){
     const c=data(state),r=c.round;

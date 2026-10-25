@@ -45,7 +45,7 @@ const KEY='zahada-v1-progress';
   await page.reload();await page.locator('.signal-restore').waitFor();
   assert.equal(await page.locator('.quest-story').count(),0);
   await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();
-  assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
+  assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*Zapamätajte[\s\S]*môžete telefón odložiť/);
   assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
   await printed.goto(BASE+'/printables.html?sheet=p2');
   assert.equal(await printed.locator('#p2 .worksheet-entry-qr').count(),0,'Pixi has no QR');
