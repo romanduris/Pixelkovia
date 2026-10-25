@@ -528,3 +528,9 @@
  .final-password-slots b{width:9mm;height:9mm}
 }
 @media screen and (max-width:600px){.final-password-slots{gap:6px}.final-password-slots b{width:28px;height:28px}.final-password-slots span{font-size:8px}}
+
+/* Use the open space beside the seals for the shared party illustration. */
+.seal-rows-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center}
+.seal-party-scene{min-width:0;margin:0}
+@media print{#p6 .seal-rows-body{gap:5mm}#p6 .seal-party-scene{padding:2mm}#p6 .seal-party-scene img{height:auto;aspect-ratio:3/1;object-fit:contain}}
+@media screen and (max-width:600px){.seal-rows-body{grid-template-columns:1fr;gap:16px}}
