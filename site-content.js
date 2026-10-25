@@ -13,7 +13,7 @@
     {id:'p4',task:'04',title:'Doručte stratenú správu',where:'Indícia pri topánkach',copy:'Celý list k úlohe 4 bez strihania ukryte do čistej suchej topánky. Deti najprv opravia mostíky a potom doručia správu. Hrá sa iba na papieri.',status:'Pracovný podklad',character:'pingy'},
     {id:'p5',task:'05',title:'Čipkove štyri hry',where:'Samostatná indícia · posteľ',copy:'List k úlohe 5 ukryte pod vankúš v detskej posteli. Jeho QR otvorí štyri hry. Po dohraní deti pokračujú na papieri.',status:'Pracovný podklad',character:'cipko'},
     {id:'p6',task:'06',title:'Poškodené pečate',where:'Indícia 6 · chladnička',copy:'List k úlohe 6 vložte do suchého uzavretého obalu do chladničky. List k úlohe 7 ukryte pod gauč. Označte „Úloha 6“.',status:'Pracovný podklad',character:'guardy'},
-    {id:'p7',task:'07',title:'Poškodený signál',where:'Samostatná indícia · pod gaučom',copy:'Vytlačenú indíciu ukryte pod gauč na dosah ruky. Na troch obrazovkách deti vyfarbia správne dvojice a získajú posledný návratový znak do spoločného hesla.',status:'Hotový list A4',character:'piko'}
+    {id:'p7',task:'07',title:'Poškodený signál',where:'Samostatná indícia · pod gaučom',copy:'Vytlačenú indíciu ukryte pod gauč na dosah ruky. Na jednej veľkej obrazovke deti vyfarbia správne dvojice a získajú posledný návratový znak do spoločného hesla.',status:'Hotový list A4',character:'piko'}
   ];
   const {money,product,purchase,productState,states}=SITE_CONFIG;
   const buyButton=(cls='btn')=>`<button class="${cls}" data-action="${purchase.action}">${purchase.label} →</button>`;

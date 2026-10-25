@@ -38,3 +38,7 @@ Caveat v fonts/Caveat.ttf zostáva pod licenciou fonts/OFL-Caveat.txt.
 ## Oprava svetelných uzlov — Úloha 4
 
 `printable-scenes/p4-svetelne-uzly.png`: nová ilustrácia cez vstavaný image_gen, odvodená od schválenej skupiny piatich postáv. Kompozícia na výšku (4 : 5) zoskupuje postavy nad sebou pri oprave svetelných uzlov a mostíkov. Bez textu, mien a riešenia; Plugy nemá chvost. Presný prompt je uložený v `printable-scenes/PROMPTS.json`. Pôvodná ilustrácia štyroch pásikov zostáva archívnym assetom.
+
+## Portréty celej partie na listoch 6 a 7
+
+`printable-scenes/p6-pecate-portrait.png` a `printable-scenes/p7-navrat-portrait.png` sú nové ilustrácie na výšku vytvorené vstavaným nástrojom imagegen podľa schválenej skupiny a pôvodného modrého Pika. Každá obsahuje všetkých sedem postáv, bez mien či popisov v bitmape. Plugy nemá káblový chvost. Východiskové obrázky zostávajú zachované. Presné zadania, referencie a výsledné cesty sú v [dokumentácii ilustrácií](../docs/ilustracie-ulohy6-7.md).

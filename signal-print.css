@@ -473,66 +473,90 @@
 .parent-guide .guide-hint strong,.parent-guide .guide-tools strong{color:#234c71}
 @media print{.parent-guide .guide-hint,.parent-guide .guide-tools p{font-size:9pt;line-height:1.4}.parent-guide .guide-hint{margin-bottom:.8mm}.parent-guide .guide-tools{padding:1.5mm 2mm;margin-bottom:2mm}.parent-guide .guide-tools p{margin-bottom:.5mm}}
 
-/* Matching seal repairs before the short final signal. */
+/* Shared visual language for the final two A4 worksheets. */
 .seal-pattern{display:block;width:42px;height:28px;flex-shrink:0}
-.seal-key-patterns{display:flex;justify-content:space-between;gap:12px;margin:10px 0}
-.seal-key-patterns>div{display:flex;align-items:center;gap:8px}
-.seal-example{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0;font-size:10px}
-.seal-row{display:flex;align-items:center;gap:12px;border-top:1px solid #bcc9d2;padding:5px 0;break-inside:avoid}
-.seal-row>span:first-of-type{flex:1}
-.seal-order{display:block;width:25px;height:25px;border:1px solid #536b78;flex-shrink:0}
+.seal-workbench,.final-workbench{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:14px;margin:14px 0;align-items:stretch}
+#p6 .seal-key,#p7 .final-signal-panel{margin:0}
+.seal-key-patterns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.seal-repair-card{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border:1px solid #a7b9cd;background:#fff;padding:7px}
+.seal-repair-card b{display:grid;place-items:center;width:22px;height:22px;background:#edf3fa;border:1px solid #b5c5d7;font:700 12px monospace;color:#234c71}
+.seal-example{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 0;font-size:10px;flex-wrap:wrap}
+.seal-example>span{font:8px monospace;letter-spacing:.3px}
+.seal-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.seal-section-heading h3{margin:0}
+.seal-section-heading>span{font:9px monospace;color:#526b83}
+.seal-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.seal-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border:1px solid #a7b9cd;background:#fff;break-inside:avoid}
+.seal-digit-block,.seal-order-block{display:flex;flex-direction:column;align-items:center;gap:4px}
+.seal-row small{font:7px monospace;color:#526b83;letter-spacing:.2px}
+.seal-digit{font:700 22px monospace;color:#172e4d}
+.seal-order{display:block;width:25px;height:25px;border:1px solid #536b78;background:white}
 .seal-answer{display:flex;align-items:center;justify-content:space-between;gap:15px}
-.seal-answer .word-break{margin-left:15px}
+.seal-party-scene,.final-party-scene{min-width:0;margin:0}
+.seal-party-scene img,.final-party-scene img{width:100%;height:auto;aspect-ratio:4/5;object-fit:contain}
+#p7 .final-workbench{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+#p7 .signal-pair-key{gap:7px;justify-content:space-between;margin:10px 0}
+#p7 .signal-pair-key span{padding:5px 8px;font-size:20px;letter-spacing:2px}
+#p7 .paper-signal-screens{grid-template-columns:1fr;max-width:320px;width:100%;gap:0;margin:14px auto 0}
+#p7 .paper-screen svg{height:auto;aspect-ratio:1}
+#p7 .final-sign-answer{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;margin:14px 0;border:1px solid #a7b9cd;background:#f6f9fc}
+#p7 .final-sign-answer .code-boxes{margin:0;flex-shrink:0}
+.final-password-slots{display:flex;justify-content:center;gap:10px;margin:15px 0}
+.final-password-slots>div{display:grid;justify-items:center;gap:5px}
+.final-password-slots span{font:9px monospace}
+.final-password-slots b{display:block;width:34px;height:34px;border:1px solid #456a74;background:white}
 @media print{
  #p6 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
  #p6 .worksheet-story p{font-size:var(--sheet-copy);line-height:1.35}
- #p6 .worksheet-puzzle{padding:2mm 3mm;margin:2mm 0}
+ #p6 .worksheet-puzzle{padding:2.5mm 3mm;margin:2mm 0}
+ #p6 .seal-workbench,#p7 .final-workbench{gap:4mm;margin:3mm 0;break-inside:avoid}
+ #p6 .seal-key,#p7 .final-signal-panel{margin:0}
  #p6 .seal-pattern{width:10.5mm;height:7mm}
- #p6 .seal-key-patterns{gap:2mm;margin:2mm 0}
- #p6 .seal-key-patterns>div{gap:1.5mm}
- #p6 .seal-row{padding:1mm 0;gap:3mm;font-size:var(--sheet-copy)}
+ #p6 .seal-key-patterns{gap:2mm;margin:2.5mm 0}
+ #p6 .seal-repair-card{gap:1.5mm;min-height:13mm;padding:1.5mm}
+ #p6 .seal-repair-card b{width:5mm;height:5mm;font-size:8pt}
+ #p6 .seal-example{gap:1.5mm;margin:2mm 0 0;font-size:7pt}
+ #p6 .seal-example>span{font-size:6pt}
+ #p6 .seal-list{gap:2mm}
+ #p6 .seal-row{padding:2mm;gap:2mm}
+ #p6 .seal-row small{font-size:5.5pt}
+ #p6 .seal-digit-block,#p6 .seal-order-block{gap:1mm}
+ #p6 .seal-digit{font-size:14pt}
  #p6 .seal-order{width:6mm;height:6mm}
- #p6 .seal-example{gap:3mm;margin:1mm 0;font-size:7pt}
- #p6 .seal-answer{padding:2mm 3mm;margin:2mm 0}
+ #p6 .seal-section-heading>span{font-size:6pt}
+ #p6 .seal-answer{padding:2mm 3mm;margin:3mm 0}
  #p6 .seal-answer p{font-size:var(--sheet-copy);line-height:1.35}
  #p6 .seal-answer .code-boxes{margin:2mm 0}
  #p6 .seal-answer .code-boxes span{width:7mm;height:7mm}
  #p6 .seal-answer .worksheet-entry-qr{flex-shrink:0}
  #p6 .seal-answer img{width:var(--sheet-qr);height:var(--sheet-qr)}
- #p7 .paper-signal-screens{width:128mm;gap:3mm 10mm}
- #p7 .paper-screen svg{height:44mm}
-}
-@media screen and (max-width:600px){
- .seal-key-patterns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
- .seal-key-patterns>div{gap:5px}
- .seal-answer{flex-direction:column;align-items:stretch}
- .seal-answer .worksheet-entry-qr{align-self:center}
- .seal-example{flex-wrap:wrap;gap:8px}
- .seal-row{gap:8px}
- .seal-row>span:first-of-type{min-width:0}
- .seal-answer .code-boxes{gap:4px}
- .seal-answer .code-boxes span{width:25px}
-}
-
-.seal-digit{font:700 22px monospace}
-.final-password-slots{display:flex;justify-content:center;gap:10px;margin:15px 0}
-.final-password-slots>div{display:grid;justify-items:center;gap:5px}
-.final-password-slots span{font:9px monospace}
-.final-password-slots b{display:block;width:34px;height:34px;border:1px solid #456a74;background:white}
-#p7 .paper-signal-screens{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;width:100%;gap:20px;margin:18px auto}
-@media print{
- #p6 .seal-digit{font-size:14pt}
- #p7 .paper-signal-screens{width:166mm;max-width:166mm;gap:6mm;margin:4mm auto}#p7 .paper-screen svg{height:62mm}
+ #p6 .seal-party-scene img{height:76mm;aspect-ratio:4/5}
+ #p7 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
+ #p7 .final-signal-panel{padding:2.5mm 3mm}
+ #p7 .final-signal-panel>p{font-size:var(--sheet-copy);line-height:1.35}
+ #p7 .signal-pair-key{gap:1.5mm;margin:2mm 0}
+ #p7 .signal-pair-key span{font-size:13pt;padding:1mm 1.5mm;letter-spacing:.5mm}
+ #p7 .paper-signal-screens{width:80mm;max-width:80mm;margin:3mm auto 0}
+ #p7 .paper-screen svg{height:80mm}
+ #p7 .final-party-scene img{height:96mm;aspect-ratio:4/5}
+ #p7 .final-sign-answer{padding:2mm 3mm;margin:3mm 0}
+ #p7 .final-sign-answer h3{font-size:9pt;margin:0 0 1mm}
+ #p7 .final-sign-answer p{font-size:var(--sheet-copy);margin:0}
+ #p7 .final-gate-panel{padding:2.5mm 3mm;margin:3mm 0}
  .final-password-slots{gap:3mm;margin:3mm 0}
  .final-password-slots span{font-size:7pt}
  .final-password-slots b{width:9mm;height:9mm}
 }
-@media screen and (max-width:600px){.final-password-slots{gap:6px}.final-password-slots b{width:28px;height:28px}.final-password-slots span{font-size:8px}}
-
-/* Use the open space beside the seals for the shared party illustration. */
-.seal-rows-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center}
-.seal-party-scene{min-width:0;margin:0}
-@media print{#p6 .seal-rows-body{gap:5mm}#p6 .seal-party-scene{padding:2mm}#p6 .seal-party-scene img{height:auto;aspect-ratio:3/1;object-fit:contain}}
-@media screen and (max-width:600px){.seal-rows-body{grid-template-columns:1fr;gap:16px}}
-
-@media screen and (max-width:600px){#p7 .paper-signal-screens{grid-template-columns:1fr;max-width:210px;gap:22px}}
+@media screen and (max-width:600px){
+ .seal-workbench,#p7 .final-workbench{grid-template-columns:1fr}
+ .seal-workbench .worksheet-scene,#p7 .final-workbench .worksheet-scene{max-width:300px;width:100%;justify-self:center}
+ .seal-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .seal-section-heading{align-items:flex-start;flex-direction:column;gap:4px}
+ .seal-answer{flex-direction:column;align-items:stretch}
+ .seal-answer .worksheet-entry-qr{align-self:center}
+ .seal-answer .code-boxes{gap:4px}
+ .seal-answer .code-boxes span{width:25px}
+ .final-password-slots{gap:6px}
+ .final-password-slots b{width:28px;height:28px}
+ .final-password-slots span{font-size:8px}
+}

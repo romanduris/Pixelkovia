@@ -22,7 +22,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
  await page.reload();assert.deepEqual(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)).completed,KEY),[1,2,3,4]);
  await require('./helpers/cipko.cjs')(page);await page.goto(BASE+'/game.html?signal=guardy');
  await page.locator('#answer').fill('5817264');await page.locator('.answer-form button').tap();assert.match(await page.locator('.phone-away').innerText(),/Telefón môžete odložiť/);await page.locator('[data-action="next"]').tap();
- assert.match(await page.locator('.task-question').innerText(),/písmeno/);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ assert.match(await page.locator('.task-question').innerText(),/návratový znak/);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.screenshot({path:'/tmp/pixelkovia-'+engine.name()+'-finale-phone.png'});
  await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();await page.locator('[data-action="next"]').tap();assert.equal(await page.locator('.finale .contact.connected').count(),7);
  assert.match(await page.locator('.finale .phone-away').innerText(),/Telefón môžete odložiť/);

@@ -43,20 +43,21 @@ assert.ok(game.stages[6].answer.includes('5817264'));
 assert.ok(game.stages[6].legacyAnswers.includes('SPOLU'),'old printed worksheets remain playable');
 assert.ok(!sheets.p6.includes('POD GAUČ'),'the hiding place is only revealed after verification');
 assert.equal((sheets.p6.match(/class="seal-row"/g)||[]).length,9);
-// Independently decode the single-symbol grids into the six expected glyphs.
+// Independently decode the ordered pairs into the single final return sign.
 const signal=game.paperPuzzles.signal;
-assert.equal(signal.columns,5);assert.equal(signal.rows,7);assert.equal(signal.screens.length,3);
-assert.deepEqual(Array.from(signal.validPairs),['○★','△□']);
-const expected=['01110/10001/10001/10001/10001/10001/01110','10001/10010/10100/11000/10100/10010/10001','01110/10001/10001/10001/10001/10001/01110'];
-const allowed=new Set(signal.validPairs);
-assert.ok(!allowed.has('★○')&&!allowed.has('□△'),'reversed pairs must stay white');
-for(const [n,cells] of signal.screens.entries()){
- assert.equal(cells.length,35);
- assert.equal(cells.map(pair=>allowed.has(pair)?'1':'0').join('').match(/.{5}/g).join('/'),expected[n]);
-}
-assert.equal((sheets.p7.match(/<rect /g)||[]).length,105);assert.ok(!sheets.p7.includes('SVETLO'),'no plaintext final password on player sheet');
+assert.equal(signal.columns,9);assert.equal(signal.rows,9);assert.equal(signal.screens.length,1);
+assert.deepEqual(Array.from(signal.validPairs),['○★','△□','+◇']);
+const expected='001111100/011000110/110000011/110000011/110000011/110000011/110000011/011000110/001111100';
+const allowed=new Set(signal.validPairs),cells=signal.screens[0];
+assert.equal(cells.length,81);
+for(const reversed of ['★○','□△','◇+'])assert.ok(!allowed.has(reversed)&&cells.includes(reversed),'reversed pairs must occur as white decoys');
+for(const pair of signal.validPairs)assert.ok(cells.includes(pair),'all three key pairs are used');
+assert.equal(cells.map(pair=>allowed.has(pair)?'1':'0').join('').match(/.{9}/g).join('/'),expected);
+assert.equal((sheets.p7.match(/<rect /g)||[]).length,81);assert.ok(!sheets.p7.includes('SVETLO'),'no plaintext final password on player sheet');
+assert.ok(sheets.p6.includes('p6-pecate-portrait.png'));
+assert.ok(sheets.p7.includes('p7-navrat-portrait.png'));
 assert.equal(game.stages[6].reward,'');assert.equal(game.stages[7].finalLetter,'O');
 assert.equal(game.stages[7].answer[0],'SVETLO');
 assert.deepEqual([...Array.from(game.stages.slice(1,6),s=>s.reward),game.stages[7].finalLetter],['S','V','E','T','L','O']);
 assert.equal(Object.keys(sheets).join(','),'p1,p2,p3,p4,p5,p6,p7,diplom');
-console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine seals → 5817264, three pair grids → O K O → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');
+console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine seals → 5817264, one 9x9 pair grid → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');
