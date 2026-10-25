@@ -439,3 +439,17 @@
 .parent-guide .guide-reward{font-size:11px;line-height:1.4;margin:0}
 .parent-guide .guide-reward>strong{color:#234c71}
 @media print{.parent-guide .guide-reward{font-size:9pt}}
+
+.guardy-phone-panel{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.guardy-phone-panel .worksheet-entry-qr{flex-shrink:0}
+@media print{
+ #p6 .guardy-phone-panel{padding:2mm 3mm;margin:2mm 0}
+ #p6 .guardy-phone-panel img{width:var(--sheet-qr);height:var(--sheet-qr)}
+ #p6 .guardy-phone-panel p{font-size:var(--sheet-copy)}
+}
+@media screen and (max-width:600px){
+ .cipko-paper-key{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .cipko-paper-digits{gap:12px}
+ .cipko-paper-answer{flex-wrap:wrap;gap:12px}
+ .maze-phone-panel,.guardy-phone-panel{flex-direction:column;align-items:stretch}
+}

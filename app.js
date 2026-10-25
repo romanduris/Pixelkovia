@@ -83,14 +83,14 @@
     if(n===1&&(success||s.completed.includes(1)))return mikyConnectionScreen();
     if(n===1)return mikyRestoreScreen();
     if(n===4)return paperDeliveryScreen();
-    if(n===5&&!success&&!s.completed.includes(5))return cipkoScreen();
+    if(n===5)return cipkoScreen();
     if(n===3)return success||s.completed.includes(3)?plugyConnectionScreen():plugyLockScreen();
     if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${sceneReader(t,'before')}<div style="max-width:430px;margin:auto">${mapHTML()}</div>${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="notebook">Váš tímový zápisník ↗</button><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div></div></section>`;
     return taskInteractionScreen(t,n);
   }
   function cipkoScreen(){
     app.classList.add('signal-mode');
-    return `<section class="signal-screen signal-task cipko-screen">${signalHeader(preview?'exit-test':'home','ČIPKOVE OPRAVY')}<div class="signal-content">${sprite('cipko')}${CIPKO_GAME.render(state())}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
+    return `<section class="signal-screen signal-task cipko-screen">${signalHeader(preview?'exit-test':'home','ČIPKOVE OPRAVY')}<div class="signal-content">${sprite('cipko')}${CIPKO_GAME.render(state())}${CIPKO_GAME.ready(state())||state().completed.includes(5)?'':'<button class="text-link" data-action="notebook">Tímový zápisník ↗</button>'}</div></section>`;
   }
   function paperDeliveryScreen(){
     app.classList.add('signal-mode');
@@ -99,7 +99,7 @@
   function taskInteractionScreen(t,n){
     app.classList.add('signal-mode');
     const done=success||state().completed.includes(n);
-    const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',5:'Zadajte miesto z papierovej tajničky.',6:'Zadajte slovo zo sľubu Pixelkov.',7:'Zadajte spoločné návratové heslo.'}[n];
+    const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',6:'Zadajte slovo zo sľubu Pixelkov.',7:'Zadajte spoločné návratové heslo.'}[n];
     const title=done?(t.id==='search'?'SĽUB POTVRDENÝ':t.character?'SPOJENIE OBNOVENÉ!':'NÁVRATOVÝ SIGNÁL PRIJATÝ'):t.label;
     const controls=`<form class="answer-form signal-form"><label for="answer">${t.id==='code'?'Návratové heslo':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${n===3?'numeric':'text'}" maxlength="40" autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
     return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`<div class="signal-reward"><span>VAŠA ZÍSKANÁ INDÍCIA</span><strong>${esc(t.reward)}</strong><small>Je uložená v tímovom zápisníku.</small></div>${STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${t.id==='code'?'Dokončiť bezpečný návrat':'Pokračovať'} →</button>`:`${STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${taskHints()}`}<button class="text-link" data-action="notebook">Tímový zápisník ↗</button></div></section>`;
@@ -273,6 +273,7 @@
       if(!state().completed.includes(2))state().completed.push(2);
       state().stage=3;success=false;save();
     }
+    if(view==='player'&&state().stage===5&&CIPKO_GAME.ready(state())&&!state().completed.includes(5))recordTaskCompletion();
     resetAnswerViewport();
     app.classList.remove('signal-mode');
     const previousAudio=app.querySelector('#miky-audio');
@@ -383,9 +384,9 @@
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
   function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3});goTop();}
-  function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||(state().stage===5&&!CIPKO_GAME.ready(state())))return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
+  function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||state().stage===5)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
     if(valid){completeTask();}
-    else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':state().stage===5?'Miesto ešte nesedí. Porovnajte číslice s kľúčom na P5 a čítajte časti slova zľava doprava.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
+    else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
   }
   function notebook(){const s=state();showDialog(`<span class="section-kicker">VÁŠ ZÁCHRANNÝ ZÁPISNÍK</span><h2>Každá stopa sa počíta.</h2><p>${s.completed.length} z ${TASK_COUNT} úloh vyriešených.</p>${contactsHTML()}${mapHTML()}${allTasks.map((t,i)=>`<div class="notebook-row"><span>${esc(t.label)}</span><strong>${s.completed.includes(i+1)?t.reward:'·'}</strong></div>`).join('')}${s.completed.includes(6)?'<div class="notice">Karta poradia: písmená z úloh 1 → 2 → 3 → 4 → 5 → 6.</div>':'<p class="quiet">Každá vyriešená úloha uloží svoj objav sem.</p>'}`);}
   document.addEventListener('click',e=>{
@@ -393,7 +394,7 @@
     if(b.classList.contains('brand')){e.preventDefault();preview=null;navigate('sales');return;}
     if(b.dataset.view){preview=null;navigate(b.dataset.view);return;}
     const a=b.dataset.action;if(!a)return;
-    if(a==='cipko'){if(cipkoSuppressClick){cipkoSuppressClick=false;return;}if(view!=='player'||state().stage!==5||state().completed.includes(5))return;CIPKO_GAME.act(state(),b.dataset.kind,Number(b.dataset.index));save();render();return;}
+    if(a==='cipko'){if(cipkoSuppressClick){cipkoSuppressClick=false;return;}if(view!=='player'||state().stage!==5||state().completed.includes(5))return;CIPKO_GAME.act(state(),b.dataset.kind,Number(b.dataset.index));if(CIPKO_GAME.ready(state())){completeTask();return;}save();render();return;}
     if(a==='toggle-copy'){
       const content=document.getElementById(b.dataset.target);if(!content)return;
       content.hidden=!content.hidden;b.setAttribute('aria-expanded',String(!content.hidden));return;
@@ -492,7 +493,7 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
   // Legacy printed QR payloads must keep working; new names are not storage keys.
-  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4,cipko:5}[new URLSearchParams(location.search).get('signal')];
+  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4,cipko:5,guardy:6}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     progress.stage=scannedSignal;

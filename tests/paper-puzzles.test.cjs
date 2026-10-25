@@ -26,7 +26,7 @@ assert.match(sheets.p5,/cipko-qr.svg/);assert.match(game.stages[5].parent,/pod v
 const cipko=game.cipkoPuzzle,key=new Map(cipko.key.map(([digit,part])=>[digit,part]));
 const destination=cipko.digits.map(digit=>key.get(digit)).join('');
 assert.equal(destination,'CHLADNIČKA');
-assert.equal(destination.normalize('NFD').replace(/[\u0300-\u036f]/g,''),game.stages[5].answer[0]);
+assert.equal(game.stages[5].answer.length,0,'P5 no longer verifies any phone answer');assert.ok(game.stages[5].solution.includes(destination));assert.match(sheets.p6,/guardy-qr.svg/);
 assert.ok(!sheets.p5.includes('CHLADNIČKA')&&!sheets.p5.includes('class="maze"'),'paper requires phone rewards instead of printing the answer or old maze');
 assert.match(game.stages[6].parent,/chladničky/);assert.match(game.stages[7].parent,/chladničky/);
 // Independently decode the printable symbol pairs into the six expected glyphs.

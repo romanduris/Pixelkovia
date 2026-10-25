@@ -17,10 +17,10 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
  await page.evaluate(({k,s})=>localStorage.setItem(k,JSON.stringify(s)),{k:KEY,s:saved});
  await page.goto(BASE+'/game.html?signal=listok');assert.equal(await page.locator('.answer-form').count(),0);assert.match(await page.locator('h1').innerText(),/papieri/);
  assert.deepEqual(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)).completed,KEY),[1,2,3]);
- await page.goto(BASE+'/game.html?signal=cipko');assert.equal(await page.locator('h1').innerText(),'Pozbieraj pixely');
+ await page.goto(BASE+'/game.html?signal=cipko');assert.equal(await page.locator('h1').innerText(),'Rozsvieť pixely po poradí');
  let current=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);assert.deepEqual(current.completed,[1,2,3,4]);assert.deepEqual(current.plugyCells,[0,1]);
  await page.reload();assert.deepEqual(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)).completed,KEY),[1,2,3,4]);
- await require('./helpers/cipko.cjs')(page);await page.locator('[data-action="next"]').tap();
+ await require('./helpers/cipko.cjs')(page);await page.goto(BASE+'/game.html?signal=guardy');
  await page.locator('#answer').fill('SPOLU');await page.locator('.answer-form button').tap();await page.locator('[data-action="next"]').tap();
  assert.match(await page.locator('.task-question').innerText(),/vyfarbite/);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.screenshot({path:'/tmp/pixelkovia-'+engine.name()+'-finale-phone.png'});

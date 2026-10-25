@@ -354,12 +354,12 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .cipko-screen p{text-align:center;line-height:1.5}
 .cipko-round{color:#8ce9e0;font:700 12px monospace;letter-spacing:2px}
 .cipko-instruction{font-size:17px;min-height:50px}
-.cipko-pixels,.cipko-memory{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.cipko-pixels,.cipko-memory{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0}
 .cipko-screen button{touch-action:manipulation}
-.cipko-pixel,.cipko-card{min-height:68px;border:1px solid #46768a;border-radius:16px;background:#152c44;color:#82f7e3;font-size:36px;box-shadow:inset 0 0 20px #24e9db13}
-.cipko-pixel{color:#fff4a9;text-shadow:0 0 18px #ffc65b}
+.cipko-pixel,.cipko-card{min-height:60px;border:1px solid #46768a;border-radius:16px;background:#152c44;color:#82f7e3;font-size:36px;box-shadow:inset 0 0 20px #24e9db13}
+.cipko-pixel{font-size:25px;color:#fff4a9;text-shadow:0 0 18px #ffc65b}
 .cipko-pixel.collected{color:#82f7e3;opacity:.4;text-shadow:none}
-.cipko-card{height:90px;color:#c6d4e8}
+.cipko-card{height:68px;color:#c6d4e8}
 .cipko-card.flipped{background:#28485c;color:#ffe398}
 .cipko-card.matched{background:#11493f;color:#9df6cf;opacity:.65}
 .cipko-digits{display:flex;gap:8px;padding:0;margin:24px 0;list-style:none;justify-content:center}
@@ -371,11 +371,11 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .cipko-status{font-size:14px;color:#b9e7dd;min-height:42px}
 .cipko-jigsaw{display:flex;align-items:center;justify-content:center;gap:16px;margin:18px 0}
 .cipko-reference{width:76px;height:76px;object-fit:contain;background:white;border-radius:8px}
-.cipko-slots{display:grid;grid-template-columns:repeat(2,1fr);width:220px;aspect-ratio:1}
+.cipko-slots{display:grid;grid-template-columns:repeat(3,1fr);width:220px;aspect-ratio:1}
 .cipko-slot,.cipko-tile{padding:0;border:2px dashed #668497;background:#1d3349;position:relative;aspect-ratio:1;overflow:hidden;color:#b3c9d9;font:24px monospace}
 .cipko-slot.placed{border:1px solid #90b5bb;background:white}
-.cipko-piece{display:block;width:100%;height:100%;background:white url('assets/characters/cipko.png') var(--piece-x) var(--piece-y)/200% 200% no-repeat}
-.cipko-tray{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;min-height:76px}
+.cipko-piece{display:block;width:100%;height:100%;background:white url('assets/characters/cipko.png') var(--piece-x) var(--piece-y)/300% 300% no-repeat}
+.cipko-tray{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:234px;margin:auto;min-height:76px}
 .cipko-tile{border:3px solid #658da3;border-radius:8px;cursor:grab;touch-action:none}
 .cipko-tile.selected{border-color:#ffe398;outline:2px solid #ffe398;outline-offset:2px}
 .cipko-pipe-labels{display:flex;flex-direction:column;gap:118px;position:absolute;left:0;top:18px;font:700 10px monospace;color:#c2eadc;pointer-events:none}
@@ -390,3 +390,8 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 @media(prefers-reduced-motion:no-preference){.cipko-pixel:active,.cipko-card:active{transform:scale(.95)}}
 .cipko-core{text-align:left!important;margin:-18px 0 20px 48px;color:#b9e7dd;font:700 12px monospace}
 .cipko-screen .cipko-tile{touch-action:none}
+
+.cipko-finished .cipko-digits{gap:10px;margin:28px 0}
+.cipko-finished .cipko-digits li{width:78px;padding:12px 0}
+.cipko-finished .cipko-digits strong{font-size:42px}
+.cipko-finished .cipko-paper-handoff{padding:18px;border:1px solid #6a829d;border-radius:14px;background:#172c43;font-size:18px}

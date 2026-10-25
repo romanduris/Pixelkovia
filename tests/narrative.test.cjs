@@ -23,7 +23,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
  for(let index=1;index<=7;index++){
   const stage=narrative[index],before=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="before"]`);
   if(index===4)await page.goto(BASE+'/game.html?signal=cipko');
-  if(index===5){await require('./helpers/cipko.cjs')(page,{touch:false});const after=page.locator('[data-story-stage="maze"][data-story-phase="after"]');assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')));await page.locator('[data-action="next"]').click();continue;}
+  if(index===5){await require('./helpers/cipko.cjs')(page,{touch:false});assert.match(await page.locator('.cipko-finished').innerText(),/pokračujte na papieri/);await page.goto(BASE+'/game.html?signal=guardy');continue;}
   if(stage.paperOnly){assert.equal(await before.count(),0,'Pixi has no phone page');assert.equal(stage.narrative.after.length,0);continue;}
   if(index===1||index===3)assert.equal(await before.count(),0,'terminal leaves the story on paper');
   else {await before.waitFor();assert.equal(normal(await before.innerText()),normal(stage.narrative.before.join(' ')),stage.id+': readable setup');}

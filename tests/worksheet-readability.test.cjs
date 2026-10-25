@@ -11,14 +11,14 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   for(const id of ['p1','p2','p3','p4','p5','p6','p7']){
    const size=await page.locator('#'+id+' h2').evaluate(n=>parseFloat(getComputedStyle(n).fontSize));assert.ok(Math.abs(size-28)<.1,id+': consistent main heading size');
   }
-  for(const selector of ['#p1 .qr-mockup img','#p3 .worksheet-entry-qr img','#p5 .worksheet-entry-qr img']){
+  for(const selector of ['#p1 .qr-mockup img','#p3 .worksheet-entry-qr img','#p5 .worksheet-entry-qr img','#p6 .worksheet-entry-qr img']){
    const size=await page.locator(selector).evaluate(n=>({w:parseFloat(getComputedStyle(n).width),h:parseFloat(getComputedStyle(n).height)}));
    assert.ok(Math.abs(size.w-32*96/25.4)<.1&&Math.abs(size.h-size.w)<.1,'every printed QR is a 32mm square');
   }
   const captions=await page.locator('#p1 .qr-mockup small,#p3 .worksheet-entry-qr small').evaluateAll(nodes=>nodes.map(n=>parseFloat(getComputedStyle(n).fontSize)));
   for(const size of captions)assert.ok(Math.abs(size-7*96/72)<.1,'equivalent QR captions print at 7pt');
   // Read the actual SVG pixels, including their format bits, rather than checking a generator setting alone.
-  for(const [file,key] of [['miky','mikyQr'],['plugy','plugyQr'],['pingy','pingyQr'],['cipko','mazeQr']]){
+  for(const [file,key] of [['miky','mikyQr'],['plugy','plugyQr'],['pingy','pingyQr'],['cipko','mazeQr'],['guardy','guardyQr']]){
    const qr=await page.evaluate(async file=>{
     const source=await fetch('assets/'+file+'-qr.svg').then(r=>r.text());
     const svg=new DOMParser().parseFromString(source,'image/svg+xml').documentElement;
@@ -41,7 +41,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    for(const variant of ['clean','damaged'])assert.equal(jsQR(new Uint8ClampedArray(qr[variant]),qr.side,qr.side)?.data,target,file+': '+variant+' QR retains its exact legacy destination');
   }
   await page.emulateMedia({media:'screen'});await page.setViewportSize({width:390,height:844});
-  for(const id of ['p1','p3','p5']){await page.goto(BASE+'/printables.html?sheet='+id);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),id+': larger QR does not overflow the phone view');}
+  for(const id of ['p1','p3','p5','p6']){await page.goto(BASE+'/printables.html?sheet='+id);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),id+': larger QR does not overflow the phone view');}
   console.log('PASS '+engine.name()+': shared 9pt primary copy/21pt titles, 32mm QRs, actual H format bits, quiet zones, decoding with an erased patch, unchanged URLs and phone layout.');
  }finally{await browser.close();}}
 })().catch(e=>{console.error(e);process.exit(1)});

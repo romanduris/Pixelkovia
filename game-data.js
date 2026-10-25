@@ -258,21 +258,19 @@ window.GAME = {
         1
       ],
       "reward": "L",
-      "answer": [
-        "CHLADNICKA"
-      ],
-      "placeholder": "Miesto z tajničky",
+      "answer": [],
+      "placeholder": "",
       "action": "Pod vankúšom nájdite P5. Naskenujte QR a zahrajte štyri krátke hry. Získané číslice zapisujte po poradí na papier.",
-      "task": "Po každej hre získate číslicu. Na P5 vyhľadajte jej časť slova a doplňte tajničku. Výsledné miesto potvrďte v telefóne.",
-      "materials": "P5: štyri políčka na číslice, dekódovací kľúč a tajnička. QR otvára štyri hry v telefóne.",
-      "mobile": "Zbieranie pixelov, skladanie obrázka, pexeso a otáčanie potrubia postupne odhalia číslice 7, 2, 9, 4.",
+      "task": "Po každej hre zapíšte číslicu na P5. Po štvrtej hre odložte telefón a podľa papierového kľúča rozlúštite ďalší úkryt.",
+      "materials": "P5: štyri políčka na číslice, dekódovací kľúč a tajnička. QR otvorí štyri náročnejšie hry v telefóne. Miesto sa v telefóne nepotvrdzuje.",
+      "mobile": "Pixely 1–16 po poradí, obrázok z 9 dielikov, pexeso so 6 pármi a potrubie z 9 otočných dielikov dajú číslice 7, 2, 9, 4. Záver iba zobrazí číslice a pošle deti na papier.",
       "solution": "7 → CH, 2 → LAD, 9 → NIČ, 4 → KA. Tajnička: CHLADNIČKA.",
       "hints": [
         "Číslice z hier zapisujte zľava doprava. Každú nájdite v kľúči na P5.",
         "Časti slova v poradí sú CH – LAD – NIČ – KA."
       ],
-      "parent": "P5 ukryte pod vankúš v detskej posteli. P6 a P7 vložte do suchého uzavretého obalu v chladničke. Štyri hry dajú 7294 → CHLADNIČKA.",
-      "transition": "Čipko pridá L. P6 a P7 čakajú v chladničke.",
+      "parent": "P5 ukryte pod vankúš v detskej posteli. P6 a P7 sú v suchom uzavretom obale v chladničke. Štyri hry dajú 7294 → CHLADNIČKA; nič sa nezadáva do telefónu. QR na P6 otvorí úlohu 6.",
+      "transition": "Po štvrtej hre sa uloží L. Telefón zobrazí 7294 a pokyn dokončiť tajničku na P5. P6 a P7 sú v chladničke; QR na P6 otvorí úlohu 6.",
       "character": "cipko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -280,11 +278,11 @@ window.GAME = {
       "narrative": {
         "before": [
           "Výpadok roztrúsil pixely a pomiešal našu cestu. Pomôžete mi so štyrmi malými opravami?",
-          "Naskenujte QR na tomto liste. Po každej hre zapíšte získanú číslicu do políčka. Podľa kľúča zložte tajničku a objavíte ďalší úkryt."
+          "Naskenujte QR na tomto liste. Po každej hre zapíšte získanú číslicu do políčka. Po štvrtej hre pokračujte na papieri a pomocou kľúča odhaľte ďalší úkryt."
         ],
         "after": [
-          "Všetky štyri opravy sa podarili! Ďakujem a pridávam písmeno L.",
-          "Rozlúštili ste CHLADNIČKA. Nájdite v nej indíciu Úloha 6. Pri návratovej bráne už čaká náš ochranca."
+          "Štyri hry sú hotové! Získali ste číslice 7, 2, 9, 4.",
+          "Pokračujte na papieri P5. Pomocou kľúča odhaľte, kde sa skrýva ďalšia indícia. Telefón môžete odložiť."
         ]
       }
     },
@@ -303,9 +301,9 @@ window.GAME = {
         "SPOLU"
       ],
       "placeholder": "Slovo z piatich riadkov",
-      "action": "Nájdite v chladničke indíciu označenú Úloha 6. Vyberte sľub Pixelkov a kartu poradia.",
+      "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na P6. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
-      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta poradia. Priložte P7 s poškodeným signálom na finále.",
+      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta poradia. Priložte P7 s poškodeným signálom na finále. QR na P6 otvorí úlohu 6.",
       "mobile": "Overí slovo SPOLU, pripojí Guardyho a uloží jeho písmeno O aj kartu poradia do zápisníka.",
       "solution": "Prvé písmená viet tvoria SPOLU. Karta určuje poradie šiestich nazbieraných písmen podľa úloh.",
       "hints": [
@@ -1293,7 +1291,8 @@ window.GAME = {
       "NIČ",
       "KA"
     ]
-  }
+  },
+  "guardyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=guardy"
 };
 
 // All reading surfaces derive from the same authored story.

@@ -6,7 +6,7 @@ const context={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);
 const game=context.window.GAME;
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['POSTELI'],['CHLADNICKA'],['SPOLU'],['SVETLO']];
+const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['POSTELI'],[],['SPOLU'],['SVETLO']];
 assert.equal(game.stages.length,9);
 assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),58);
 assert.equal(new Set(game.stages.map(s=>s.id)).size,9);
@@ -127,8 +127,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.locator('.gm-dramaturgy,.studio-stage-details').count(),0,'developer notes are removed from all stages');
  // GM stage previews remain isolated from real progress.
  await page.locator('[data-action="test"][data-stage="5"]').click();await noAtlas();
- await require('./helpers/cipko.cjs')(page,{touch:false});await page.locator('.success-card').waitFor();
- assert.equal(await page.locator('.success-card').count(),1);
+ await require('./helpers/cipko.cjs')(page,{touch:false});await page.locator('.cipko-finished').waitFor();
+ assert.equal(await page.locator('.cipko-finished').count(),1);
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.locator('[data-action="exit-test"]').click();
  await page.locator('[data-action="test"][data-stage="0"]').click();await page.locator('.message-status [data-action="close"]').click();
@@ -183,7 +183,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
   if(i===3){const indexes=await page.evaluate(()=>GAME.plugyPuzzle.grid.flat().flatMap((value,index)=>GAME.plugyPuzzle.values.includes(value)?[index]:[]));for(const index of indexes)await page.locator('[data-cell="'+index+'"]').click();
-  }else if(i===5){await require('./helpers/cipko.cjs')(page,{touch:false});}else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
+  }else if(i===5){await require('./helpers/cipko.cjs')(page,{touch:false});await page.goto(BASE+'/game.html?signal=guardy');continue;}else{await page.locator('#answer').fill(legacyAnswers[i-1][0].toLowerCase());await page.locator('.answer-form button').click();}
   if(i===3)await page.locator('.plugy-connected').waitFor();
   assert.equal(await page.locator('.success-card').count(),1,`stage ${i} completes`);await noAtlas();
   if(i<=6&&i!==3)assert.equal(await page.locator('.success-character').count(),1);
