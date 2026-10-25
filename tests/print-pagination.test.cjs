@@ -4,7 +4,7 @@ const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:pa
 const {spawnSync}=require('node:child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const footers=['ŤAHÁK PRE RODIČA','ZÁCHRANNÝ SIGNÁL · P1','P2 / Indícia pri okne','P3 / Indícia pod stoličkou','P4 / Indícia pri topánkach','P5 / Indícia v posteli','P6 / Indícia v chladničke','POŠKODENÝ NÁVRATOVÝ SIGNÁL · P7','DIPLOM ZÁCHRANCOV PIXELKOV'];
+const footers=['ŤAHÁK PRE RODIČA','ZÁCHRANNÝ SIGNÁL','Úloha 2 / Indícia pri okne','Úloha 3 / Indícia pod stoličkou','Úloha 4 / Indícia pri topánkach','Úloha 5 / Indícia v posteli','Úloha 6 / Indícia v chladničke','POŠKODENÝ NÁVRATOVÝ SIGNÁL','DIPLOM ZÁCHRANCOV PIXELKOV'];
 function pages(file){
  const r=spawnSync('python3',['-c','import json,sys;from pypdf import PdfReader;print(json.dumps([p.extract_text() for p in PdfReader(sys.argv[1]).pages]))',file],{encoding:'utf8'});
  if(r.status!==0)throw new Error(r.stderr);return JSON.parse(r.stdout);
@@ -22,6 +22,7 @@ function pages(file){
    await page.pdf({path:file,format,preferCSSPageSize:true,printBackground:true,displayHeaderFooter});
    const text=pages(file);assert.equal(text.length,9,`${format}: one page per sheet, no blank or detached-footer pages`);
    for(const [i,footer] of footers.entries())assert.ok(text[i].includes(footer),`${format}: footer ${footer} stays with its sheet`);
+   assert.ok(!/\bP[1-7]\b/.test(text.join(' ')), 'printed pages use the unified task labels');
    assert.ok(text[2].includes('KODGDM'),'P2 cipher remains on the same page as its footer');
   }
   for(const format of ['A4','Letter']){
