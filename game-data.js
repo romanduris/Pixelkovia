@@ -77,7 +77,7 @@ window.GAME = {
         "Tri marcové záznamy majú rovnaký dátum. O ich poradí rozhodne presný čas: od skoršieho po neskorší."
       ],
       "parent": "Obálka 1 v kúpeľni obsahuje iba celý list k úlohe 1. Ústrižky vystrihujú až deti. Úloha 2 patrí do samostatnej obálky 2 pri okne. Farebná tlač je odporúčaná, čiernobiela na bielom papieri je plne hrateľná.",
-      "transition": "Vypočujte si Mikyho odkaz a zapamätajte si indíciu S. Pri okne nájdite ďalšiu indíciu a rozlúštite Pixiin odkaz na papieri.",
+      "transition": "Vypočujte si Mikyho odkaz a zapamätajte si návratový znak S. Pri okne nájdite ďalšiu indíciu a rozlúštite Pixiin odkaz na papieri.",
       "character": "miky",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -120,7 +120,7 @@ window.GAME = {
       "action": "Nájdite indíciu pri okne. Vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
       "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštenú vetu zapíšte do políčok na pracovnom liste a choďte podľa nej hľadať ďalšiu indíciu.",
       "materials": "Úloha 2: Pixiin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v indícii 2 pri okne. Úloha 3: samostatná indícia prilepená zo spodnej strany sedadla stoličky.",
-      "mobile": "Čisto papierová úloha bez QR kódu, hráčskej stránky, potvrdenia a textu po vyriešení. Rozlúštená indícia vedie pod stoličky. Telefón sa použije až pri QR kóde na Plugyho liste k úlohe 3; vtedy sa zachová aj písmeno V.",
+      "mobile": "Čisto papierová úloha bez QR kódu, hráčskej stránky, potvrdenia a textu po vyriešení. Rozlúštená indícia vedie pod stoličky. Telefón sa použije až pri QR kóde na Plugyho liste k úlohe 3; vtedy sa zachová aj návratový znak V.",
       "solution": "Posun −3: KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Deti hľadajú indíciu Úloha 3 prilepenú zospodu sedadla. Telefón sa v tejto úlohe nepoužíva.",
       "hints": [
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
@@ -164,7 +164,7 @@ window.GAME = {
       "task": "Na papieri zistite hodnoty trojuholníka, kruhu a štvorca. Naskenujte QR kód a v tabuľke označte všetky políčka s týmito číslami.",
       "materials": "Úloha 3: tri rovnice s miestom na hodnoty a QR. Úloha 4: cesta doručovateľa v topánke; Úloha 5: samostatný list pod vankúšom v detskej posteli.",
       "mobile": "QR z listu k úlohe 3 otvorí tabuľku 5 × 7. Správny výber 2, 3 a 4 odhalí 9, odomkne digitálny most a uloží E. Nový dabing čaká na dodanie; indíciu k ďalšiemu miestu obsahuje textová správa.",
-      "solution": "△ = 3, ○ = 2, □ = 4. V tabuľke označte všetky políčka s číslami 2, 3 a 4 a žiadne ďalšie. Rozsvietené políčka vytvoria číslicu 9; most sa odomkne a tím získa písmeno E.",
+      "solution": "△ = 3, ○ = 2, □ = 4. V tabuľke označte všetky políčka s číslami 2, 3 a 4 a žiadne ďalšie. Rozsvietené políčka vytvoria číslicu 9; most sa odomkne a tím získa návratový znak E.",
       "hints": [
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
@@ -211,15 +211,15 @@ window.GAME = {
       "placeholder": "Miesto z doručenej správy",
       "action": "Nájdite pracovný list pri topánkach. Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
       "task": "Uzol je veľký kruh. Mostík je cesta so šípkou medzi kruhmi. Opravte 12 mostíkov. Bodky na mostíku porovnajte s kľúčom. Dopíšte symbol na bodkovanú čiaru. Nájdite cestu. Od ŠTARTU sledujte šípky. Vyberajte mostík s rovnakým symbolom, aký má kruh, a cestu vyfarbujte. Prečítajte odkaz. Písmená z prejdených kruhov zapisujte po poradí do políčok. Kruhy bez písmena len prejdite.",
-      "materials": "Úloha 4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička indície T. List k úlohe 5 ukryte pod vankúš v detskej posteli.",
+      "materials": "Úloha 4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička návratového znaku T. List k úlohe 5 ukryte pod vankúš v detskej posteli.",
       "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie listu k úlohe 5; jeho QR otvorí úlohu 5.",
-      "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Písmená na správnej ceste dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
+      "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Písmená na správnej ceste dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Návratový znak: T.",
       "hints": [
         "Uzol je veľký kruh a mostík je cesta medzi kruhmi. V prázdnom rámiku mostíka svieti jeden z troch bodov. V servisnom kľúči nájdite rovnakú polohu a na bodkovanú čiaru dokreslite symbol.",
         "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte písmená z prejdených kruhov. Kruh bez písmena do odpovede nič nepridá."
       ],
       "parent": "Celý list k úlohe 4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. List k úlohe 5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. List k úlohe 4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv opravia všetkých 12 mostíkov podľa trojbodového kľúča, potom vyfarbia cestu a zapisujú písmená z prejdených kruhov.",
-      "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s písmenom T si odložte. V detskej posteli pod vankúšom nájdite ďalšiu indíciu a jej QR kódom otvorte ďalšiu úlohu.",
+      "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s návratovým znakom T si odložte. V detskej posteli pod vankúšom nájdite ďalšiu indíciu a jej QR kódom otvorte ďalšiu úlohu.",
       "character": "pingy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -270,7 +270,7 @@ window.GAME = {
         "Časti slova v poradí sú CH – LAD – NIČ – KA."
       ],
       "parent": "List k úlohe 5 ukryte pod vankúš v detskej posteli. List k úlohe 6 je v suchom uzavretom obale v chladničke. List k úlohe 7 ukryte pod gauč. Štyri hry dajú 7294 → CHLADNIČKA; nič sa nezadáva do telefónu. QR na liste k úlohe 6 otvorí úlohu 6.",
-      "transition": "Po štvrtej hre získate L a číslice 7294. Dokončite tajničku na papieri a choďte hľadať ďalšiu indíciu do chladničky. Naskenujte QR na nájdenom liste.",
+      "transition": "Po štvrtej hre získate návratový znak L a číslice 7294. Dokončite tajničku na papieri a choďte hľadať ďalšiu indíciu do chladničky. Naskenujte QR na nájdenom liste.",
       "character": "cipko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -326,7 +326,7 @@ window.GAME = {
           "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
           "Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.",
           "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
-          "Choďte sa tam pozrieť. Nájdete poslednú indíciu do spoločného hesla. Pridajte ju k písmenám, ktoré ste získali cestou. Už sme naozaj blízko!"
+          "Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!"
         ]
       },
       "character": "guardy",
@@ -338,7 +338,7 @@ window.GAME = {
     },
     {
       "id": "code",
-      "title": "Posledná indícia a návratová brána",
+      "title": "Posledný návratový znak a návratová brána",
       "label": "Úloha 7 – Pod gaučom",
       "icon": "assets/location-icons/sofa.svg",
       "time": [
@@ -352,13 +352,13 @@ window.GAME = {
       ],
       "placeholder": "Šesťpísmenové heslo",
       "action": "Pod gaučom nájdite posledný list. Podľa servisného kľúča vyfarbite tri obrazovky a nájdite písmeno, ktoré sa opakuje.",
-      "task": "Na papieri vyfarbite dvojice ○★ a △□ presne v tomto poradí. Z troch odhalených písmen vyberte to, ktoré sa opakuje. Opakujúce sa písmeno pridajte za písmená z úloh 1–5 a celé heslo zadajte do návratovej brány.",
-      "materials": "Úloha 7: tri obrazovky 5 × 7 políčok, spolu 105 políčok. Presné dvojice ○★ a △□ odhalia O, K, O. Opakujúce sa O je posledná indícia.",
+      "task": "Na papieri vyfarbite dvojice ○★ a △□ presne v tomto poradí. Z troch odhalených písmen vyberte to, ktoré sa opakuje. Opakujúce sa písmeno je váš posledný návratový znak. Pridajte ho za návratové znaky z úloh 1–5 a celé heslo zadajte do návratovej brány.",
+      "materials": "Úloha 7: tri obrazovky 5 × 7 políčok, spolu 105 políčok. Presné dvojice ○★ a △□ odhalia O, K, O. Opakujúce sa O je posledný návratový znak.",
       "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
       "solution": "Vyfarbite iba presné dvojice ○★ a △□; opačné poradie neplatí. Tri obrazovky odhalia O, K, O. Opakuje sa O. Pridajte ho k S, V, E, T, L z úloh 1–5 → SVETLO.",
       "hints": [
         "Porovnávajte oba symboly aj ich poradie. Vyfarbujte ○★ a △□; dvojice ★○ a □△ nechajte biele.",
-        "Obrazovky odhalia O, K, O. Poslednou indíciou je písmeno, ktoré sa opakuje."
+        "Obrazovky odhalia O, K, O. Návratovým znakom je písmeno, ktoré sa opakuje."
       ],
       "parent": "List k úlohe 7 ukryte pod gauč na dosah ruky. Nestrihá sa. Presné dvojice ○★ a △□ na troch obrazovkách 5 × 7 odhalia O, K, O. Deti vyberú opakujúce sa O, pridajú ho k S, V, E, T, L a heslo SVETLO odošlú v telefóne.",
       "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
@@ -367,8 +367,8 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Cesta domov je už bezpečná. Poslednú indíciu som ukryl do troch overovacích obrazoviek.",
-          "Vyfarbite iba políčka s dvojicami zo servisného kľúča. Dôležité sú oba symboly aj ich poradie. Na každej obrazovke sa objaví jedno písmeno. Vyberte to, ktoré sa opakuje, pridajte ho za písmená z úloh 1–5 a celé heslo zadajte do návratovej brány."
+          "Cesta domov je už bezpečná. Posledný návratový znak som ukryl do troch overovacích obrazoviek.",
+          "Vyfarbite iba políčka s dvojicami zo servisného kľúča. Dôležité sú oba symboly aj ich poradie. Na každej obrazovke sa objaví jedno písmeno. Vyberte to, ktoré sa opakuje, pridajte ho za návratové znaky z úloh 1–5 a celé heslo zadajte do návratovej brány."
         ],
         "after": [
           "SVETLO! Návratová brána sa otvorila. Všetci sa môžeme bezpečne vrátiť domov.",
@@ -576,7 +576,7 @@ window.GAME = {
       "duration": "cca 35–40 sekúnd",
       "model": "ElevenLabs v3",
       "direction": "Pokojný, spoľahlivý ochranca. Na začiatku úľava a poďakovanie, pri poslednom signále zvedavosť. Úkryt pod gaučom vysloviť zreteľne s krátkou pauzou.",
-      "prompt": "[relieved, proud] Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!\n\n[warm, grateful] Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.\n\n[curious, then certain] Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.\n\n[encouraging, cheerful] Choďte sa tam pozrieť. Nájdete poslednú indíciu do spoločného hesla. Pridajte ju k písmenám, ktoré ste získali cestou. Už sme naozaj blízko!",
+      "prompt": "[relieved, proud] Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!\n\n[warm, grateful] Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.\n\n[curious, then certain] Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.\n\n[encouraging, cheerful] Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!",
       "recordingStatus": "Text je pripravený na nahovorenie. Guardyho nahrávka ešte nie je dodaná."
     }
   },
@@ -1256,7 +1256,7 @@ window.GAME = {
     "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
     "Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.",
     "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
-    "Choďte sa tam pozrieť. Nájdete poslednú indíciu do spoločného hesla. Pridajte ju k písmenám, ktoré ste získali cestou. Už sme naozaj blízko!"
+    "Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!"
   ]
 };
 
