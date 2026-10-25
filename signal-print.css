@@ -271,3 +271,42 @@
 .pingy-phone-panel .worksheet-entry-qr{text-align:center}
 @media(max-width:500px){.pingy-phone-panel{grid-template-columns:minmax(0,1fr) 98px;gap:10px}}
 @media print{.pingy-phone-panel{grid-template-columns:minmax(0,1fr) 29mm;gap:4mm}.pingy-phone-panel .worksheet-entry-qr img{width:22mm;height:22mm}.pingy-phone-panel .worksheet-entry-qr small{font-size:5pt}}
+
+/* Paper-only delivery and the six restored signal screens. */
+.delivery-map{display:block;width:100%;height:auto;margin:8px 0}
+.route-symbol{text-anchor:middle;dominant-baseline:middle;font:18px Arial,sans-serif;fill:#172e4d}
+.route-letter{text-anchor:middle;font:700 19px Arial,sans-serif;fill:#172e4d}
+.route-label{text-anchor:middle;font:700 13px Arial,sans-serif;fill:#172e4d}
+.delivery-answer{border:2px solid #456a74;padding:12px;margin:12px 0}
+.delivery-answer h3{font:700 17px/1.4 Arial,sans-serif;margin:0 0 10px}
+.delivery-answer .code-boxes,.signal-paper-sheet .code-boxes{justify-content:center;gap:8px}
+.delivery-answer .code-boxes span,.signal-paper-sheet .code-boxes span{width:38px;height:38px;border:1px solid #456a74}
+.signal-pair-key{display:flex;justify-content:center;gap:25px;margin:10px 0}
+.signal-pair-key span{border:1px solid #536b78;padding:6px 18px;font:24px Arial,sans-serif;letter-spacing:4px;background:white}
+.paper-signal-screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 20px;margin:15px 0}
+.paper-screen{min-width:0;break-inside:avoid}
+.paper-screen h3{text-align:center;font:700 10px monospace;letter-spacing:1px;margin:0 0 6px}
+.paper-screen svg{display:block;width:100%;height:auto;overflow:visible}
+.maze-phone-panel{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.maze-phone-panel .worksheet-entry-qr{flex-shrink:0}
+@media print{
+ #p4 .worksheet-heading,#p7 .worksheet-heading{margin-bottom:2mm}
+ #p4 .worksheet-story,#p7 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
+ #p4 .worksheet-story p,#p7 .worksheet-story p{font-size:8.5pt;line-height:1.4}
+ #p4 .worksheet-mission{padding:2mm 3mm;margin:2mm 0}
+ #p4 .delivery-map{width:100%;height:121mm;margin:1mm 0}
+ .delivery-answer{padding:2mm 3mm;margin:2mm 0}
+ .delivery-answer h3{font-size:11pt;margin-bottom:2mm}
+ .delivery-answer .code-boxes span,.signal-paper-sheet .code-boxes span{width:9mm;height:9mm}
+ #p7 .worksheet-mission{padding:2mm 3mm;margin:2mm 0}
+ .signal-pair-key{gap:8mm;margin:1.5mm 0}
+ .signal-pair-key span{font-size:16pt;padding:1mm 4mm}
+ .paper-signal-screens{gap:3mm 8mm;margin:3mm auto;width:148mm}
+ .paper-screen h3{font-size:6.5pt;margin-bottom:1mm}
+ .paper-screen svg{height:53mm}
+ #p7 .worksheet-answer{margin:1mm 0 2mm}
+ #p7 .worksheet-answer h3{font-size:8pt;margin:0 0 1mm}
+ #p5 .maze-phone-panel{padding:1mm 3mm;margin-bottom:1mm}
+ #p5 .maze-phone-panel img{width:18mm;height:18mm}
+ #p5 .maze-phone-panel p{font-size:8pt}
+}

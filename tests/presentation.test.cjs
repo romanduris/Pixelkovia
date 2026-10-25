@@ -26,13 +26,13 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   }
   await page.goto(BASE+'/parent.html');
   assert.equal(await page.locator('.portal-header').count(),1);
-  assert.equal(await page.locator('.material-card').count(),6);
+  assert.equal(await page.locator('.material-card').count(),7);
   assert.equal(await page.locator('[data-check]').count(),14);
   assert.equal(await page.locator('.prep-table tbody tr').count(),6);
   assert.ok((await page.locator('.prototype-access').textContent()).includes('Nie je produkčne chránený'));
   assert.ok(await page.locator('[data-action="start"]').isDisabled());
   await page.locator('[data-check="printed"]').check();
-  for(const id of ['p1','p2','p3','p4','p5','p6','diplom']){
+  for(const id of ['p1','p2','p3','p4','p5','p6','p7','diplom']){
    const link=page.locator(`a[download][href="assets/printables/${id}.pdf"]`);assert.equal(await link.count(),1);
    const response=await page.request.get(BASE+'/assets/printables/'+id+'.pdf');assert.equal(response.status(),200);
    const pdf=await response.body();assert.ok(pdf.subarray(0,5).toString()==='%PDF-');
@@ -55,7 +55,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    assert.equal(await toggle.getAttribute('aria-expanded'),'false');
    assert.ok(!await block.locator('.storyboard-content').isVisible(),'whole stage content collapses');
    assert.ok(await block.locator('.storyboard-head h2').isVisible());
-   if(await block.getAttribute('id')==='gm-document')assert.equal(await block.locator('[data-action="test"]').count(),0);
+   if(['gm-document','gm-cipher'].includes(await block.getAttribute('id')))assert.equal(await block.locator('[data-action="test"]').count(),0);
    else assert.ok(await block.locator('.storyboard-head [data-action="test"]').isVisible(),'testing stays available while the stage is collapsed');
    await toggle.focus();await page.keyboard.press('Enter');
    assert.equal(await toggle.getAttribute('aria-expanded'),'true','keyboard expands the same stage');
@@ -114,6 +114,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await page.locator('#gm-document [data-action="test"]').count(),0,'paper Pixi has no player test');
   assert.equal(await page.locator('#gm-document .storyboard-continuation').count(),0);
   for(let n=3;n<=7;n++){
+   if(n===4)continue;
    await page.locator(`[data-action="test"][data-stage="${n}"]`).click();
    assert.equal(await page.locator('.signal-task').count(),1,'stage '+n+' opens its direct interaction');
    assert.equal(await page.locator('.task-main, .task-aside, .scene-reader, .task-instruction').count(),0);
@@ -153,6 +154,6 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    }
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: separate entries, preserved hero, sales offer and isolated purchase state, seven PDF downloads, customer checklist, playable StoryBoard media, exact worksheet copy, exact authored ElevenLabs TTS prompts, refresh-to-home without save loss, mobile and desktop.');
+  console.log('PASS: separate entries, preserved hero, sales offer and isolated purchase state, eight PDF downloads, customer checklist, playable StoryBoard media, exact worksheet copy, exact authored ElevenLabs TTS prompts, refresh-to-home without save loss, mobile and desktop.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

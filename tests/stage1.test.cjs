@@ -63,7 +63,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     assert.ok(await start.isDisabled(),'undoing any mandatory placement relocks launch');
     await page.locator('[data-check="bathroom"]').check();
     // Check all links and actual downloads including the composed bundle.
-    for (const id of ['p1','p2','p3','p4','p5','p6','diplom','vsetky-materialy']) {
+    for (const id of ['p1','p2','p3','p4','p5','p6','p7','diplom','vsetky-materialy']) {
       const response = await page.request.get(BASE+`/assets/printables/${id}.pdf`);
       assert.equal(response.status(),200);
       assert.equal((await response.body()).subarray(0,5).toString(),'%PDF-');
@@ -90,7 +90,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     await page.screenshot({path:'/tmp/v5-launch-mobile.png'});
     await start.click();
     assert.ok(page.url().endsWith('/game.html'));
-    assert.equal(await page.locator('.signal-task').count(),1,'old saved task resumes');
+    assert.match(await page.locator('.signal-content h1').innerText(),/Pokračujte na papieri/,'old saved task resumes at paper handoff');
     assert.equal(await page.locator('a[href="index.html"],a[href="storyboard.html"]').count(),0);
     await page.locator('[data-action="home"]').click();
     assert.ok(page.url().endsWith('/parent.html'));

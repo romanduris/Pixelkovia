@@ -82,9 +82,14 @@
     const toolbar=`<div class="task-toolbar"><button class="text-link" ${preview?'data-action="exit-test"':'data-action="home"'}>← ${preview?'Späť do storyboardu':'Prehľad dobrodružstva'}</button><span class="time-pill">${preview?'TEST ETAPY · ':''}${t.label} · ~${total(t)} min</span>${s.callDone?'<button class="text-link" data-action="reopen-message">Pikova správa ▷</button>':''}</div>`;
     if(n===1&&(success||s.completed.includes(1)))return mikyConnectionScreen();
     if(n===1)return mikyRestoreScreen();
+    if(n===4)return paperDeliveryScreen();
     if(n===3)return success||s.completed.includes(3)?plugyConnectionScreen():plugyLockScreen();
     if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${sceneReader(t,'before')}<div style="max-width:430px;margin:auto">${mapHTML()}</div>${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="notebook">Váš tímový zápisník ↗</button><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div></div></section>`;
     return taskInteractionScreen(t,n);
+  }
+  function paperDeliveryScreen(){
+    app.classList.add('signal-mode');
+    return `<section class="signal-screen"><div class="signal-content">${sprite('pingy')}<h1 tabindex="-1">Pokračujte na papieri</h1><p>Pri topánkach vás čaká list P4 s cestou doručovateľa. Vyriešte ju ceruzkou a choďte podľa doručenej správy hľadať.</p><p>Telefón zatiaľ odložte. Ďalšiu úlohu otvoríte QR kódom na nájdenom liste P5.</p><p>Písmeno T z listu P4 si odložte k ostatným indíciám.</p><button class="text-link" data-action="${preview?'exit-test':'home'}">← Prehľad hry</button></div></section>`;
   }
   function taskInteractionScreen(t,n){
     app.classList.add('signal-mode');
@@ -267,6 +272,9 @@
     if(view==='player'&&state().stage===2&&state().completed.includes(1)){
       if(!state().completed.includes(2))state().completed.push(2);
       state().stage=3;success=false;save();
+    }
+    if(view==='player'&&state().stage===4&&state().completed.includes(4)){
+      state().stage=5;success=false;save();
     }
     resetAnswerViewport();
     app.classList.remove('signal-mode');
@@ -470,7 +478,7 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
   // Legacy printed QR payloads must keep working; new names are not storage keys.
-  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4}[new URLSearchParams(location.search).get('signal')];
+  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4,cipko:5}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     if(progress.stage===0)progress.stage=1;
@@ -479,6 +487,10 @@
       progress.stage=Math.max(3,progress.stage);
     }
     if(scannedSignal===4&&progress.completed.includes(3))progress.stage=Math.max(4,progress.stage);
+    if(scannedSignal===5&&progress.completed.includes(3)){
+      if(!progress.completed.includes(4))progress.completed.push(4);
+      progress.stage=Math.max(5,progress.stage);
+    }
     // Identify the scanned sheet instead of silently showing an earlier task.
     if(scannedSignal>progress.stage)qrPrerequisite=scannedSignal;
     view='player';save();

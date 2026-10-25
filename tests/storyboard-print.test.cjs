@@ -31,7 +31,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
 
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');
- assert.equal(await printed.locator('.sheet').count(),8);assert.equal(await printed.locator('.sheet:visible').count(),8);
+ assert.equal(await printed.locator('.sheet').count(),9);assert.equal(await printed.locator('.sheet:visible').count(),9);
  assert.equal(normalize(await bathroom.locator('.worksheet-text').innerText()),normalize(await printed.locator('.miky-print-story').innerText()+' '+await printed.locator('.miky-print-mission').innerText()));
  assert.equal(normalize((await bathroom.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator('#rodicovsky-navod .adult-help[data-stage="envelope"] p').allTextContents()).join(' ')));
  assert.equal(normalize(await bathroom.locator('.gm-solution').innerText()),normalize(await printed.locator('#rodicovsky-navod .guide-stage[data-stage="envelope"] .gm-solution').innerText()));
@@ -45,7 +45,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
   const block=page.locator('#gm-'+id),toggle=block.locator('.storyboard-toggle');
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
   assert.equal(await block.locator('.storyboard-content>.gm-instructions').count(),1,id+': one shared Game master section');
-  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),id==='document'?0:1);
+  assert.equal(await block.locator('.storyboard-head [data-action="test"]').count(),['document','cipher'].includes(id)?0:1);
   assert.equal(normalize((await block.locator('.adult-help p').allTextContents()).join(' ')),normalize((await printed.locator(`.guide-stage[data-stage="${id}"] .adult-help p`).allTextContents()).join(' ')),id+': parent instructions match storyboard');
  }
  assert.equal(await page.locator('#gm-digital').count(),0,'the separate symbol puzzle is removed');
@@ -54,7 +54,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(normalize(await pixi.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Pixi story remains in the shared worksheet text');
 
  assert.match(await printed.locator('#p5 .note').innerText(),/Úlohu 6/);
- assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.locator('#p6 .card').textContent()),'final password shows the printed ordering card');
+ assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.evaluate(()=>{const box=document.createElement('div');box.innerHTML=PRINT_MATERIALS.summary('p7','code');return box.textContent;})),'final password shows the printed ordering card');
  for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols'&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
   const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
   assert.ok(await panel.isHidden());await toggle.click();assert.ok(await panel.isVisible());
@@ -72,8 +72,8 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await page.locator('dialog video').getAttribute('src'),'assets/PicoVideo.mp4');
  await page.locator('.dialog-close').click();assert.ok(await page.locator('dialog video').evaluate(video=>video.paused));
  assert.equal(await printed.locator('header>a').getAttribute('href'),'storyboard.html');assert.equal(await printed.locator('header>a').innerText(),'Späť na storyboard');
- for(const id of ['p1','p2','p3','p4','p5','p6']){await printed.goto(BASE+'/printables.html?internalPreview=1#'+id);await printed.waitForFunction(id=>Math.abs(document.getElementById(id).getBoundingClientRect().top)<40,id);assert.equal(await printed.locator('.sheet:visible').count(),8);}
- const map={envelope:'p1',document:'p2',symbols:'p3',cipher:'p4',maze:'p5',search:'p6',code:'p6'};
+ for(const id of ['p1','p2','p3','p4','p5','p6','p7']){await printed.goto(BASE+'/printables.html?internalPreview=1#'+id);await printed.waitForFunction(id=>Math.abs(document.getElementById(id).getBoundingClientRect().top)<40,id);assert.equal(await printed.locator('.sheet:visible').count(),9);}
+ const map={envelope:'p1',document:'p2',symbols:'p3',cipher:'p4',maze:'p5',search:'p6',code:'p7'};
  for(const [stage,sheet] of Object.entries(map))assert.ok((await page.locator('#gm-'+stage+' .worksheet-image').getAttribute('href')).endsWith('#'+sheet));
  await printed.goto(BASE+'/printables.html?sheet=p1');assert.equal(await printed.locator('.sheet:visible').count(),1);assert.ok(await printed.locator('#rodicovsky-navod').isHidden());assert.ok(!(await printed.locator('#p1').innerText()).includes('741296'));
  await printed.close();
@@ -81,7 +81,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  const saved=JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}});
  await page.evaluate(saved=>localStorage.setItem('zahada-v1-progress',saved),saved);await page.reload();
  for(let stage=0;stage<9;stage++){
-  if(stage===2){assert.equal(await page.locator('#gm-document [data-action="test"]').count(),0);assert.equal(await page.locator('#gm-document .storyboard-continuation').count(),0);continue;}
+  if(stage===2||stage===4){const id=stage===2?'document':'cipher';assert.equal(await page.locator('#gm-'+id+' [data-action="test"]').count(),0);assert.equal(await page.locator('#gm-'+id+' .storyboard-continuation').count(),0);continue;}
   const button=page.locator(`.storyboard-head [data-action="test"][data-stage="${stage}"]`);
   assert.ok(await button.isVisible());assert.equal(await page.locator('.storyboard-content:visible').count(),0);
   await button.click();
@@ -102,5 +102,5 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom.png'});
  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await bathroom.screenshot({path:'/tmp/storyboard-bathroom-phone.png'});
- assert.deepEqual(errors,[]);console.log('PASS: eight isolated header tests including intro/bathroom/finale, paper-only Pixi without a player test, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, six anchored worksheets, private parent page and responsive layout.');
+ assert.deepEqual(errors,[]);console.log('PASS: seven isolated header tests including intro/bathroom/finale, paper-only Pixi and delivery without player tests, storyboard navigation, bathroom ordering, closed transcript/TTS controls, exact shared print text/help/solution, seven anchored worksheets, private parent page and responsive layout.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

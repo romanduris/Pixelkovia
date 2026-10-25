@@ -162,14 +162,14 @@ window.GAME = {
       "placeholder": "Výsledné číslo",
       "action": "Nájdite indíciu označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte Plugyho list P3 a ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na papieri zistite hodnoty trojuholníka, kruhu a štvorca. Naskenujte QR kód a v tabuľke označte všetky políčka s týmito číslami.",
-      "materials": "P3: tri rovnice s miestom na zapísanie hodnôt a QR kód. P4: Pingyho indícia ukrytá v topánke; P5 zostáva samostatne na stole.",
+      "materials": "P3: tri rovnice s miestom na hodnoty a QR. P4: cesta doručovateľa v topánke; P5: samostatný list pod vankúšom v detskej posteli.",
       "mobile": "QR z P3 otvorí tabuľku 5 × 7. Správny výber 2, 3 a 4 odhalí 9, odomkne digitálny most a uloží E. Nový dabing čaká na dodanie; indíciu k ďalšiemu miestu obsahuje textová správa.",
       "solution": "△ = 3, ○ = 2, □ = 4. V tabuľke označte všetky políčka s číslami 2, 3 a 4 a žiadne ďalšie. Rozsvietené políčka vytvoria číslicu 9; most sa odomkne a tím získa písmeno E.",
       "hints": [
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
-      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 nechajte samostatne uzavretý na stole s označením Úloha 5. P6 zostáva pod inou stoličkou v obálke (indícii) 4 označenej Úloha 6.",
+      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 ukryte pod vankúš v detskej posteli. P6 a P7 zostávajú pod inou stoličkou v obálke (indícii) 4 označenej Úloha 6.",
       "transition": "Pingyho indíciu hľadajte pri dvojiciach cestovateľov, ktoré majú jazyk, no nerozprávajú. Na cestu vyrazia iba s vašimi nohami.",
       "character": "plugy",
       "dramaturgy": [
@@ -196,51 +196,49 @@ window.GAME = {
     },
     {
       "id": "cipher",
-      "title": "Pingy – roztrhaný odkaz",
+      "title": "Pingy – cesta doručovateľa",
       "label": "Úloha 4 – Pri topánkach",
       "icon": "👟",
       "time": [
         1,
-        2,
-        4
+        0,
+        7
       ],
       "reward": "T",
       "answer": [
-        "STOL",
-        "STÔL"
+        "POSTELI"
       ],
-      "placeholder": "Miesto zo zloženého odkazu",
-      "action": "Nájdite Pingyho indíciu pri topánkach. Vyberte hornú časť listu P4 a štyri pripravené pásiky. Zoraďte ich podľa čísiel v rohoch od 1 po 4. Môžete ich spojiť papierovou páskou.",
-      "task": "Zoraďte štyri pásiky podľa čísiel v rohoch. Prečítajte odkaz a do telefónu zadajte miesto, kde čaká Čipkov plán. Až potom otvorte jeho samostatnú indíciu.",
-      "materials": "P4: Pingyho indícia pri topánkach. P5: Čipkov plán zostáva samostatne uzavretý na stole až do vyriešenia úlohy 4.",
-      "mobile": "Slovná odpoveď STÔL odomkne písmeno T a sprístupní Čipkov plán P5 na stole.",
-      "solution": "Pásiky 1–4 vytvoria STÔL / SKRÝVA / ČIPKOV PLÁN. / TERAZ HO OTVORTE. Odpoveď STÔL; uznáva sa aj STOL.",
+      "placeholder": "Miesto z doručenej správy",
+      "action": "Nájdite list P4 pri topánkach. Od stanice ŠTART sledujte šípky a pri každej stanici vyberte spoj so zhodným symbolom.",
+      "task": "Na každej stanici porovnajte jej symbol so symbolmi na odchádzajúcich spojoch. Choďte len v smere šípok po spoji s rovnakým symbolom. Písmeno každej novej stanice zapíšte do ďalšieho políčka. Sedem písmen doplní vetu „Ďalšia indícia sa skrýva v tvojej…“.",
+      "materials": "P4: papierová cesta doručovateľa, sedem políčok na miesto a písmeno T. P5 ukryte pod vankúš v detskej posteli.",
+      "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie P5; jeho QR otvorí úlohu 5.",
+      "solution": "Zo ŠTARTU sledujte zhodné symboly v smere šípok. Navštívené stanice dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Písmeno do finále: T.",
       "hints": [
-        "Malé čísla v rohoch určujú poradie štyroch pásikov.",
-        "Začnite pásikom s číslom 1. Veta sa začína slovom STÔL."
+        "Symbol na stanici určuje správny odchádzajúci spoj. Šípky ukazujú smer; ostatné spoje ignorujte.",
+        "Prvé dve navštívené stanice dávajú P a O. Zapisujte po jednom písmene až po CIEĽ."
       ],
-      "parent": "Hornú časť P4 a štyri premiešané pásiky vložte do obálky (indície) 3 a ukryte do čistej suchej topánky na dosah detí. P5 nechajte samostatne uzavretý na stole s označením Úloha 5 – otvoriť po zložení odkazu.",
-      "transition": "STÔL ukázal miesto ďalšej stopy. Pingy varuje: nič neotvárajte nasilu. Na stole otvorte samostatnú indíciu s Čipkovým plánom P5 a nájdite bezpečnú cestu.",
+      "parent": "Celý P4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. P5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. P4 nemá QR a nič sa neoveruje v telefóne.",
+      "transition": "Papierová správa odhalí POSTELI a pridá písmeno T. V detskej posteli pod vankúšom nájdite P5 a jeho QR kódom otvorte ďalšiu úlohu.",
       "character": "pingy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Pingy, malý dátový posol. Prenášam odkazy medzi kamarátmi, aby každý vedel, čo sa deje aj na opačnom konci nášho sveta.",
-          "Pri výpadku sa moja správa rozdelila na štyri časti. Plugy už obnovil most, ale bez celého odkazu nevieme, kde čaká Čipkov plán správnej cesty. Potrebujem správu opraviť.",
-          "Zoraďte štyri papierové pásiky podľa čísiel v rohoch od 1 po 4. Prečítajte celý odkaz. Miesto, ktoré prezradí, zadajte do telefónu cez QR kód. Až potom otvorte samostatnú indíciu s plánom."
+          "Som doručovateľ správ. Po výpadku sa mi pomiešali cesty a ďalšiu stopu viem doručiť iba s vašou pomocou.",
+          "Začnite pri ŠTARTE. Na stanici si všimnite symbol a vyberte odchádzajúci spoj s rovnakým symbolom. Choďte iba v smere šípok. Písmeno každej novej stanice zapíšte do ďalšieho políčka, až kým nedôjdete do CIEĽA.",
+          "Doplňte vetu pod mapou a choďte podľa nej hľadať. Telefón teraz nepotrebujete. Za doručenie správy vám nechávam písmeno T; zapíšte si ho k ostatným indíciám."
         ],
-        "after": [
-          "Správa je opravená! STÔL ukazuje, kde čaká ďalšia indícia. Za pomoc vám posielam písmeno T. Zachytil som aj hlásenie brány: OCHRANA AKTÍVNA. Neútočí na nás, ale chráni nás. Najprv sa musíme všetci pripraviť na návrat.",
-          "Na stole otvorte samostatný plán P5. Čipko vám pomôže nájsť správne spojenie. Všetko už máme o ďalší odkaz bližšie!"
-        ]
-      }
+        "after": []
+      },
+      "paperOnly": true,
+      "paperAnswer": "POSTELI"
     },
     {
       "id": "maze",
       "title": "Čipko – bezpečná digitálna cesta",
-      "label": "Úloha 5 – Stôl",
+      "label": "Úloha 5 – V posteli",
       "icon": "🗺️",
       "time": [
         1,
@@ -252,16 +250,16 @@ window.GAME = {
         "246"
       ],
       "placeholder": "Tri číslice z cesty",
-      "action": "Na stole nájdite samostatnú indíciu s Čipkovým plánom P5. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
+      "action": "Pod vankúšom v detskej posteli nájdite samostatnú indíciu s plánom P5. Naskenujte jeho QR. Prstom alebo ceruzkou nájdite cestu papierovým plánom od šípky VSTUP ku kruhu JADRO.",
       "task": "Sledujte spojité potrubie až k jadru. Odbočky končia bez výstupu. Prečítajte tri čísla na úspešnej ceste v poradí od vstupu.",
-      "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; smerovanie k poslednej indícii.",
+      "materials": "P5: vetviaci sa plán s číslami 2, 4, 6 na hlavnej trase a 8, 1 v slepých vetvách; smerovanie k poslednej indícii. QR na P5 otvorí úlohu 5 po papierovej ceste doručovateľa.",
       "mobile": "Trojmiestny kód opraví Čipkovu cestu. Potom sa pokračuje priamo sľubom Pixelkov v úlohe 6.",
       "solution": "Jediná cesta k jadru vedie cez 2 → 4 → 6, teda 246.",
       "hints": [
         "Slepé odbočky nepatria do kódu. Môžete začať aj pri jadre a ísť naspäť.",
         "Na správnej ceste sú čísla 2, 4 a 6."
       ],
-      "parent": "Ide o jednoduchý pracovný potrubný plán, nie finálne ilustrované bludisko. Mechanika aj tlač sú funkčné; obtiažnosť treba otestovať.",
+      "parent": "P5 ukryte pod vankúš v detskej posteli. Označte ho Úloha 5. QR na P5 otvorí úlohu 5 a do zápisníka zachová písmeno T z papierovej úlohy 4. Plán má jedinú cestu s kódom 246.",
       "transition": "Čipko pridá L a cesta dosiahne Guardyho bránu. Posledná indícia s úlohou 6 čaká pod inou stoličkou pri stole.",
       "character": "cipko",
       "dramaturgy": [
@@ -269,9 +267,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Čipko, malý mikročip. Spracúvam informácie a pomáham kamarátom vybrať správnu digitálnu cestu. Mám rád, keď do seba všetko pekne zapadá.",
-          "Po výpadku sa niektoré spojenia pomiešali. Pingy vás priviedol k môjmu plánu, ale sám ešte neviem určiť bezpečnú trasu. Nechcem kamarátov poslať do slepej uličky.",
-          "Prstom sledujte potrubie na papierovom pláne od VSTUPU až k JADRU. Čísla v slepých odbočkách preskočte. Tri číslice na správnej ceste zadajte do telefónu v poradí od vstupu. Podľa nich znovu nastavím bezpečné spojenie."
+          "Pomáham kamarátom vybrať bezpečnú digitálnu cestu. Vďaka doručenej správe ste našli môj plán.",
+          "Po výpadku sa niektoré spojenia pomiešali. Nechcem nikoho poslať do slepej uličky. Pomôžete mi nájsť trasu až k jadru?",
+          "Prstom sledujte potrubie od VSTUPU až k JADRU. Čísla v slepých odbočkách preskočte. Tri číslice na správnej ceste zadajte do telefónu v poradí od vstupu."
         ],
         "after": [
           "Dva, štyri, šesť! Správna cesta je opäť pripravená. Ďakujem za pomoc a pridávam písmeno L.",
@@ -296,15 +294,15 @@ window.GAME = {
       "placeholder": "Slovo z piatich riadkov",
       "action": "Nájdite indíciu k úlohe 6 pod sedadlom inej dostupnej stoličky pri stole než pri úlohe 3. Má označenie Úloha 6 – otvoriť po opravení Čipkovej cesty. Vyberte sľub Pixelkov a kartu poradia.",
       "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
-      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta „Písmená úloh 1 → 2 → 3 → 4 → 5 → 6“; indícia k úlohe 6.",
+      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta poradia. Priložte P7 s poškodeným signálom na finále.",
       "mobile": "Overí slovo SPOLU, pripojí Guardyho a uloží jeho písmeno O aj kartu poradia do zápisníka.",
       "solution": "Prvé písmená viet tvoria SPOLU. Karta určuje poradie šiestich nazbieraných písmen podľa úloh.",
       "hints": [
         "Guardy spomínal začiatky riadkov. Pozrite sa na prvé písmeno každého riadka.",
         "Písmená sú S, P, O, L, U."
       ],
-      "parent": "Obálku 4 s P6 prilepte pod inú stoličku než P3. Označte ju Úloha 6 – otvoriť po opravení Čipkovej cesty. Ak ju deti nájdu počas úlohy 2, nechajte ju zatvorenú. Dieťa nemá presúvať ťažký nábytok; pomôžte s odlepením obálky.",
-      "transition": "Guardy pridá O. Šesť písmen z úloh 1 až 6 už stačí na posledný spoločný signál; poradie určí karta P6.",
+      "parent": "P6 aj P7 vložte do obálky 4 pod inú stoličku než P3. Označte Úloha 6 – otvoriť po opravení Čipkovej cesty. P7 použijú až po sľube. Pomôžte s odlepením; nábytok sa nepresúva.",
+      "transition": "Ochranca pridá O. Potom otvorte P7: opravený signál odhalí spoločné návratové heslo.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
@@ -316,45 +314,45 @@ window.GAME = {
         ],
         "after": [
           "SPOLU! Presne tak. Za váš sľub posielam posledné písmeno O. Všetkých sedem je pripravených a nikto nezostane sám.",
-          "Zostaňte pri P6. Karta ukazuje poradie šiestich získaných písmen podľa úloh. Piko s vami odošle spoločný návratový signál. Domov sa vráti aj on."
+          "Teraz vezmite list P7. Vyfarbite správne dvojice signálov a obnovte šesť obrazoviek. Odhalené heslo porovnajte s písmenami, ktoré ste získali cestou."
         ]
       },
       "character": "guardy"
     },
     {
       "id": "code",
-      "title": "Heslo, ktoré spája",
+      "title": "Poškodený návratový signál",
       "label": "Úloha 7 – Pod stoličkou",
       "icon": "⚡",
       "time": [
         1,
         0,
-        4
+        8
       ],
       "reward": "✓",
       "answer": [
         "SVETLO"
       ],
       "placeholder": "Šesťpísmenové heslo",
-      "action": "Rozložte kartu poradia. Každý člen tímu môže prečítať jednu zo získaných indícií. Nájdete ich aj v hernom zápisníku.",
-      "task": "Usporiadajte šesť získaných písmen podľa úloh 1 až 6. Odošlite spoločný návratový signál, ktorý zosúladí pripravené schopnosti Pixelkov.",
-      "materials": "Karta poradia P6 a šesť písmen v digitálnom zápisníku.",
+      "action": "Vezmite list P7 priložený k P6. Pripravte ceruzku alebo tmavú pastelku a servisný kľúč v hornej časti listu.",
+      "task": "Na každej zo šiestich obrazoviek vyfarbite políčka so správnymi dvojicami zo servisného kľúča. Dvojice platia aj v opačnom poradí. Obrazovky čítajte zľava doprava, najprv horný a potom dolný riadok. Odhalené heslo odošlite v telefóne.",
+      "materials": "P7: šesť obrazoviek 5 × 7 políčok, tri správne dvojice symbolov a šesť políčok na heslo. P6 a zápisník na porovnanie získaných písmen.",
       "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
-      "solution": "Úlohy 1–6 dali S, V, E, T, L, O → SVETLO.",
+      "solution": "Správne dvojice ○–□, △–◇ a +–★ (aj obrátene) odhalia na šiestich obrazovkách S, V, E, T, L, O → SVETLO. Heslo sa zhoduje s písmenami z úloh 1–6.",
       "hints": [
-        "Použite šesť písmen z úloh 1 až 6. Fajka za posledný krok nie je súčasťou hesla.",
-        "V poradí úloh čítajte S – V – E – T – L – O."
+        "Vyfarbujte celé políčka, iba ak oba symboly tvoria niektorú dvojicu zo servisného kľúča. Poradie dvojice nehrá rolu.",
+        "Čítajte obrazovky 1–6. Prvá odhalí S. Odhalené písmená porovnajte s indíciami z úloh 1–6."
       ],
-      "parent": "Nechajte heslo vysloviť celý tím. Nie je tu skutočný časový limit ani riziko straty hry.",
+      "parent": "P7 priložte k P6 pod stoličku. Netreba strihať. Deti vyfarbia 6 obrazoviek a získajú SVETLO; potom heslo odošlú v telefóne. Čiernobiela tlač funguje. Nie je tu časový limit.",
       "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Tu je znovu Piko. Už sme všetci v spojení! Miky počúva signály, Pixi svieti, Plugy spája most, Pingy doručuje odkazy, Čipko kontroluje cestu a Guardy chráni našu partiu. Ja dávam pozor, aby nikto nezostal pozadu.",
-          "Každá schopnosť je potrebná. Svetlo samo neopraví spojenie a správny odkaz nám nepomôže bez bezpečnej cesty. Teraz nám chýba už len spoločný signál, že sme pripravení vyraziť.",
-          "Zložte ho zo šiestich písmen získaných od kamarátov. Karta na P6 ukazuje poradie podľa úloh 1 až 6. Písmená nájdete aj v zápisníku telefónu. Vyslovte heslo celým tímom a odošlite ho. Ja prejdem ako posledný."
+          "Už sme všetci v spojení a cesta domov je pripravená. Návratový signál sa však rozpadol na množstvo drobných značiek. Pomôžete nám ho obnoviť?",
+          "Servisný kľúč na liste P7 ukazuje tri dvojice, ktoré patria k sebe. Vyfarbite celé políčka s týmito dvojicami; platia aj v opačnom poradí. Ostatné nechajte prázdne. Postupne sa objaví šesť písmen.",
+          "Obrazovky čítajte v poradí od jednej po šesť. Heslo porovnajte s písmenami získanými počas cesty, vyslovte ho celým tímom a odošlite v telefóne. Ja prejdem ako posledný."
         ],
         "after": [
           "SVETLO! Funguje to! Všetci pomáhajú a bezpečná cesta sa rozsvietila až k našim dverám.",
@@ -644,6 +642,526 @@ window.GAME = {
   "archivedAudio": {
     "miky": "assets/KvakMessage.mp3",
     "plugy": "assets/Sutko.mp3"
+  },
+  "mazeQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=cipko",
+  "paperPuzzles": {
+    "delivery": {
+      "nodes": [
+        {
+          "x": 0,
+          "y": 0,
+          "symbol": "○",
+          "letter": ""
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "symbol": "△",
+          "letter": "P"
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "symbol": "□",
+          "letter": "K"
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "symbol": "○",
+          "letter": "M"
+        },
+        {
+          "x": 4,
+          "y": 0,
+          "symbol": "△",
+          "letter": "D"
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "symbol": "□",
+          "letter": "O"
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "symbol": "○",
+          "letter": "O"
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "symbol": "△",
+          "letter": "S"
+        },
+        {
+          "x": 3,
+          "y": 1,
+          "symbol": "□",
+          "letter": "A"
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "symbol": "○",
+          "letter": "B"
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "symbol": "△",
+          "letter": "N"
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "symbol": "□",
+          "letter": "C"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "symbol": "○",
+          "letter": "T"
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "symbol": "△",
+          "letter": "E"
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "symbol": "□",
+          "letter": "L"
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "symbol": "○",
+          "letter": "U"
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "symbol": "△",
+          "letter": "H"
+        },
+        {
+          "x": 2,
+          "y": 3,
+          "symbol": "□",
+          "letter": "Y"
+        },
+        {
+          "x": 3,
+          "y": 3,
+          "symbol": "○",
+          "letter": "L"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "symbol": "△",
+          "letter": "I"
+        }
+      ],
+      "edges": [
+        {
+          "from": 0,
+          "to": 1,
+          "symbol": "○"
+        },
+        {
+          "from": 0,
+          "to": 5,
+          "symbol": "□"
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "symbol": "□"
+        },
+        {
+          "from": 1,
+          "to": 6,
+          "symbol": "△"
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "symbol": "△"
+        },
+        {
+          "from": 2,
+          "to": 7,
+          "symbol": "△"
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "symbol": "△"
+        },
+        {
+          "from": 3,
+          "to": 8,
+          "symbol": "△"
+        },
+        {
+          "from": 4,
+          "to": 9,
+          "symbol": "○"
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "symbol": "○"
+        },
+        {
+          "from": 5,
+          "to": 10,
+          "symbol": "○"
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "symbol": "○"
+        },
+        {
+          "from": 6,
+          "to": 11,
+          "symbol": "□"
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "symbol": "□"
+        },
+        {
+          "from": 7,
+          "to": 12,
+          "symbol": "△"
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "symbol": "△"
+        },
+        {
+          "from": 8,
+          "to": 13,
+          "symbol": "△"
+        },
+        {
+          "from": 9,
+          "to": 14,
+          "symbol": "△"
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "symbol": "○"
+        },
+        {
+          "from": 10,
+          "to": 15,
+          "symbol": "○"
+        },
+        {
+          "from": 11,
+          "to": 12,
+          "symbol": "○"
+        },
+        {
+          "from": 11,
+          "to": 16,
+          "symbol": "○"
+        },
+        {
+          "from": 12,
+          "to": 13,
+          "symbol": "○"
+        },
+        {
+          "from": 12,
+          "to": 17,
+          "symbol": "□"
+        },
+        {
+          "from": 13,
+          "to": 14,
+          "symbol": "□"
+        },
+        {
+          "from": 13,
+          "to": 18,
+          "symbol": "△"
+        },
+        {
+          "from": 14,
+          "to": 19,
+          "symbol": "△"
+        },
+        {
+          "from": 15,
+          "to": 16,
+          "symbol": "△"
+        },
+        {
+          "from": 16,
+          "to": 17,
+          "symbol": "○"
+        },
+        {
+          "from": 17,
+          "to": 18,
+          "symbol": "○"
+        },
+        {
+          "from": 18,
+          "to": 19,
+          "symbol": "○"
+        }
+      ],
+      "start": 0,
+      "finish": 19
+    },
+    "signal": {
+      "validPairs": [
+        "○□",
+        "△◇",
+        "+★",
+        "□○",
+        "◇△",
+        "★+"
+      ],
+      "screens": [
+        [
+          "+★",
+          "★+",
+          "○□",
+          "★+",
+          "△◇",
+          "◇△",
+          "+○",
+          "◇★",
+          "★△",
+          "□+",
+          "+★",
+          "□+",
+          "★△",
+          "□+",
+          "□+",
+          "◇△",
+          "◇△",
+          "★+",
+          "◇△",
+          "★+",
+          "+○",
+          "◇★",
+          "★△",
+          "+○",
+          "△◇",
+          "□◇",
+          "◇★",
+          "○△",
+          "+○",
+          "+★",
+          "△◇",
+          "□○",
+          "△◇",
+          "□○",
+          "□○"
+        ],
+        [
+          "◇△",
+          "○△",
+          "★△",
+          "◇★",
+          "+★",
+          "+★",
+          "□◇",
+          "□+",
+          "○△",
+          "★+",
+          "★+",
+          "★△",
+          "□+",
+          "□◇",
+          "□○",
+          "◇△",
+          "□◇",
+          "□+",
+          "◇★",
+          "★+",
+          "◇△",
+          "□+",
+          "□+",
+          "◇★",
+          "○□",
+          "□◇",
+          "□○",
+          "□+",
+          "+★",
+          "★△",
+          "□◇",
+          "+○",
+          "△◇",
+          "□+",
+          "○△"
+        ],
+        [
+          "◇△",
+          "+★",
+          "★+",
+          "◇△",
+          "★+",
+          "△◇",
+          "□◇",
+          "□◇",
+          "□◇",
+          "+○",
+          "△◇",
+          "◇★",
+          "□+",
+          "□◇",
+          "★△",
+          "+★",
+          "○□",
+          "○□",
+          "○□",
+          "+○",
+          "○□",
+          "+○",
+          "+○",
+          "○△",
+          "+○",
+          "◇△",
+          "◇★",
+          "○△",
+          "◇★",
+          "★△",
+          "★+",
+          "+★",
+          "★+",
+          "○□",
+          "+★"
+        ],
+        [
+          "△◇",
+          "□○",
+          "△◇",
+          "△◇",
+          "□○",
+          "□◇",
+          "○△",
+          "+★",
+          "+○",
+          "○△",
+          "+○",
+          "◇★",
+          "★+",
+          "□+",
+          "+○",
+          "□+",
+          "★△",
+          "△◇",
+          "○△",
+          "○△",
+          "★△",
+          "□+",
+          "□○",
+          "+○",
+          "○△",
+          "○△",
+          "○△",
+          "□○",
+          "◇★",
+          "★△",
+          "○△",
+          "□◇",
+          "★+",
+          "○△",
+          "□◇"
+        ],
+        [
+          "□○",
+          "★△",
+          "★△",
+          "□◇",
+          "○△",
+          "◇△",
+          "★△",
+          "★△",
+          "★△",
+          "○△",
+          "□○",
+          "+○",
+          "+○",
+          "◇★",
+          "□◇",
+          "★+",
+          "□◇",
+          "□+",
+          "◇★",
+          "+○",
+          "△◇",
+          "○△",
+          "□+",
+          "□◇",
+          "○△",
+          "★+",
+          "□◇",
+          "◇★",
+          "★△",
+          "◇★",
+          "△◇",
+          "△◇",
+          "△◇",
+          "△◇",
+          "★+"
+        ],
+        [
+          "★△",
+          "□○",
+          "◇△",
+          "□○",
+          "□◇",
+          "★+",
+          "□+",
+          "+○",
+          "◇★",
+          "△◇",
+          "★+",
+          "★△",
+          "◇★",
+          "□+",
+          "★+",
+          "△◇",
+          "+○",
+          "○△",
+          "◇★",
+          "△◇",
+          "◇△",
+          "★△",
+          "○△",
+          "+○",
+          "□○",
+          "◇△",
+          "□◇",
+          "□+",
+          "□◇",
+          "□○",
+          "◇★",
+          "△◇",
+          "□○",
+          "★+",
+          "□◇"
+        ]
+      ]
+    }
   }
 };
 

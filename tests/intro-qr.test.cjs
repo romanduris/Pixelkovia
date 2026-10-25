@@ -73,7 +73,9 @@ const KEY='zahada-v1-progress';
   assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 3 – Pod stoličkou');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2]);
   await printed.goto(BASE+'/printables.html?sheet=p4');
-  const pingyPixels=await printed.locator('.pingy-phone-panel .worksheet-entry-qr img').evaluate(async img=>{
+  assert.equal(await printed.locator('#p4 .worksheet-entry-qr').count(),0,'P4 is entirely paper-only');
+  const pingyPixels=await printed.evaluate(async()=>{
+    const img=new Image();img.src='assets/pingy-qr.svg';
     await img.decode();const canvas=document.createElement('canvas');canvas.width=392;canvas.height=392;
     const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,392,392);return Array.from(ctx.getImageData(0,0,392,392).data);
   });
@@ -86,13 +88,20 @@ const KEY='zahada-v1-progress';
   await page.locator('[data-action="resume-scanned-game"]').click();
   assert.equal(await page.locator('.plugy-lock').count(),1,'early scanning cannot bypass Plugy');
   await page.evaluate(key=>localStorage.setItem(key,JSON.stringify({started:true,callDone:true,stage:3,completed:[1,2,3],hints:{}})),KEY);
-  await page.goto(pingyScan);assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
+  await page.goto(pingyScan);assert.equal(await page.locator('.signal-content h1').innerText(),'Pokračujte na papieri');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),[1,2,3]);
   const advanced={started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{},messageWatched:true};
   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved:advanced});
   await page.goto(plugyScan);await page.goto(pingyScan);
-  assert.equal(await page.locator('.signal-content h1').innerText(),'Úloha 4 – Pri topánkach');
+  assert.equal(await page.locator('.signal-content h1').innerText(),'Pokračujte na papieri');
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),{progressVersion:2,...advanced});
+
+  await printed.goto(BASE+'/printables.html?sheet=p5');
+  const mazePixels=await printed.locator('.maze-phone-panel img').evaluate(async img=>{
+    await img.decode();const c=document.createElement('canvas');c.width=392;c.height=392;const x=c.getContext('2d');x.drawImage(img,0,0,392,392);return Array.from(x.getImageData(0,0,392,392).data);
+  });
+  const maze=jsQR(new Uint8ClampedArray(mazePixels),392,392);
+  assert.equal(maze?.data,await printed.evaluate(()=>GAME.mazeQr),'P5 has the new, decodable return-to-phone QR');
 
   // Legacy text-mode saves open the video, without bringing the removed option back.
   await page.evaluate(key=>localStorage.setItem(key,JSON.stringify({started:true,callDone:false,stage:0,completed:[],messageRead:true,messageOpened:true})),KEY);

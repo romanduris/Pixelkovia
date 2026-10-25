@@ -6,9 +6,9 @@ const context={window:{}};
 vm.runInNewContext(fs.readFileSync('game-data.js','utf8'),context);
 const game=context.window.GAME;
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['STOL','STÔL'],['246'],['SPOLU'],['SVETLO']];
+const legacyAnswers=[['741296'],['HLADAJ POD STOLICKAMI'],['9'],['POSTELI'],['246'],['SPOLU'],['SVETLO']];
 assert.equal(game.stages.length,9);
-assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),53);
+assert.equal(game.stages.reduce((sum,s)=>sum+s.time.reduce((a,b)=>a+b,0),0),58);
 assert.equal(new Set(game.stages.map(s=>s.id)).size,9);
 assert.equal(game.characters.length,7);
 assert.equal(new Set(game.stages.slice(1,7).map(s=>s.character)).size,6);
@@ -22,7 +22,7 @@ for(const s of game.stages){
 }
 for(const file of ['game-data.js','app.js','index.html','printables.html','atlas.html','README.md'])assert.ok(!/závoj/i.test(fs.readFileSync(file,'utf8')),`${file}: approved terminology`);
 assert.ok(!JSON.stringify(game.call).includes('Ochranné pole'),'no explanation in the incoming call');
-assert.ok(JSON.stringify(game.stages[4].resolution).includes('OCHRANA AKTÍVNA.'),'the authored twist is present');
+assert.ok(JSON.stringify(game.stages[6].story).includes('Ochranné pole'),'the authored explanation is present');
 assert.ok(JSON.stringify(game.stages[7].resolution).includes('Piko. Poď.'),'Piko is included in the safe return');
 const ordered=[...game.signalRecords].sort((a,b)=>a.month-b.month||a.day-b.day||a.time.localeCompare(b.time));
 assert.equal(ordered.map(r=>r.digit).join(''),'741296');
@@ -92,12 +92,12 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  // Existing progress remains usable; the new optional panel cursor persists independently.
  await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{'cipher:before':1}})));
  await reloadAndResume(page);
- assert.equal(await page.locator('.signal-task h1').textContent(),game.stages[4].label);
+ assert.match(await page.locator('.signal-content h1').textContent(),/papieri/);
  assert.equal(await page.locator('.task-main, .task-aside, .scene-reader').count(),0,'old instruction screen is removed');
  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).completed.length),3);
- assert.equal(await page.locator('#answer').count(),1,'task opens directly at answer input');
+ assert.equal(await page.locator('#answer').count(),0,'paper-only task has no phone answer');
  await readScene(page);
- assert.equal(await page.locator('#hints p').count(),1);
+ assert.equal(await page.locator('#hints p').count(),0);
  const cursor=await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).scenePages['cipher:before']);
  await reloadAndResume(page);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).scenePages['cipher:before']),cursor);
  // The home restart clears the entire saved journey and immediately opens a fresh incoming message.
@@ -105,7 +105,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  assert.equal(await page.getByRole('button',{name:'Začať dobrodružstvo od začiatku',exact:false}).count(),1);
  await resume(page);
  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).scenePages['cipher:before']),cursor,'continue preserves the current scene');
- assert.equal(await page.locator('#hints p').count(),1,'continue preserves hints');
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')).hints[4]),1,'continue preserves hints');
  await page.locator('[data-action="home"]').click();
  await page.evaluate(()=>localStorage.setItem('zahada-prep-0','1'));
  for(const width of [320,390,768,1440]){await resizePlayerViewport({width,height:1100});await noOverflow(page,`home with restart ${width}`);}
@@ -122,12 +122,12 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.goto(BASE+'/storyboard.html');
  assert.equal(await page.locator('.storyboard').count(),9);
  assert.equal(await page.locator('.gm-atlas').count(),0);
- assert.ok((await page.locator('#gm-cipher').textContent()).includes('OCHRANA AKTÍVNA.'));
+ assert.ok((await page.locator('#gm-cipher').textContent()).includes('POSTELI'));
  assert.equal(await page.locator('#gm-intro .gm-dramaturgy, #gm-envelope .gm-dramaturgy').count(),0,'first two duplicate scenarios are omitted');
  assert.equal(await page.locator('.gm-dramaturgy,.studio-stage-details').count(),0,'developer notes are removed from all stages');
  // GM stage previews remain isolated from real progress.
- await page.locator('[data-action="test"][data-stage="4"]').click();await noAtlas();
- await readScene(page);await page.locator('#answer').fill('stôl');await page.locator('.answer-form button').click();
+ await page.locator('[data-action="test"][data-stage="5"]').click();await noAtlas();
+ await readScene(page);await page.locator('#answer').fill('246');await page.locator('.answer-form button').click();await page.locator('.success-card').waitFor();
  assert.equal(await page.locator('.success-card').count(),1);
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),null);
  await page.locator('[data-action="exit-test"]').click();
@@ -178,6 +178,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await reloadAndResume(page);assert.equal(await page.locator('#hints').count(),0);
  let entireJourney='';
  for(let i=1;i<=7;i++){
+  if(i===4)await page.goto(BASE+'/game.html?signal=cipko');
   if(game.stages[i].paperOnly)continue;
   await noAtlas();entireJourney+=await readScene(page);
   if(i===1){assert.equal(await page.locator('.signal-restore').count(),1);}
@@ -279,8 +280,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await page.goto(BASE+'/storyboard.html');await noOverflow(page,'mobile GM');
  await page.locator('[data-action="test"][data-stage="6"]').click();await readScene(page);await noOverflow(page,'mobile task');await noAtlas();
  await page.screenshot({path:'/tmp/mystery-task-mobile.png',fullPage:true});
- await page.goto(BASE+'/printables.html');assert.equal(await page.locator('.sheet').count(),8);assert.equal(await page.locator('#circles svg').count(),2);await noOverflow(page,'mobile printables');
- await page.emulateMedia({media:'print'});const pdf=await page.pdf({path:'/tmp/mystery-working-print.pdf',format:'A4',printBackground:true});assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,8,'six worksheets, diploma and adult guide fit eight pages');await page.emulateMedia({media:'screen'});
+ await page.goto(BASE+'/printables.html');assert.equal(await page.locator('.sheet').count(),9);assert.equal(await page.locator('#circles svg').count(),2);await noOverflow(page,'mobile printables');
+ await page.emulateMedia({media:'print'});const pdf=await page.pdf({path:'/tmp/mystery-working-print.pdf',format:'A4',printBackground:true});assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,9,'seven worksheets, diploma and adult guide fit nine pages');await page.emulateMedia({media:'screen'});
  // The first worksheet is self-contained, low-ink, and one A4 even without colour.
  await page.goto(BASE+'/printables.html?sheet=p1');
  assert.equal(await page.locator('.sheet:visible').count(),1,'player cannot see future worksheets');
@@ -346,6 +347,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.evaluate(()=>localStorage.removeItem('zahada-v1-progress'));await page.reload();
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: Miky V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete seven-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, eight print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
+ console.log('PASS: Miky V4 six-digit chronological code, printed QR, official duo, MPEG playback/pause/replay and missing-audio fallback, legacy first completion, mobile fullscreen, self-contained low-ink colour/grayscale A4, parent logistics; complete seven-task journey through direct interaction screens, authored storyboard preserved, seven safe returns, V1 saves, legacy reader state, wrong answers/hints, GM isolation, finale-only atlas CTA, full static atlas without JS or gameplay, seven sprite crops, mobile/tablet/desktop, nine print pages, offline files and unavailable storage/video, full-screen message with the supplied PicoVideo.mp4, video replay, restored message and spoiler-free failures.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
