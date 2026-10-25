@@ -137,20 +137,20 @@
     sheets[id]=sheets[id].replace(/>([^<>]+)</g,(match,text)=>'>'+text.replace(/(?: \/ | · )?\bP[1-7]\b(?: \/ )?/g,'')+'<');
   }
   const bathroom = {
-    label: 'Úloha 1 – Kúpeľňa',
-    placement: 'Stopu k úlohe Kúpeľňa schovajte medzi zložené uteráky, do dostupnej skrinky s uterákmi alebo za ľahký košík na suchej poličke. Po obnovení spojenia pokračujú deti podľa Mikyho správy k P2 pri okne.',
-    hint: 'Deti vystrihnú a otočia šesť signálov. Zoradia ich od najstaršieho po najnovší: najskôr mesiac a deň, pri rovnakom dátume presný čas.'
+    label:'Úloha 1 – Kúpeľňa',
+    placement:'Vytlačenú indíciu k P1 ukryte medzi uteráky. Strihajú až deti.',
+    hint:'Signály zoraďte podľa dátumu, potom času.'
   };
   const parentInstructions = {
-    intro: {label:'Úvod', placement:'Telefón so spustenou hrou položte tam, kde ho deti objavia. Pikovo video si môžu prehrať aj viackrát. Nech samy zistia, kam ísť. Úvod končí videom; ďalej pokračujú QR kódom z P1.', hint:'Ak váhajú, nech si znova prehrajú záver Pikovej videosprávy.'},
-    envelope: bathroom,
-    document: {label:'Úloha pri okne · Pixi', placement:'P2 ukryte pri zatvorenom okne na dosah detí. Úloha je iba na papieri. Rozlúštená indícia ich pošle pod stoličky; telefón nepoužívajú.', hint:'Nastavte vonkajšie D oproti vnútornému A. Vonkajšie písmená odkazu čítajte na vnútornom kruhu.'},
-    symbols: {label:'Úloha pod stoličkou · Plugy', placement:'P3 vložte do obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 patrí do chladničky v suchom uzavretom obale označenom Úloha 6. P7 ukryte pod gauč. Pomôžte s odlepením; nábytok sa nepresúva. QR v spodnej časti P3 otvorí Plugyho úlohu.', hint:'Na papieri začnite dvojicou trojuholníkov. V telefóne označte všetky políčka s hodnotami troch tvarov; opätovným ťuknutím sa výber zruší.'},
-    cipher: {label:'Úloha pri topánkach · Pingy', placement:'Celý P4 bez strihania ukryte do čistej suchej topánky. Iba papier, bez QR. P5 dajte pod vankúš v detskej posteli.', hint:'Uzol = veľký kruh, mostík = cesta medzi kruhmi. Doplňte 12 mostíkov: ľavý bod → ○, stred → △, pravý → □. Písmená zapisujte z prejdených kruhov.'},
-    maze: {label:'Čipkova cesta · P5', placement:'P5 ukryte pod vankúš v posteli, kde dieťa spáva. Pri viacerých deťoch stačí jedna z ich postelí. QR na P5 otvorí úlohu 5.', hint:'Po štyroch hrách pokračujte iba na papieri. Číslice premeňte podľa kľúča na časti slova.'},
-    search: {label:'Úloha v chladničke · Sľub', placement:'P6 vložte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. P7 ukryte samostatne pod gauč. QR na P6 otvorí úlohu 6.', hint:'Nech čítajú prvé písmená piatich riadkov zhora nadol. Po overení ich správa pošle pod gauč.'},
-    code: {label:'Poškodený signál · P7', placement:'Vytlačenú indíciu k P7 ukryte pod gauč na dosah ruky. Netreba strihať; deti vyfarbia políčka a odhalené heslo odošlú v telefóne.', hint:'Platné dvojice ○–□, △–◇, +–★ aj obrátene odhalia šesť písmen. Čítajte horný riadok zľava doprava, potom dolný.'},
-    finale: {label:'Finále', placement:'Oslávte pomoc každého člena tímu, doplňte názov tímu na voliteľný diplom. Atlas si môžete prezrieť spolu.', hint:'Hra nemá časový limit. Nápovedy dávajte postupne; riešenia si nechajte pre seba.'}
+    intro:{label:'Úvod',placement:'Po ukrytí listov spustite úvodné video na telefóne.',hint:'Video pošle deti do kúpeľne.'},
+    envelope:bathroom,
+    document:{label:'Úloha pri okne',placement:'Vytlačenú indíciu k P2 položte k zatvorenému oknu. Kruhy strihajú až deti.',hint:'Vonkajšie D nastavte oproti vnútornému A.'},
+    symbols:{label:'Úloha pod stoličkou',placement:'Vytlačenú indíciu k P3 prilepte pod sedadlo stoličky.',hint:'Dopočítajte tvary; v telefóne označte všetky políčka s ich hodnotami.'},
+    cipher:{label:'Úloha pri topánkach',placement:'Vytlačenú indíciu k P4 ukryte do čistej suchej topánky.',hint:'Opravte mostíky, potom sledujte zhodné symboly a zbierajte písmená.'},
+    maze:{label:'Úloha v posteli',placement:'Vytlačenú indíciu k P5 dajte pod vankúš v detskej posteli.',hint:'Číslice z hier vymeňte podľa papierového kľúča za časti slova.'},
+    search:{label:'Úloha v chladničke',placement:'Vytlačenú indíciu k P6 dajte do chladničky v suchom uzavretom obale.',hint:'Čítajte prvé písmená riadkov zhora nadol.'},
+    code:{label:'Úloha pod gaučom',placement:'Vytlačenú indíciu k P7 ukryte pod gauč na dosah ruky.',hint:'Vyfarbite správne dvojice aj obrátene. Čítajte obrazovky 1–6.'},
+    finale:{label:'Finále',placement:'Užite si rozlúčku. Diplom a Atlas sú voliteľné.',hint:'Žiadna ďalšia úloha už nečaká.'}
   };
   for(const stage of window.GAME.stages)parentInstructions[stage.id].label=stage.label;
   function adultHelp(id='envelope', compact=false) {
@@ -163,8 +163,8 @@
     return (stage.answer||[]).map(answer=>answer.includes(',')?answer.split(',').map(value=>symbols[value]||value).join(' → '):answer).join(' / ');
   }
   function stageSolution(id,compact=false) {
-    const stage=GAME.stages.find(stage=>stage.id===id),answer=solutionAnswer(stage);
-    const text=compact&&id!=='envelope'?(id==='intro'?'Prvá obálka je v kúpeľni.':id==='symbols'?'△ 3, ○ 2, □ 4. Označiť všetky 2, 3 a 4 → znak 9.':`${answer||'Úspech tímu'}.`):stage.solution;
+    const stage=GAME.stages.find(stage=>stage.id===id),answer=id==='maze'?'7294 → CHLADNIČKA':solutionAnswer(stage);
+    const text=compact?(id==='intro'?'Prvá obálka je v kúpeľni.':id==='symbols'?'△ 3, ○ 2, □ 4. Označiť všetky 2, 3 a 4 → znak 9.':`${answer||'Úspech tímu'}.`):stage.solution;
     return `<p class="gm-solution${compact?' guide-answer':''}" aria-label="Riešenie etapy"><strong>Riešenie:</strong> ${esc(text)}</p>`;
   }
   function gameMasterInstructions(id,compact=false) {
@@ -186,22 +186,14 @@
     return sheet.innerHTML;
   }
   function parentGuide() {
-    const preparation={
-      envelope:['Kúpeľňa','Vytlačenú indíciu k P1 ukryte celú medzi uteráky. Vystrihujú až deti.'],
-      document:['Pri okne','Vytlačenú indíciu k P2 položte celú k zatvorenému oknu na dosah detí. Kruhy vystrihujú až deti.'],
-      symbols:['Pod stoličkou','Vytlačenú indíciu k P3 prilepte pod sedadlo stoličky.'],
-      cipher:['Pri topánkach','Vytlačenú indíciu k P4 ukryte celú do čistej suchej topánky.'],
-      maze:['V posteli','Vytlačenú indíciu k P5 dajte pod vankúš v jednej z detských postelí.'],
-      search:['V chladničke','Vytlačenú indíciu k P6 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte „Úloha 6“.'],
-      code:['Pod gaučom','Vytlačenú indíciu k P7 ukryte pod gauč na dosah ruky. Nábytok sa nepresúva.']
-    };
+    const preparation={envelope:'Kúpeľňa',document:'Pri okne',symbols:'Pod stoličkou',cipher:'Pri topánkach',maze:'V posteli',search:'V chladničke',code:'Pod gaučom'};
     const cards=GAME.stages.filter(stage=>preparation[stage.id]).map((stage,index)=>{
-      const [location,setup]=preparation[stage.id];
+      const location=preparation[stage.id],setup=parentInstructions[stage.id].placement;
       const answer=stage.id==='maze'?'7294 → CHLADNIČKA':stage.id==='symbols'?'△ = 3, ○ = 2, □ = 4 → v telefóne znak 9.':solutionAnswer(stage);
       const reward=stage.id==='code'?'':`<p class="guide-reward"><strong>Písmeno do tajničky:</strong> <b>${esc(stage.reward)}</b></p>`;
-      return `<section class="guide-stage" data-stage="${esc(stage.id)}"><div class="guide-stage-heading"><span class="guide-step">P${index+1}</span><h3>${esc(location)}</h3></div><p class="guide-setup">${esc(setup)}</p><p class="gm-solution" aria-label="Riešenie etapy"><strong>${stage.id==='code'?'Záverečné heslo':'Riešenie'}:</strong> ${esc(answer)}</p>${reward}</section>`;
+      return `<section class="guide-stage" data-stage="${esc(stage.id)}"><div class="guide-stage-heading"><span class="guide-step">P${index+1}</span><h3>${esc(location)}</h3></div><p class="guide-setup">${esc(setup)}</p><p class="guide-hint"><strong>Nápoveda:</strong> ${esc(parentInstructions[stage.id].hint)}</p><p class="gm-solution" aria-label="Riešenie etapy"><strong>${stage.id==='code'?'Záverečné heslo':'Riešenie'}:</strong> ${esc(answer)}</p>${reward}</section>`;
     });
-    return `<section class="sheet parent-guide" id="rodicovsky-navod"><header class="guide-heading"><div><div class="label">PIXELKOVIA / LEN PRE DOSPELÝCH</div><h2>Ťahák pre rodiča</h2><p>Príprava pred hrou a správne riešenia.</p></div></header><div class="guide-intro"><section><h3>Vytlačte</h3><p>Indície P1–P7 jednostranne na A4, mierka 100 %. Farebne alebo čiernobielo. Listy vopred nestrihajte.</p></section><section><h3>Pripravte</h3><p>Telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a lepiacu pásku.</p></section><section><h3>Ukryte a spustite</h3><p>Vytlačené indície ukryte podľa prehľadu nižšie. Spustite úvod hry v telefóne; video pošle deti do kúpeľne.</p></section></div><aside class="guide-safety"><strong>Úkryty</strong><p>Suché a na dosah detí, mimo elektriny, liekov a čistiacich prostriedkov.</p></aside><div class="guide-section-label"><span>KAM UKRYŤ VYTLAČENÉ INDÍCIE A AKÉ SÚ ODPOVEDE</span></div><div class="guide-stages"><div class="guide-column">${cards.slice(0,4).join('')}</div><div class="guide-column">${cards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Riešenia si nechajte pre seba. Diplom je voliteľný.</span></footer></section>`;
+    return `<section class="sheet parent-guide" id="rodicovsky-navod"><header class="guide-heading"><div><div class="label">PIXELKOVIA / LEN PRE RODIČA</div><h2>Ťahák pre rodiča</h2><p>Tri kroky prípravy. Potom už deti vedie hra.</p></div></header><div class="guide-intro"><section><h3>1. Vytlačte</h3><p>Listy P1–P7 jednostranne na A4, mierka 100 %. Farebne alebo čiernobielo. Nestrihajte ich.</p></section><section><h3>2. Ukryte</h3><p>Vytlačené indície rozmiestnite podľa prehľadu nižšie, na dosah detí.</p></section><section><h3>3. Spustite</h3><p>Na telefóne pustite úvodné video. Hra sa môže začať!</p></section></div><div class="guide-tools"><p><strong>Deti potrebujú:</strong> detské nožnice, ceruzku, tmavú pastelku a telefón s internetom.</p><p><strong>Na prípravu:</strong> tlačiareň, papier A4 a lepiacu pásku. Listy strihajú až deti.</p></div><aside class="guide-safety"><strong>Úkryty</strong><p>Suché a na dosah detí, mimo elektriny, liekov a čistiacich prostriedkov. Nábytok sa nepresúva.</p></aside><div class="guide-section-label"><span>ÚKRYTY · KRÁTKE NÁPOVEDY · RIEŠENIA</span></div><div class="guide-stages"><div class="guide-column">${cards.slice(0,4).join('')}</div><div class="guide-column">${cards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Nápovedy dávajte až na požiadanie. Riešenia si nechajte pre seba.</span></footer></section>`;
   }
   window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,stageSolution,gameMasterInstructions,bathroomSolution,bathroomInstructions,parentGuide};
 })();

@@ -466,3 +466,9 @@
  #p5 .worksheet-scene{padding:1.5mm}
  #p5 .cipko-workbook{margin-block:2.5mm}
 }
+
+.parent-guide .guide-hint{font-size:11px;line-height:1.4;margin:0 0 5px}
+.parent-guide .guide-tools{padding:8px 10px;margin:0 0 12px;background:#f3f7fb;border:1px solid #c3cfdd}
+.parent-guide .guide-tools p{font-size:12px;line-height:1.4;margin:0 0 3px}
+.parent-guide .guide-hint strong,.parent-guide .guide-tools strong{color:#234c71}
+@media print{.parent-guide .guide-hint,.parent-guide .guide-tools p{font-size:9pt;line-height:1.4}.parent-guide .guide-hint{margin-bottom:.8mm}.parent-guide .guide-tools{padding:1.5mm 2mm;margin-bottom:2mm}.parent-guide .guide-tools p{margin-bottom:.5mm}}

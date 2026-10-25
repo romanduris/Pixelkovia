@@ -277,3 +277,5 @@ body[data-environment="designer"] .storyboard-stage-icon img{display:block;width
 .chapter-icon img{display:block;width:28px;height:28px;object-fit:contain}
 
 .media-preview h2{padding-right:36px;overflow-wrap:anywhere}
+
+.parent-hint{padding:14px 0;border-top:1px solid #435271}.parent-hint h3{font-size:18px;margin:0 0 8px}.parent-hint p{font-size:14px;line-height:1.6;margin:0 0 6px}
