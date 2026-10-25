@@ -513,3 +513,18 @@
  .seal-answer .code-boxes{gap:4px}
  .seal-answer .code-boxes span{width:25px}
 }
+
+.seal-digit{font:700 22px monospace}
+.final-password-slots{display:flex;justify-content:center;gap:10px;margin:15px 0}
+.final-password-slots>div{display:grid;justify-items:center;gap:5px}
+.final-password-slots span{font:9px monospace}
+.final-password-slots b{display:block;width:34px;height:34px;border:1px solid #456a74;background:white}
+#p7 .paper-signal-screens{grid-template-columns:1fr;max-width:115px;margin:18px auto}
+@media print{
+ #p6 .seal-digit{font-size:14pt}
+ #p7 .paper-signal-screens{width:30mm;max-width:30mm;margin:4mm auto}
+ .final-password-slots{gap:3mm;margin:3mm 0}
+ .final-password-slots span{font-size:7pt}
+ .final-password-slots b{width:9mm;height:9mm}
+}
+@media screen and (max-width:600px){.final-password-slots{gap:6px}.final-password-slots b{width:28px;height:28px}.final-password-slots span{font-size:8px}}

@@ -297,79 +297,85 @@ window.GAME = {
         5,
         1
       ],
-      "reward": "O",
+      "reward": "",
       "answer": [
-        "POD GAUC",
-        "PODGAUC",
-        "SPOLU"
+        "5817264"
       ],
-      "placeholder": "Miesto ukryté v odkaze",
+      "placeholder": "Sedemmiestny kód",
       "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na nájdenom liste.",
-      "task": "Opravte pečate pomocou kľúča na papieri. Platné riadky zoraďte podľa čísel opráv 1–7. Ich prvé písmená prezradia úkryt poslednej indície. Miesto potvrďte v telefóne.",
-      "materials": "Úloha 6: sedem očíslovaných opráv, deväť poškodených pečatí a políčka na sedempísmenový odkaz. Dve pečate sú falošné. List k úlohe 7 ukryte pod gauč.",
-      "mobile": "Overí miesto POD GAUČ, pripojí ochrancu a uloží písmeno O. Historické SPOLU zostáva prijaté pre už vytlačené listy.",
-      "solution": "Oprava dopĺňa presne biele políčka pečate: bez prekrývania a bez medzery. Platné riadky v poradí opráv 1–7 začínajú P, O, D, G, A, U, C → POD GAUČ. Riadky K a V sú falošné. Odmena O.",
+      "task": "Opravte pečate pomocou kľúča na papieri. Číslice pri platných pečatiach prepíšte v poradí opráv 1–7 a sedemmiestny kód zadajte do telefónu.",
+      "materials": "Úloha 6: sedem očíslovaných opráv, deväť pečatí s číslicami a sedem políčok na kód. Dve pečate sú falošné. Posledná indícia je samostatne pod gaučom; miesto prezradí až správa po overení.",
+      "mobile": "Overí kód 5817264 na číselnej klávesnici. Potom správa ochrancu prezradí úkryt pod gaučom. Nahovorenie je pripravené; kým nahrávka nie je dodaná, je dostupný jej text.",
+      "solution": "Opravy presne dopĺňajú biele políčka bez prekrývania. Číslice platných pečatí podľa opráv 1–7: 5, 8, 1, 7, 2, 6, 4 → 5817264. Pečate s 9 a 0 sú falošné. Úkryt POD GAUČ prezradí až správa po overení.",
       "hints": [
-        "Čierne políčka opravy musia presne zaplniť biele políčka pečate. Porovnávajte ich bez otáčania. Dve pečate nemajú vhodnú opravu.",
-        "Pri riadku začínajúcom Priateľov sedí oprava 1. Pokračujte opravami 2–7 a čítajte prvé písmená ich riadkov."
+        "Čierne políčka opravy presne zaplnia biele políčka pečate. Vzory neotáčajte; dve pečate nemajú vhodnú opravu.",
+        "Oprava 1 patrí k pečati s číslicou 5. Potom hľadajte číslice pri pečatiach s opravami 2–7."
       ],
       "parent": "Vytlačenú indíciu k úlohe 6 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. Vytlačenú indíciu k úlohe 7 ukryte samostatne pod gauč na dosah ruky.",
-      "transition": "Overený odkaz POD GAUČ vedie priamo k úlohe 7. Získate posledné písmeno O.",
+      "transition": "Správny číselný kód obnoví bezpečnú cestu. Správa ochrancu pošle deti pod gauč po poslednú indíciu.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Konečne počujem celú partiu! Ochranné pole pri nezvyčajnom signále uzavrelo cesty, aby nás chránilo. Teraz už chýba iba posledná indícia na bezpečný návrat.",
-          "Jej úkryt som schoval do bezpečnostných pečatí. Niekto ich však poškodil a pridal dve falošné. Pomôžte mi odhaliť tie pravé.",
-          "Ku každej pečati nájdite opravu, ktorej čierne políčka presne zaplnia všetky jej biele políčka. Nič sa nesmie prekryť ani zostať prázdne. Vzory neotáčajte. Číslo opravy napíšte k riadku; dve pečate bez opravy vynechajte. Potom čítajte prvé písmená platných riadkov v poradí 1–7."
+          "Konečne počujem celú partiu! Ochranné pole pri nezvyčajnom signále uzavrelo cesty, aby nás chránilo. Na otvorenie bezpečnej cesty potrebujem overovací kód.",
+          "Bezpečnostné pečate sa pri prerušení poškodili. Sú medzi nimi aj dve falošné. Opravte tie pravé a pomôžte mi obnoviť spojenie.",
+          "Ku každej pečati nájdite opravu, ktorej čierne políčka presne zaplnia všetky biele políčka pečate. Nič sa nesmie prekryť ani zostať prázdne. Vzory neotáčajte. Číslo opravy dopíšte k pečati; dve bez opravy prečiarknite. Číslice platných pečatí prepíšte v poradí opráv 1–7 a kód zadajte do telefónu."
         ],
         "after": [
-          "POD GAUČ! Odhalili ste správny úkryt. Za opravené pečate vám posielam posledné písmeno O.",
-          "Pod gaučom na vás čaká úloha 7. Obnovte už len krátky návratový signál a môžeme ísť všetci domov."
+          "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
+          "Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.",
+          "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
+          "Choďte sa tam pozrieť. Nájdete poslednú indíciu do spoločného hesla. Pridajte ju k písmenám, ktoré ste získali cestou. Už sme naozaj blízko!"
         ]
       },
-      "character": "guardy"
+      "character": "guardy",
+      "legacyAnswers": [
+        "POD GAUC",
+        "PODGAUC",
+        "SPOLU"
+      ]
     },
     {
       "id": "code",
-      "title": "Poškodený návratový signál",
+      "title": "Posledná indícia a návratová brána",
       "label": "Úloha 7 – Pod gaučom",
       "icon": "assets/location-icons/sofa.svg",
       "time": [
         1,
         0,
-        3
+        1
       ],
       "reward": "✓",
       "answer": [
         "SVETLO"
       ],
       "placeholder": "Šesťpísmenové heslo",
-      "action": "Nájdite poslednú indíciu pod gaučom. Pripravte si ceruzku alebo tmavú pastelku.",
-      "task": "Na šiestich malých obrazovkách vyfarbite iba políčka s hviezdou ★. Písmená čítajte v poradí 1–6 a heslo odošlite v telefóne.",
-      "materials": "Úloha 7: šesť obrazoviek 3 × 5 políčok. Vyfarbuje sa jediný symbol ★; písmená z úloh 1–6 slúžia na porovnanie.",
+      "action": "Pod gaučom nájdite posledný list. Vyfarbite hviezdy a doplňte poslednú indíciu k písmenám získaným cestou.",
+      "task": "Na papieri odhaľte posledné písmeno. Pridajte ho za písmená z úloh 1–5 a celé šesťpísmenové heslo zadajte do návratovej brány.",
+      "materials": "Úloha 7: jedna obrazovka 3 × 5 políčok odhalí posledné písmeno O. K nemu patria písmená S, V, E, T, L z úloh 1–5.",
       "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
-      "solution": "Vyfarbené hviezdy ★ na obrazovkách 1–6 vytvoria S, V, E, T, L, O → SVETLO. Celkom 90 políčok.",
+      "solution": "Vyfarbenie hviezd na jedinej obrazovke odhalí O. Písmená z úloh 1, 2, 3, 4, 5 a 7 vytvoria SVETLO. Šestka overuje číselný kód a smeruje pod gauč.",
       "hints": [
-        "Vyfarbite celé políčko vždy, keď je v ňom hviezda ★. Ostatné políčka nechajte biele.",
-        "Prvá obrazovka odhalí S. Heslo porovnajte s písmenami z úloh 1–6."
+        "Vyfarbite celé políčka s hviezdou ★. Na malej obrazovke sa objaví jedno písmeno.",
+        "Posledné písmeno je O. Pridajte ho za písmená z úloh 1–5."
       ],
-      "parent": "Vytlačenú indíciu k úlohe 7 ukryte pod gauč na dosah ruky. Nábytok sa nepresúva. List sa nestrihá. Deti vyfarbia iba hviezdy na šiestich obrazovkách 3 × 5 a odošlú heslo SVETLO. Funguje aj čiernobiela tlač.",
+      "parent": "List k úlohe 7 ukryte pod gauč na dosah ruky. Nestrihá sa. Vyfarbením jednej obrazovky deti získajú O, pridajú ho k písmenám S, V, E, T, L a heslo SVETLO odošlú v telefóne.",
       "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Už sme všetci v spojení a cesta domov je pripravená. Pomôžete nám rozsvietiť posledný návratový signál?",
-          "Vyfarbite iba políčka s hviezdou ★. Na šiestich malých obrazovkách sa objavia písmená. Prečítajte ich v poradí 1–6, porovnajte s písmenami získanými cestou a heslo odošlite v telefóne. Ja prejdem ako posledný."
+          "Cesta domov je už bezpečná. Chýba nám iba posledná indícia do spoločného hesla.",
+          "Na nájdenom liste vyfarbite políčka s hviezdou ★. Objaví sa jedno písmeno. Pridajte ho za písmená získané v úlohách 1–5 a celé heslo zadajte do návratovej brány."
         ],
         "after": [
-          "SVETLO! Funguje to! Bezpečná cesta sa rozsvietila a celá partia sa môže vrátiť domov.",
-          "Všetci sme pripravení. Poďte si prečítať našu rozlúčku."
+          "SVETLO! Návratová brána sa otvorila. Všetci sa môžeme bezpečne vrátiť domov.",
+          "Ďakujeme vám! Čaká vás naša rozlúčka."
         ]
-      }
+      },
+      "finalLetter": "O"
     },
     {
       "id": "finale",
@@ -564,6 +570,14 @@ window.GAME = {
       "direction": "Rovnaký hlas ako v úvode. Srdečne, s úľavou a radosťou. Záver povedať pokojne, bez naliehavosti.",
       "prompt": "[relieved, joyful] Dokázali ste to! Všetci sme opäť spolu a cesta domov svieti. Ďakujeme, že ste nás nenechali samých.\n\n[warm, grateful] Každý z vás pomohol — dobrým nápadom, odvahou alebo podporou kamaráta. Teraz sa môžeme bezpečne vrátiť do nášho sveta.\n\n[gentle, cheerful] Keď nabudúce zabliká malé svetielko, možno vás len zdravíme. Majte sa krásne, kamaráti. A nezabudnite: spolu dokážeme viac!",
       "recordingStatus": "Text je pripravený na nahovorenie. Finálová nahrávka ešte nie je dodaná."
+    },
+    "guardy": {
+      "title": "Guardyho správa po obnovení pečatí",
+      "duration": "cca 35–40 sekúnd",
+      "model": "ElevenLabs v3",
+      "direction": "Pokojný, spoľahlivý ochranca. Na začiatku úľava a poďakovanie, pri poslednom signále zvedavosť. Úkryt pod gaučom vysloviť zreteľne s krátkou pauzou.",
+      "prompt": "[relieved, proud] Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!\n\n[warm, grateful] Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.\n\n[curious, then certain] Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.\n\n[encouraging, cheerful] Choďte sa tam pozrieť. Nájdete poslednú indíciu do spoločného hesla. Pridajte ju k písmenám, ktoré ste získali cestou. Už sme naozaj blízko!",
+      "recordingStatus": "Text je pripravený na nahovorenie. Guardyho nahrávka ešte nie je dodaná."
     }
   },
   "pikoMessage": [
@@ -1019,91 +1033,6 @@ window.GAME = {
           "★",
           "★",
           "★",
-          "△",
-          "□",
-          "★",
-          "★",
-          "★",
-          "○",
-          "△",
-          "★",
-          "★",
-          "★",
-          "★"
-        ],
-        [
-          "★",
-          "□",
-          "★",
-          "★",
-          "□",
-          "★",
-          "★",
-          "□",
-          "★",
-          "★",
-          "□",
-          "★",
-          "△",
-          "★",
-          "○"
-        ],
-        [
-          "★",
-          "★",
-          "★",
-          "★",
-          "○",
-          "△",
-          "★",
-          "★",
-          "△",
-          "★",
-          "○",
-          "△",
-          "★",
-          "★",
-          "★"
-        ],
-        [
-          "★",
-          "★",
-          "★",
-          "○",
-          "★",
-          "□",
-          "○",
-          "★",
-          "□",
-          "○",
-          "★",
-          "□",
-          "○",
-          "★",
-          "□"
-        ],
-        [
-          "★",
-          "□",
-          "○",
-          "★",
-          "□",
-          "○",
-          "★",
-          "□",
-          "○",
-          "★",
-          "□",
-          "○",
-          "★",
-          "★",
-          "★"
-        ],
-        [
-          "★",
-          "★",
-          "★",
-          "★",
           "○",
           "★",
           "★",
@@ -1131,39 +1060,39 @@ window.GAME = {
       "rows": [
         {
           "mask": "110010",
-          "text": "Aj najmenší pomocník je dôležitý."
+          "digit": "2"
         },
         {
           "mask": "011010",
-          "text": "Každý signál musí svietiť sám."
+          "digit": "9"
         },
         {
           "mask": "000111",
-          "text": "Odvaha rastie, keď si pomáhame."
+          "digit": "8"
         },
         {
           "mask": "001101",
-          "text": "Udržíme spojenie až do konca."
+          "digit": "6"
         },
         {
           "mask": "111000",
-          "text": "Priateľov nenecháme za bránou."
+          "digit": "5"
         },
         {
           "mask": "101001",
-          "text": "Všetky cesty radšej uzavrieme."
+          "digit": "0"
         },
         {
           "mask": "100101",
-          "text": "Cestu prejde celá naša partia."
+          "digit": "4"
         },
         {
           "mask": "101100",
-          "text": "Domov sa vrátime ako jeden tím."
+          "digit": "1"
         },
         {
           "mask": "010011",
-          "text": "Generátor už rozsvietil bezpečnú cestu."
+          "digit": "7"
         }
       ]
     }
@@ -1225,7 +1154,13 @@ window.GAME = {
     ]
   },
   "guardyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=guardy",
-  "finaleVideoPrompt": "Vytvor 25-sekundové rozlúčkové video vo formáte 9 : 16 podľa priložených referenčných obrázkov všetkých siedmich postavičiek. Presne zachovaj ich vzhľad, farby, proporcie a mäkký maľovaný pixelový štýl. Nepridávaj ďalšie postavy. Modrá postavička má hlavu v tvare obláčika, tvár na displeji, oblek a tyrkysovú kravatu. USB postavička nemá káblový chvost. Ochranca má podobu oranžového zdobeného štítu s tyrkysovou kravatou a azúrovou kľúčovou dierkou.\n\n0–6 s: Útulná ľudská obývačka. Celá partia stojí pri malej svetelnej bráne do digitálneho sveta. Kamera sa pomaly približuje a cesta pod ich nohami sa rozžiari.\n6–15 s: Postavičky zamávajú deťom do kamery. Priateľsky si ťuknú dlaňami. Modrá postavička s hlavou v tvare obláčika si položí ruku na srdce ako poďakovanie.\n15–22 s: Postupne prejdú bránou. Modrá postavička zostane posledná, ešte raz zamáva a pridá sa k ostatným.\n22–25 s: Brána sa jemne zmení na drobné svetielko. To dvakrát veselo zabliká a obraz pomaly stmavne.\n\nBez hovorenia, pohybov úst naznačujúcich reč, titulkov, nápisov, mien a log. Povolená je jemná hudba bez spevu, digitálne pípnutia a zvuk trblietania. Žiadne prudké záblesky ani strašidelné efekty. Hlas rozlúčky vznikne ako samostatná nahrávka; video nesmie obsahovať hovorený prejav."
+  "finaleVideoPrompt": "Vytvor 25-sekundové rozlúčkové video vo formáte 9 : 16 podľa priložených referenčných obrázkov všetkých siedmich postavičiek. Presne zachovaj ich vzhľad, farby, proporcie a mäkký maľovaný pixelový štýl. Nepridávaj ďalšie postavy. Modrá postavička má hlavu v tvare obláčika, tvár na displeji, oblek a tyrkysovú kravatu. USB postavička nemá káblový chvost. Ochranca má podobu oranžového zdobeného štítu s tyrkysovou kravatou a azúrovou kľúčovou dierkou.\n\n0–6 s: Útulná ľudská obývačka. Celá partia stojí pri malej svetelnej bráne do digitálneho sveta. Kamera sa pomaly približuje a cesta pod ich nohami sa rozžiari.\n6–15 s: Postavičky zamávajú deťom do kamery. Priateľsky si ťuknú dlaňami. Modrá postavička s hlavou v tvare obláčika si položí ruku na srdce ako poďakovanie.\n15–22 s: Postupne prejdú bránou. Modrá postavička zostane posledná, ešte raz zamáva a pridá sa k ostatným.\n22–25 s: Brána sa jemne zmení na drobné svetielko. To dvakrát veselo zabliká a obraz pomaly stmavne.\n\nBez hovorenia, pohybov úst naznačujúcich reč, titulkov, nápisov, mien a log. Povolená je jemná hudba bez spevu, digitálne pípnutia a zvuk trblietania. Žiadne prudké záblesky ani strašidelné efekty. Hlas rozlúčky vznikne ako samostatná nahrávka; video nesmie obsahovať hovorený prejav.",
+  "guardyMessage": [
+    "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
+    "Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.",
+    "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
+    "Choďte sa tam pozrieť. Nájdete poslednú indíciu do spoločného hesla. Pridajte ju k písmenám, ktoré ste získali cestou. Už sme naozaj blízko!"
+  ]
 };
 
 // All reading surfaces derive from the same authored story.

@@ -26,8 +26,8 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 | Úloha 3, pod stoličkou | △ 3, ○ 2, □ 4; tabuľka 5 × 7 odhalí 9, E, hádanka smeruje k topánkam. |
 | Úloha 4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. Úloha 5 pod vankúšom v detskej posteli. |
 | Úloha 5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. List k úlohe 6 je v chladničke; List k úlohe 7 je samostatne pod gaučom. |
-| Úloha 6, chladnička | Deväť poškodených pečatí, sedem doplnkových vzorov, dve falošné pečate. Prvé písmená platných riadkov v poradí opráv 1–7 → POD GAUČ, odmena O. Ochranné pole partiu chráni, nie je nepriateľom. |
-| Úloha 7, pod gaučom | Vyfarbovanie iba hviezd ★ na šiestich obrazovkách 3 × 5 (90 políčok) → SVETLO; potvrdenie v telefóne. Vráti sa všetkých sedem, Piko posledný. |
+| Úloha 6, chladnička | Deväť poškodených pečatí, sedem doplnkových vzorov, dve falošné pečate. Číslice platných pečatí v poradí opráv 1–7 → 5817264. Úkryt pod gaučom prezradí až Guardyho správa po overení. Ochranné pole partiu chráni, nie je nepriateľom. |
+| Úloha 7, pod gaučom | Vyfarbovanie hviezd ★ na jedinej obrazovke 3 × 5 → posledné písmeno O. Spolu s písmenami z úloh 1–5 vytvorí SVETLO; potvrdenie v návratovej bráne. Vráti sa všetkých sedem, Piko posledný. |
 
 Úkryty sú suché a dostupné bez presúvania nábytku; okno sa neotvára. List úlohy 1 a kruhy z úlohy 2 strihajú deti, Úloha 4 a Úloha 7 zostávajú celé. Čiernobiela tlač je plne hrateľná.
 
@@ -83,4 +83,4 @@ Tlačové listy používajú spoločné typografické roly v `signal-print.css`:
 
 Podklady pre Pikovu záverečnú nahrávku a voliteľné video bez hovorenia (25 s) sú v [docs/finale-podklady.md](docs/finale-podklady.md) aj v storyboarde pri finále. Kým nie sú dodané médiá, hra zobrazuje celú rozlúčku ako text bez ďalšej úlohy. Úlohy majú jednotné označenia Úloha 1–7; v štvorčekoch rodičovského ťaháka sú skrátené na U1–U7.
 
-Aktuálna šestka posiela deti priamo pod gauč. Telefón prijíma miesto POD GAUČ; staré SPOLU zostáva prijaté pre už vytlačené listy. Uložené splnenia ani písmená sa nemenia. Finále používa jediný cieľový symbol a menšie písmenové mriežky.
+Aktuálna šestka overuje sedemmiestny kód 5817264 cez číselnú klávesnicu. Správa po úspechu prezradí miesto pod gaučom. Staré odpovede POD GAUC a SPOLU sa prijímajú pre už vytlačené listy; uložené splnenia sa nemenia. Šestka už nepridáva O: posledné písmeno deti odhalia na papieri v sedmičke. Celé heslo SVETLO sa zadáva iba raz. Podklady na nahovorenie: [Guardy](docs/guardy-nahravka.md), [záverečná rozlúčka a video](docs/finale-podklady.md). Nové nahrávky ani finálové video ešte nie sú dodané; hra používa textové správy.

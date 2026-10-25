@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const steps = [
-    {id:'printed', revision:'seals-short-finale-v6', label:'Vytlačil som pracovné listy úloh 1–7 jednostranne na A4; Úloha 2 obsahuje oba kruhy.'},
+    {id:'printed', revision:'numeric-seals-final-letter-v7', label:'Vytlačil som pracovné listy úloh 1–7 jednostranne na A4; Úloha 2 obsahuje oba kruhy.'},
     {id:'supplies', legacy:1, label:'Pripravil som telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a pásku.'},
     {id:'cut-p4', revision:'paper-puzzles-v2', label:'Listy úloh 4 a 7 som nechal celé, bez strihania. Pripravil som tmavú pastelku. List úlohy 1 a kruhy z úlohy 2 strihajú deti.'},
     {id:'envelope-1', label:'Indícia k úlohe 1 obsahuje celý list, bez strihania.'},

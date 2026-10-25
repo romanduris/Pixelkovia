@@ -412,3 +412,5 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .finale .quest-story p{font-size:16px;line-height:1.7}
 .finale .atlas-invitation{padding:20px;margin:28px auto}
 @media(max-width:600px){.finale .whole-party{gap:2px}.finale .contact{padding:1px}.finale h1{font-size:32px}.finale .atlas-invitation>.pixel-sprite{width:56px}}
+
+.guardy-message{margin:20px 0;text-align:left}.guardy-message summary{cursor:pointer;padding:12px;border:1px solid #606a8b;border-radius:8px}
