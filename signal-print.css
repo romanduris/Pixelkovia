@@ -312,7 +312,7 @@
 }
 
 /* Two paper phases: repair the light bridges, then deliver the message. */
-.light-node .route-symbol{font-size:16px}
+.light-node .route-symbol{font-size:23px}
 .delivery-repair-key{border:1px solid #9aaec6;padding:9px 12px;margin:10px 0;background:#f7fafc;break-inside:avoid}
 .delivery-repair-key h3{font:700 11px/1.4 monospace;margin:0 0 4px;color:#234c71}
 .delivery-repair-key h3 small{font:11px/1.4 Arial,sans-serif;letter-spacing:0;margin-left:10px;color:#263c4d}
