@@ -433,7 +433,19 @@
       document.querySelector('.scene-reader')?.scrollIntoView({block:'start',behavior:'instant'});return;
     }
     if(a==='purchase'){showDialog(SITE_CONFIG.purchaseHTML());return;}
-    if(a==='preview-media'){const isPiko=b.dataset.media==='piko';showDialog(`<section class="media-preview ${isPiko?'piko-media-preview':''}"><span class="section-kicker">KONTROLA NAHRÁVKY</span><h2>${isPiko?'Pikova videospráva':'Mikyho hlasová správa'}</h2>${isPiko?`<video controls playsinline preload="metadata" src="${esc(GAME.video)}" aria-label="Náhľad Pikovej videosprávy"></video>`:`<audio controls preload="metadata" src="${esc(GAME.audio)}" aria-label="Náhľad Mikyho hlasovej správy"></audio>`}${isPiko?`<p class="preview-message-instructions">${esc(GAME.stages[0].task)}</p>`:''}<p role="status" class="preview-media-status"></p></section>`);const media=modal.querySelector('video,audio');media.addEventListener('error',()=>{modal.querySelector('.preview-media-status').textContent='Nahrávku sa nepodarilo načítať. Text a podklady nájdete v StoryBoarde.';});media.play().catch(()=>{});return;}
+    if(a==='preview-media'){
+      const id=b.dataset.media,isPiko=id==='piko',name=isPiko?'Piko':id==='plugy'?'Plugy':'Miky';
+      const title=isPiko?'Pikova videospráva':id==='plugy'?'Plugyho hlasová správa':'Mikyho hlasová správa';
+      const source=isPiko?GAME.video:id==='plugy'?GAME.plugyAudio:GAME.audio;
+      showDialog(`<section class="media-preview ${isPiko?'piko-media-preview':''}"><span class="section-kicker">KONTROLA NAHRÁVKY</span><h2>${title}</h2>${isPiko?`<video controls playsinline preload="metadata" src="${esc(source)}" aria-label="Náhľad Pikovej videosprávy"></video>`:`<audio controls playsinline preload="auto" src="${esc(source)}" aria-label="${name} – náhľad hlasovej správy"></audio>`}${isPiko?`<p class="preview-message-instructions">${esc(GAME.stages[0].task)}</p>`:''}<p role="status" class="preview-media-status">Načítava sa nahrávka…</p></section>`);
+      const media=modal.querySelector('video,audio'),status=modal.querySelector('.preview-media-status');
+      media.addEventListener('playing',()=>{status.textContent='Správa sa prehráva.';});
+      media.addEventListener('pause',()=>{if(!media.ended&&!media.error)status.textContent='Správa je pozastavená. Pokračujte tlačidlom prehrávania.';});
+      media.addEventListener('ended',()=>{status.textContent='Správa dohrala. Môžete si ju prehrať znova.';});
+      media.addEventListener('error',()=>{status.textContent='Nahrávku sa nepodarilo načítať. Skúste ju otvoriť znova. Text správy je dostupný v storyboarde.';});
+      media.play().catch(error=>{if(error.name==='NotAllowedError')status.textContent='Spustite správu tlačidlom prehrávania.';else status.textContent='Prehrávanie sa nepodarilo. Skúste nahrávku otvoriť znova.';});
+      return;
+    }
     if(a==='start')start();
     if(a==='restart-adventure'){if(!internal || !SITE_CONFIG.access.canLaunch(PREP_STORE.ready()))return;preview=null;progress=fresh();success=false;start();}
     if(a==='home'){navigate('prep');}

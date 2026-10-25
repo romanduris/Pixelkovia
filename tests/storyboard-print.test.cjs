@@ -27,7 +27,9 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await plugy.locator('.studio-stage-details,.storyboard-continuation').count(),0);
  assert.equal(await plugy.locator('.recording-archive audio').getAttribute('src'),'assets/Sutko.mp3');
  assert.match(await plugy.locator('.script-status').first().innerText(),/Nová nahrávka je zapojená/);
- assert.equal(await plugy.locator('.miky-message-controls audio').getAttribute('src'),'assets/Plugy.mp3','new recording is separate from the archive');
+ assert.equal(await plugy.locator('[data-action="preview-media"][data-media="plugy"]').innerText(),'▶ Prehrať Plugyho správu');
+ await plugy.locator('[data-media="plugy"]').click();await page.waitForFunction(()=>{const a=document.querySelector('dialog audio');return a&&!a.paused&&a.currentTime>0;});
+ assert.equal(await page.locator('dialog audio').getAttribute('src'),'assets/Plugy.mp3','preview uses the current recording');await page.locator('.dialog-close').click();assert.ok(await page.locator('dialog audio').evaluate(a=>a.paused));
 
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');
