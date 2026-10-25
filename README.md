@@ -48,6 +48,7 @@ Administrácia ponecháva historické obchodné kľúče produktov, pretože ich
 Autorské závislosti sa inštalujú mimo repozitára: Playwright s Chromium/WebKit, qrcode, jsqr a Python pypdf. `PLAYWRIGHT_MODULE` určuje absolútnu cestu k modulu. Lokálny server: `python3 -m http.server 8080`.
 
 ```sh
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/print-pagination.test.cjs
 node tests/paper-puzzles.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/paper-flow.test.cjs
 node tests/mission-data.test.cjs
@@ -72,3 +73,5 @@ Zvukové regresné testy pripájajú pôvodné nahrávky iba ako výslovné test
 Existujúci Site: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site
 
 ID aj publikum sú zachované. Build vzniká cez `node scripts/prepare-static.mjs`; `dist/` nie je zdrojom obsahu. Zmeny sa commitnú a pushnú do `origin/main`, potom sa publikuje existujúci Site. Trvalý odkaz funguje aj po vypnutí Codespace.
+
+Priama tlač webových listov zachováva samostatné strany aj pri voľbe kratšieho papiera Letter: celé rozloženie vrátane pätičky sa rovnomerne prispôsobí. A4 aj stiahnutý deväťstranový PDF balík zostávajú v pôvodnej mierke. Regresný test overuje kompletnú tlač s hlavičkami aj bez nich a samostatný list P2.
