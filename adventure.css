@@ -401,3 +401,14 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .signal-content .phone-away{color:#c2eadc}
 
 .cipko-outlet span{left:auto;right:0;text-align:right}
+
+/* A single farewell, with the whole party as a compact decorative strip. */
+.finale .whole-party{grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:0 auto 24px;max-width:420px}
+.finale .contact{padding:4px;background:transparent;border:0}
+.finale .contact .pixel-sprite{width:100%;height:auto;aspect-ratio:1;margin:0}
+.finale .contact strong,.finale .contact small{display:none}
+.finale .final-icon{font-size:32px;margin:0 0 14px}
+.finale .quest-story{max-width:620px;margin:24px auto;text-align:left}
+.finale .quest-story p{font-size:16px;line-height:1.7}
+.finale .atlas-invitation{padding:20px;margin:28px auto}
+@media(max-width:600px){.finale .whole-party{gap:2px}.finale .contact{padding:1px}.finale h1{font-size:32px}.finale .atlas-invitation>.pixel-sprite{width:56px}}

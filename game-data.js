@@ -67,7 +67,7 @@ window.GAME = {
         "741296"
       ],
       "placeholder": "Šesťmiestny kód",
-      "action": "Vyberte z indície 1 jediný list P1. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
+      "action": "Vyberte pracovný list z prvej indície. Vystrihnite všetkých šesť signálov po prerušovaných čiarach a otočte ich tak, aby ste prečítali všetky údaje.",
       "task": "Zoraďte záznamy od najstaršieho po najnovší. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí a zapíšte šesťmiestny kód. Naskenujte QR kód a na otvorenej stránke skúste zadať svoj kód.",
       "materials": "P1: jeden jednostranný pracovný list A4 s Mikyho príbehom, návodom a šiestimi otočenými vystrihovacími signálmi.",
       "mobile": "Pôvodný QR z P1 otvorí obnovu spojenia. Kód 741296 uloží S. Textová správa vedie k oknu; nový dabing čaká na dodanie.",
@@ -77,7 +77,7 @@ window.GAME = {
         "Tri marcové záznamy majú rovnaký dátum. O ich poradí rozhodne presný čas: od skoršieho po neskorší."
       ],
       "parent": "Obálka 1 v kúpeľni obsahuje iba celý P1. Ústrižky vystrihujú až deti. P2 patrí do samostatnej obálky 2 pri okne. Farebná tlač je odporúčaná, čiernobiela na bielom papieri je plne hrateľná.",
-      "transition": "Vypočujte si Mikyho odkaz a zapamätajte si indíciu S. Pri okne nájdite P2 a rozlúštite Pixiin odkaz na papieri.",
+      "transition": "Vypočujte si Mikyho odkaz a zapamätajte si indíciu S. Pri okne nájdite ďalšiu indíciu a rozlúštite Pixiin odkaz na papieri.",
       "character": "miky",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -117,7 +117,7 @@ window.GAME = {
         "HLADAJ POD STOLICKAMI"
       ],
       "placeholder": "Rozlúštené miesto",
-      "action": "Nájdite indíciu 2 pri okne. Vyberte celý P2, vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
+      "action": "Nájdite indíciu pri okne. Vystrihnite oba kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A; stred stačí pridržať prstom.",
       "task": "Na papierovom stroji nastavte vonkajšie D oproti vnútornému A. Písmená odkazu KODGDM SRG VWROLFNDPL čítajte z vonkajšieho kruhu na vnútornom. Rozlúštenú vetu zapíšte do políčok na pracovnom liste a choďte podľa nej hľadať ďalšiu indíciu.",
       "materials": "P2: Pixiin dekódovací stroj s dvoma kruhmi A–Z a zašifrovanou vetou, celý v indícii 2 pri okne. P3: samostatná indícia Úloha 3 prilepená zo spodnej strany sedadla stoličky.",
       "mobile": "Čisto papierová úloha bez QR kódu, hráčskej stránky, potvrdenia a textu po vyriešení. Rozlúštená indícia vedie pod stoličky. Telefón sa použije až pri QR kóde na Plugyho P3; vtedy sa zachová aj písmeno V.",
@@ -126,12 +126,12 @@ window.GAME = {
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
       ],
-      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 a P7 sú v chladničke v suchom uzavretom obale označenom Úloha 6.",
+      "parent": "Obálku 2 s celým P2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. P3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. P6 je v chladničke v suchom uzavretom obale označenom Úloha 6. P7 ukryte pod gauč.",
       "transition": "Rozlúštená veta posiela deti hľadať ďalšiu indíciu pod stoličkami. Pixiina úloha sa končí na papieri, bez obrazovky po vyriešení.",
       "character": "pixi",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; P6 a P7 patria do chladničky v suchom uzavretom obale označenom Úloha 6."
+        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; P6 patrí do chladničky v suchom uzavretom obale označenom Úloha 6. P7 ukryte pod gauč."
       ],
       "narrative": {
         "before": [
@@ -160,7 +160,7 @@ window.GAME = {
         "9"
       ],
       "placeholder": "Výsledné číslo",
-      "action": "Nájdite indíciu označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte Plugyho list P3 a ceruzkou si poznačte hodnotu každého tvaru.",
+      "action": "Nájdite indíciu označenú Úloha 3 prilepenú zo spodnej strany sedadla stoličky. Vyberte pracovný list a ceruzkou si poznačte hodnotu každého tvaru.",
       "task": "Na papieri zistite hodnoty trojuholníka, kruhu a štvorca. Naskenujte QR kód a v tabuľke označte všetky políčka s týmito číslami.",
       "materials": "P3: tri rovnice s miestom na hodnoty a QR. P4: cesta doručovateľa v topánke; P5: samostatný list pod vankúšom v detskej posteli.",
       "mobile": "QR z P3 otvorí tabuľku 5 × 7. Správny výber 2, 3 a 4 odhalí 9, odomkne digitálny most a uloží E. Nový dabing čaká na dodanie; indíciu k ďalšiemu miestu obsahuje textová správa.",
@@ -169,12 +169,12 @@ window.GAME = {
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
-      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 ukryte pod vankúš v detskej posteli. P6 a P7 sú v chladničke v suchom uzavretom obale označenom Úloha 6.",
+      "parent": "P3 je v samostatnej obálke (indícii) Úloha 3 pod sedadlom stoličky. P4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. P5 ukryte pod vankúš v detskej posteli. P6 je v chladničke v suchom uzavretom obale označenom Úloha 6. P7 ukryte pod gauč.",
       "transition": "Pingyho indíciu hľadajte pri dvojiciach cestovateľov, ktoré majú jazyk, no nerozprávajú. Na cestu vyrazia iba s vašimi nohami.",
       "character": "plugy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; P6 a P7 patria do chladničky v suchom uzavretom obale označenom Úloha 6."
+        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; P6 patrí do chladničky v suchom uzavretom obale označenom Úloha 6. P7 ukryte pod gauč."
       ],
       "narrative": {
         "before": [
@@ -209,7 +209,7 @@ window.GAME = {
         "POSTELI"
       ],
       "placeholder": "Miesto z doručenej správy",
-      "action": "Nájdite list P4 pri topánkach. Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
+      "action": "Nájdite pracovný list pri topánkach. Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
       "task": "Uzol je veľký kruh. Mostík je cesta so šípkou medzi kruhmi. Opravte 12 mostíkov. Bodky na mostíku porovnajte s kľúčom. Dopíšte symbol na bodkovanú čiaru. Nájdite cestu. Od ŠTARTU sledujte šípky. Vyberajte mostík s rovnakým symbolom, aký má kruh, a cestu vyfarbujte. Prečítajte odkaz. Písmená z prejdených kruhov zapisujte po poradí do políčok. Kruhy bez písmena len prejdite.",
       "materials": "P4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička indície T. P5 ukryte pod vankúš v detskej posteli.",
       "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie P5; jeho QR otvorí úlohu 5.",
@@ -219,7 +219,7 @@ window.GAME = {
         "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte písmená z prejdených kruhov. Kruh bez písmena do odpovede nič nepridá."
       ],
       "parent": "Celý P4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. P5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. P4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv opravia všetkých 12 mostíkov podľa trojbodového kľúča, potom vyfarbia cestu a zapisujú písmená z prejdených kruhov.",
-      "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s písmenom T si odložte. V detskej posteli pod vankúšom nájdite P5 a jeho QR kódom otvorte ďalšiu úlohu.",
+      "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s písmenom T si odložte. V detskej posteli pod vankúšom nájdite ďalšiu indíciu a jej QR kódom otvorte ďalšiu úlohu.",
       "character": "pingy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -260,17 +260,17 @@ window.GAME = {
       "reward": "L",
       "answer": [],
       "placeholder": "",
-      "action": "Pod vankúšom nájdite P5. Naskenujte QR a zahrajte štyri krátke hry. Získané číslice zapisujte po poradí na papier.",
-      "task": "Po každej hre zapíšte číslicu na P5. Po štvrtej hre odložte telefón a podľa papierového kľúča rozlúštite ďalší úkryt.",
+      "action": "Pod vankúšom nájdite ďalšiu indíciu. Naskenujte QR a zahrajte štyri krátke hry. Získané číslice zapisujte po poradí na papier.",
+      "task": "Po každej hre zapíšte číslicu na tento list. Po štvrtej hre odložte telefón a podľa papierového kľúča rozlúštite ďalší úkryt.",
       "materials": "P5: štyri políčka na číslice, dekódovací kľúč a tajnička. QR otvorí štyri náročnejšie hry v telefóne. Miesto sa v telefóne nepotvrdzuje.",
       "mobile": "Pixely 1–16 po poradí, obrázok z 9 dielikov, pexeso so 6 pármi a potrubie z 9 otočných dielikov dajú číslice 7, 2, 9, 4. Záver iba zobrazí číslice a pošle deti na papier.",
       "solution": "7 → CH, 2 → LAD, 9 → NIČ, 4 → KA. Tajnička: CHLADNIČKA.",
       "hints": [
-        "Číslice z hier zapisujte zľava doprava. Každú nájdite v kľúči na P5.",
+        "Číslice z hier zapisujte zľava doprava. Každú nájdite v kľúči na tomto liste.",
         "Časti slova v poradí sú CH – LAD – NIČ – KA."
       ],
-      "parent": "P5 ukryte pod vankúš v detskej posteli. P6 a P7 sú v suchom uzavretom obale v chladničke. Štyri hry dajú 7294 → CHLADNIČKA; nič sa nezadáva do telefónu. QR na P6 otvorí úlohu 6.",
-      "transition": "Po štvrtej hre sa uloží L. Telefón zobrazí 7294 a pokyn dokončiť tajničku na P5. P6 a P7 sú v chladničke; QR na P6 otvorí úlohu 6.",
+      "parent": "P5 ukryte pod vankúš v detskej posteli. P6 je v suchom uzavretom obale v chladničke. P7 ukryte pod gauč. Štyri hry dajú 7294 → CHLADNIČKA; nič sa nezadáva do telefónu. QR na P6 otvorí úlohu 6.",
+      "transition": "Po štvrtej hre získate L a číslice 7294. Dokončite tajničku na papieri a choďte hľadať ďalšiu indíciu do chladničky. Naskenujte QR na nájdenom liste.",
       "character": "cipko",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -283,7 +283,7 @@ window.GAME = {
         ],
         "after": [
           "Štyri hry sú hotové! Získali ste číslice 7, 2, 9, 4.",
-          "Pokračujte na papieri P5. Pomocou kľúča odhaľte, kde sa skrýva ďalšia indícia. Telefón môžete odložiť."
+          "Pokračujte na papieri. Pomocou kľúča odhaľte, kde sa skrýva ďalšia indícia. Telefón môžete odložiť."
         ]
       }
     },
@@ -302,17 +302,17 @@ window.GAME = {
         "SPOLU"
       ],
       "placeholder": "Slovo z piatich riadkov",
-      "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na P6. Vyberte sľub Pixelkov a kartu poradia.",
-      "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne. Kartu poradia si odložte na finále.",
-      "materials": "P6: päť viet začínajúcich S, P, O, L, U a karta poradia. Priložte P7 s poškodeným signálom na finále. QR na P6 otvorí úlohu 6.",
-      "mobile": "Overí slovo SPOLU, pripojí Guardyho a uloží jeho písmeno O aj kartu poradia do zápisníka.",
-      "solution": "Prvé písmená viet tvoria SPOLU. Karta určuje poradie šiestich nazbieraných písmen podľa úloh.",
+      "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na nájdenom liste.",
+      "task": "Prečítajte prvé písmeno každého z piatich riadkov zhora nadol. Získané slovo potvrďte v telefóne a zistite, kde je posledná indícia.",
+      "materials": "P6: päť viet začínajúcich S, P, O, L, U a QR na otvorenie úlohy 6. P7 ukryte samostatne pod gauč.",
+      "mobile": "Overí slovo SPOLU, pripojí Guardyho, uloží jeho písmeno O a pošle deti hľadať poslednú indíciu pod gauč.",
+      "solution": "Prvé písmená viet tvoria SPOLU. Po overení deti získajú O a pokyn hľadať poslednú indíciu pod gaučom.",
       "hints": [
         "Guardy spomínal začiatky riadkov. Pozrite sa na prvé písmeno každého riadka.",
         "Písmená sú S, P, O, L, U."
       ],
-      "parent": "P6 a P7 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. P7 použijú až po sľube.",
-      "transition": "Ochranca pridá O. Potom otvorte P7: opravený signál odhalí spoločné návratové heslo.",
+      "parent": "Vytlačenú indíciu k P6 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. Vytlačenú indíciu k P7 ukryte samostatne pod gauč na dosah ruky.",
+      "transition": "Po overení sľubu získate písmeno O. Posledná indícia sa skrýva pod gaučom.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
@@ -320,11 +320,11 @@ window.GAME = {
         "before": [
           "Ahojte! Ja som Guardy, digitálny ochranca. Spravujem Ochranné pole a kontrolujem neznáme spojenia. Čipko práve našiel bezpečnú cestu až ku mne. Konečne počujem celú partiu!",
           "Teraz vám môžem vysvetliť, čo sa stalo. Pri nezvyčajnom signále sa naša svetelná brána automaticky uzavrela a Ochranné pole uzamklo niektoré cesty. Chránilo náš svet pred nebezpečenstvom a pred prezradením. Nikomu sa nič nestalo. Pred návratom sa musíme spojiť všetci a pripomenúť si, že nikoho nenecháme samého.",
-          "Prečítajte prvé písmeno každého z piatich riadkov nášho sľubu zhora nadol. Vytvoria slovo. Potvrďte ho v telefóne a kartu poradia zo spodnej časti listu si odložte na posledný krok."
+          "Prečítajte prvé písmeno každého z piatich riadkov nášho sľubu zhora nadol. Vytvoria slovo. Potvrďte ho v telefóne a prezradím vám, kde sa skrýva posledná indícia."
         ],
         "after": [
           "SPOLU! Presne tak. Za váš sľub posielam posledné písmeno O. Všetkých sedem je pripravených a nikto nezostane sám.",
-          "Teraz vezmite list P7. Vyfarbite správne dvojice signálov a obnovte šesť obrazoviek. Odhalené heslo porovnajte s písmenami, ktoré ste získali cestou."
+          "Posledná indícia sa skrýva pod gaučom. Nájdite ju a opravte poškodený návratový signál. Odhalené heslo porovnajte s písmenami, ktoré ste získali cestou."
         ]
       },
       "character": "guardy"
@@ -332,8 +332,8 @@ window.GAME = {
     {
       "id": "code",
       "title": "Poškodený návratový signál",
-      "label": "Úloha 7 – V chladničke",
-      "icon": "assets/location-icons/fridge.svg",
+      "label": "Úloha 7 – Pod gaučom",
+      "icon": "assets/location-icons/sofa.svg",
       "time": [
         1,
         0,
@@ -344,16 +344,16 @@ window.GAME = {
         "SVETLO"
       ],
       "placeholder": "Šesťpísmenové heslo",
-      "action": "Vezmite list P7 priložený k P6. Pripravte ceruzku alebo tmavú pastelku a servisný kľúč v hornej časti listu.",
+      "action": "Nájdite poslednú indíciu pod gaučom. Pripravte si ceruzku alebo tmavú pastelku a pozrite si servisný kľúč v hornej časti listu.",
       "task": "Na každej zo šiestich obrazoviek vyfarbite políčka so správnymi dvojicami zo servisného kľúča. Dvojice platia aj v opačnom poradí. Obrazovky čítajte zľava doprava, najprv horný a potom dolný riadok. Odhalené heslo odošlite v telefóne.",
-      "materials": "P7: šesť obrazoviek 5 × 7 políčok, tri správne dvojice symbolov a šesť políčok na heslo. P6 a zápisník na porovnanie získaných písmen.",
+      "materials": "P7: šesť obrazoviek 5 × 7 políčok, tri správne dvojice symbolov a šesť políčok na heslo. Nazbierané písmená z úloh 1–6 na porovnanie.",
       "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
       "solution": "Správne dvojice ○–□, △–◇ a +–★ (aj obrátene) odhalia na šiestich obrazovkách S, V, E, T, L, O → SVETLO. Heslo sa zhoduje s písmenami z úloh 1–6.",
       "hints": [
         "Vyfarbujte celé políčka, iba ak oba symboly tvoria niektorú dvojicu zo servisného kľúča. Poradie dvojice nehrá rolu.",
         "Čítajte obrazovky 1–6. Prvá odhalí S. Odhalené písmená porovnajte s indíciami z úloh 1–6."
       ],
-      "parent": "P7 priložte k P6 do chladničky. Netreba strihať. Deti vyfarbia 6 obrazoviek a získajú SVETLO; potom heslo odošlú v telefóne. Čiernobiela tlač funguje. Nie je tu časový limit.",
+      "parent": "Vytlačenú indíciu k P7 ukryte pod gauč na dosah ruky, aby deti nemuseli presúvať nábytok. Netreba strihať. Vyfarbením 6 obrazoviek získajú SVETLO a heslo odošlú v telefóne. Čiernobiela tlač funguje.",
       "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -361,18 +361,18 @@ window.GAME = {
       "narrative": {
         "before": [
           "Už sme všetci v spojení a cesta domov je pripravená. Návratový signál sa však rozpadol na množstvo drobných značiek. Pomôžete nám ho obnoviť?",
-          "Servisný kľúč na liste P7 ukazuje tri dvojice, ktoré patria k sebe. Vyfarbite celé políčka s týmito dvojicami; platia aj v opačnom poradí. Ostatné nechajte prázdne. Postupne sa objaví šesť písmen.",
+          "Servisný kľúč na tomto liste ukazuje tri dvojice, ktoré patria k sebe. Vyfarbite celé políčka s týmito dvojicami; platia aj v opačnom poradí. Ostatné nechajte prázdne. Postupne sa objaví šesť písmen.",
           "Obrazovky čítajte v poradí od jednej po šesť. Heslo porovnajte s písmenami získanými počas cesty, vyslovte ho celým tímom a odošlite v telefóne. Ja prejdem ako posledný."
         ],
         "after": [
-          "SVETLO! Funguje to! Všetci pomáhajú a bezpečná cesta sa rozsvietila až k našim dverám.",
-          "Už počujem kamarátov: „Piko. Poď.“ Kamarátov som ešte raz spočítal a idem za nimi ako posledný. Potvrďte posledný krok a ukážem vám, že sme sa dostali domov všetci."
+          "SVETLO! Funguje to! Bezpečná cesta sa rozsvietila a celá partia sa môže vrátiť domov.",
+          "Všetci sme pripravení. Poďte si prečítať našu rozlúčku."
         ]
       }
     },
     {
       "id": "finale",
-      "title": "Tajomstvo zostáva doma",
+      "title": "Ďakujeme, kamaráti!",
       "label": "Finále – Domov",
       "icon": "assets/location-icons/home.svg",
       "time": [
@@ -380,15 +380,15 @@ window.GAME = {
         0,
         0
       ],
-      "action": "Dajte si tímové plácnutie. Každý môže povedať, ktorá schopnosť Pixelkov pomohla partii a čím prispel on sám.",
-      "task": "Všetkých sedem úloh je splnených. Pixelkovia sú spolu a ich svet je znovu ukrytý. Pomenujte svoj tím a povedzte si, čím pomohol každý z vás.",
+      "action": "Prečítajte si rozlúčku celej partie. Dobrodružstvo je úspešne dokončené.",
+      "task": "Všetci sú bezpečne doma. Telefón môžete odložiť.",
       "materials": "Voliteľný diplom záchrancov Pixelkov na tlačovej stránke. Žiadne ďalšie pomôcky netreba.",
-      "mobile": "Finále obnoví skrytý svet Pixelkov; zostáva úplná mapa, zápisník a možnosť novej hry.",
+      "mobile": "Záverečná ďakovná správa bez ďalšieho zadávania a úloh. Nahrávka a voliteľné video sa doplnia po dodaní.",
       "solution": "Úspech tímu. Hra nemá prehratý koniec.",
       "hints": [
         "Každý z vás pomohol iným spôsobom."
       ],
-      "parent": "Oslávte pomoc každého člena tímu. Piko sa bezpečne vrátil ako posledný. Atlas je dobrovoľný darček na spoločné čítanie, nie ďalšia úloha.",
+      "parent": "Nechajte deti vychutnať si záverečnú rozlúčku. Žiadna ďalšia úloha ani odpoveď ich nečaká. Diplom a Atlas sú voliteľné.",
       "transition": "Všetkých sedem Pixelkov je doma. Ochranné pole je v bežnom režime a ich svet je opäť ukrytý.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
@@ -402,13 +402,11 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte, tu je Piko z domu! Všetkých sedem sme sa bezpečne vrátili za vaše obrazovky. Naše cestičky opäť svietia a Ochranné pole je znovu v bežnom režime. Tentoraz veselé pípnutia nie sú volaním o pomoc. To vás zdraví celá partia!",
-          "Ďakujem za každý nájdený odkaz aj za to, že ste si pomáhali. Vy ste spojili našu partiu a my sme spojili svoje schopnosti. Sám by som to nedokázal.",
-          "Náš svet zostane ukrytý, ale vy už poznáte jeho malé tajomstvo. Za pomoc som vám pripravil darček: Tajný atlas Pixelkov. Najprv si však dajte tímové plácnutie. Toto dobrodružstvo sme zvládli spolu!"
+          "Dokázali ste to! Všetci sme opäť spolu a cesta domov svieti. Ďakujeme, že ste nás nenechali samých.",
+          "Každý z vás pomohol — dobrým nápadom, odvahou alebo podporou kamaráta. Teraz sa môžeme bezpečne vrátiť do nášho sveta.",
+          "Keď nabudúce zabliká malé svetielko, možno vás len zdravíme. Majte sa krásne, kamaráti. A nezabudnite: spolu dokážeme viac!"
         ],
-        "after": [
-          "Cestičky opäť svietia a nikto nezostal sám. Keď sa najbližšie rozsvieti vaša obrazovka, možno vám z jej druhej strany práve mávame!"
-        ]
+        "after": []
       }
     }
   ],
@@ -557,6 +555,14 @@ window.GAME = {
       "direction": "Pokojný, spoľahlivý a srdečný hlas; hádanku povedať pomalšie, miesto neprezradiť priamo.",
       "prompt": "[relieved, proud, speaking firmly] Podarilo sa! Zámok povolil a most stále drží!\n\n[grateful, warm] Ďakujem vám, kamaráti! Už môžeme konečne bezpečne prejsť.\n\n[suddenly alert, quieter] Počkať... Za bránou sa ozval nejaký tichý šepot.\n\n[curious, speaking softly] Myslím, že je to náš posol!\n\n[thoughtful, slightly urgent] Zanechal nám indíciu, no musíme ju nájsť.\n\n[mysterious, slowly, emphasizing important words] Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov.\n\n[playful, cryptic, short pause] Majú jazyk, ale nerozprávajú. Na cestu vyrazia iba s vašimi nohami.\n\n[whispering, conspiratorial] Jeden z nich ukrýva tajný odkaz!",
       "recordingStatus": "Nová nahrávka je zapojená v hre. Pôvodná nahrávka zostáva v archíve."
+    },
+    "finale": {
+      "title": "Pikova rozlúčka",
+      "duration": "cca 25–30 sekúnd",
+      "model": "ElevenLabs v3",
+      "direction": "Rovnaký hlas ako v úvode. Srdečne, s úľavou a radosťou. Záver povedať pokojne, bez naliehavosti.",
+      "prompt": "[relieved, joyful] Dokázali ste to! Všetci sme opäť spolu a cesta domov svieti. Ďakujeme, že ste nás nenechali samých.\n\n[warm, grateful] Každý z vás pomohol — dobrým nápadom, odvahou alebo podporou kamaráta. Teraz sa môžeme bezpečne vrátiť do nášho sveta.\n\n[gentle, cheerful] Keď nabudúce zabliká malé svetielko, možno vás len zdravíme. Majte sa krásne, kamaráti. A nezabudnite: spolu dokážeme viac!",
+      "recordingStatus": "Text je pripravený na nahovorenie. Finálová nahrávka ešte nie je dodaná."
     }
   },
   "pikoMessage": [
@@ -1293,7 +1299,8 @@ window.GAME = {
       "KA"
     ]
   },
-  "guardyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=guardy"
+  "guardyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=guardy",
+  "finaleVideoPrompt": "Vytvor 25-sekundové rozlúčkové video vo formáte 9 : 16 podľa priložených referenčných obrázkov všetkých siedmich postavičiek. Presne zachovaj ich vzhľad, farby, proporcie a mäkký maľovaný pixelový štýl. Nepridávaj ďalšie postavy. Modrá postavička má hlavu v tvare obláčika, tvár na displeji, oblek a tyrkysovú kravatu. USB postavička nemá káblový chvost. Ochranca má podobu oranžového zdobeného štítu s tyrkysovou kravatou a azúrovou kľúčovou dierkou.\n\n0–6 s: Útulná ľudská obývačka. Celá partia stojí pri malej svetelnej bráne do digitálneho sveta. Kamera sa pomaly približuje a cesta pod ich nohami sa rozžiari.\n6–15 s: Postavičky zamávajú deťom do kamery. Priateľsky si ťuknú dlaňami. Modrá postavička s hlavou v tvare obláčika si položí ruku na srdce ako poďakovanie.\n15–22 s: Postupne prejdú bránou. Modrá postavička zostane posledná, ešte raz zamáva a pridá sa k ostatným.\n22–25 s: Brána sa jemne zmení na drobné svetielko. To dvakrát veselo zabliká a obraz pomaly stmavne.\n\nBez hovorenia, pohybov úst naznačujúcich reč, titulkov, nápisov, mien a log. Povolená je jemná hudba bez spevu, digitálne pípnutia a zvuk trblietania. Žiadne prudké záblesky ani strašidelné efekty. Hlas rozlúčky vznikne ako samostatná nahrávka; video nesmie obsahovať hovorený prejav."
 };
 
 // All reading surfaces derive from the same authored story.

@@ -25,9 +25,9 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 | P2, okno | D → A, KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Iba papier, bez QR; V sa zachová pri vstupe na P3. |
 | P3, pod stoličkou | △ 3, ○ 2, □ 4; tabuľka 5 × 7 odhalí 9, E, hádanka smeruje k topánkam. |
 | P4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. P5 pod vankúšom v detskej posteli. |
-| P5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. P6 a P7 sú v chladničke. |
+| P5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. P6 je v chladničke; P7 je samostatne pod gaučom. |
 | P6, chladnička | QR otvorí úlohu 6; akrostich SPOLU → O. Ochranné pole partiu chráni, nie je nepriateľom. |
-| P7, poškodený signál | Vyfarbovanie správnych dvojíc na šiestich obrazovkách → SVETLO; potvrdenie v telefóne. Vráti sa všetkých sedem, Piko posledný. |
+| P7, pod gaučom | Vyfarbovanie správnych dvojíc na šiestich obrazovkách → SVETLO; potvrdenie v telefóne. Vráti sa všetkých sedem, Piko posledný. |
 
 Úkryty sú suché a dostupné bez presúvania nábytku; okno sa neotvára. P1 a kruhy P2 strihajú deti, P4 a P7 zostávajú celé. Čiernobiela tlač je plne hrateľná.
 
@@ -80,3 +80,5 @@ ID aj publikum sú zachované. Build vzniká cez `node scripts/prepare-static.mj
 Priama tlač webových listov zachováva samostatné strany aj pri voľbe kratšieho papiera Letter: celé rozloženie vrátane pätičky sa rovnomerne prispôsobí. A4 aj stiahnutý deväťstranový PDF balík zostávajú v pôvodnej mierke. Regresný test overuje kompletnú tlač s hlavičkami aj bez nich a samostatný list P2.
 
 Tlačové listy používajú spoločné typografické roly v `signal-print.css`: hlavné správy a pracovné pokyny 9 pt Arial, doplňujúce vysvetlenia 8 pt, hlavné nadpisy 21 pt. Menšie popisky a pätičky sú oddelené od hráčskych pokynov; samotné šifry, rovnice a získané písmená zostávajú zámerne výraznejšie. QR kódy na P1, P3 a P5 majú jednotne 32 × 32 mm vrátane bieleho okraja štyroch modulov. Generátor používa korekciu H; pôvodné URL sa nemenia. Test číta korekčnú úroveň priamo z formátových bitov vygenerovaných SVG, dekóduje aj vzorku s vymazanou plochou a porovnáva typografiu i rozmery v Chromium a WebKite.
+
+Podklady pre Pikovu záverečnú nahrávku a voliteľné video bez hovorenia (25 s) sú v [docs/finale-podklady.md](docs/finale-podklady.md) aj v storyboarde pri finále. Kým nie sú dodané médiá, hra zobrazuje celú rozlúčku ako text bez ďalšej úlohy. Označenia P1–P7 sú určené iba rodičovi, nie detským pokynom.

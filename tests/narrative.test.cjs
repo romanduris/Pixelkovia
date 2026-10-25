@@ -38,7 +38,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
   const after=page.locator(`[data-story-stage="${stage.id}"][data-story-phase="after"]`);
   if(index===1){
    await page.locator('.signal-connected').waitFor();
-   assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*zapamätajte[\s\S]*neskôr/);
+   assert.match(await page.locator('.signal-reward').innerText(),/S[\s\S]*Zapamätajte[\s\S]*môžete telefón odložiť/);
    assert.equal(await page.locator('[data-action="next"],[data-action="notebook"]').count(),0);
    assert.equal(await page.locator('.signal-content audio').getAttribute('src'),'assets/Miky.mp3','new recording stays available with text fallback');
    await page.locator('[data-action="read-miky-message"]').click();
@@ -46,7 +46,7 @@ const normal=text=>text.replace(/\s+/g,' ').trim();
    await page.locator('.dialog-close').click();
    await page.goto(BASE+'/game.html?signal=sutko');continue;
   }
-  if(index===3){await page.locator('.plugy-connected').waitFor();assert.equal(await page.locator('#plugy-transcript').count(),0);await page.locator('[data-action="read-plugy-message"]').click();await page.locator('#plugy-transcript').waitFor();assert.equal(normal((await page.locator('#plugy-transcript p').allTextContents()).join(' ')),normal(stage.narrative.after.join(' ')));await page.locator('.dialog-close').click();assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*neskôr/);assert.equal(await page.locator('[data-action="next"]').count(),0);await page.goto(BASE+'/game.html?signal=listok');continue;}
+  if(index===3){await page.locator('.plugy-connected').waitFor();assert.equal(await page.locator('#plugy-transcript').count(),0);await page.locator('[data-action="read-plugy-message"]').click();await page.locator('#plugy-transcript').waitFor();assert.equal(normal((await page.locator('#plugy-transcript p').allTextContents()).join(' ')),normal(stage.narrative.after.join(' ')));await page.locator('.dialog-close').click();assert.match(await page.locator('.signal-reward').innerText(),/E[\s\S]*môžete telefón odložiť/);assert.equal(await page.locator('[data-action="next"]').count(),0);await page.goto(BASE+'/game.html?signal=listok');continue;}
   await after.waitFor();
   assert.equal(normal(await after.innerText()),normal(stage.narrative.after.join(' ')),stage.id+': thanks, discovery and next step are visible without media');
   if(index===4)assert.match(await after.innerText(),/OCHRANA AKTÍVNA/);

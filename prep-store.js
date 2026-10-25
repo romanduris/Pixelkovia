@@ -12,7 +12,7 @@
     {id:'symbols', revision:'party-chair-v1', label:'Obálka Úloha 3 s P3 je prilepená zo spodnej strany sedadla stoličky.'},
     {id:'shoes', revision:'paper-puzzles-v2', label:'Obálka (indícia) 3 s pripraveným P4 je ukrytá v čistej suchej topánke na dosah detí.'},
     {id:'table', revision:'cipko-games-v1', label:'P5 s QR je pod vankúšom v detskej posteli, označený „Úloha 5“.'},
-    {id:'chair', revision:'fridge-v1', label:'P6 a P7 sú v suchom uzavretom obale v chladničke na dosah detí, označené „Úloha 6“.'},
+    {id:'chair', revision:'fridge-sofa-v2', label:'Indícia k P6 je v suchom uzavretom obale v chladničke, označená „Úloha 6“. Indícia k P7 je samostatne pod gaučom na dosah ruky.'},
     {id:'media', label:'Overil som čitateľnosť správ v telefóne; video a zvuk sú voliteľným doplnkom.'},
     {id:'phone', label:'Telefón je nabitý, pripravený a tím môže začať.'}
   ].map(step => ({...step, required:true}));

@@ -230,7 +230,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   else await page.locator('[data-action="next"]').click();
  }
  assert.equal(await page.locator('.finale').count(),1);entireJourney+=await readScene(page);
- assert.ok(entireJourney.includes('bezpečne vrátili'));
+ assert.ok((await page.locator('.finale').innerText()).includes('spolu dokážeme viac'));
  assert.equal(await page.locator('.finale .contact.connected').count(),7);
  assert.equal(await page.locator('.finale .contact small').first().textContent(),'Doma ✓');
  assert.equal(await page.locator('.atlas-cta').count(),1);

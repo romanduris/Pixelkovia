@@ -1,0 +1,35 @@
+const assert=require('node:assert/strict');
+const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress';
+(async()=>{for(const [engine,device] of [[chromium,devices['Pixel 7']],[webkit,devices['iPhone 13']]]){
+ const browser=await engine.launch();try{
+  const context=await browser.newContext(device),page=await context.newPage(),errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(BASE+'/printables.html');
+  for(let i=1;i<=7;i++)assert.doesNotMatch(await page.locator('#p'+i).innerText(),/\bP[1-7]\b/,'children read ordinary instructions without production IDs');
+  assert.match(await page.locator('.guide-stage[data-stage="code"]').innerText(),/P7[\s\S]*Pod gaučom/);
+  assert.doesNotMatch(await page.locator('.guide-stage[data-stage="search"]').innerText(),/P7/,'fridge contains only task 6');
+  await page.goto(BASE+'/game.html?signal=guardy');
+  await page.locator('#answer').fill('SPOLU');await page.locator('.answer-form button').tap();
+  assert.match(await page.locator('.signal-content').innerText(),/pod gaučom/);
+  assert.doesNotMatch(await page.locator('.signal-content').innerText(),/\bP[1-7]\b/);
+  await page.locator('[data-action="next"]').tap();
+  assert.equal(await page.locator('h1').innerText(),'Úloha 7 – Pod gaučom');
+  assert.doesNotMatch(await page.locator('.signal-content').innerText(),/\bP[1-7]\b/);
+  await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();await page.locator('[data-action="next"]').tap();
+  assert.equal(await page.locator('.finale .scene-reader,.finale form').count(),0,'farewell has no pages or additional answers');
+  const farewell=await page.locator('.finale [data-story-stage="finale"]').innerText();
+  assert.match(farewell,/Dokázali ste to/);assert.match(farewell,/spolu dokážeme viac/);
+  assert.match(await page.locator('.finale .phone-away').innerText(),/Telefón môžete odložiť/);
+  assert.deepEqual(await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)).completed,KEY),[6,7]);
+  await page.screenshot({path:'/tmp/pixelkovia-farewell-'+engine.name()+'.png',fullPage:true});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await page.goto(BASE+'/parent.html');for(const checkbox of await page.locator('[data-check]').all())await checkbox.check();await page.locator('[data-action="start"]').tap();assert.equal(await page.locator('.finale').count(),1,'farewell survives resume');
+  await page.goto(BASE+'/storyboard.html');await page.locator('#gm-finale .storyboard-toggle').tap();
+  await page.locator('[data-target="finale-message-tts"]').tap();
+  assert.equal(await page.locator('#finale-message-tts pre').innerText(),await page.evaluate(()=>GAME.voiceScripts.finale.prompt));
+  assert.doesNotMatch(await page.locator('#finale-message-tts pre').innerText(),/Piko|Miky|Pixi|Plugy|Pingy|Čipko|Guardy/,'new spoken script has no concrete names');
+  await page.locator('[data-target="finale-video-prompt"]').tap();assert.match(await page.locator('#finale-video-prompt').innerText(),/25-sekundové[\s\S]*Bez hovorenia/);
+  assert.deepEqual(errors,[]);console.log('PASS '+engine.name()+': child copy without P codes, separate fridge/sofa hiding places, simple persistent farewell and authoring scripts.');
+ }finally{await browser.close();}}
+})().catch(e=>{console.error(e);process.exit(1)});
