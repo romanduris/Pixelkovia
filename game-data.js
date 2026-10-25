@@ -12,7 +12,7 @@ window.GAME = {
       "id": "intro",
       "title": "Piko – stratené spojenie",
       "label": "Úvod – Telefón",
-      "icon": "✉️",
+      "icon": "assets/location-icons/phone.svg",
       "time": [
         4,
         0,
@@ -56,7 +56,7 @@ window.GAME = {
       "id": "envelope",
       "title": "Miky – stratené signály",
       "label": "Úloha 1 – Kúpeľňa",
-      "icon": "🚿",
+      "icon": "assets/location-icons/bathroom.svg",
       "time": [
         1,
         2,
@@ -106,7 +106,7 @@ window.GAME = {
       "id": "document",
       "title": "Pixi – zašifrovaná správa",
       "label": "Úloha 2 – Pri okne",
-      "icon": "🪟",
+      "icon": "assets/location-icons/window.svg",
       "time": [
         1,
         2,
@@ -149,7 +149,7 @@ window.GAME = {
       "id": "symbols",
       "title": "Plugy – zamknutý digitálny most",
       "label": "Úloha 3 – Pod stoličkou",
-      "icon": "🪑",
+      "icon": "assets/location-icons/chair.svg",
       "time": [
         1,
         2,
@@ -198,7 +198,7 @@ window.GAME = {
       "id": "cipher",
       "title": "Pingy – doručte stratenú správu",
       "label": "Úloha 4 – Pri topánkach",
-      "icon": "👟",
+      "icon": "assets/location-icons/shoes.svg",
       "time": [
         1,
         0,
@@ -251,7 +251,7 @@ window.GAME = {
       "id": "maze",
       "title": "Čipko – štyri opravy signálu",
       "label": "Úloha 5 – V posteli",
-      "icon": "🗺️",
+      "icon": "assets/location-icons/bed.svg",
       "time": [
         1,
         4,
@@ -292,7 +292,7 @@ window.GAME = {
       "id": "search",
       "title": "Guardy – Ochranné pole",
       "label": "Úloha 6 – V chladničke",
-      "icon": "🔎",
+      "icon": "assets/location-icons/fridge.svg",
       "time": [
         1,
         4,
@@ -334,7 +334,7 @@ window.GAME = {
       "id": "code",
       "title": "Poškodený návratový signál",
       "label": "Úloha 7 – V chladničke",
-      "icon": "⚡",
+      "icon": "assets/location-icons/fridge.svg",
       "time": [
         1,
         0,
@@ -375,7 +375,7 @@ window.GAME = {
       "id": "finale",
       "title": "Tajomstvo zostáva doma",
       "label": "Finále – Domov",
-      "icon": "✨",
+      "icon": "assets/location-icons/home.svg",
       "time": [
         3,
         0,

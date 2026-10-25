@@ -4,7 +4,7 @@
   'use strict';
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function storyboardIcon(stage){
-    return esc(stage.icon);
+    return `<img src="${esc(stage.icon)}" alt="" width="28" height="28">`;
   }
   const materials=[
     {id:'p1',task:'01',title:'Mikyho rozhádzané signály',where:'Indícia Kúpeľňa',copy:'Celý list pripravte ako jednu indíciu. Šesť signálov vystrihujú až deti.',status:'Hotový list A4',character:'miky'},
@@ -86,5 +86,5 @@
   }
   function designer({sprite,fullScene}){return `<section class="studio-header"><div><span class="section-kicker">VÝVOJÁRSKE ZÁKULISIE / OBSAHUJE RIEŠENIA</span><h1 class="screen-heading" tabindex="-1">StoryBoard</h1></div>${sprite('cipko')}</section><nav class="designer-bar" aria-label="Interná navigácia"><a class="btn secondary small" href="parent.html" target="_blank" rel="noopener noreferrer">Customer page</a><a class="btn secondary small" href="atlas.html?internalPreview=1" target="_blank" rel="noopener noreferrer">Atlas Pixelkov</a><a class="btn secondary small" href="printables.html?internalPreview=1" target="_blank" rel="noopener noreferrer">Tlačové materiály</a></nav>
     <div class="studio-timeline">${GAME.stages.map((s,i)=>{const label=PRINT_MATERIALS.parentInstructions[s.id].label;return `<article class="storyboard is-collapsed ${i===1?'bathroom-stage':''}" id="gm-${s.id}"><div class="storyboard-head"><button class="storyboard-toggle" data-action="toggle-storyboard" data-label="${esc(label)}" aria-expanded="false" aria-controls="gm-content-${s.id}" aria-label="Rozbaliť blok ${esc(label)}"><span aria-hidden="true">+</span></button><span class="storyboard-stage-icon" aria-hidden="true">${storyboardIcon(s)}</span><div class="storyboard-heading"><span class="section-kicker">${esc(s.title)} / ${s.time.reduce((a,b)=>a+b,0)} min${s.reward?' / indícia '+s.reward:''}</span><h2>${esc(label)}</h2></div>${s.paperOnly?'':`<button class="btn secondary small storyboard-test" data-action="test" data-stage="${i}">Test</button>`}</div><div class="storyboard-content" id="gm-content-${s.id}" hidden>${stageBody(s,i,fullScene)}</div></article>`;}).join('')}</div>`;}
-  window.SITE_CONTENT={sales,prep,designer,materials};
+  window.SITE_CONTENT={sales,prep,designer,materials,stageIcon:storyboardIcon};
 })();

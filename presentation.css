@@ -271,3 +271,7 @@ body[data-environment="designer"] .symbol-puzzle .plugy-phone-panel p{margin:0;l
   .sales-hero .hero-meta>span>span{white-space:nowrap}
   .sales-hero .hero-meta small{white-space:normal;line-height:1.4}
 }
+
+/* Location symbols use SVG so windows and fridges render on every device. */
+body[data-environment="designer"] .storyboard-stage-icon img{display:block;width:100%;height:100%;object-fit:contain}
+.chapter-icon img{display:block;width:28px;height:28px;object-fit:contain}
