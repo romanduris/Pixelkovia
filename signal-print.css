@@ -435,3 +435,7 @@
  #p5 .worksheet-next{padding:2mm 3mm;margin:2mm 0}
  #p5 .worksheet-next p{font-size:var(--sheet-copy)}
 }
+
+.parent-guide .guide-reward{font-size:11px;line-height:1.4;margin:0}
+.parent-guide .guide-reward>strong{color:#234c71}
+@media print{.parent-guide .guide-reward{font-size:9pt}}
