@@ -193,6 +193,13 @@
       const story=document.querySelector('.miky-print-story');story.querySelector('.sheet-avatar')?.remove();
       return story.innerHTML+document.querySelector('.miky-print-mission').innerHTML;
     }
+    if(id==='p5') {
+      const heading=document.querySelector('.worksheet-heading h2');
+      const story=document.querySelector('.worksheet-story');
+      story.querySelector('.worksheet-speaker')?.remove();
+      // The printed key and answer boxes are already visible in the PDF preview.
+      return heading.outerHTML+story.outerHTML+document.querySelector('.worksheet-mission').outerHTML;
+    }
     const sheet=document.querySelector('.sheet');
     sheet.querySelectorAll('.quest-party figcaption').forEach(node=>node.remove());
     sheet.querySelector('.worksheet-heading .label')?.remove();
