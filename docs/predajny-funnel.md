@@ -48,3 +48,5 @@ Presné prompty a vstupy: [funnel-image-prompts.json](funnel-image-prompts.json)
 Samostatne prešla kontrola migrácie uloženého postupu. Rozloženie sa vizuálne kontroluje na mobilných aj desktopových snímkach, vrátane úvodu, pracovných listov, postáv a súhrnu objednávky.
 
 Obmedzenia: miestny WebKit padá aj na samostatnom HTML `<h1>Test</h1>` bez projektu; jeho overenie v tomto prostredí nie je spoľahlivé. Existujúce `mission-data.test.cjs` očakáva starú formuláciu „iba celý P1“ v nezmenených herných dátach, ktoré už používajú „iba celý list k úlohe 1“. Existujúci `narrative.test.cjs` čaká scénu pri úlohe `search`, ktorú aktuálny hráč nezobrazuje týmto spôsobom. Tieto staršie nezhody sa v rámci predajnej stránky nemenili.
+
+Následná mobilná úprava s novými fotografickými scénami a skutočnými zábermi hry: [mobile-sales.md](mobile-sales.md).

@@ -46,3 +46,9 @@ Caveat v fonts/Caveat.ttf zostáva pod licenciou fonts/OFL-Caveat.txt.
 ## Predajný funnel, október 2026
 
 Aktuálna stránka používa nové ilustračné scény `family-signal-puzzle-v2.webp` a `family-cipher-puzzle-v2.webp`, pripravené vstavaným image_gen podľa skutočných listov 1 a 2. Pôvodné rodinné obrázky zostávajú archívne. Úvodná mobilná kompozícia používa `pixelkovia-room-mobile.webp` s CSS výrezom, aby bola celá partia hneď viditeľná; nákupné tlačidlo je už v úvode. Mená a predajné texty zostávajú v HTML. Presné prompty, vybrané súbory a kontext sú v [dokumentácii funnelu](../docs/predajny-funnel.md) a [promptov](../docs/funnel-image-prompts.json).
+
+## Mobilné zábery s telefónom a papierom
+
+Aktuálny funnel používa dve portrétové scény `sales/family-opening-mobile.webp` a `sales/family-lock-mobile.webp` s variantmi 640, 960 a 1200 px. Vznikli vstavaným image_gen podľa skutočného videa, PDF a snímky rozťukanej úlohy 3. Postavy nemajú mená v bitmape. Priame nemenené herné zábery sú samostatne v `sales/opening-video-frame.webp` a `sales/game-lock-partial.webp`. Pôvodné rodinné ilustrácie zostávajú archívne. [Popis a uložené prompty](../docs/mobile-sales.md).
+
+Predajná aj objednávková stránka používajú `sales/characters/*.webp`: priehľadné rozmerové kópie schválených portrétov, 512 px, spolu približne 384 kB. Pôvodných sedem PNG s celkovou veľkosťou 7,2 MB zostáva zdrojom pre hru a tlačoviny.

@@ -8,7 +8,7 @@
   document.querySelector('[data-book-price]').textContent=money(product('bedtime-book').priceCents);
   document.querySelector('[data-bundle-price]').textContent='+'+money(product('mission-bundle').priceCents);
   document.querySelector('[data-bundle-savings]').textContent=money(offer.missionIds.reduce((sum,id)=>sum+product(id).priceCents,0)-product('mission-bundle').priceCents);
-  document.querySelector('#mission-options').innerHTML=offer.missionIds.map(id=>{const p=product(id);return `<label class="mission-choice"><input type="checkbox" name="mission" value="${id}"><img src="assets/characters/${p.character}.png" alt="" width="52" height="52"><span><b>${p.name}</b><small>Samostatné doplnkové dobrodružstvo</small></span><strong>+${money(p.priceCents)}</strong></label>`;}).join('');
+  document.querySelector('#mission-options').innerHTML=offer.missionIds.map(id=>{const p=product(id);return `<label class="mission-choice"><input type="checkbox" name="mission" value="${id}"><img src="assets/sales/characters/${p.character}.webp" alt="" width="52" height="52"><span><b>${p.name}</b><small>Samostatné doplnkové dobrodružstvo</small></span><strong>+${money(p.priceCents)}</strong></label>`;}).join('');
   function update(){
     const q=quote([...selected]),all=selected.size===offer.missionIds.length;
     document.querySelector('#all-missions').checked=all;
