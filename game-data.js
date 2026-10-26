@@ -579,11 +579,11 @@ window.GAME = {
     },
     "guardy": {
       "title": "Guardyho správa po oprave poškodených správ",
-      "duration": "cca 35–40 sekúnd",
+      "duration": "cca 33 sekúnd",
       "model": "ElevenLabs v3",
       "direction": "Pokojný, spoľahlivý ochranca. Na začiatku úľava a poďakovanie, pri poslednom signále zvedavosť. Úkryt pod gaučom vysloviť zreteľne s krátkou pauzou.",
       "prompt": "[relieved, proud] Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!\n\n[warm, grateful] Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.\n\n[curious, then certain] Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.\n\n[encouraging, cheerful] Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!",
-      "recordingStatus": "Text je pripravený na nahovorenie. Guardyho nahrávka ešte nie je dodaná."
+      "recordingStatus": "Dodaná nahrávka je zapojená v hre aj storyboarde. Prehrá sa po správnom kóde v úlohe 6."
     }
   },
   "pikoMessage": [
@@ -673,6 +673,10 @@ window.GAME = {
     },
     "plugy": {
       "expectedFile": "assets/Plugy.mp3",
+      "status": "available"
+    },
+    "guardy": {
+      "expectedFile": "assets/Guardy.mp3",
       "status": "available"
     }
   },
@@ -1270,7 +1274,8 @@ window.GAME = {
     "Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.",
     "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
     "Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!"
-  ]
+  ],
+  "guardyAudio": "assets/Guardy.mp3"
 };
 
 // All reading surfaces derive from the same authored story.

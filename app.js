@@ -135,8 +135,8 @@
     const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',6:'Zadajte sedemmiestny kód z opravených správ.',7:'Zadajte spoločné návratové heslo.'}[n];
     const title=done?(t.id==='search'?'SPRÁVY OPRAVENÉ':t.character?'SPOJENIE OBNOVENÉ!':'NÁVRATOVÝ SIGNÁL PRIJATÝ'):t.label;
     const controls=`<form class="answer-form signal-form"><label for="answer">${t.id==='code'?'Návratové heslo':n===6?'Sedemmiestny kód':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${n===3||n===6?'numeric':'text'}" maxlength="40" autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
-    if((n===6||n===7)&&!done)return `<section class="signal-screen signal-task code-check-screen ${n===6?'guardy':'return'}-check-screen" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',n===6?'OVERENIE KÓDU':'NÁVRATOVÁ BRÁNA')}<div class="signal-content"><h1 id="stage-title" tabindex="-1">${esc(title)}</h1><img class="code-check-party ${n===6?'guardy-happy-party':''}" src="assets/guardy-party-transparent.png" alt="Celá veselá partia siedmich Pixelkov je spolu."><div class="code-check-entry"><p>${n===6?'Číslice pri opravených správach prečítajte zhora nadol a vzniknutý sedemmiestny kód zadajte tu:':'Zadajte návratové heslo zo získaných znakov.'}</p>${controls}<p class="feedback" id="feedback" role="status"></p></div></div></section>`;
-    return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`${t.reward?`<div class="signal-reward"><span>${t.id==='code'?'BRÁNA OTVORENÁ':'VÁŠ NÁVRATOVÝ ZNAK'}</span><strong>${esc(t.reward)}</strong>${t.id==='code'?'':'<small>Tento návratový znak si dobre zapamätajte. Budete ho potrebovať neskôr.</small>'}</div>`:''}${n===6?`<p>Spojenie s ochrancom je obnovené. Čaká vás jeho správa.</p><details class="guardy-message"><summary>Prečítať Guardyho správu</summary>${STORY_TEXT.html(t,'after')}</details>`:STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${t.id==='code'?'Prečítať rozlúčku':'Pokračovať'} →</button>${t.id==='code'?taskCompletionNote('Návratová brána je otvorená. Pokračujte k rozlúčke celej partie.'):taskCompletionNote()}`:`${n===6?'':STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${n===6?'':taskHints()}`}</div></section>`;
+    if((n===6||n===7)&&!done)return `<section class="signal-screen signal-task code-check-screen ${n===6?'guardy':'return'}-check-screen" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',n===6?'OVERENIE KÓDU':'NÁVRATOVÁ BRÁNA')}<div class="signal-content"><h1 id="stage-title" tabindex="-1">${esc(title)}</h1><img class="code-check-party ${n===6?'guardy-happy-party':''}" src="assets/guardy-party-transparent.png" alt="Celá veselá partia siedmich Pixelkov je spolu."><div class="code-check-entry"><p>${n===6?'Číslice pri opravených správach prečítajte zhora nadol a vzniknutý sedemmiestny kód zadajte tu:':'Zadajte návratové heslo zo získaných znakov.'}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${n===6&&GAME.guardyAudio?'<span data-guardy-audio-slot hidden></span>':''}</div></div></section>`;
+    return `<section class="signal-screen ${done?'signal-stage-result success-card':'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`${t.reward?`<div class="signal-reward"><span>${t.id==='code'?'BRÁNA OTVORENÁ':'VÁŠ NÁVRATOVÝ ZNAK'}</span><strong>${esc(t.reward)}</strong>${t.id==='code'?'':'<small>Tento návratový znak si dobre zapamätajte. Budete ho potrebovať neskôr.</small>'}</div>`:''}${n===6?`<p>Spojenie s ochrancom je obnovené. Čaká vás jeho správa.</p>${GAME.guardyAudio?'<span data-guardy-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="guardy-audio-toggle" aria-controls="guardy-audio">▶ Prehrať Guardyho správu</button></div><p id="guardy-audio-status" role="status">Ťuknutím spustíte Guardyho správu.</p>':''}<details class="guardy-message"><summary>Prečítať Guardyho správu</summary>${STORY_TEXT.html(t,'after')}</details>`:STORY_TEXT.html(t,'after')}<button class="btn" data-action="next">${t.id==='code'?'Prečítať rozlúčku':'Pokračovať'} →</button>${t.id==='code'?taskCompletionNote('Návratová brána je otvorená. Pokračujte k rozlúčke celej partie.'):taskCompletionNote()}`:`${n===6?'':STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${n===6?'':taskHints()}`}</div></section>`;
   }
   function taskCompletionNote(text='Po vypočutí alebo prečítaní správy môžete telefón odložiť a ísť hľadať ďalšiu indíciu.') {return `<p class="task-completion-note">${esc(text)}</p>`;}
   function signalHeader(back,label){return `<header class="signal-header"><button class="text-link" data-action="${back}">← ${preview?'Späť do storyboardu':'Prehľad hry'}</button><span class="section-kicker">PIXEL / ${label}</span><button class="text-link" data-action="game-fullscreen" aria-label="Zapnúť celú obrazovku">⛶</button></header>`;}
@@ -261,22 +261,22 @@
       if(error.name==='NotAllowedError')audio.mikyBlocked();else audio.mikyFallback();
     });
   }
-  function bindMikyAudio(autoplay=false){
-    const audio=app.querySelector('#miky-audio');if(!audio)return;
-    const screen=audio.closest('.signal-screen'),status=app.querySelector('#miky-audio-status'),button=app.querySelector('[data-action="miky-audio-toggle"]');
+  function bindMessageAudio(autoplay=false,id='miky',name='Miky'){
+    const audio=app.querySelector('#'+id+'-audio');if(!audio)return;
+    const screen=audio.closest('.signal-screen'),status=app.querySelector('#'+id+'-audio-status'),button=app.querySelector('[data-action="'+id+'-audio-toggle"]');
     if(!button||!status)return;
     const events=new AbortController();audio.mikyEvents=events;
     const listen=(name,handler)=>audio.addEventListener(name,handler,{signal:events.signal});
     let failed=false,attempted=autoplay;
     const idle=()=>{screen.classList.remove('is-speaking');button.textContent=audio.ended||audio.mikyReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať správu';};
     const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;audio.pause();idle();button.textContent='↻ Skúsiť prehrať znova';messageAudioStatus(status,'Správu sa nepodarilo prehrať. Môžete si ju prečítať.');};
-    listen('play',()=>{attempted=true;failed=false;audio.mikyReplayReady=false;button.textContent='Ⅱ Pozastaviť';messageAudioStatus(status,'Načítavam Mikyho správu…');});
-    listen('playing',()=>{screen.classList.add('is-speaking');messageAudioStatus(status,'Hovorí Miky…');});
-    listen('waiting',()=>{screen.classList.remove('is-speaking');messageAudioStatus(status,'Načítavam Mikyho správu…');});
+    listen('play',()=>{attempted=true;failed=false;audio.mikyReplayReady=false;button.textContent='Ⅱ Pozastaviť';messageAudioStatus(status,`Načítavam ${name==='Miky'?'Mikyho':'Guardyho'} správu…`);});
+    listen('playing',()=>{screen.classList.add('is-speaking');messageAudioStatus(status,`Hovorí ${name}…`);});
+    listen('waiting',()=>{screen.classList.remove('is-speaking');messageAudioStatus(status,`Načítavam ${name==='Miky'?'Mikyho':'Guardyho'} správu…`);});
     listen('pause',()=>{if(failed||!audio.paused)return;idle();messageAudioStatus(status,audio.ended?'Správu si môžete prehrať znova.':'Správa je pozastavená.');});
     listen('ended',()=>{audio.mikyReplayReady=true;idle();messageAudioStatus(status,'Správu si môžete prehrať znova.');});
     listen('error',()=>{if(attempted&&audio.error)fallback();});audio.mikyFallback=fallback;
-    audio.mikyBlocked=()=>{idle();messageAudioStatus(status,'Ťuknutím spustíte Mikyho správu.');};
+    audio.mikyBlocked=()=>{idle();messageAudioStatus(status,`Ťuknutím spustíte ${name==='Miky'?'Mikyho':'Guardyho'} správu.`);};
     if(autoplay)playMikyAudio(audio);
   }
   let answerViewportFrame=0;
@@ -302,7 +302,7 @@
       if(Math.abs(delta)>1)app.scrollTop+=delta;
     });
   }
-  function render({autoplayMiky=false,autoplayPlugy=false}={}){
+  function render({autoplayMiky=false,autoplayPlugy=false,autoplayGuardy=false}={}){
     clearTimeout(finaleEndTimer);finaleEndTimer=null;
     clearTimeout(plugyRevealTimer);plugyRevealTimer=null;
     // Old saves on the removed phone stage resume at the next playable task.
@@ -319,6 +319,9 @@
     const previousPlugyAudio=app.querySelector('#plugy-audio');
     const retainedPlugyAudio=view==='player'&&state().stage===3?previousPlugyAudio:null;
     previousPlugyAudio?.plugyEvents?.abort();
+    const previousGuardyAudio=app.querySelector('#guardy-audio');
+    const retainedGuardyAudio=view==='player'&&state().stage===6?previousGuardyAudio:null;
+    previousGuardyAudio?.mikyEvents?.abort();
     app.querySelectorAll('video,audio').forEach(media=>{
       if(!(autoplayPlugy&&media===retainedPlugyAudio&&media.plugySound?.revealing))media.pause();
     });
@@ -327,6 +330,8 @@
     else if(previousAudio){previousAudio.removeAttribute('src');previousAudio.load();}
     if(retainedPlugyAudio)document.body.append(retainedPlugyAudio);
     else if(previousPlugyAudio){releasePlugyAudio(previousPlugyAudio);previousPlugyAudio.removeAttribute('src');previousPlugyAudio.load();}
+    if(retainedGuardyAudio)document.body.append(retainedGuardyAudio);
+    else if(previousGuardyAudio){previousGuardyAudio.removeAttribute('src');previousGuardyAudio.load();}
     document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(view==='player'?'prep':view)));
     if(internal && SITE_CONFIG.access.mode !== 'test'){
       app.innerHTML='<section class="portal-header"><div><h1>Prístup zatiaľ nie je dostupný</h1><p>Produkčná verzia vyžaduje serverové overenie nákupu. V tejto etape nie je implementované.</p></div></section>';return;
@@ -341,7 +346,7 @@
       audioSlot.replaceWith(audio);
       if(!retainedAudio)audio.load();
     }else retainedAudio?.remove();
-    bindMikyAudio(autoplayMiky);
+    bindMessageAudio(autoplayMiky);
     const plugyAudioSlot=app.querySelector('[data-plugy-audio-slot]');
     if(plugyAudioSlot){
       const audio=retainedPlugyAudio||document.createElement('audio');
@@ -349,6 +354,13 @@
       plugyAudioSlot.replaceWith(audio);if(!retainedPlugyAudio)audio.load();
     }else if(retainedPlugyAudio){releasePlugyAudio(retainedPlugyAudio);retainedPlugyAudio.remove();}
     bindPlugyAudio(autoplayPlugy);
+    const guardySlot=app.querySelector('[data-guardy-audio-slot]');
+    if(guardySlot){
+      const audio=retainedGuardyAudio||document.createElement('audio');
+      if(!retainedGuardyAudio){audio.id='guardy-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.setAttribute('aria-label','Guardyho hlasová správa');audio.src=GAME.guardyAudio;}
+      guardySlot.replaceWith(audio);if(!retainedGuardyAudio)audio.load();
+    }else retainedGuardyAudio?.remove();
+    bindMessageAudio(autoplayGuardy,'guardy','Guardy');
     bindFinaleVideo();
     if(view==='prep'){app.querySelectorAll('[data-check]').forEach(el=>{el.checked=PREP_STORE.read(el.dataset.check);});updatePreparation();}
   }
@@ -421,7 +433,7 @@
     modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
-  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3});goTop();}
+  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3,autoplayGuardy:n===6});goTop();}
   function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||state().stage===5)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:[...t.answer,...(t.legacyAnswers||[])].some(a=>normalize(raw)===normalize(a));
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
@@ -472,6 +484,10 @@
       const audio=app.querySelector('#plugy-audio');
       if(audio){if(!audio.error&&!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.plugyReplayReady)audio.currentTime=0;playPlugyAudio(audio);}}
       return;
+    }
+    if(a==='guardy-audio-toggle'){
+      const audio=app.querySelector('#guardy-audio');
+      if(audio){if(!audio.error&&!audio.paused&&!audio.ended)audio.pause();else{if(audio.ended||audio.mikyReplayReady)audio.currentTime=0;playMikyAudio(audio);}}return;
     }
     if(a==='miky-audio-toggle'){
       const audio=app.querySelector('#miky-audio');

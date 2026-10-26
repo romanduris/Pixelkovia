@@ -83,7 +83,7 @@ Tlačové listy používajú spoločné typografické roly v `signal-print.css`:
 
 Podklady pre Pikovu záverečnú nahrávku a voliteľné video bez hovorenia (10 s) sú v [docs/finale-podklady.md](docs/finale-podklady.md) aj v storyboarde pri finále. Dodané video `assets/EndScene-Dabing.mp4` je zapojené do finále a storyboardu; text rozlúčky zostáva v storyboarde. Úlohy majú jednotné označenia Úloha 1–7; v štvorčekoch rodičovského ťaháka sú skrátené na U1–U7.
 
-Aktuálna šestka overuje sedemmiestny kód 5817264 cez číselnú klávesnicu. Správa po úspechu prezradí miesto pod gaučom. Staré odpovede POD GAUC a SPOLU sa prijímajú pre už vytlačené listy; uložené splnenia sa nemenia. Šestka už nepridáva O: posledný návratový znak deti odhalia na papieri v sedmičke. Celé heslo SVETLO sa zadáva iba raz. Podklady na nahovorenie: [Guardy](docs/guardy-nahravka.md), [záverečná rozlúčka a video](docs/finale-podklady.md). Nové samostatné hlasové nahrávky ešte nie sú dodané; finálové video `assets/EndScene-Dabing.mp4` je zapojené.
+Aktuálna šestka overuje sedemmiestny kód 5817264 cez číselnú klávesnicu. Správa po úspechu prezradí miesto pod gaučom. Staré odpovede POD GAUC a SPOLU sa prijímajú pre už vytlačené listy; uložené splnenia sa nemenia. Šestka už nepridáva O: posledný návratový znak deti odhalia na papieri v sedmičke. Celé heslo SVETLO sa zadáva iba raz. Podklady na nahovorenie: [Guardy](docs/guardy-nahravka.md), [záverečná rozlúčka a video](docs/finale-podklady.md). Guardyho hlasová nahrávka je dodaná a zapojená; finálové video `assets/EndScene-Dabing.mp4` je zapojené.
 
 Zbierané písmená S, V, E, T, L, O označujeme ako návratové znaky. Prvý získaný znak vysvetľuje ich použitie v spoločnom hesle. Bežné písmená šifier a názvy fyzických indícií majú vlastný význam.
 
@@ -98,3 +98,5 @@ Záverečná reč má cieľ 7–8 sekúnd do 10-sekundového videa. Video prompt
 Po dohraní záverečného videa zostane dekódovaný posledný záber a po 1 sekunde sa nad ním zobrazí KONIEC. Pri opakovanom spustení, posunutí prehrávania a obnovení stránky sa nápis skryje; stav titulku sa neukladá do postupu.
 
 Po overení SVETLO sa priamo zobrazí iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, maximálne video a tlačidlo Koniec hry. Ovládanie prehrávania je priamo nad videom. Koniec hry zastaví prehrávanie a pokúsi sa zavrieť kartu; ak prehliadač zavretie nepovolí, tlačidlo vyzve na ručné zatvorenie. Uložené splnenia sa nemenia; staré finálové uloženia otvoria rovnakú obrazovku.
+
+Guardyho dodaná nahrávka `assets/Guardy.mp3` je dostupná cez `GAME.guardyAudio` v hre aj storyboarde. Počas zadávania kódu šestky sa potichu prednačíta na tom istom prehrávači, ktorý sa zachová pri úspechu. Správny kód spustí prehrávanie v obslužnom kóde odoslania. Ovládanie podporuje pauzu, pokračovanie, opakovanie a retry; prepis ostáva zbalený. Obnovenie už vyriešenej šestky neprehráva automaticky, odchod nahrávku zastaví a uvoľní.
