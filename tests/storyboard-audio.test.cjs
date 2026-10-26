@@ -5,7 +5,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
  const browser=await engine.launch();try{
   const page=await browser.newPage(device),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE+'/storyboard.html');assert.equal(await page.locator('.recording-archive').count(),0);
-  for(const [stage,file] of [['envelope','Miky.mp3'],['symbols','Plugy.mp3']]){
+  for(const [stage,file] of [['envelope','Miky.mp3'],['symbols','Plugy.mp3'],['search','Guardy.mp3']]){
    const card=page.locator('#gm-'+stage);await card.locator('.storyboard-toggle').tap();
    const audio=card.locator('.miky-message-controls audio');assert.equal(await audio.getAttribute('src'),'assets/'+file);assert.ok(await audio.evaluate(a=>a.controls&&a.paused));
    assert.equal(await card.locator('.audio-message-button,.recording-archive').count(),0);
@@ -19,6 +19,6 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    await card.locator('.storyboard-toggle').tap();assert.ok(await audio.evaluate(a=>a.paused),'collapsing the stage pauses playback');
   }
   assert.equal(await page.locator('dialog[open]').count(),0);assert.deepEqual(errors,[]);
-  console.log('PASS '+engine.name()+': matching native Miky/Plugy players, current recordings, touch play/pause/replay, collapse cleanup and no archive controls.');
+  console.log('PASS '+engine.name()+': matching native Miky/Plugy/Guardy players, current recordings, touch play/pause/replay, collapse cleanup and no archive controls.');
  }finally{await browser.close();}
 }})().catch(e=>{console.error(e);process.exit(1)});
