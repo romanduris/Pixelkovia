@@ -497,6 +497,8 @@
 .seal-digit{font:700 22px monospace;color:#172e4d}
 .seal-order{display:block;width:25px;height:25px;border:1px solid #536b78;background:white}
 .seal-answer{display:flex;align-items:center;justify-content:space-between;gap:15px;border:1px solid #a7b9cd;padding:12px}
+.seal-code-slot{display:grid;justify-items:center;gap:4px}
+.seal-code-slot small{font:700 11px/1.3 Arial,sans-serif;color:#234c71}
 .seal-party-scene,.final-party-scene{min-width:0;margin:0;align-self:start}
 .seal-party-scene img,.final-party-scene img{width:100%;height:auto;max-height:280px;aspect-ratio:4/5;object-fit:contain;background:white}
 #p7 .final-workbench{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
@@ -515,11 +517,12 @@
 @media print{
  #p6 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
  #p6 .worksheet-story p{font-size:var(--sheet-copy);line-height:1.35}
- #p6 .worksheet-puzzle{padding:2.5mm 3mm;margin:2mm 0}
+ #p6 .worksheet-puzzle{padding:2mm 3mm;margin:2mm 0}
  #p6 .seal-workbench,#p7 .final-workbench{gap:4mm;margin:3mm 0;break-inside:avoid}
+ #p6 .seal-workbench{margin:2mm 0}
  #p6 .seal-key,#p7 .final-signal-panel{margin:0}
  #p6 .seal-pattern{width:10.5mm;height:7mm}
- #p6 .seal-key-patterns{gap:2mm;margin:2.5mm 0}
+ #p6 .seal-key-patterns{gap:2mm;margin:2mm 0}
  #p6 .seal-repair-card{gap:1.5mm;min-height:13mm;padding:1.5mm}
  #p6 .seal-repair-card b{width:5mm;height:5mm;font-size:8pt}
  #p6 .seal-example{gap:1.5mm;margin:2mm 0 0;font-size:7pt}
@@ -531,10 +534,12 @@
  #p6 .seal-digit{font-size:14pt}
  #p6 .seal-order{width:6mm;height:6mm}
  #p6 .seal-section-heading>span{font-size:6pt}
- #p6 .seal-answer{padding:2mm 3mm;margin:3mm 0}
+ #p6 .seal-answer{padding:2mm 3mm;margin:2mm 0}
  #p6 .seal-answer p{font-size:var(--sheet-copy);line-height:1.35}
  #p6 .seal-answer .code-boxes{margin:2mm 0}
  #p6 .seal-answer .code-boxes span{width:7mm;height:7mm}
+ #p6 .seal-code-slot{gap:1mm}
+ #p6 .seal-code-slot small{font-size:8pt}
  #p6 .seal-answer .worksheet-entry-qr{flex-shrink:0}
  #p6 .seal-answer img{width:var(--sheet-qr);height:var(--sheet-qr)}
  #p6 .seal-party-scene img{height:60mm;aspect-ratio:4/5}

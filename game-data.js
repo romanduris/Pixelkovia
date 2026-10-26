@@ -302,13 +302,13 @@ window.GAME = {
       ],
       "placeholder": "Sedemmiestny kód",
       "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na nájdenom liste.",
-      "task": "Opravte pečate pomocou kľúča na papieri. Číslice pri platných pečatiach prepíšte v poradí opráv 1–7 a sedemmiestny kód zadajte do telefónu.",
+      "task": "Opravte pečate pomocou kľúča na papieri. Číslicu z pečate s opravou 1 zapíšte do políčka 1, s opravou 2 do políčka 2 a tak ďalej. Rozhoduje číslo opravy, nie poloha pečate v tabuľke. Sedemmiestny kód zadajte do telefónu.",
       "materials": "Úloha 6: sedem očíslovaných opráv, deväť pečatí s číslicami a sedem políčok na kód. Dve pečate sú falošné. Posledná indícia je samostatne pod gaučom; miesto prezradí až správa po overení.",
       "mobile": "Overí kód 5817264 na číselnej klávesnici. Potom správa ochrancu prezradí úkryt pod gaučom. Nahovorenie je pripravené; kým nahrávka nie je dodaná, je dostupný jej text.",
       "solution": "Opravy presne dopĺňajú biele políčka bez prekrývania. Číslice platných pečatí podľa opráv 1–7: 5, 8, 1, 7, 2, 6, 4 → 5817264. Pečate s 9 a 0 sú falošné. Úkryt POD GAUČ prezradí až správa po overení.",
       "hints": [
         "Čierne políčka opravy presne zaplnia biele políčka pečate. Vzory neotáčajte; dve pečate nemajú vhodnú opravu.",
-        "Oprava 1 patrí k pečati s číslicou 5. Potom hľadajte číslice pri pečatiach s opravami 2–7."
+        "Oprava 1 patrí k pečati s číslicou 5: do políčka 1 preto zapíšte 5. Potom hľadajte číslice pri pečatiach s opravami 2–7. Poloha pečatí v tabuľke poradie neurčuje."
       ],
       "parent": "Vytlačenú indíciu k úlohe 6 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. Vytlačenú indíciu k úlohe 7 ukryte samostatne pod gauč na dosah ruky.",
       "transition": "Správny číselný kód obnoví bezpečnú cestu. Správa ochrancu pošle deti pod gauč po poslednú indíciu.",
@@ -319,7 +319,7 @@ window.GAME = {
         "before": [
           "Ahojte! Som ochranný štít. Strážim bezpečnú cestu medzi obrazovkami a chránim kamarátov, aby sa každý dostal domov v poriadku.",
           "Konečne počujem celú partiu! Na otvorenie bezpečnej cesty domov potrebujem overovací kód. Pri prerušení spojenia sa poškodili bezpečnostné pečate.",
-          "Opravte tie pravé a odhaľte dve falošné. Číslice pri platných pečatiach prepíšte podľa poradia opráv 1–7. Získaný kód potvrďte v telefóne."
+          "Opravte tie pravé a odhaľte dve falošné. Ku každej pravej pečati dopíšte číslo vhodnej opravy. Pomôže vám zapísať kód do očíslovaných políčok. Získaný kód potvrďte v telefóne."
         ],
         "after": [
           "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
