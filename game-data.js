@@ -559,7 +559,7 @@ window.GAME = {
       "model": "ElevenLabs v3",
       "direction": "Zvedavý a energický hlas malého mikrofónu; počúva a zachytáva zvuky.",
       "prompt": "[confused, startled] Haló?! Čo to je? Kto mi lezie do signálu?!\n\n[surprised, excited] Počkajte! Ja vás počujem! Vy ste obnovili moje spojenie?!\n\n[amazed] Ľudia?! Naozajstní ľudia?! Toto musím povedať nášmu sprievodcovi!\n\n[happy, relieved] Jééj! Už ho vidím! Konečne sme zase v spojení!\n\n[grateful, warm] Ďakujem vám! Bez vás by som sa s ním nespojil!\n\n[more serious, mysterious] Ale niečo mi stále nejde do hlavy. Tesne predtým, ako všetko zablikalo, zachytil som zvláštny signál. Opakoval sa stále dookola. Určite to nebola náhoda.\n\n[curious, hopeful] Myslím, že naša kamarátka by nám mohla pomôcť. Stará sa o svetlo a farby obrazoviek. Nájde aj to, čo ostatní nevidia!\n\n[playful, conspiratorial] Zachytil som jej posledný odkaz, ale pri prerušení spojenia sa poškodil.\n\n[encouraging, energetic] Nájdite ďalšiu indíciu tam, kde cez deň do vášho domu prichádza svetlo!\n\n[cheerful] Ešte raz vám ďakujem, kamaráti!",
-      "recordingStatus": "Nová nahrávka je zapojená v hre. Pôvodná nahrávka zostáva v archíve."
+      "recordingStatus": "Aktuálna nahrávka je zapojená v hre aj storyboarde."
     },
     "plugy": {
       "title": "Správa po odomknutí mosta",
@@ -567,7 +567,7 @@ window.GAME = {
       "model": "ElevenLabs v3",
       "direction": "Pokojný, spoľahlivý a srdečný hlas; hádanku povedať pomalšie, miesto neprezradiť priamo.",
       "prompt": "[relieved, proud, speaking firmly] Podarilo sa! Zámok povolil a most stále drží!\n\n[grateful, warm] Ďakujem vám, kamaráti! Už môžeme konečne bezpečne prejsť.\n\n[suddenly alert, quieter] Počkať... Za bránou sa ozval nejaký tichý šepot.\n\n[curious, speaking softly] Myslím, že je to náš posol!\n\n[thoughtful, slightly urgent] Zanechal nám indíciu, no musíme ju nájsť.\n\n[mysterious, slowly, emphasizing important words] Hľadajte tam, kde po návrate domov odpočívajú dvojice unavených cestovateľov.\n\n[playful, cryptic, short pause] Majú jazyk, ale nerozprávajú. Na cestu vyrazia iba s vašimi nohami.\n\n[whispering, conspiratorial] Jeden z nich ukrýva tajný odkaz!",
-      "recordingStatus": "Nová nahrávka je zapojená v hre. Pôvodná nahrávka zostáva v archíve."
+      "recordingStatus": "Aktuálna nahrávka je zapojená v hre aj storyboarde."
     },
     "finale": {
       "title": "Pikova rozlúčka",

@@ -3,28 +3,22 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 (async()=>{for(const [engine,device] of [[chromium,devices['Pixel 7']],[webkit,devices['iPhone 13']]]){
  const browser=await engine.launch();try{
-  const context=await browser.newContext(device),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(BASE+'/storyboard.html');await page.locator('#gm-symbols .storyboard-toggle').tap();
-  const launch=page.locator('#gm-symbols [data-media="plugy"]');
-  assert.ok(await launch.isVisible());assert.equal(await page.locator('dialog[open]').count(),0);
-  assert.equal(await page.locator('#gm-symbols .recording-archive audio').getAttribute('src'),'assets/Sutko.mp3');
-  await launch.tap();await page.waitForFunction(()=>{const a=document.querySelector('dialog audio');return a&&!a.paused&&a.currentTime>.1;});
-  assert.equal(await page.locator('dialog audio').getAttribute('src'),'assets/Plugy.mp3');
-  assert.match(await page.locator('.preview-media-status').innerText(),/prehráva/);
-  await page.locator('dialog audio').evaluate(a=>a.pause());assert.match(await page.locator('.preview-media-status').innerText(),/pozastavená/);
-  await page.locator('dialog audio').evaluate(a=>a.play());await page.waitForFunction(()=>!document.querySelector('dialog audio').paused);
-  await page.locator('dialog audio').evaluate(a=>{a.playbackRate=16;});await page.waitForFunction(()=>document.querySelector('dialog audio').ended);
-  assert.match(await page.locator('.preview-media-status').innerText(),/prehrať znova/);
-  await page.locator('.dialog-close').tap();await launch.tap();await page.waitForFunction(()=>{const a=document.querySelector('dialog audio');return !a.paused&&a.currentTime>.1&&a.currentTime<3;});
-  await page.screenshot({path:'/tmp/plugy-storyboard-preview-'+engine.name()+'.png'});
-  await page.locator('.dialog-close').tap();assert.ok(await page.locator('dialog audio').evaluate(a=>a.paused));
-  await page.route('**/assets/Plugy.mp3',route=>route.abort());await launch.tap();await page.waitForFunction(()=>document.querySelector('dialog audio').error);
-  assert.match(await page.locator('.preview-media-status').innerText(),/nepodarilo/);
-  await page.locator('.dialog-close').tap();await page.unroute('**/assets/Plugy.mp3');await launch.tap();await page.waitForFunction(()=>!document.querySelector('dialog audio').paused&&document.querySelector('dialog audio').currentTime>.1);
-  await page.locator('.dialog-close').tap();
-  await page.evaluate(()=>{HTMLMediaElement.prototype.play=()=>Promise.reject(new DOMException('Blocked','NotAllowedError'));});await launch.tap();
-  await page.waitForFunction(()=>document.querySelector('.preview-media-status').textContent.includes('Spustite'));
-  assert.ok(await page.locator('dialog audio').evaluate(a=>a.controls),'native controls remain available after denial');
-  assert.deepEqual(errors,[]);console.log('PASS '+engine.name()+': Plugy preview starts on tap, current MP3, native controls, status, replay, close, network recovery and blocked-play fallback.');
- }finally{await browser.close();}}
-})().catch(e=>{console.error(e);process.exit(1)});
+  const page=await browser.newPage(device),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(BASE+'/storyboard.html');assert.equal(await page.locator('.recording-archive').count(),0);
+  for(const [stage,file] of [['envelope','Miky.mp3'],['symbols','Plugy.mp3']]){
+   const card=page.locator('#gm-'+stage);await card.locator('.storyboard-toggle').tap();
+   const audio=card.locator('.miky-message-controls audio');assert.equal(await audio.getAttribute('src'),'assets/'+file);assert.ok(await audio.evaluate(a=>a.controls&&a.paused));
+   assert.equal(await card.locator('.audio-message-button,.recording-archive').count(),0);
+   // Tap the browser's own play/pause control, without changing autoplay policy.
+   await audio.tap({position:{x:20,y:21}});await page.waitForFunction(id=>{const a=document.querySelector('#gm-'+id+' .miky-message-controls audio');return a&&!a.paused&&a.currentTime>.1},stage);
+   assert.ok(await audio.evaluate(a=>!a.muted&&a.duration>20));
+   await audio.tap({position:{x:20,y:21}});await page.waitForFunction(id=>document.querySelector('#gm-'+id+' .miky-message-controls audio').paused,stage);
+   await audio.tap({position:{x:20,y:21}});await page.waitForFunction(id=>!document.querySelector('#gm-'+id+' .miky-message-controls audio').paused,stage);
+   await audio.evaluate(a=>{a.playbackRate=16});await page.waitForFunction(id=>document.querySelector('#gm-'+id+' .miky-message-controls audio').ended,stage);
+   await audio.evaluate(a=>{a.playbackRate=1});await audio.tap({position:{x:20,y:21}});await page.waitForFunction(id=>{const a=document.querySelector('#gm-'+id+' .miky-message-controls audio');return !a.paused&&a.currentTime>.1&&a.currentTime<3},stage);
+   await card.locator('.storyboard-toggle').tap();assert.ok(await audio.evaluate(a=>a.paused),'collapsing the stage pauses playback');
+  }
+  assert.equal(await page.locator('dialog[open]').count(),0);assert.deepEqual(errors,[]);
+  console.log('PASS '+engine.name()+': matching native Miky/Plugy players, current recordings, touch play/pause/replay, collapse cleanup and no archive controls.');
+ }finally{await browser.close();}
+}})().catch(e=>{console.error(e);process.exit(1)});

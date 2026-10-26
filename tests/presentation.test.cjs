@@ -77,7 +77,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await page.locator('[data-tts="piko"] h4').first().textContent(),'ElevenLabs v3 · cca 7 sekúnd');
   assert.equal(await page.locator('#gm-intro video').count(),0);
   assert.equal(await page.locator('#gm-envelope .miky-message-controls audio').getAttribute('src'),'assets/Miky.mp3');
-  assert.equal(await page.locator('#gm-envelope .recording-archive audio').getAttribute('src'),'assets/KvakMessage.mp3');
+  assert.equal(await page.locator('.recording-archive').count(),0);
   assert.ok((await page.locator('#gm-intro .script-status').textContent()).includes('Schválené pôvodné video'));
   const scripts=await page.evaluate(()=>GAME.voiceScripts);
   for(const id of ['piko','miky','plugy'])assert.equal(await page.locator(`[data-tts="${id}"] pre`).textContent(),scripts[id].prompt,'verbatim production direction');

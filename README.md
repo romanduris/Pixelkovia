@@ -33,7 +33,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 
 ## Video a dabing
 
-`assets/PicoVideo.mp4` a obe pôvodné MP3 zostávajú byte po byte nezmenené. Storyboard oddeľuje archívne nahrávky od nových textov.
+`assets/PicoVideo.mp4` a obe pôvodné MP3 zostávajú byte po byte nezmenené. Storyboard zobrazuje iba aktuálne nahrávky, bez prehrávačov pôvodných verzií.
 
 **Nové nahrávky Mikyho a Plugyho sú zapojené** cez `GAME.audio = assets/Miky.mp3` a `GAME.plugyAudio = assets/Plugy.mp3`; pôvodné súbory zostávajú v archíve. Miky sa prehrá po správnom kóde. Plugy sa počas odhalenia deviatky pripraví potichu a po odomknutí mosta sa automaticky prehrá od začiatku. Obe správy majú pauzu, pokračovanie, opakovanie a dostupný prepis. `GAME.recordings` určuje stav jednotlivých nahrávok. Testy používajú priamo dodané MP3 v dotykovom Chrome aj WebKite. Prehrávač zachováva prednačítanie, gesto, automatický štart pri úspechu, pauzu, pokračovanie, opakovanie a retry. Chyba sama neotvára prepis ani nemení postup.
 

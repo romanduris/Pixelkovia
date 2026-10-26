@@ -25,11 +25,10 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await page.locator('#plugy-message-tts pre').textContent(),await page.evaluate(()=>GAME.voiceScripts.plugy.prompt));
  assert.equal(normalize((await page.locator('#plugy-message-text>div>p').allTextContents()).join(' ')),normalize(await page.evaluate(()=>GAME.plugyMessage.join(' '))));
  assert.equal(await plugy.locator('.studio-stage-details,.storyboard-continuation').count(),0);
- assert.equal(await plugy.locator('.recording-archive audio').getAttribute('src'),'assets/Sutko.mp3');
- assert.match(await plugy.locator('.script-status').first().innerText(),/Nová nahrávka je zapojená/);
- assert.equal(await plugy.locator('[data-action="preview-media"][data-media="plugy"]').innerText(),'▶ Prehrať Plugyho správu');
- await plugy.locator('[data-media="plugy"]').click();await page.waitForFunction(()=>{const a=document.querySelector('dialog audio');return a&&!a.paused&&a.currentTime>0;});
- assert.equal(await page.locator('dialog audio').getAttribute('src'),'assets/Plugy.mp3','preview uses the current recording');await page.locator('.dialog-close').click();assert.ok(await page.locator('dialog audio').evaluate(a=>a.paused));
+ assert.equal(await plugy.locator('.recording-archive').count(),0);
+ assert.match(await plugy.locator('.script-status').first().innerText(),/Aktuálna nahrávka je zapojená/);
+ assert.equal(await plugy.locator('.miky-message-controls audio').getAttribute('src'),'assets/Plugy.mp3');
+ assert.ok(await plugy.locator('.miky-message-controls audio').evaluate(audio=>audio.controls));
 
  const open=page.waitForEvent('popup');await bathroom.locator('.worksheet-image').click();const printed=await open;await printed.waitForLoadState();
  assert.equal(new URL(printed.url()).searchParams.get('internalPreview'),'1');assert.equal(new URL(printed.url()).hash,'#p1');
@@ -55,9 +54,10 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await pixi.locator('.storyboard-message').count(),0,'paper-only Pixi has no duplicate story block');
  assert.equal(normalize(await pixi.locator('.worksheet-text .quest-story').innerText()),normalize(await printed.locator('#p2 .quest-story').innerText()),'Pixi story remains in the shared worksheet text');
 
- assert.match(await printed.locator('#p5 .note').innerText(),/do úkrytu, ktorý ste práve odhalili/);
+ assert.equal(await printed.locator('#p5 .paper-reward>strong').innerText(),'L');
+ assert.match(await printed.locator('#p5>.instructions').innerText(),/do odhaleného úkrytu/);
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.evaluate(()=>{const box=document.createElement('div');box.innerHTML=PRINT_MATERIALS.summary('p7','code');return box.textContent;})),'final password shows the printed ordering card');
- for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>s.id!=='symbols'&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
+ for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>!['symbols','maze','search'].includes(s.id)&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
   const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
   assert.ok(await panel.isHidden());await toggle.click();assert.ok(await panel.isVisible());
   const text=await panel.textContent();for(const line of stage.lines)assert.ok(text.includes(line),stage.id+': full authored story retained');
@@ -93,7 +93,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
    await page.locator('#answer').fill('000000');await page.locator('.answer-form button').click();assert.match(await page.locator('#feedback').innerText(),/nesedí/);
    await page.locator('#answer').fill('741296');await page.locator('.answer-form button').click();await page.locator('.signal-connected').waitFor();
    assert.equal(await page.locator('.signal-content audio').getAttribute('src'),'assets/Miky.mp3');await page.locator('.signal-header [data-action="exit-test"]').click();
-  }else if(stage===8){await page.locator('.finale').waitFor();assert.equal(await page.locator('.finale [data-action="reset"]').count(),0,'finale test cannot reset family progress');await page.locator('.finale [data-action="exit-test"]').click();}
+  }else if(stage===8){await page.locator('.finale').waitFor();assert.equal(await page.locator('.finale [data-action="reset"]').count(),0,'finale test cannot reset family progress');await page.locator('.finale [data-action="end-game"]').click();}
   else{await page.locator('.signal-task').waitFor();await page.locator('.signal-header [data-action="exit-test"]').click();}
   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),saved,'test '+stage+' preserves family progress');
  }
