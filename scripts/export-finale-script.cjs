@@ -38,7 +38,7 @@ ${game.finaleVideoPrompt}
 
 ## Zapojenie hotových médií
 
-GAME.finaleVideo: ${game.finaleVideo||'null'}. GAME.finaleAudio: ${game.finaleAudio||'null (samostatná hlasová stopa ešte nie je dodaná)'}. Používa sa pôvodná zvuková stopa dodaného MP4, bez pridanej TTS nahrávky. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
+GAME.finaleVideo: ${game.finaleVideo||'null'}. GAME.finaleAudio: ${game.finaleAudio||'null (samostatná hlasová stopa ešte nie je dodaná)'}. Používa sa zvuková stopa dodaného MP4 so slovenským dabingom; nepridáva sa ďalší prehrávač hlasu. Pôvodné EndScene.mp4 zostáva archívnou verziou. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
 
 Zdroj textu je game-data.js. Po jeho úprave spusti node scripts/export-finale-script.cjs.
 `;

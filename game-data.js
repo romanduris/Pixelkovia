@@ -4,7 +4,7 @@ window.GAME = {
   "audio": "assets/Miky.mp3",
   "video": "assets/PicoVideo.mp4",
   "finaleQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=navrat",
-  "finaleVideo": "assets/EndScene.mp4",
+  "finaleVideo": "assets/EndScene-Dabing.mp4",
   "finaleAudio": null,
   "mikyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
   "plugyThanks": "Ďakujem vám, kamaráti! Ste skvelí. Pomáhate nám znovu spojiť celú partiu.",
@@ -393,7 +393,7 @@ window.GAME = {
       "action": "Prečítajte si rozlúčku celej partie. Dobrodružstvo je úspešne dokončené.",
       "task": "Všetci sú bezpečne doma. Telefón môžete odložiť.",
       "materials": "Voliteľný diplom záchrancov Pixelkov na tlačovej stránke. Žiadne ďalšie pomôcky netreba.",
-      "mobile": "Záverečné video s ovládaním prehrávania a textová rozlúčka bez ďalšieho zadávania a úloh. Samostatná hlasová nahrávka zatiaľ nie je dodaná.",
+      "mobile": "Záverečné video so slovenským dabingom a ovládaním prehrávania. Textová rozlúčka zostáva dostupná, bez ďalšieho zadávania a úloh.",
       "solution": "Úspech tímu. Hra nemá prehratý koniec.",
       "hints": [
         "Každý z vás pomohol iným spôsobom."
@@ -575,7 +575,7 @@ window.GAME = {
       "model": "ElevenLabs v3",
       "direction": "Rovnaký hlas ako v úvode. Srdečne, s úľavou a radosťou. Plynulo a prirodzene, len krátke pauzy medzi vetami, bez zrýchľovania. Cieľ 7–8 sekúnd; v 10-sekundovom videu približne od 0,5 do 8,5 s. Dĺžku po vygenerovaní overiť. Hlas je voliteľný a pridáva sa neskôr k videu; záber musí fungovať aj bez neho.",
       "prompt": "[warm, cheerful] Dokázali ste to! Ďakujeme, kamaráti. Už môžeme ísť domov. Majte sa krásne!",
-      "recordingStatus": "Text je pripravený na nahovorenie. Finálová nahrávka ešte nie je dodaná."
+      "recordingStatus": "Slovenský dabing je súčasťou dodaného záverečného videa. Text na nahovorenie zostáva podkladom pre ďalšie verzie."
     },
     "guardy": {
       "title": "Guardyho správa po oprave poškodených správ",

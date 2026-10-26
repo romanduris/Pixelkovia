@@ -12,7 +12,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   const video=page.locator('#finale-video'),button=page.locator('[data-action="finale-video-toggle"]'),status=page.locator('#finale-video-status');
   await video.evaluate(v=>v.readyState>=1?null:new Promise((resolve,reject)=>{v.addEventListener('loadedmetadata',resolve,{once:true});v.addEventListener('error',()=>reject(new Error(v.error?.message||'Video load failed')),{once:true});}));
   const meta=await video.evaluate(v=>({duration:v.duration,width:v.videoWidth,height:v.videoHeight,paused:v.paused,muted:v.muted,inline:v.playsInline}));
-  assert.equal(meta.width,720);assert.equal(meta.height,1280);assert.ok(meta.duration>=9&&meta.duration<=11);assert.ok(meta.paused&&meta.inline&&!meta.muted);
+  assert.equal(meta.width,480);assert.equal(meta.height,854);assert.ok(meta.duration>=9&&meta.duration<=11);assert.ok(meta.paused&&meta.inline&&!meta.muted);
   const saved=await page.evaluate(key=>localStorage.getItem(key),KEY);
   assert.ok(await page.locator('.finale-end-title').isHidden());
   await button.tap();await page.waitForFunction(()=>document.querySelector('#finale-video').currentTime>.2);assert.match(await status.innerText(),/prehráva/);
@@ -33,14 +33,14 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   await video.evaluate(v=>{v.realPlay=v.play;v.play=()=>Promise.reject(new DOMException('Denied','NotAllowedError'));});await button.tap();await page.waitForFunction(()=>document.querySelector('#finale-video-status').textContent.includes('Ťuknutím'));
   await video.evaluate(v=>{v.play=v.realPlay;});assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),saved);
   // A real failed request can be retried on the same element after recovery.
-  await page.route('**/assets/EndScene.mp4*',route=>route.abort());await video.evaluate(v=>{v.src+='?failed-check';v.load();});await page.waitForFunction(()=>!!document.querySelector('#finale-video').error);assert.match(await status.innerText(),/nepodarilo/);
-  await page.unroute('**/assets/EndScene.mp4*');await page.route('**/assets/EndScene.mp4?failed-check',route=>route.continue());
+  await page.route('**/assets/EndScene-Dabing.mp4*',route=>route.abort());await video.evaluate(v=>{v.src+='?failed-check';v.load();});await page.waitForFunction(()=>!!document.querySelector('#finale-video').error);assert.match(await status.innerText(),/nepodarilo/);
+  await page.unroute('**/assets/EndScene-Dabing.mp4*');await page.route('**/assets/EndScene-Dabing.mp4?failed-check',route=>route.continue());
   await button.tap();await page.waitForFunction(()=>{const v=document.querySelector('#finale-video');return !v.paused&&v.currentTime>.1});
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),saved);
   await video.evaluate(v=>{v.currentTime=v.duration-.15;});await page.locator('.finale-end-title').waitFor({state:'visible'});
   await page.reload();await page.locator('[data-action="next"]').tap();assert.ok(await page.locator('.finale-end-title').isHidden(),'refresh clears ending title');
   await button.tap();await page.waitForFunction(()=>document.querySelector('#finale-video').currentTime>.1);
   await video.evaluate(v=>{window.departingFinaleVideo=v;});await page.locator('[data-action="home"]').tap();assert.ok(await page.evaluate(()=>window.departingFinaleVideo.paused));
-  assert.deepEqual(errors,[]);console.log('PASS '+engine.name()+': real 720x1280 finale video, touch play/pause/resume/replay, denied play, retry, progress, delayed title over the retained final frame, replay/refresh and leaving.');
+  assert.deepEqual(errors,[]);console.log('PASS '+engine.name()+': real 480x854 dubbed finale video, touch play/pause/resume/replay, denied play, retry, progress, delayed title over the retained final frame, replay/refresh and leaving.');
  }finally{await browser.close();}
 }})().catch(error=>{console.error(error);process.exit(1);});
