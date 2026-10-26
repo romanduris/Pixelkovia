@@ -278,8 +278,7 @@ window.GAME = {
       "narrative": {
         "before": [
           "Pomáham kamarátom nájsť bezpečné cesty medzi obrazovkami. Váš doručený odkaz ku mne konečne dorazil! Už viem, že sme sa po výpadku opäť našli. Pred nami je však posledný úsek k návratovej bráne, pri ktorej čaká náš ochranca.",
-          "Na ceste zostali rozhádzané pixely, pomiešané dieliky a prerušené potrubia. Pripravil som štyri malé opravy. Keď ich zvládneme, budeme môcť pokračovať všetci spolu a nikto nezablúdi.",
-          "Naskenujte QR. Za každú opravu získate číslicu. Po štvrtej hre sa vráťte k tomuto listu a odhaľte ďalší úkryt. Počkám, kým budeme pripravení všetci!"
+          "Na ceste zostali rozhádzané pixely, pomiešané dieliky a prerušené potrubia. Pripravil som štyri malé opravy. Keď ich zvládneme, budeme môcť pokračovať všetci spolu a nikto nezablúdi."
         ],
         "after": [
           "Štyri hry sú hotové! Získali ste číslice 7, 2, 9, 4.",
@@ -318,6 +317,7 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
+          "Ahojte! Som ochranný štít. Strážim bezpečnú cestu medzi obrazovkami a chránim kamarátov, aby sa každý dostal domov v poriadku.",
           "Konečne počujem celú partiu! Na otvorenie bezpečnej cesty domov potrebujem overovací kód. Pri prerušení spojenia sa poškodili bezpečnostné pečate.",
           "Opravte tie pravé a odhaľte dve falošné. Číslice pri platných pečatiach prepíšte podľa poradia opráv 1–7. Získaný kód potvrďte v telefóne."
         ],
@@ -350,24 +350,25 @@ window.GAME = {
         "SVETLO"
       ],
       "placeholder": "Šesťpísmenové heslo",
-      "action": "Pod gaučom nájdite posledný list. Na jednej veľkej obrazovke vyfarbite presné dvojice zo servisného kľúča a odhaľte návratový znak.",
+      "action": "Pod gaučom nájdite posledný list. V mozaike brány vyfarbite presné dvojice z kľúča návratovej brány a odhaľte návratový znak.",
       "task": "Na papieri vyfarbite presné dvojice ○★, △□ a +◇. Obrátené dvojice neplatia. Odhalený návratový znak pridajte za znaky z úloh 1–5 a celé heslo zadajte do návratovej brány.",
-      "materials": "Úloha 7: jedna štvorcová obrazovka 9 × 9 (81 políčok). Tri presné dvojice symbolov ○★, △□ a +◇ odhalia návratový znak O.",
+      "materials": "Úloha 7: jedna štvorcová mozaika 9 × 9 (81 políčok). Tri presné dvojice symbolov ○★, △□ a +◇ odhalia návratový znak O.",
       "mobile": "Heslo SVETLO zosúladí pripravené schopnosti. Po scénach návratu pokračujte do úspešného finále.",
-      "solution": "Vyfarbite presne ○★, △□ a +◇. Poradie symbolov je dôležité, opačné dvojice neplatia. Jediná obrazovka 9 × 9 odhalí návratový znak O. Pridajte ho k S, V, E, T, L → SVETLO.",
+      "solution": "Vyfarbite presne ○★, △□ a +◇. Poradie symbolov je dôležité, opačné dvojice neplatia. Jediná mozaika 9 × 9 odhalí návratový znak O. Pridajte ho k S, V, E, T, L → SVETLO.",
       "hints": [
         "Porovnávajte oba symboly aj ich poradie. Dvojice ★○, □△ a ◇+ nechajte biele.",
         "Vyfarbené políčka vytvoria obrys písmena O. To je posledný návratový znak."
       ],
-      "parent": "List k úlohe 7 ukryte pod gauč na dosah ruky. Nestrihá sa. Na jedinej obrazovke 9 × 9 sa vyfarbujú tri presné dvojice zo servisného kľúča. Objaví sa návratový znak O, ktorý doplní S, V, E, T, L na heslo SVETLO.",
+      "parent": "List k úlohe 7 ukryte pod gauč na dosah ruky. Nestrihá sa. V jedinej mozaike 9 × 9 sa vyfarbujú tri presné dvojice z kľúča návratovej brány. Objaví sa návratový znak O, ktorý doplní S, V, E, T, L na heslo SVETLO.",
       "transition": "SVETLO je spoločný potvrdzovací signál. Bezpečnou cestou prejde celá partia; Piko sa vracia ako posledný.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Cesta domov je už bezpečná. Celá partia je pripravená, no návratovej bráne ešte chýba posledný znak.",
-          "Pomôžte nám opraviť záverečný signál. Vyfarbite správne dvojice zo servisného kľúča. Dôležité sú oba symboly aj ich poradie. Objaví sa posledný návratový znak. Pridajte ho za znaky z úloh 1–5 a otvorte nám cestu domov."
+          "Pred nami sa konečne rozžiarila návratová brána. Za ňou už vidíme náš domov! Celá partia sa zhromaždila pri jej prahu. Tentoraz nikoho nenecháme za sebou.",
+          "Znaky, ktoré ste cestou pozbierali, však ešte netvoria celé heslo. Chýba nám posledný návratový znak! Brána ho ukryla do mozaiky symbolov a na svojom ráme nám nechala kľúč.",
+          "Pomôžete nám odhaliť jej tajomstvo? Keď nájdeme posledný znak, pridáme ho k ostatným a spoločne otvoríme cestu domov. Už sme tak blízko!"
         ],
         "after": [
           "SVETLO! Návratová brána sa otvorila. Všetci sa môžeme bezpečne vrátiť domov.",

@@ -496,10 +496,12 @@
 .seal-row small{font:7px monospace;color:#526b83;letter-spacing:.2px}
 .seal-digit{font:700 22px monospace;color:#172e4d}
 .seal-order{display:block;width:25px;height:25px;border:1px solid #536b78;background:white}
-.seal-answer{display:flex;align-items:center;justify-content:space-between;gap:15px}
-.seal-party-scene,.final-party-scene{min-width:0;margin:0}
-.seal-party-scene img,.final-party-scene img{width:100%;height:auto;aspect-ratio:4/5;object-fit:contain}
+.seal-answer{display:flex;align-items:center;justify-content:space-between;gap:15px;border:1px solid #a7b9cd;padding:12px}
+.seal-party-scene,.final-party-scene{min-width:0;margin:0;align-self:start}
+.seal-party-scene img,.final-party-scene img{width:100%;height:auto;max-height:280px;aspect-ratio:4/5;object-fit:contain;background:white}
 #p7 .final-workbench{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+.final-companions{display:grid;align-content:start;gap:12px;min-width:0}
+#p7 .final-companions .final-sign-answer{margin:0}
 #p7 .signal-pair-key{gap:7px;justify-content:space-between;margin:10px 0}
 #p7 .signal-pair-key span{padding:5px 8px;font-size:20px;letter-spacing:2px}
 #p7 .paper-signal-screens{grid-template-columns:1fr;max-width:320px;width:100%;gap:0;margin:14px auto 0}
@@ -535,7 +537,7 @@
  #p6 .seal-answer .code-boxes span{width:7mm;height:7mm}
  #p6 .seal-answer .worksheet-entry-qr{flex-shrink:0}
  #p6 .seal-answer img{width:var(--sheet-qr);height:var(--sheet-qr)}
- #p6 .seal-party-scene img{height:76mm;aspect-ratio:4/5}
+ #p6 .seal-party-scene img{height:60mm;aspect-ratio:4/5}
  #p7 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
  #p7 .final-signal-panel{padding:2.5mm 3mm}
  #p7 .final-signal-panel>p{font-size:var(--sheet-copy);line-height:1.35}
@@ -543,11 +545,12 @@
  #p7 .signal-pair-key span{font-size:13pt;padding:1mm 1.5mm;letter-spacing:.5mm}
  #p7 .paper-signal-screens{width:80mm;max-width:80mm;margin:3mm auto 0}
  #p7 .paper-screen svg{height:80mm}
- #p7 .final-party-scene img{height:96mm;aspect-ratio:4/5}
- #p7 .final-sign-answer{padding:2mm 3mm;margin:3mm 0}
+ #p7 .final-party-scene img{height:64mm;aspect-ratio:4/5}
+ #p7 .final-workbench{margin:2mm 0}
+ #p7 .final-sign-answer{padding:2mm 3mm;margin:2mm 0}
  #p7 .final-sign-answer h3{font-size:9pt;margin:0 0 1mm}
  #p7 .final-sign-answer p{font-size:var(--sheet-copy);margin:0}
- #p7 .final-gate-panel{padding:2.5mm 3mm;margin:3mm 0}
+ #p7 .final-gate-panel{padding:2.5mm 3mm;margin:2mm 0}
  .final-password-slots{gap:3mm;margin:3mm 0}
  .final-password-slots span{font-size:7pt}
  .final-password-slots b{width:9mm;height:9mm}
