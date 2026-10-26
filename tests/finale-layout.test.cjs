@@ -4,7 +4,12 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 (async()=>{for(const engine of [chromium,webkit]){
  const browser=await engine.launch();try{for(const [width,height] of [[320,568],[390,844],[844,390],[1440,900]]){
   const context=await browser.newContext({viewport:{width,height},hasTouch:true}),page=await context.newPage();
-  await page.goto(BASE+'/game.html?signal=navrat');await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();
+  await page.goto(BASE+'/game.html?signal=navrat');
+  assert.equal(await page.locator('.return-check-screen #answer').count(),1);
+  await page.locator('.return-check-screen img').evaluate(i=>i.decode());
+  assert.ok(await page.locator('main').evaluate(m=>m.scrollHeight<=m.clientHeight+1),'password screen fits the viewport');
+  assert.match(await page.locator('.return-check-screen img').getAttribute('src'),/return-party-holding-hands.png$/);
+  await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();
   assert.equal(await page.locator('.finale').count(),1,'password opens video directly');
   assert.equal(await page.locator('.finale>h1').innerText(),'NÁVRATOVÝ SIGNÁL PRIJATÝ');
   assert.equal(await page.locator('.finale>button').innerText(),'Koniec hry');

@@ -21,6 +21,15 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   assert.equal(await page.locator('.finale audio').count(),0,'undelivered standalone voice does not create a broken player');
   assert.ok(await page.locator('.finale video').evaluate(video=>video.paused),'entering the finale does not autoplay');
   assert.deepEqual(await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)).completed,KEY),[7]);
+  // A saved completion must never bypass the password when scanning again.
+  for(const stage of [7,8]){
+   await page.evaluate(({KEY,stage})=>localStorage.setItem(KEY,JSON.stringify({progressVersion:2,started:true,callDone:true,stage,completed:[1,2,3,4,5,6,7],hints:{}})),{KEY,stage});
+   await page.goto(BASE+'/game.html?signal=navrat');assert.equal(await page.locator('#answer').count(),1);assert.equal(await page.locator('#finale-video').count(),0);
+   await page.locator('#answer').fill('NESPRAVNE');await page.locator('.answer-form button').tap();assert.equal(await page.locator('#finale-video').count(),0);
+   await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();assert.equal(await page.locator('#finale-video').count(),1);
+   assert.deepEqual(await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)).completed,KEY),[1,2,3,4,5,6,7]);
+   await page.reload();assert.equal(await page.locator('#answer').count(),1);assert.equal(await page.locator('#finale-video').count(),0);
+  }
   await page.evaluate(KEY=>localStorage.removeItem(KEY),KEY);
   await page.goto(BASE+'/game.html?signal=cipko');await page.locator('[data-kind="pixel"][data-index="1"]').tap();
   await page.goto(BASE+'/game.html?signal=plugy');

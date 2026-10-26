@@ -38,7 +38,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   await button.tap();await page.waitForFunction(()=>{const v=document.querySelector('#finale-video');return !v.paused&&v.currentTime>.1});
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),saved);
   await video.evaluate(v=>{v.currentTime=v.duration-.15;});await page.locator('.finale-end-title').waitFor({state:'visible'});
-  await page.reload();assert.ok(await page.locator('.finale-end-title').isHidden(),'refresh clears ending title');
+  await page.reload();assert.equal(await page.locator('#finale-video').count(),0,'refresh requires the final password again');await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();assert.ok(await page.locator('.finale-end-title').isHidden(),'refresh clears ending title');
   await button.tap();await page.waitForFunction(()=>document.querySelector('#finale-video').currentTime>.1);
   await video.evaluate(v=>{window.departingFinaleVideo=v;});await page.evaluate(()=>{window.close=()=>{window.closeAttempted=true};});await page.locator('[data-action="end-game"]').tap();await page.waitForFunction(()=>document.querySelector('[data-action="end-game"]').textContent.includes('Kartu môžete zavrieť'));assert.ok(await page.evaluate(()=>window.closeAttempted));assert.ok(await page.evaluate(()=>window.departingFinaleVideo.paused));
   assert.deepEqual(errors,[]);console.log('PASS '+engine.name()+': real 480x854 dubbed finale video, touch play/pause/resume/replay, denied play, retry, progress, delayed title over the retained final frame, replay/refresh and leaving.');

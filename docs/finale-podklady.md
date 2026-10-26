@@ -1,6 +1,6 @@
 # Záverečná rozlúčka a scenár pre OpenGen
 
-QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. Dodané video assets/EndScene-Dabing.mp4 sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Finálová obrazovka obsahuje iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké video a tlačidlo Koniec hry. Text rozlúčky je naďalej v storyboarde.
+QR na pracovnom liste úlohy 7 vždy otvorí zadanie hesla, aj pri už dokončenej hre. Uložené splnenie nenahrádza overenie pri novom otvorení. Rozlúčka sa sprístupní po jeho správnom overení. Dodané video assets/EndScene-Dabing.mp4 sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Finálová obrazovka obsahuje iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké video a tlačidlo Koniec hry. Text rozlúčky je naďalej v storyboarde.
 
 ## Reč na nahovorenie
 

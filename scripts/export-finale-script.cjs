@@ -12,7 +12,7 @@ const fs=require('node:fs/promises'),path=require('node:path'),vm=require('node:
  await fs.writeFile(path.join(root,'assets/finale-production/README.txt'),kit);
  const notes=`# Záverečná rozlúčka a scenár pre OpenGen
 
-QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. ${game.finaleVideo?`Dodané video ${game.finaleVideo} sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Finálová obrazovka obsahuje iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké video a tlačidlo Koniec hry. Text rozlúčky je naďalej v storyboarde.`:'Kým nie je dodané video, hra používa text rozlúčky.'}
+QR na pracovnom liste úlohy 7 vždy otvorí zadanie hesla, aj pri už dokončenej hre. Uložené splnenie nenahrádza overenie pri novom otvorení. Rozlúčka sa sprístupní po jeho správnom overení. ${game.finaleVideo?`Dodané video ${game.finaleVideo} sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Finálová obrazovka obsahuje iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké video a tlačidlo Koniec hry. Text rozlúčky je naďalej v storyboarde.`:'Kým nie je dodané video, hra používa text rozlúčky.'}
 
 ## Reč na nahovorenie
 
