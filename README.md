@@ -92,3 +92,5 @@ QR na pracovnom liste úlohy 7 otvára `game.html?signal=navrat`. Heslo sa overu
 Podklady pre Seedance: `GAME.finaleProduction` obsahuje presné anglické prompt jedného klipu. Exportuj texty cez `node scripts/export-finale-script.cjs` a zabaľ ich s obrázkami a siedmimi schválenými portrétmi cez `python3 scripts/bundle-finale-production.py`. Pri režime Start Image sa používa iba príslušný hotový obrázok; portréty v ZIP sú zálohou pre iný režim alebo úpravu ilustrácií. Žiadna platená generácia videa sa týmito skriptmi nespúšťa.
 
 Telefónna stránka QR šestky zobrazuje veselú spoločnú ilustráciu, jeden pokyn na čítanie číslic zhora nadol a formulár. Úvodné zadanie sa prispôsobuje výške obrazovky; úspech a kompatibilita starých odpovedí zostávajú zachované.
+
+Záverečná reč má cieľ 7–8 sekúnd do 10-sekundového videa. Video prompt ponecháva iba jemný pohyb pôvodnej čiary úst modrého sprievodcu a nehovorené pixelkové efekty. Voliteľný hlas z ElevenLabs sa pridá až pri strihu; rozhodnutie o jeho použití zostáva otvorené. Dĺžku skutočnej nahrávky treba overiť.

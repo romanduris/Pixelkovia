@@ -21,6 +21,9 @@ ${finale.narrative.before.join('\n\n')}
 
 Prednes: ${game.voiceScripts.finale.direction} ${game.voiceScripts.finale.duration}.
 
+TTS zadanie:
+${game.voiceScripts.finale.prompt}
+
 Celý návod s obrázkami, nastaveniami a kopírovaním zadania je priamo v storyboard.html po rozbalení „Scenár pre OpenGen“ pri finále.
 
 ## Obrazové referencie
