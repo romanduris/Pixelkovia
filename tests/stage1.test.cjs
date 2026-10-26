@@ -16,8 +16,10 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
       assert.equal(await page.locator('a[href="parent.html"],a[href="game.html"],a[href="storyboard.html"],a[href="atlas.html"],[data-view],[data-action="start"]').count(),0);
       assert.ok(!/29,99|19,99|Bežná cena|15–20/.test(await page.locator('body').innerText()));
       assert.equal(await page.locator('.funnel-hero .funnel-cta[href="checkout.html"]').count(),1);
-      assert.match(await page.locator('.funnel-facts').innerText(),/15–60 min/);
+      assert.match(await page.locator('.faq-primary').textContent(),/15–60 min/);
       if(width<=700){
+        await page.locator('#ukazka').scrollIntoViewIfNeeded();
+        await page.waitForTimeout(100);
         const bar=await page.locator('.mobile-buy').boundingBox();
         assert.ok(bar.y>=0&&bar.y+bar.height<=height+1,'mobile purchase action stays available');
       }

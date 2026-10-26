@@ -1,5 +1,7 @@
 # Mobilná predajná stránka a kombinácia papiera s telefónom
 
+> Aktuálny stav po CRO úprave: [audit, nové poradie, merania a screenshoty](cro-audit-2026-10-26/README.md). Stránka má osem sekcií, ponuku hneď po ukážke a FAQ 8 + 11. Nižšie je zachovaný historický záznam predchádzajúcej iterácie; jej dve veľké scény a samostatná knižka už nepopisujú aktuálne rozloženie.
+
 Aktualizácia z 26. 10. 2026 podľa následného zadania: telefón je hlavné zariadenie návštevníka stránky a oba nové rodinné zábery majú priamo vysvetliť hybridný priebeh hry.
 
 - Úvod výslovne ukazuje „Papierové stopy + Jeden spoločný mobil“. Zostáva schválená obývačka a celá partia pri stole. Na malých a nízkych telefónoch sa mení výška úvodu a mierka obrazu; nákupná výzva je dostupná v spodnej lište.

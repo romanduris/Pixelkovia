@@ -17,7 +17,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
  for(const engine of (process.env.BROWSER==='webkit'?[webkit]:process.env.BROWSER==='chromium'?[chromium]:[chromium,webkit])){
   const browser=await engine.launch();
   try{
-   for(const [width,height] of [[320,568],[360,640],[390,844],[430,932],[768,1024],[1440,1000]]){
+   for(const [width,height] of [[320,568],[360,640],[390,844],[430,932],[768,1024],[1366,768],[1440,900]]){
     const context=await browser.newContext({...devices[engine===chromium?'Pixel 7':'iPhone 13'],viewport:{width,height},deviceScaleFactor:1,isMobile:width<600});
     const page=await context.newPage(),errors=[],failures=[];
     page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400&&new URL(r.url()).origin===new URL(BASE).origin)failures.push(r.url());});
@@ -26,28 +26,73 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await page.goto(BASE);await page.locator('.funnel-hero').waitFor();await page.evaluate(()=>document.fonts.ready);
     assert.equal(await page.locator('h1').count(),1);assert.equal(await page.locator('.faq-list details').count(),19);assert.equal(await page.locator('.character-card').count(),7);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'sales overflow '+width);
-    assert.match(await page.locator('.hero-format').innerText(),/Papierové stopy[\s\S]*Jeden spoločný mobil/);
-    if(width<600){
+    assert.equal(await page.locator('#app>section').count(),8);
+    assert.match(await page.locator('.hero-format').innerText(),/7–13 rokov[\s\S]*PDF na domácu tlač[\s\S]*Jeden spoločný mobil/);
+    assert.match(await page.locator('.hero-price').innerText(),/14,99 €/);
+    assert.match(await page.locator('.funnel-offer-card').innerText(),/Knižka \+ encyklopédia Pixelkov/);
+    assert.equal(await page.locator('.faq-primary>.faq-item').count(),8);
+    assert.equal(await page.locator('.faq-more .faq-item').count(),11);
+    assert.equal(await page.locator('.faq-more').evaluate(el=>el.open),false);
+    const faqMore=page.locator('.faq-more>summary');
+    await faqMore.focus();await page.keyboard.press('Enter');
+    assert.ok(await page.locator('.faq-more').evaluate(el=>el.open),'keyboard opens all remaining answers');
+    const moreQuestion=page.locator('.faq-more .faq-item').first();
+    await moreQuestion.locator('summary').focus();await page.keyboard.press('Space');
+    assert.ok(await moreQuestion.evaluate(el=>el.open));
+    await moreQuestion.locator('summary').press('Enter');
+    await faqMore.focus();await page.keyboard.press('Enter');
+    for(const cta of await page.locator('a[href="checkout.html"]').all()){
+     assert.match(await cta.innerText(),/^Pozrieť ponuku/,'consistent checkout action');
+     const rect=await cta.boundingBox();if(rect)assert.ok(rect.height>=44,'44px checkout targets');
+    }
+    if(width<=700){
+     const heroCta=page.locator('.funnel-hero .funnel-cta');
+     await heroCta.scrollIntoViewIfNeeded();await page.waitForTimeout(100);
+     assert.ok(await page.locator('.mobile-buy').isHidden(),'no duplicate bar when hero CTA is fully visible');
+     await page.locator('#ukazka').scrollIntoViewIfNeeded();
+     await page.waitForTimeout(100);
+     assert.ok(await page.locator('.mobile-buy').isVisible(),'bar accompanies content away from primary CTAs');
      const bar=await page.locator('.mobile-buy').boundingBox(),button=await page.locator('.mobile-buy>a').boundingBox();
      assert.ok(bar.y>=0&&bar.y+bar.height<=height+1,'purchase bar fits the visible phone screen');
      assert.ok(button.height>=46,'comfortable phone touch target');
+     await page.locator('.mobile-buy>a').focus();await heroCta.scrollIntoViewIfNeeded();await page.waitForTimeout(100);
+     assert.ok(await page.locator('.mobile-buy').isVisible(),'focused bar is retained while scrolling to another CTA');
+     await heroCta.focus();await page.waitForTimeout(100);
+     assert.ok(await page.locator('.mobile-buy').isHidden(),'bar hides after focus moves to visible hero CTA');
+     await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));
+     const footer=await page.locator('.site-footer').boundingBox();
+     assert.ok(footer.height>=95,'last content has clearance above fixed mobile bar');
+    }else assert.ok(await page.locator('.mobile-buy').isHidden());
+    const photo=page.locator('.evidence-family>img');
+    await photo.scrollIntoViewIfNeeded();await photo.evaluate(img=>img.decode());
+    const image=await photo.evaluate(img=>({ratio:img.naturalWidth/img.naturalHeight,rendered:img.clientWidth,fit:getComputedStyle(img).objectFit}));
+    assert.ok(Math.abs(image.ratio-.8)<.01&&image.fit==='contain','portrait photograph remains uncropped');
+    if(width<600)assert.ok(image.rendered>width*.85,'paper and phone remain large on narrow screens');
+    assert.equal(await page.locator('.evidence-screen img').count(),1,'actual game frame visible without accordion');
+    assert.equal(await page.locator('img[src*="game-lock-partial"],img[src*="family-lock"]').count(),0,'no revealed grid answer');
+    assert.equal(await page.locator('.compact-materials a,.compact-materials button,a[href$=".pdf"]').count(),0,'worksheets cannot be enlarged or downloaded from funnel');
+    for(const sheet of await page.locator('.worksheet-window>img').all()){
+     await sheet.evaluate(img=>img.decode());
+     const preview=await sheet.evaluate(img=>({sourceWidth:img.naturalWidth,width:img.clientWidth,clipped:img.clientHeight>img.parentElement.clientHeight,overflow:getComputedStyle(img.parentElement).overflow}));
+     assert.ok(preview.sourceWidth>=700&&preview.width<=110,'sharp but intentionally small worksheet preview');
+     assert.ok(preview.clipped&&preview.overflow==='hidden','bottom reward/footer is outside public preview');
     }
-    for(const photo of await page.locator('.hybrid-activity img').all()){
-     await photo.scrollIntoViewIfNeeded();await photo.evaluate(img=>img.decode());
-     const image=await photo.evaluate(img=>({ratio:img.naturalWidth/img.naturalHeight,rendered:img.clientWidth}));
-     assert.ok(Math.abs(image.ratio-.8)<.01,'hybrid photographs keep their portrait composition');
-     if(width<600)assert.ok(image.rendered>width*.85,'paper and phone remain large on narrow screens');
-    }
-    await page.locator('.game-screen-previews summary').click();
-    assert.ok(await page.locator('.game-screen-previews').evaluate(el=>el.open));
-    await page.locator('.game-screen-gallery img').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
-    assert.equal(await page.locator('.game-screen-gallery img').count(),2,'actual game screens are available beside the illustrative photographs');
-    await page.locator('.game-screen-previews summary').click();
+    const previewButton=page.locator('[data-sales-open-preview]');
+    await previewButton.focus();await page.keyboard.press('Enter');
+    assert.ok(await page.locator('#sales-preview').evaluate(el=>el.open));
+    assert.ok(await page.locator('.sales-preview-close').evaluate(el=>el===document.activeElement));
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('#sales-preview').evaluate(el=>el.open),false);
+    assert.ok(await previewButton.evaluate(el=>el===document.activeElement),'preview returns keyboard focus');
+    if(width<600)await previewButton.tap();else await previewButton.click();
+    await page.locator('.sales-preview-close').click();
     const broken=await page.locator('a[href^="#"]').evaluateAll(as=>as.filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash));assert.deepEqual(broken,[]);
     assert.equal(await page.locator('a[href="parent.html"],a[href="storyboard.html"],a[href="game.html"]').count(),0);
     await page.locator('.faq-list summary').first().click();assert.ok(await page.locator('.faq-list details').first().evaluate(el=>el.open));
     await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL('**/checkout.html');
     await page.locator('#mission-options input').first().waitFor();
+    assert.match(await page.locator('.checkout-status').innerText(),/Platby ešte nie sú spustené/);
+    const statusRect=await page.locator('.checkout-status').boundingBox();assert.ok(statusRect.y<height,'inactive status is immediately visible');
     assert.equal(await page.locator('[name="mission"]:checked').count(),0,'no paid additions preselected');
     assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
     await page.locator('[name="mission"]').nth(0).check();assert.equal(await page.locator('#order-total').innerText(),'17,89 €');
@@ -70,7 +115,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await page.goto(BASE+'/parent.html');await page.locator('.portal-header').waitFor();assert.equal(await page.locator('.material-card').count(),7);
     assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);await context.close();
    }
-   console.log('PASS '+engine.name()+': phone-first sales and checkout at 320/360/390/430/768/1440px, hybrid images, real screen previews, pricing combinations, bundle discount, inactive payment, private form and preserved game progress.');
+   console.log('PASS '+engine.name()+': phone-first sales and checkout at 320/360/390/430/768/1366/1440px, 8 sections, 19 keyboard FAQs, conditional mobile bar, sharp protected worksheet previews, keyboard/touch game preview, pricing combinations, bundle discount, inactive payment, private form and preserved game progress.');
   }finally{await browser.close();}
  }
 })().catch(e=>{console.error(e);process.exit(1);});

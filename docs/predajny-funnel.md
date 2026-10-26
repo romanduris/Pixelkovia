@@ -1,5 +1,7 @@
 # Predajný funnel Pixelkovia
 
+> Aktuálny stav po CRO úprave: [audit, nové poradie, merania a screenshoty](cro-audit-2026-10-26/README.md). Stránka má osem sekcií, ponuku hneď po ukážke a FAQ 8 + 11. Nižšie je zachovaný historický záznam predchádzajúcej iterácie; jej dve veľké scény a samostatná knižka už nepopisujú aktuálne rozloženie.
+
 Zmena z 26. 10. 2026. Zdroj stránky je `sales-page.js` a `sales.css`, výber ponuky tvorí `checkout.html`, `checkout.js` a `checkout.css`. Ceny, garancia a výpočet sú v `site-config.js`. Hra, odpovede, uložený postup a herné PDF sa touto zmenou nemenia.
 
 ## Obsah a výber ponuky
