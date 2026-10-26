@@ -70,7 +70,7 @@
     p2:{file:'p2-pixi',caption:'Posvietim nám na ďalšiu stopu.',alt:'Pixi svieti na dekódovací stroj a Piko s Mikym jej pomáhajú.'},
     p3:{file:'p3-plugy',caption:'Spojíme most, aby sme mohli ísť spolu.',alt:'Plugy obnovuje spojenie digitálneho mosta s pomocou Pika, Mikyho a Pixi.'},
     p4:{file:'p4-svetelne-uzly',caption:'Spolu obnovíme svetelné uzly.',alt:'Piko, Miky, Pixi, Plugy a Pingy spolu opravujú prerušené mostíky medzi svetelnými uzlami.'},
-    p5:{file:'p5-cipko-guardy',caption:'Opravujeme cestu až k Guardyho bráne.',alt:'Čipko s piatimi kamarátmi opravuje cestu a na jej konci sa ozýva Guardy.'},
+    p5:{file:'p5-cipko-guardy-portrait',caption:'Opravujeme cestu až k Guardyho bráne.',alt:'Čipko s piatimi kamarátmi opravuje cestu a na jej konci sa ozýva Guardy.'},
     p6:{file:'p6-spolocny-navrat',caption:'Spolu sa pripravujeme na cestu domov.',alt:'Všetkých sedem Pixelkov spája svoje schopnosti pri návratovej bráne.'}
   };
   function speakerPortrait(stageId) {
@@ -80,7 +80,7 @@
   }
   for(const [id,stageId] of Object.entries(sheetStages)) {
     const scene=illustratedScenes[id];
-    const illustration=`<figure class="worksheet-scene" data-scene="${scene.file}"><div class="worksheet-scene-label">SPOLU V PRÍBEHU</div><img src="assets/printable-scenes/${scene.file}.png" alt="${scene.alt}" width="${id==='p4'?1122:1536}" height="${id==='p4'?1402:512}"><figcaption>${scene.caption}</figcaption></figure>`;
+    const illustration=`<figure class="worksheet-scene" data-scene="${scene.file}"><div class="worksheet-scene-label">SPOLU V PRÍBEHU</div><img src="assets/printable-scenes/${scene.file}.png" alt="${scene.alt}" width="${id==='p4'||id==='p5'?1122:1536}" height="${id==='p4'||id==='p5'?1402:512}"><figcaption>${scene.caption}</figcaption></figure>`;
     let html=sheets[id].replace(window.STORY_TEXT.party(stageId),speakerPortrait(stageId));
     const mission=id==='p1'?/<div class="miky-print-mission">[\s\S]*?<\/ol><\/div>/:/<section class="worksheet-mission">[\s\S]*?<\/section>/;
     html=html.replace(mission,match=>id==='p4'?deliveryGuide(illustration):`<div class="worksheet-visual-row">${match}${illustration}</div>`);
@@ -142,7 +142,8 @@
   sheets.p5=sheets.p5.replace('Úloha 5 / Indícia pri stole','Úloha 5 / Indícia v posteli');
   const cipko=window.GAME.cipkoPuzzle;
   sheets.p5=sheets.p5.replace('__CIPKO_WORKBOOK__',`<section class="worksheet-puzzle cipko-workbook"><h3>ČÍSLICE Z TELEFÓNU</h3><div class="cipko-paper-digits">${cipko.digits.map((_,i)=>`<div><span>${i+1}. HRA</span><b></b></div>`).join('')}</div><h3>KĽÚČ K TAJNIČKE</h3><p>Nájdenú číslicu vymeňte za časť slova.</p><div class="cipko-paper-key">${cipko.key.map(([digit,part])=>`<div><strong>${digit}</strong><span>→</span><b>${esc(part)}</b></div>`).join('')}</div><h3>TAJNÝ ÚKRYT</h3><div class="cipko-paper-answer">${cipko.parts.map((part,i)=>`<div><span>${i+1}. HRA</span><div>${Array.from(part,()=>'<b></b>').join('')}</div></div>`).join('')}</div></section>`);
-  sheets.p5=sheets.p5.replace('<div class="worksheet-visual-row">',`<section class="worksheet-next maze-phone-panel"><div><h3>OTVORTE ŠTYRI HRY</h3><p>Naskenujte QR. Tento list aj ceruzku si nechajte pri telefóne.</p></div><div class="worksheet-entry-qr"><img src="assets/cipko-qr.svg" alt="QR kód na otvorenie Čipkových hier" width="121" height="121"></div></section><div class="worksheet-visual-row">`);
+  const cipkoPhonePanel=`<section class="worksheet-next maze-phone-panel"><div><h3>OTVORTE ŠTYRI HRY</h3><p>Naskenujte QR. Tento list aj ceruzku si nechajte pri telefóne.</p></div><div class="worksheet-entry-qr"><img src="assets/cipko-qr.svg" alt="QR kód na otvorenie Čipkových hier" width="121" height="121"></div></section>`;
+  sheets.p5=sheets.p5.replace(/<div class="worksheet-visual-row">(<section class="worksheet-mission">[\s\S]*?<\/section>)(<figure class="worksheet-scene"[\s\S]*?<\/figure>)<\/div>/,(_,mission,scene)=>`<div class="cipko-workbench"><div class="cipko-instructions">${cipkoPhonePanel}${mission}</div>${scene}</div>`);
   sheets.p6=`<section class="sheet story-sheet seal-paper-sheet" id="p6"><div class="worksheet-heading"><div class="label">PIXELKOVIA / ${window.GAME.stages[6].label}</div><h2>Opravte bezpečnostné pečate</h2></div><section class="worksheet-story">${speakerPortrait('search')}<h3>Guardyho odkaz</h3>${story('search')}</section>${sealPuzzle()}<section class="worksheet-answer seal-answer"><div><h3>OVEROVACÍ KÓD</h3><p>Číslice platných pečatí prepíšte v poradí opráv 1–7.</p><div class="code-boxes">${Array.from({length:7},(_,i)=>'<span></span>').join('')}</div><p>Naskenujte QR a zadajte kód. Po overení si vypočujte alebo prečítajte správu.</p></div><div class="worksheet-entry-qr"><img src="assets/guardy-qr.svg" alt="Otvoriť úlohu 6" width="121" height="121"></div></section><span class="footer">PIXELKOVIA · Úloha 6 / Indícia v chladničke</span></section>`;
   // Insert before the optional diploma in both the viewer and the combined PDF.
   const diploma=sheets.diplom;delete sheets.diplom;

@@ -568,3 +568,20 @@
  .final-password-slots b{width:28px;height:28px}
  .final-password-slots span{font-size:8px}
 }
+
+/* QR and mission share the left column; the portrait spans both on the right. */
+.cipko-workbench{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px;margin:13px 0;break-inside:avoid}
+.cipko-instructions{display:grid;gap:12px;min-width:0}
+#p5 .cipko-instructions>.worksheet-next,#p5 .cipko-instructions>.worksheet-mission{margin:0}
+#p5 .cipko-workbench .worksheet-scene{justify-content:center}
+#p5 .cipko-workbench .worksheet-scene img{height:auto;aspect-ratio:4/5;max-height:280px;object-fit:contain}
+@media print{
+ .cipko-workbench{gap:3mm;margin:2mm 0}
+ .cipko-instructions{gap:3mm}
+ #p5 .cipko-instructions .maze-phone-panel{gap:2mm;padding:2mm 3mm}
+ #p5 .cipko-workbench .worksheet-scene img{height:54mm;max-height:none;aspect-ratio:4/5}
+}
+@media screen and (max-width:600px){
+ .cipko-workbench{grid-template-columns:1fr}
+ #p5 .cipko-workbench .worksheet-scene{width:100%;max-width:300px;justify-self:center}
+}
