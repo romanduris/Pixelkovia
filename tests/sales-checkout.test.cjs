@@ -27,7 +27,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.equal(await page.locator('h1').count(),1);assert.equal(await page.locator('.faq-list details').count(),19);assert.equal(await page.locator('.character-card').count(),7);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'sales overflow '+width);
     assert.equal(await page.locator('#app>section').count(),8);
-    assert.match(await page.locator('.hero-format').innerText(),/7–13 rokov[\s\S]*PDF na domácu tlač[\s\S]*Jeden spoločný mobil/);
+    assert.match(await page.locator('.hero-format').innerText(),/7–13 rokov[\s\S]*45–60 min[\s\S]*2–5 hráčov[\s\S]*U vás doma/);
     assert.match(await page.locator('.hero-price').innerText(),/14,99 €/);
     assert.match(await page.locator('.funnel-offer-card').innerText(),/Knižka \+ encyklopédia Pixelkov/);
     assert.equal(await page.locator('.faq-primary>.faq-item').count(),8);

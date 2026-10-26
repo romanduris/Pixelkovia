@@ -7,7 +7,7 @@ const root='dist/funnel';
 const forbidden=['game.html','parent.html','storyboard.html','atlas.html','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
 for(const file of forbidden)assert.ok(!fs.existsSync(path.join(root,file)),'public artifact excludes '+file);
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
-assert.ok(index.includes('Premeňte svoj byt'),'landing is rendered without JavaScript');
+assert.ok(index.includes('Dnes večer budeme'),'landing is rendered without JavaScript');
 assert.ok(!/741296|SVETLO/.test(index),'no authored answer codes');
 const compiled={window:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'purchase-config.js'),'utf8'),compiled);
 const source={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),source);
