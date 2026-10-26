@@ -467,3 +467,5 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .finale-video-frame #finale-video-status{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .finale-video-frame[data-playback="error"] #finale-video-status{width:auto;height:auto;inset:20% 12px auto;overflow:visible;clip-path:none;white-space:normal;padding:12px;background:#080d1de6;color:white;font-size:14px;line-height:1.5;pointer-events:none}
 .finale-end-title{z-index:1}
+
+.cipko-finish-exit{width:100%;min-height:54px;margin-top:20px}
