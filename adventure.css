@@ -424,3 +424,22 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 @media(max-width:600px){.finale .whole-party{gap:2px}.finale .contact{padding:1px}.finale h1{font-size:32px}.finale .atlas-invitation>.pixel-sprite{width:56px}}
 
 .guardy-message{margin:20px 0;text-align:left}.guardy-message summary{cursor:pointer;padding:12px;border:1px solid #606a8b;border-radius:8px}
+
+/* A short, viewport-sized entry from the sixth worksheet's QR. */
+.signal-screen.guardy-check-screen{padding:10px max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.guardy-check-screen .signal-header{padding-bottom:4px}
+.guardy-check-screen .signal-content{width:min(100%,480px);padding:12px 0;display:grid;gap:12px}
+.guardy-check-screen .signal-content h1{font-size:clamp(21px,5vw,30px);margin:0}
+.guardy-happy-party{display:block;width:100%;height:clamp(110px,28dvh,240px);object-fit:contain;background:#fff;border-radius:12px}
+.guardy-check-screen .signal-content p{font-size:15px;line-height:1.5;margin:0}
+.guardy-check-screen .signal-form{margin:12px auto 0;gap:10px;max-width:none}
+.guardy-check-screen .signal-form label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.guardy-check-screen .signal-form #answer{min-height:56px;padding:10px;font-size:28px;letter-spacing:.12em}
+.guardy-check-screen .signal-form .btn{min-height:48px}
+.guardy-check-screen .signal-content .feedback{min-height:24px;margin-top:6px;font-size:13px}
+@media(max-height:500px) and (min-width:600px){
+ .guardy-check-screen .signal-content{width:min(100%,800px);grid-template-columns:220px minmax(0,1fr);gap:8px 24px;padding:8px 0}
+ .guardy-check-screen h1{grid-column:1/-1}
+ .guardy-happy-party{height:210px;grid-column:1}
+ .guardy-code-entry{grid-column:2;align-self:center}
+}

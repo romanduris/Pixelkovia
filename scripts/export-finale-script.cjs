@@ -15,23 +15,22 @@ Použi režim Start Image / Image to Video, pomer 9:16, zvuk ON.
 Odporúčaný model na finál: ${plan.model}. ${plan.resolution}.
 Na priloženej snímke používateľa šípka ukazuje na Seedance 2.0, ale fajkou a v spodnej lište je vybraný Seedance 2.0 Fast.
 
-1. Pre klip A nahraj start-a.png, nastav 8 sekúnd a vlož celý prompt-a.txt.
-2. Pre klip B nahraj start-b.png, nastav 12 sekúnd a vlož celý prompt-b.txt.
-3. Každý klip generuj samostatne. Neposielaj oba prompty do jedného 15-sekundového behu.
-4. Spoj A a B v tomto poradí. Výsledok má približne 20 sekúnd; krátky prestrih alebo prelínačka môže spoj zjemniť.
+1. Nahraj start-a.png ako Start Image.
+2. Nastav 10 sekúnd, pomer 9:16 a zvuk ON.
+3. Vlož celý prompt-a.txt a vytvor jeden klip. Netreba druhý beh ani spájanie klipov.
 
 ${plan.instructions}
 
 ## Zvuk
-Zapni generovanie zvuku. V oboch promptoch sú iba nehovorené elektronické pípnutia, jemné poskoky a zvuk brány. Žiadne hovorenie, spev, ľudské hlasy ani hudba. Hlasová záverečná reč na hernej stránke je samostatný podklad, nie súčasť tohto videa.
+Zapni generovanie zvuku. V prompte sú iba nehovorené elektronické pípnutia, jemné poskoky a zvuk brány. Žiadne hovorenie, spev, ľudské hlasy ani hudba. Hlasová záverečná reč na hernej stránke je samostatný podklad, nie súčasť tohto videa.
 
 ## Referencie
-Pri Start Image použi iba príslušný hotový obrázok. Sedem samostatných portrétov v priečinku references je záloha pre alternatívny režim References a úpravu obrázkov. Do tohto behu ich nepridávaj. Režimy snímok a referencií sa v dokumentovaných integráciách Seedance používajú oddelene.
+Pri Start Image použi iba hotový obrázok. Sedem samostatných portrétov v priečinku references je záloha pre alternatívny režim References a úpravu obrázkov. Do tohto behu ich nepridávaj. Režimy snímok a referencií sa v dokumentovaných integráciách Seedance používajú oddelene.
 
 ## Kontrola výsledku
 ${plan.review.map(item=>'- '+item).join('\n')}
 
-Presný vzhľad a pohyb nie sú zaručené ani s referenciou. Pred druhým plateným behom skontroluj prvý klip. Výsledok Fast nie je zárukou rovnakého výsledku pri štandardnom modeli; pri vyššom rozlíšení vzniká nové generovanie. Pred spustením vždy použi cenu zobrazenú priamo v OpenGen.
+Presný vzhľad a pohyb nie sú zaručené ani s referenciou. Pred ďalším plateným behom skontroluj výsledok. Výsledok Fast nie je zárukou rovnakého výsledku pri štandardnom modeli; pri vyššom rozlíšení vzniká nové generovanie. Pred spustením vždy použi cenu zobrazenú priamo v OpenGen.
 
 Modelové podklady:
 https://seed.bytedance.com/en/blog/seedance-2-0-official-launch
@@ -50,10 +49,9 @@ Prednes: ${game.voiceScripts.finale.direction} ${game.voiceScripts.finale.durati
 
 ## Obrazové referencie
 
-Na každý z dvoch behov použi jeho hotový Start Image. Samostatné portréty sú záložné podklady; nekombinujú sa s týmto režimom. Názvy sú len označením súborov; do videa sa nepíšu.
+Na jeden 10-sekundový beh použi hotový Start Image. Samostatné portréty sú záložné podklady; nekombinujú sa s týmto režimom. Názvy sú len označením súborov; do videa sa nepíšu.
 
 - assets/finale-production/start-a.png
-- assets/finale-production/start-b.png
 
 ${references}
 - assets/printable-scenes/p7-navrat-portrait.png
