@@ -9,33 +9,7 @@ const fs=require('node:fs/promises'),path=require('node:path'),vm=require('node:
  await fs.mkdir(path.join(root,'assets/finale-production'),{recursive:true});
  for(const clip of plan.clips)await fs.writeFile(path.join(root,clip.promptFile),clip.prompt+'\n');
  const references=game.characters.map(character=>`- ${character.image}`).join('\n');
- const kit=`# OpenGen — hotové podklady pre Seedance 2.0
-
-Použi režim Start Image / Image to Video, pomer 9:16, zvuk ON.
-Odporúčaný model na finál: ${plan.model}. ${plan.resolution}.
-Na priloženej snímke používateľa šípka ukazuje na Seedance 2.0, ale fajkou a v spodnej lište je vybraný Seedance 2.0 Fast.
-
-1. Nahraj start-a.png ako Start Image.
-2. Nastav 10 sekúnd, pomer 9:16 a zvuk ON.
-3. Vlož celý prompt-a.txt a vytvor jeden klip. Netreba druhý beh ani spájanie klipov.
-
-${plan.instructions}
-
-## Zvuk
-Zapni generovanie zvuku. V prompte sú iba nehovorené elektronické pípnutia, jemné poskoky a zvuk brány. Žiadne hovorenie, spev, ľudské hlasy ani hudba. Hlasová záverečná reč na hernej stránke je samostatný podklad, nie súčasť tohto videa.
-
-## Referencie
-Pri Start Image použi iba hotový obrázok. Sedem samostatných portrétov v priečinku references je záloha pre alternatívny režim References a úpravu obrázkov. Do tohto behu ich nepridávaj. Režimy snímok a referencií sa v dokumentovaných integráciách Seedance používajú oddelene.
-
-## Kontrola výsledku
-${plan.review.map(item=>'- '+item).join('\n')}
-
-Presný vzhľad a pohyb nie sú zaručené ani s referenciou. Pred ďalším plateným behom skontroluj výsledok. Výsledok Fast nie je zárukou rovnakého výsledku pri štandardnom modeli; pri vyššom rozlíšení vzniká nové generovanie. Pred spustením vždy použi cenu zobrazenú priamo v OpenGen.
-
-Modelové podklady:
-https://seed.bytedance.com/en/blog/seedance-2-0-official-launch
-https://elevenlabs.io/docs/overview/capabilities/image-video
-`;
+ const kit=game.finaleVideoPrompt+'\n\nV ZIP balíku je start-a.png, prompt-a.txt a záložné portréty v priečinku references/.\n';
  await fs.writeFile(path.join(root,'assets/finale-production/README.txt'),kit);
  const notes=`# Záverečná rozlúčka a scenár pre OpenGen
 

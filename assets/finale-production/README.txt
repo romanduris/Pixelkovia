@@ -1,22 +1,48 @@
-# OpenGen — hotové podklady pre Seedance 2.0
+OpenGen — jeden 10-sekundový klip 9:16
 
-Použi režim Start Image / Image to Video, pomer 9:16, zvuk ON.
-Odporúčaný model na finál: Seedance 2.0. 1080p pri Seedance 2.0, ak je dostupné; 720p pri Fast.
-Na priloženej snímke používateľa šípka ukazuje na Seedance 2.0, ale fajkou a v spodnej lište je vybraný Seedance 2.0 Fast.
+1. OTVOR OPENGEN
+https://opengen.ai/video-generator
 
-1. Nahraj start-a.png ako Start Image.
-2. Nastav 10 sekúnd, pomer 9:16 a zvuk ON.
-3. Vlož celý prompt-a.txt a vytvor jeden klip. Netreba druhý beh ani spájanie klipov.
+2. ŠTARTOVACÍ OBRÁZOK
+https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/finale-production/start-a.png
+Stiahni PNG a nahraj ho do Start Image. End Image nechaj prázdne.
 
-Vytvor jeden 10-sekundový klip. Nahraj start-a.png ako Start Image a vlož celý prompt-a.txt. Samostatné portréty sú záložné podklady; do tohto behu ich nepridávaj. Nastav 9:16 a zvuk ON. Pred plateným spustením skontroluj model, dĺžku a cenu v OpenGen.
+3. REFERENCIE
+Pre tento postup nepridávaj samostatné portréty do References. Celá partia je už v štartovacom obrázku.
+Voliteľné záložné portréty na otvorenie a stiahnutie:
+Piko: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/piko.png
+Miky: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/miky.png
+Pixi: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/pixi.png
+Plugy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/plugy.png
+Pingy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/pingy.png
+Čipko: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/cipko.png
+Guardy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/guardy.png
 
-## Zvuk
-Zapni generovanie zvuku. V prompte sú iba nehovorené elektronické pípnutia, jemné poskoky a zvuk brány. Žiadne hovorenie, spev, ľudské hlasy ani hudba. Hlasová záverečná reč na hernej stránke je samostatný podklad, nie súčasť tohto videa.
+4. NASTAVENIA
+Model: Seedance 2.0 (na snímke bol vybraný Fast; skontroluj výber).
+Režim: Start Image / Image to Video.
+Pomer: 9:16. Dĺžka: 10 sekúnd.
+Rozlíšenie: 1080p, ak je dostupné, inak 720p. Fast: 720p.
+Zvuk: ON — iba nehovorené pixelkové zvuky.
+End Image a References: prázdne.
+Pred spustením skontroluj cenu v OpenGen.
 
-## Referencie
-Pri Start Image použi iba hotový obrázok. Sedem samostatných portrétov v priečinku references je záloha pre alternatívny režim References a úpravu obrázkov. Do tohto behu ich nepridávaj. Režimy snímok a referencií sa v dokumentovaných integráciách Seedance používajú oddelene.
+5. SKOPÍRUJ IBA NASLEDUJÚCI ANGLICKÝ TEXT DO PROMPTU
 
-## Kontrola výsledku
+Animate the supplied start image as one continuous 10-second vertical 9:16 farewell shot. Preserve the exact warm apartment living room, painted pixel-art texture, lighting, fixed camera framing and all seven distinct electronic friends. Keep their original faces, bodies, colours, clothes and accessories. The blue cloud-headed screen-face guide keeps his black suit, teal tie and clipboard in his left hand. The USB character has arms and legs but no cable tail. The orange shield keeps its teal tie and cyan keyhole.
+
+0-2 seconds: the blue membrane inside the gateway dissolves inward into a clear luminous passage. The arch stays fixed. The friends make one small joyful bounce; the tiny yellow pixel gently bobs.
+2-6 seconds: the six companions take short cheerful steps through the opening in three loose pairs, giving small waves toward the viewer as they go. Keep separate silhouettes and a clear path. The yellow pixel floats through beside the microphone. Each disappears only after crossing the threshold. The blue guide waits in the room nearest the camera; he does not follow yet.
+6-9 seconds: with all six companions through, the blue guide looks toward the viewer and gives two slow warm waves with his free right hand. Preserve his cloud-shaped head and cyan screen-face marks.
+9-10 seconds: the blue guide turns and takes a quick final step through the nearby gateway. Only after he crosses, the passage light gently dims. Keep the arch visible.
+
+Prioritize clear farewell gestures and stable character identities over elaborate movement. Locked camera; no cuts, zoom, orbit or reframing. Start with exactly seven friends; no duplicates, new characters, merging bodies or changing accessories.
+
+AUDIO: soft synchronized 8-bit electronic chirps, short playful bleep-bloop notes and gentle digital boings, a shimmering ascending chime when the gateway opens, two delicate electronic greeting notes during the last wave, and a soft descending chime at the end. Synthetic nonverbal pixel sound effects only. No spoken words, dialogue, singing, human voices, speech-like gibberish or background music. Warm cheerful soft volume; no loud impacts or distortion. No talking mouths. No text, names, captions, logos or watermarks.
+
+KONIEC TEXTU NA KOPÍROVANIE
+
+KONTROLA VÝSLEDKU
 - Na začiatku je presne sedem rôznych postavičiek; žiadna sa nespojí s inou ani sa nerozmnoží.
 - Všetky ruky a nohy zostávajú v obraze, tváre a oblečenie sa nemenia.
 - Brána sa otvára na rovnakom mieste a postavičky prechádzajú otvorom.
@@ -24,8 +50,4 @@ Pri Start Image použi iba hotový obrázok. Sedem samostatných portrétov v pr
 - Zvuk obsahuje iba tiché elektronické efekty, bez slov a spevu.
 - Video má 10 sekúnd; posledné mávanie má priestor a odchod zostáva zrozumiteľný.
 
-Presný vzhľad a pohyb nie sú zaručené ani s referenciou. Pred ďalším plateným behom skontroluj výsledok. Výsledok Fast nie je zárukou rovnakého výsledku pri štandardnom modeli; pri vyššom rozlíšení vzniká nové generovanie. Pred spustením vždy použi cenu zobrazenú priamo v OpenGen.
-
-Modelové podklady:
-https://seed.bytedance.com/en/blog/seedance-2-0-official-launch
-https://elevenlabs.io/docs/overview/capabilities/image-video
+V ZIP balíku je start-a.png, prompt-a.txt a záložné portréty v priečinku references/.

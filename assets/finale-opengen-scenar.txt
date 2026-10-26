@@ -1,11 +1,33 @@
-OpenGen / Seedance 2.0 — jeden 10-sekundový klip 9:16.
+OpenGen — jeden 10-sekundový klip 9:16
 
-Vytvor jeden 10-sekundový klip. Nahraj start-a.png ako Start Image a vlož celý prompt-a.txt. Samostatné portréty sú záložné podklady; do tohto behu ich nepridávaj. Nastav 9:16 a zvuk ON. Pred plateným spustením skontroluj model, dĺžku a cenu v OpenGen.
+1. OTVOR OPENGEN
+https://opengen.ai/video-generator
 
-MODEL A ZVUK
-Seedance 2.0; 1080p pri Seedance 2.0, ak je dostupné; 720p pri Fast. ON — iba nehovorené pixelkové zvuky a jemné efekty
+2. ŠTARTOVACÍ OBRÁZOK
+https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/finale-production/start-a.png
+Stiahni PNG a nahraj ho do Start Image. End Image nechaj prázdne.
 
-Start Image: assets/finale-production/start-a.png
+3. REFERENCIE
+Pre tento postup nepridávaj samostatné portréty do References. Celá partia je už v štartovacom obrázku.
+Voliteľné záložné portréty na otvorenie a stiahnutie:
+Piko: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/piko.png
+Miky: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/miky.png
+Pixi: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/pixi.png
+Plugy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/plugy.png
+Pingy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/pingy.png
+Čipko: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/cipko.png
+Guardy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/guardy.png
+
+4. NASTAVENIA
+Model: Seedance 2.0 (na snímke bol vybraný Fast; skontroluj výber).
+Režim: Start Image / Image to Video.
+Pomer: 9:16. Dĺžka: 10 sekúnd.
+Rozlíšenie: 1080p, ak je dostupné, inak 720p. Fast: 720p.
+Zvuk: ON — iba nehovorené pixelkové zvuky.
+End Image a References: prázdne.
+Pred spustením skontroluj cenu v OpenGen.
+
+5. SKOPÍRUJ IBA NASLEDUJÚCI ANGLICKÝ TEXT DO PROMPTU
 
 Animate the supplied start image as one continuous 10-second vertical 9:16 farewell shot. Preserve the exact warm apartment living room, painted pixel-art texture, lighting, fixed camera framing and all seven distinct electronic friends. Keep their original faces, bodies, colours, clothes and accessories. The blue cloud-headed screen-face guide keeps his black suit, teal tie and clipboard in his left hand. The USB character has arms and legs but no cable tail. The orange shield keeps its teal tie and cyan keyhole.
 
@@ -17,6 +39,8 @@ Animate the supplied start image as one continuous 10-second vertical 9:16 farew
 Prioritize clear farewell gestures and stable character identities over elaborate movement. Locked camera; no cuts, zoom, orbit or reframing. Start with exactly seven friends; no duplicates, new characters, merging bodies or changing accessories.
 
 AUDIO: soft synchronized 8-bit electronic chirps, short playful bleep-bloop notes and gentle digital boings, a shimmering ascending chime when the gateway opens, two delicate electronic greeting notes during the last wave, and a soft descending chime at the end. Synthetic nonverbal pixel sound effects only. No spoken words, dialogue, singing, human voices, speech-like gibberish or background music. Warm cheerful soft volume; no loud impacts or distortion. No talking mouths. No text, names, captions, logos or watermarks.
+
+KONIEC TEXTU NA KOPÍROVANIE
 
 KONTROLA VÝSLEDKU
 - Na začiatku je presne sedem rôznych postavičiek; žiadna sa nespojí s inou ani sa nerozmnoží.
