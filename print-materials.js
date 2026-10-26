@@ -200,7 +200,7 @@
       // The printed key and answer boxes are already visible in the PDF preview.
       return heading.outerHTML+story.outerHTML+(id==='p5'?document.querySelector('.worksheet-mission').outerHTML:'');
     }
-    if(id==='p6') {
+    if(id==='p6'||id==='p7') {
       const heading=document.querySelector('.worksheet-heading h2');
       const story=document.querySelector('.worksheet-story');
       story.querySelector('.worksheet-speaker')?.remove();
