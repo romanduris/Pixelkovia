@@ -65,19 +65,20 @@
   function fullScene(panels){return panels.map((lines,i)=>`<section class="gm-scene"><span class="section-kicker">OBRAZ ${i+1}</span>${linesHTML(lines)}</section>`).join('');}
   function finaleMediaHTML(){
     if(!GAME.finaleVideo&&!GAME.finaleAudio)return '';
-    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<div class="finale-video-frame"><video id="finale-video" controls playsinline preload="metadata" poster="assets/finale-production/start-a.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje video. Rozlúčku si môžete prečítať nižšie.</video><div class="finale-end-title" hidden aria-live="polite">KONIEC</div></div><button class="btn" data-action="finale-video-toggle" aria-controls="finale-video">▶ Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
+    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<div class="finale-video-frame" data-playback="idle"><video id="finale-video" playsinline preload="metadata" poster="assets/finale-production/start-a.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje toto video.</video><div class="finale-end-title" hidden aria-live="polite">KONIEC</div><button class="finale-video-toggle" data-action="finale-video-toggle" data-icon="▶" aria-controls="finale-video">Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p></div>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
   }
   function bindFinaleVideo(){
     const video=app.querySelector('#finale-video'),button=app.querySelector('[data-action="finale-video-toggle"]'),status=app.querySelector('#finale-video-status');
     if(!video||!button||!status)return;
-    const endTitle=app.querySelector('.finale-end-title');
+    const endTitle=app.querySelector('.finale-end-title'),frame=video.parentElement;
+    const playback=(state,icon)=>{frame.dataset.playback=state;button.dataset.icon=icon;};
     const hideEnd=()=>{clearTimeout(finaleEndTimer);finaleEndTimer=null;if(endTitle)endTitle.hidden=true;};
     for(const event of ['play','seeking','emptied'])video.addEventListener(event,hideEnd);
-    const failed=()=>{hideEnd();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Skúste znova alebo si prečítajte rozlúčku nižšie.';};
-    video.addEventListener('playing',()=>{button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';});
+    const failed=()=>{hideEnd();playback('error','↻');button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Ťuknutím skúste načítať video znova.';};
+    video.addEventListener('playing',()=>{playback('playing','❚❚');button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';});
     video.addEventListener('waiting',()=>{status.textContent='Video sa načítava…';});
-    video.addEventListener('pause',()=>{if(!video.ended&&!video.error){button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
-    video.addEventListener('ended',()=>{button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';
+    video.addEventListener('pause',()=>{if(!video.ended&&!video.error){playback('paused','▶');button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
+    video.addEventListener('ended',()=>{playback('ended','↻');button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';
       hideEnd();
       finaleEndTimer=setTimeout(()=>{finaleEndTimer=null;if(video.isConnected&&video.ended&&!video.error&&endTitle)endTitle.hidden=false;},1000);
     });
@@ -87,7 +88,7 @@
       if(video.error)video.load();
       if(video.ended)video.currentTime=0;
       status.textContent='Video sa načítava…';
-      video.play().catch(error=>{if(!video.isConnected)return;if(error.name==='NotAllowedError'){button.textContent='▶ Prehrať rozlúčku';status.textContent='Ťuknutím spustíte video so zvukom.';}else failed();});
+      video.play().catch(error=>{if(!video.isConnected)return;if(error.name==='NotAllowedError'){playback('paused','▶');button.textContent='▶ Prehrať rozlúčku';status.textContent='Ťuknutím spustíte video so zvukom.';}else failed();});
     };
   }
   function atlasInvitation(t){return `<section class="atlas-invitation">${sprite('piko')}<span class="section-kicker">PIKOV DARČEK PRE VÁŠ TÍM</span>${t.invitation.map(line=>line==='[OBJAVIŤ TAJNÝ SVET PIXELKOV]'?'<a class="btn atlas-cta" href="atlas.html" target="_blank" rel="noopener">OBJAVIŤ TAJNÝ SVET PIXELKOV ↗</a>':lineHTML(line)).join('')}</section>`;}
@@ -113,8 +114,12 @@
     if(n===4)return paperDeliveryScreen();
     if(n===5)return cipkoScreen();
     if(n===3)return success||s.completed.includes(3)?plugyConnectionScreen():plugyLockScreen();
-    if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${finaleMediaHTML()}${STORY_TEXT.html(t)}${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div>${taskCompletionNote('Telefón môžete odložiť. Všetci sú bezpečne doma.')}</div></section>`;
+    if(n===FINAL_STAGE||(n===7&&(success||s.completed.includes(7))))return finaleScreen();
     return taskInteractionScreen(t,n);
+  }
+  function finaleScreen(){
+    app.classList.add('signal-mode');
+    return `<section class="finale finale-screen" aria-labelledby="finale-title"><h1 id="finale-title" tabindex="-1">NÁVRATOVÝ SIGNÁL PRIJATÝ</h1>${finaleMediaHTML()}<button class="btn finale-exit" data-action="end-game">Koniec hry</button></section>`;
   }
   function cipkoScreen(){
     app.classList.add('signal-mode');
@@ -433,6 +438,13 @@
       const fallback=()=>{field.focus();field.select();status.textContent='Zadanie je označené. Skopíruj ho pomocou Ctrl+C alebo ponuky telefónu.';};
       if(!navigator.clipboard?.writeText){fallback();return;}
       navigator.clipboard.writeText(field.value).then(()=>{status.textContent='Celé zadanie je skopírované.';}).catch(fallback);return;
+    }
+    if(a==='end-game'){
+      app.querySelectorAll('video,audio').forEach(media=>media.pause());
+      clearTimeout(finaleEndTimer);finaleEndTimer=null;
+      if(preview){preview=null;navigate('designer');return;}
+      window.close();
+      setTimeout(()=>{if(!window.closed&&b.isConnected){b.textContent='Hra skončila. Kartu môžete zavrieť.';b.setAttribute('aria-live','polite');}},350);return;
     }
     if(a==='finale-video-toggle'){
       const video=app.querySelector('#finale-video');

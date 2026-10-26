@@ -1,6 +1,6 @@
 # Záverečná rozlúčka a scenár pre OpenGen
 
-QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. Dodané video assets/EndScene-Dabing.mp4 sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Text rozlúčky zostáva dostupný.
+QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. Dodané video assets/EndScene-Dabing.mp4 sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Finálová obrazovka obsahuje iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké video a tlačidlo Koniec hry. Text rozlúčky je naďalej v storyboarde.
 
 ## Reč na nahovorenie
 
@@ -78,6 +78,6 @@ Text: Dokázali ste to! Ďakujeme, kamaráti. Už môžeme ísť domov. Majte sa
 
 ## Zapojenie hotových médií
 
-GAME.finaleVideo: assets/EndScene-Dabing.mp4. GAME.finaleAudio: null (samostatná hlasová stopa ešte nie je dodaná). Používa sa zvuková stopa dodaného MP4 so slovenským dabingom; nepridáva sa ďalší prehrávač hlasu. Pôvodné EndScene.mp4 zostáva archívnou verziou. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
+GAME.finaleVideo: assets/EndScene-Dabing.mp4. GAME.finaleAudio: null (samostatná hlasová stopa ešte nie je dodaná). Používa sa zvuková stopa dodaného MP4 so slovenským dabingom; nepridáva sa ďalší prehrávač hlasu. Pôvodné EndScene.mp4 zostáva archívnou verziou. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu vo videu. Koniec hry zastaví prehrávanie a požiada prehliadač o zavretie karty; pri odmietnutí zobrazí pokyn na ručné zatvorenie.
 
 Zdroj textu je game-data.js. Po jeho úprave spusti node scripts/export-finale-script.cjs.

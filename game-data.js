@@ -390,10 +390,10 @@ window.GAME = {
         0,
         0
       ],
-      "action": "Prečítajte si rozlúčku celej partie. Dobrodružstvo je úspešne dokončené.",
+      "action": "Pozrite si záverečné video a ukončite hru. Dobrodružstvo je úspešne dokončené.",
       "task": "Všetci sú bezpečne doma. Telefón môžete odložiť.",
       "materials": "Voliteľný diplom záchrancov Pixelkov na tlačovej stránke. Žiadne ďalšie pomôcky netreba.",
-      "mobile": "Záverečné video so slovenským dabingom a ovládaním prehrávania. Textová rozlúčka zostáva dostupná, bez ďalšieho zadávania a úloh.",
+      "mobile": "Po overení hesla priamo nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké záverečné video so slovenským dabingom a tlačidlo Koniec hry. Bez ďalších textov, kontaktov a úloh.",
       "solution": "Úspech tímu. Hra nemá prehratý koniec.",
       "hints": [
         "Každý z vás pomohol iným spôsobom."

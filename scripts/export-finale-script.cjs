@@ -12,7 +12,7 @@ const fs=require('node:fs/promises'),path=require('node:path'),vm=require('node:
  await fs.writeFile(path.join(root,'assets/finale-production/README.txt'),kit);
  const notes=`# Záverečná rozlúčka a scenár pre OpenGen
 
-QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. ${game.finaleVideo?`Dodané video ${game.finaleVideo} sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Text rozlúčky zostáva dostupný.`:'Kým nie je dodané video, hra používa text rozlúčky.'}
+QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. ${game.finaleVideo?`Dodané video ${game.finaleVideo} sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Finálová obrazovka obsahuje iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, veľké video a tlačidlo Koniec hry. Text rozlúčky je naďalej v storyboarde.`:'Kým nie je dodané video, hra používa text rozlúčky.'}
 
 ## Reč na nahovorenie
 
@@ -38,7 +38,7 @@ ${game.finaleVideoPrompt}
 
 ## Zapojenie hotových médií
 
-GAME.finaleVideo: ${game.finaleVideo||'null'}. GAME.finaleAudio: ${game.finaleAudio||'null (samostatná hlasová stopa ešte nie je dodaná)'}. Používa sa zvuková stopa dodaného MP4 so slovenským dabingom; nepridáva sa ďalší prehrávač hlasu. Pôvodné EndScene.mp4 zostáva archívnou verziou. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
+GAME.finaleVideo: ${game.finaleVideo||'null'}. GAME.finaleAudio: ${game.finaleAudio||'null (samostatná hlasová stopa ešte nie je dodaná)'}. Používa sa zvuková stopa dodaného MP4 so slovenským dabingom; nepridáva sa ďalší prehrávač hlasu. Pôvodné EndScene.mp4 zostáva archívnou verziou. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu vo videu. Koniec hry zastaví prehrávanie a požiada prehliadač o zavretie karty; pri odmietnutí zobrazí pokyn na ručné zatvorenie.
 
 Zdroj textu je game-data.js. Po jeho úprave spusti node scripts/export-finale-script.cjs.
 `;

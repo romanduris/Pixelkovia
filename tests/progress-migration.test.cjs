@@ -18,7 +18,7 @@ const run=length=>Array.from({length},(_,i)=>i+1);
    assert.equal(migrated.progressVersion,2);assert.equal(migrated.stage,newStage);
    assert.deepEqual(migrated.completed,run(newCompleted));assert.deepEqual(migrated.hints,{5:1,6:1,7:2});
    assert.deepEqual(migrated.plugyCells,old.sutkoCells);assert.equal(Object.hasOwn(migrated,'sutkoCells'),false);assert.deepEqual(migrated.scenePages,old.scenePages);
-   if(newStage===8){assert.equal(await page.locator('.finale .contact.connected').count(),7);}
+   if(newStage===8){assert.equal(await page.locator('.finale #finale-video').count(),1);}
    else assert.equal(await page.locator('.signal-content h1').innerText(),newStage===5?'Rozsvieť pixely po poradí':newCompleted===newStage?'SPRÁVY OPRAVENÉ':await page.evaluate(n=>GAME.stages[n].label,newStage));
    await page.reload();assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),migrated,'a migrated save is never shifted twice');
   }
@@ -29,7 +29,7 @@ const run=length=>Array.from({length},(_,i)=>i+1);
   assert.equal(await page.locator('[data-action="notebook"]').count(),0);
   assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).completed,KEY),run(6));
   await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').click();
-  await page.locator('[data-action="next"]').click();assert.equal(await page.locator('.finale .contact.connected').count(),7);
+  assert.equal(await page.locator('.finale #finale-video').count(),1);
   assert.deepEqual(errors,[]);console.log('PASS: old tasks 5–9 migrate without loss, removed task resumes at the pledge, hints shift once, new saves stay stable, SVETLO and all seven friends reach the finale.');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1);});
