@@ -497,8 +497,6 @@
 .seal-digit{font:700 22px monospace;color:#172e4d}
 .seal-order{display:block;width:25px;height:25px;border:1px solid #536b78;background:white}
 .seal-answer{display:flex;align-items:center;justify-content:space-between;gap:15px;border:1px solid #a7b9cd;padding:12px}
-.seal-code-slot{display:grid;justify-items:center;gap:4px}
-.seal-code-slot small{font:700 11px/1.3 Arial,sans-serif;color:#234c71}
 .seal-party-scene,.final-party-scene{min-width:0;margin:0;align-self:start}
 .seal-party-scene img,.final-party-scene img{width:100%;height:auto;max-height:280px;aspect-ratio:4/5;object-fit:contain;background:white}
 #p7 .final-workbench{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
@@ -538,8 +536,6 @@
  #p6 .seal-answer p{font-size:var(--sheet-copy);line-height:1.35}
  #p6 .seal-answer .code-boxes{margin:2mm 0}
  #p6 .seal-answer .code-boxes span{width:7mm;height:7mm}
- #p6 .seal-code-slot{gap:1mm}
- #p6 .seal-code-slot small{font-size:8pt}
  #p6 .seal-answer .worksheet-entry-qr{flex-shrink:0}
  #p6 .seal-answer img{width:var(--sheet-qr);height:var(--sheet-qr)}
  #p6 .seal-party-scene img{height:60mm;aspect-ratio:4/5}
@@ -560,6 +556,22 @@
  .final-password-slots span{font-size:7pt}
  .final-password-slots b{width:9mm;height:9mm}
 }
+
+/* Read the repaired message directly down the single column. */
+#p6 .message-workbench{grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:start}
+.message-reference{display:grid;gap:12px;min-width:0}
+#p6 .message-reference .seal-key-patterns{grid-template-columns:repeat(2,minmax(0,1fr))}
+#p6 .message-reference .worksheet-scene{margin:0}
+#p6 .message-reference .worksheet-scene img{height:170px;aspect-ratio:4/5;object-fit:contain}
+#p6 .message-workbench .seal-rows{margin:0}
+#p6 .message-workbench .seal-list{grid-template-columns:1fr}
+@media print{
+ .message-reference{gap:3mm}
+ #p6 .message-reference .worksheet-scene img{height:36mm}
+ #p6 .message-workbench .seal-list{gap:1mm}
+ #p6 .message-workbench .seal-row{padding:1.5mm 2mm}
+}
+@media screen and (max-width:600px){#p6 .message-workbench{grid-template-columns:1fr}}
 @media screen and (max-width:600px){
  .seal-workbench,#p7 .final-workbench{grid-template-columns:1fr}
  .seal-workbench .worksheet-scene,#p7 .final-workbench .worksheet-scene{max-width:300px;width:100%;justify-self:center}

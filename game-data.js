@@ -288,7 +288,7 @@ window.GAME = {
     },
     {
       "id": "search",
-      "title": "Guardy – Poškodené pečate",
+      "title": "Guardy – Poškodené správy",
       "label": "Úloha 6 – V chladničke",
       "icon": "assets/location-icons/fridge.svg",
       "time": [
@@ -302,13 +302,13 @@ window.GAME = {
       ],
       "placeholder": "Sedemmiestny kód",
       "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na nájdenom liste.",
-      "task": "Opravte pečate pomocou kľúča na papieri. Číslicu z pečate s opravou 1 zapíšte do políčka 1, s opravou 2 do políčka 2 a tak ďalej. Rozhoduje číslo opravy, nie poloha pečate v tabuľke. Sedemmiestny kód zadajte do telefónu.",
-      "materials": "Úloha 6: sedem očíslovaných opráv, deväť pečatí s číslicami a sedem políčok na kód. Dve pečate sú falošné. Posledná indícia je samostatne pod gaučom; miesto prezradí až správa po overení.",
+      "task": "Opravte správy pomocou kľúča na papieri. Dve správy bez vhodnej opravy prečiarknite. Číslice pri opravených správach prečítajte zhora nadol a vzniknutý sedemmiestny kód zadajte do telefónu.",
+      "materials": "Úloha 6: sedem očíslovaných opráv a deväť správ s číslicami pod sebou. Dve správy sa nedajú opraviť. Kód vznikne čítaním číslic pri opravených správach zhora nadol, bez prepisovania. Posledná indícia je samostatne pod gaučom; miesto prezradí až správa po overení.",
       "mobile": "Overí kód 5817264 na číselnej klávesnici. Potom správa ochrancu prezradí úkryt pod gaučom. Nahovorenie je pripravené; kým nahrávka nie je dodaná, je dostupný jej text.",
-      "solution": "Opravy presne dopĺňajú biele políčka bez prekrývania. Číslice platných pečatí podľa opráv 1–7: 5, 8, 1, 7, 2, 6, 4 → 5817264. Pečate s 9 a 0 sú falošné. Úkryt POD GAUČ prezradí až správa po overení.",
+      "solution": "Opravy presne dopĺňajú biele políčka bez prekrývania. Správy s 9 a 0 sa nedajú opraviť a prečiarknu sa. Číslice pri opravených správach zhora nadol: 5, 8, 1, 7, 2, 6, 4 → 5817264. Úkryt POD GAUČ prezradí až správa po overení.",
       "hints": [
-        "Čierne políčka opravy presne zaplnia biele políčka pečate. Vzory neotáčajte; dve pečate nemajú vhodnú opravu.",
-        "Oprava 1 patrí k pečati s číslicou 5: do políčka 1 preto zapíšte 5. Potom hľadajte číslice pri pečatiach s opravami 2–7. Poloha pečatí v tabuľke poradie neurčuje."
+        "Čierne políčka opravy presne zaplnia biele políčka poškodenej správy. Vzory neotáčajte; dve správy nemajú vhodnú opravu.",
+        "Prvú správu s číslicou 5 doplní oprava 3. Správy s 9 a 0 prečiarknite. Zostávajúce číslice čítajte zhora nadol; nič neprepisujte ani nepreskupujte."
       ],
       "parent": "Vytlačenú indíciu k úlohe 6 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. Vytlačenú indíciu k úlohe 7 ukryte samostatne pod gauč na dosah ruky.",
       "transition": "Správny číselný kód obnoví bezpečnú cestu. Správa ochrancu pošle deti pod gauč po poslednú indíciu.",
@@ -318,12 +318,12 @@ window.GAME = {
       "narrative": {
         "before": [
           "Ahojte! Som ochranný štít. Strážim bezpečnú cestu medzi obrazovkami a chránim kamarátov, aby sa každý dostal domov v poriadku.",
-          "Konečne počujem celú partiu! Na otvorenie bezpečnej cesty domov potrebujem overovací kód. Pri prerušení spojenia sa poškodili bezpečnostné pečate.",
-          "Opravte tie pravé a odhaľte dve falošné. Ku každej pravej pečati dopíšte číslo vhodnej opravy. Pomôže vám zapísať kód do očíslovaných políčok. Získaný kód potvrďte v telefóne."
+          "Konečne počujem celú partiu! Na otvorenie bezpečnej cesty domov potrebujem overovací kód. Pri prerušení spojenia sa poškodili správy s overovacím kódom.",
+          "Ku každej správe nájdite vhodnú opravu. Dve sa opraviť nedajú — tie prečiarknite. Číslice pri opravených správach čítajte zhora nadol. Tak získate kód, ktorý nám otvorí bezpečnú cestu."
         ],
         "after": [
-          "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
-          "Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.",
+          "Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!",
+          "Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.",
           "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
           "Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!"
         ]
@@ -572,11 +572,11 @@ window.GAME = {
       "recordingStatus": "Text je pripravený na nahovorenie. Finálová nahrávka ešte nie je dodaná."
     },
     "guardy": {
-      "title": "Guardyho správa po obnovení pečatí",
+      "title": "Guardyho správa po oprave poškodených správ",
       "duration": "cca 35–40 sekúnd",
       "model": "ElevenLabs v3",
       "direction": "Pokojný, spoľahlivý ochranca. Na začiatku úľava a poďakovanie, pri poslednom signále zvedavosť. Úkryt pod gaučom vysloviť zreteľne s krátkou pauzou.",
-      "prompt": "[relieved, proud] Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!\n\n[warm, grateful] Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.\n\n[curious, then certain] Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.\n\n[encouraging, cheerful] Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!",
+      "prompt": "[relieved, proud] Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!\n\n[warm, grateful] Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.\n\n[curious, then certain] Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.\n\n[encouraging, cheerful] Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!",
       "recordingStatus": "Text je pripravený na nahovorenie. Guardyho nahrávka ešte nie je dodaná."
     }
   },
@@ -1119,42 +1119,26 @@ window.GAME = {
     },
     "seals": {
       "repairs": [
-        "000111",
-        "111000",
         "010011",
-        "101100",
-        "001101",
         "110010",
-        "011010"
+        "000111",
+        "011010",
+        "101100",
+        "111000",
+        "001101"
       ],
       "rows": [
         {
-          "mask": "110010",
-          "digit": "2"
-        },
-        {
-          "mask": "011010",
-          "digit": "9"
+          "mask": "111000",
+          "digit": "5"
         },
         {
           "mask": "000111",
           "digit": "8"
         },
         {
-          "mask": "001101",
-          "digit": "6"
-        },
-        {
-          "mask": "111000",
-          "digit": "5"
-        },
-        {
-          "mask": "101001",
-          "digit": "0"
-        },
-        {
-          "mask": "100101",
-          "digit": "4"
+          "mask": "011010",
+          "digit": "9"
         },
         {
           "mask": "101100",
@@ -1163,6 +1147,22 @@ window.GAME = {
         {
           "mask": "010011",
           "digit": "7"
+        },
+        {
+          "mask": "110010",
+          "digit": "2"
+        },
+        {
+          "mask": "101001",
+          "digit": "0"
+        },
+        {
+          "mask": "001101",
+          "digit": "6"
+        },
+        {
+          "mask": "100101",
+          "digit": "4"
         }
       ]
     }
@@ -1226,8 +1226,8 @@ window.GAME = {
   "guardyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=guardy",
   "finaleVideoPrompt": "Vytvor 25-sekundové rozlúčkové video vo formáte 9 : 16 podľa priložených referenčných obrázkov všetkých siedmich postavičiek. Presne zachovaj ich vzhľad, farby, proporcie a mäkký maľovaný pixelový štýl. Nepridávaj ďalšie postavy. Modrá postavička má hlavu v tvare obláčika, tvár na displeji, oblek a tyrkysovú kravatu. USB postavička nemá káblový chvost. Ochranca má podobu oranžového zdobeného štítu s tyrkysovou kravatou a azúrovou kľúčovou dierkou.\n\n0–6 s: Útulná ľudská obývačka. Celá partia stojí pri malej svetelnej bráne do digitálneho sveta. Kamera sa pomaly približuje a cesta pod ich nohami sa rozžiari.\n6–15 s: Postavičky zamávajú deťom do kamery. Priateľsky si ťuknú dlaňami. Modrá postavička s hlavou v tvare obláčika si položí ruku na srdce ako poďakovanie.\n15–22 s: Postupne prejdú bránou. Modrá postavička zostane posledná, ešte raz zamáva a pridá sa k ostatným.\n22–25 s: Brána sa jemne zmení na drobné svetielko. To dvakrát veselo zabliká a obraz pomaly stmavne.\n\nBez hovorenia, pohybov úst naznačujúcich reč, titulkov, nápisov, mien a log. Povolená je jemná hudba bez spevu, digitálne pípnutia a zvuk trblietania. Žiadne prudké záblesky ani strašidelné efekty. Hlas rozlúčky vznikne ako samostatná nahrávka; video nesmie obsahovať hovorený prejav.",
   "guardyMessage": [
-    "Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!",
-    "Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.",
+    "Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!",
+    "Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.",
     "Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.",
     "Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!"
   ]

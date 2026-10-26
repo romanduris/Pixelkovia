@@ -37,7 +37,9 @@ for(const row of seals.rows){
  if(choices.length)solved.push([choices[0],row.digit]);else rejected.push(row);
 }
 assert.equal(rejected.length,2);assert.equal(solved.length,7);
-assert.equal(solved.sort((a,b)=>a[0]-b[0]).map(row=>row[1]).join(''),'5817264');
+assert.equal(solved.map(row=>row[1]).join(''),'5817264','valid messages directly form the code from top to bottom');
+assert.notDeepEqual(solved.map(row=>row[0]),[0,1,2,3,4,5,6],'repair numbers identify matches without dictating the reading order');
+assert.doesNotMatch(sheets.p6,/peča[ťt]|pečat|seal-code-slot|seal-code-boxes/i,'no seal terminology or result transcription on the player sheet');
 assert.equal(new Set(solved.map(row=>row[0])).size,7,'every repair is used exactly once');
 assert.ok(game.stages[6].answer.includes('5817264'));
 assert.ok(game.stages[6].legacyAnswers.includes('SPOLU'),'old printed worksheets remain playable');
@@ -60,4 +62,4 @@ assert.equal(game.stages[6].reward,'');assert.equal(game.stages[7].finalLetter,'
 assert.equal(game.stages[7].answer[0],'SVETLO');
 assert.deepEqual([...Array.from(game.stages.slice(1,6),s=>s.reward),game.stages[7].finalLetter],['S','V','E','T','L','O']);
 assert.equal(Object.keys(sheets).join(','),'p1,p2,p3,p4,p5,p6,p7,diplom');
-console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine seals → 5817264, one 9x9 pair grid → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');
+console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine messages read top to bottom → 5817264, one 9x9 pair grid → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');

@@ -2,9 +2,9 @@
 
 Spustenie: až po overení sedemmiestneho kódu. Úkryt sa pred overením neprezrádza. Nahrávka ešte nie je dodaná; hra používa text správy.
 
-Podarilo sa! Bezpečnostné pečate opäť fungujú a ochranné pole už rozpoznáva celú našu partiu!
+Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!
 
-Ďakujem vám, kamaráti. Opravili ste poškodené pečate a odhalili aj tie falošné. Teraz môžeme bezpečne otvoriť cestu domov.
+Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.
 
 Počkať… ešte nám chýba posledný kúsok návratového signálu. Už ho vidím! Pri prerušení spojenia zostal ukrytý u vás doma — pod gaučom.
 

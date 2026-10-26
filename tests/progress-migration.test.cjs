@@ -19,7 +19,7 @@ const run=length=>Array.from({length},(_,i)=>i+1);
    assert.deepEqual(migrated.completed,run(newCompleted));assert.deepEqual(migrated.hints,{5:1,6:1,7:2});
    assert.deepEqual(migrated.plugyCells,old.sutkoCells);assert.equal(Object.hasOwn(migrated,'sutkoCells'),false);assert.deepEqual(migrated.scenePages,old.scenePages);
    if(newStage===8){assert.equal(await page.locator('.finale .contact.connected').count(),7);}
-   else assert.equal(await page.locator('.signal-content h1').innerText(),newStage===5?'Rozsvieť pixely po poradí':newCompleted===newStage?'PEČATE OPRAVENÉ':await page.evaluate(n=>GAME.stages[n].label,newStage));
+   else assert.equal(await page.locator('.signal-content h1').innerText(),newStage===5?'Rozsvieť pixely po poradí':newCompleted===newStage?'SPRÁVY OPRAVENÉ':await page.evaluate(n=>GAME.stages[n].label,newStage));
    await page.reload();assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY),migrated,'a migrated save is never shifted twice');
   }
   // A new seventh-task save is the final password, and must never be interpreted as old task 7.
