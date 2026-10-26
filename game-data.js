@@ -86,7 +86,7 @@ window.GAME = {
         "before": [
           "Ahojte! Ja som Miky, malý mikrofón zo sveta Pixelkov. Mikrofón zachytáva zvuky, aj také tiché, ktoré si ostatní nevšimnú. Počúvam signály a dávam kamarátom vedieť, keď niekto potrebuje pomoc.",
           "Dnes však obrazovky zablikali a spojenie sa prerušilo. Prestal som počuť ostatných a Piko ma nepočuje. Našťastie sa mi podarilo zachrániť šesť záznamov posledného signálu. Na každom zostal dátum, čas a jedna číslica.",
-          "Pomôžete mi obnoviť spojenie? Vystrihnite všetkých šesť záznamov a zoraďte ich od najstaršieho po najnovší. Všetky vznikli v rovnakom roku. Prečítajte číslice v tomto poradí. Naskenujte QR kód a zadajte šesťmiestny kód do telefónu."
+          "Pomôžete mi obnoviť spojenie?"
         ],
         "after": [
           "Haló?! Čo to je? Kto mi lezie do signálu?!",
