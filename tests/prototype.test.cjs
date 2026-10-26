@@ -87,7 +87,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  await noAtlas();
  await page.screenshot({path:'/tmp/mystery-home-desktop.png',fullPage:true});
  assert.equal(await page.locator('.chapter-card').count(),0,'sales page contains no game map spoilers');
- assert.equal(await page.locator('.faq-list details').count(),9);
+ assert.equal(await page.locator('.faq-list details').count(),19);
  assert.equal(await page.locator('.character-card').count(),7);
  // Existing progress remains usable; the new optional panel cursor persists independently.
  await page.evaluate(()=>localStorage.setItem('zahada-v1-progress',JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1},scenePages:{'cipher:before':1}})));

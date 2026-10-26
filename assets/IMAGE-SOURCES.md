@@ -42,3 +42,7 @@ Caveat v fonts/Caveat.ttf zostáva pod licenciou fonts/OFL-Caveat.txt.
 ## Portréty celej partie na listoch 6 a 7
 
 `printable-scenes/p6-pecate-portrait.png` a `printable-scenes/p7-navrat-portrait.png` sú nové ilustrácie na výšku vytvorené vstavaným nástrojom imagegen podľa schválenej skupiny a pôvodného modrého Pika. Každá obsahuje všetkých sedem postáv, bez mien či popisov v bitmape. Plugy nemá káblový chvost. Východiskové obrázky zostávajú zachované. Presné zadania, referencie a výsledné cesty sú v [dokumentácii ilustrácií](../docs/ilustracie-ulohy6-7.md).
+
+## Predajný funnel, október 2026
+
+Aktuálna stránka používa nové ilustračné scény `family-signal-puzzle-v2.webp` a `family-cipher-puzzle-v2.webp`, pripravené vstavaným image_gen podľa skutočných listov 1 a 2. Pôvodné rodinné obrázky zostávajú archívne. Úvodná mobilná kompozícia používa `pixelkovia-room-mobile.webp` s CSS výrezom, aby bola celá partia hneď viditeľná; nákupné tlačidlo je už v úvode. Mená a predajné texty zostávajú v HTML. Presné prompty, vybrané súbory a kontext sú v [dokumentácii funnelu](../docs/predajny-funnel.md) a [promptov](../docs/funnel-image-prompts.json).

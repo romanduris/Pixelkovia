@@ -1,0 +1,24 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-26",
+  "assets": [
+    {
+      "output": "assets/family-signal-puzzle-v2.webp",
+      "original_generated_file": "/home/codespace/.codex/generated_images/01a17949-c0a7-7471-b67a-61433852b0e1/exec-5f4f1b83-35fd-4c2e-8faa-3a1232ddfd27.png",
+      "references": ["assets/family-signal-puzzle.png", "assets/miky-sheet-preview.png"],
+      "prompt": "Use case: compositing. Edit target image 1: warm natural editorial photograph of parent and children's hands collaboratively solving paper puzzle at ordinary wooden dining table. Supporting image 2: actual printable game worksheet. Replace ALL invented mountain/lighthouse/map/symbol cards with the EXACT six small white rectangular signal record cards from the lower half of image 2, with dark blue thin borders and columns date, time, single large digit, some rotated. Six loose cards, being compared and put in order by children's hands and one adult hand. Actual card records: 14. 6. / 19:50 / 2; 13. 3. / 20:10 / 4; 15. 12. / 08:40 / 6; 13. 3. / 20:15 / 1; 15. 9. / 08:35 / 9; 13. 3. / 20:05 / 7. Keep natural imperfect arrangement, no need all text readable; large digits and compact tabular dates and times should be accurate. Show upper half of worksheet at left with simple blue-lined text blocks, no readable headings/names and small QR code; do not display any character name anywhere. Keep all family hands natural, same sleeves, warm cozy real apartment context, horizontal 3:2 composition. Remove fantasy map, all landscape sketches, candle near paper and decorative fantasy book. Phone at far right can show small abstract cyan incoming-signal UI without text. No product packaging, no invented props required to play, no brass fasteners. Convey shared attention and problem solving. This is a marketing illustration of the real supplied paper task."
+    },
+    {
+      "output": "assets/family-cipher-puzzle-v2.webp",
+      "original_generated_file": "/home/codespace/.codex/generated_images/01a17949-c0a7-7471-b67a-61433852b0e1/exec-7ea22af5-b834-4771-86cd-9d6d94afb58d.png",
+      "references": ["assets/family-cipher-puzzle.png", "assets/printables/p2-preview.png"],
+      "prompt": "Use case: compositing. Edit target image 1: warm lifestyle photo of parent and child's hands holding a paper decoder on a wooden family table. Supporting image 2: ACTUAL PDF decoder. Replace the fantasy symbol wheel with the two actual cream white paper alphabet circles from the second reference: plain dark blue uppercase A-Z letters equally spaced around each perimeter, larger outer circle and smaller inner circle centered on top. Outer D opposite inner A, as in a Caesar decoder. No pictograms, stars, moons or symbols, use real alphabet letters. Remove the brass central fastener entirely: child holds the center steady with a fingertip, another finger moves the outer ring, parent gently steadies the paper edge. Show a simple blue-bordered paper strip with uppercase encrypted letters near lower left, no symbols. Keep the warm natural domestic table, existing family hands, sweaters, ordinary pencil, soft daylight and cozy collaborative atmosphere, 3:2 horizontal. No character names or nameplates anywhere, no packaging, no unprovided game hardware. This must look like cut-out circles from an A4 home printable, not a commercial toy. Exact invariants: alphabetic circles, no metal pin, no fancy symbols. No overlay text."
+    }
+  ],
+  "unselected_refinement": {
+    "original_generated_file": "/home/codespace/.codex/generated_images/01a17949-c0a7-7471-b67a-61433852b0e1/exec-c97482d3-b948-4a12-81aa-89a96472f3b4.png",
+    "references": ["exec-7ea22af5-b834-4771-86cd-9d6d94afb58d.png", "assets/printables/p2-preview.png"],
+    "prompt": "Use case precise-object-edit. Edit image1 ONLY the letters on the two paper decoder circles. Image2 contains exact circle graphics to reproduce, as actual Czech/Slovak Caesar alphabet decoder without accents. Keep the entire family-hands photograph, paper, light, composition and texture unchanged. Both circles must have the same 26-letter uppercase Latin alphabet, in correct clockwise order: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z. Do not invent alternate letters or duplicate letters. Align inner A with outer D (offset3). Use the image2 printed rings literally as reference to insert into photograph. We only see about3/4 of circle letters, occlusions by fingers okay. Small natural print. No symbols or names. Text strip stays. This is a real working paper alphabet cipher and needs correctly ordered letters. Fingers may cover hard to read sectors, keep photographic realism.",
+    "reason": "The refinement did not improve lettering reliably. The selected scene remains explicitly illustrative; exact functional print content is shown from the real PDF."
+  }
+}

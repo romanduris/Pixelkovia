@@ -13,33 +13,25 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     for (const [width,height] of [[320,568],[375,667],[390,844],[430,932],[768,1024],[1440,1000]]) {
       await page.setViewportSize({width,height});
       await page.goto(BASE);
-      assert.equal(await page.locator('a[href="parent.html"],a[href="game.html"],a[href="storyboard.html"],a[href*="printables"],a[href="atlas.html"],[data-view],[data-action="start"]').count(),0);
+      assert.equal(await page.locator('a[href="parent.html"],a[href="game.html"],a[href="storyboard.html"],a[href="atlas.html"],[data-view],[data-action="start"]').count(),0);
       assert.ok(!/29,99|19,99|Bežná cena|15–20/.test(await page.locator('body').innerText()));
-      assert.equal(await page.locator('.sales-hero [data-action="purchase"]').count(),0,'opening scene has no purchase button');
-      assert.ok(!/Escape.room/i.test(await page.locator('.sales-hero').innerText()));
-      assert.match(await page.locator('.hero-meta').innerText(),/15–60 MINÚT/);
+      assert.equal(await page.locator('.funnel-hero .funnel-cta[href="checkout.html"]').count(),1);
+      assert.match(await page.locator('.funnel-facts').innerText(),/15–60 min/);
       if(width<=700){
-        for(const selector of ['.sales-hero','.hero-copy','.hero-meta']){
-          const box=await page.locator(selector).boundingBox();
-          assert.ok(box.y>=0&&box.y+box.height<=height,`${selector} fits first screen at ${width}×${height}`);
-        }
-        const copy=await page.locator('.hero-copy').boundingBox(),meta=await page.locator('.hero-meta').boundingBox();
-        assert.ok(copy.y+copy.height<meta.y,'readable copy and details leave room for the group scene');
+        const bar=await page.locator('.mobile-buy').boundingBox();
+        assert.ok(bar.y>=0&&bar.y+bar.height<=height+1,'mobile purchase action stays available');
       }
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-      if(width>=1024)assert.ok((await page.locator('.hero-copy').boundingBox()).x<width/3,'artwork must not occupy a grid column and push copy over the characters');
+      if(width>=1024)assert.ok((await page.locator('.funnel-hero-top').boundingBox()).x<width/3);
       await page.screenshot({path:`/tmp/v5-funnel-${width}.png`});
     }
     await page.evaluate(() => localStorage.setItem('zahada-v1-progress', JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}})));
     await page.reload();
     assert.equal(await page.locator('[data-action="start"],[data-action="restart-adventure"]').count(),0);
     const savedGame = await page.evaluate(() => localStorage.getItem('zahada-v1-progress'));
-    for (const cta of await page.locator('[data-action="purchase"]').all()) {
-      await cta.click();
-      assert.ok((await page.locator('dialog').innerText()).includes('Predaj pripravujeme'));
-      assert.equal(await page.locator('dialog a,dialog input,dialog form,[data-action="preview-customer"]').count(),0);
-      await page.locator('.dialog-close').click();
-    }
+    await page.locator('.funnel-hero .funnel-cta').click();
+    await page.waitForURL('**/checkout.html');
+    assert.ok(await page.locator('.checkout-buy').isDisabled());
     assert.equal(await page.evaluate(() => localStorage.getItem('zahada-v1-progress')),savedGame);
     await page.goto(BASE+'/parent.html');
     assert.equal(await page.locator('a[href="index.html"],a[href="storyboard.html"],a[href*="admin"]').count(),0);
@@ -82,8 +74,8 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
     }
     assert.equal(await page.locator('.extra-card').count(),4);
     assert.equal(await page.locator('.extra-card[data-product-state="coming-soon"]').count(),4);
-    assert.deepEqual(await page.locator('.extra-card .extra-price').allTextContents(),['4,99 €','2,99 €','2,99 €','2,99 €']);
-    assert.ok((await page.locator('.bundle-card .extra-price').textContent()).includes('19,99 €'));
+    assert.deepEqual(await page.locator('.extra-card .extra-price').allTextContents(),['4,90 €','2,90 €','2,90 €','2,90 €']);
+    assert.ok((await page.locator('.bundle-card .extra-price').textContent()).includes('19,89 €'));
     assert.equal(await page.locator('.extras-section button:enabled').count(),0);
     await page.setViewportSize({width:390,height:844});
     await page.locator('#spustit').scrollIntoViewIfNeeded();

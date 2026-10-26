@@ -12,8 +12,8 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 
 - `game-data.js`: príbeh, postavy, odpovede a hlasové podklady. `story-text.js` vykresľuje tie isté odseky v hre, storyboarde a tlačovinách.
 - `app.js`: oddelený funnel, príprava, hranie, uložený postup a izolované testy zo storyboardu. `cipko-game.js` obsahuje štyri dotykové hry úlohy 5.
-- `site-content.js`, `site-config.js`: prezentácia, materiály, príprava, storyboard a katalóg. Ceny a nákupné pravidlá sa nemenia.
-- `atlas.html`: deväť literárnych kapitol, sedem úplných profilov a nové ilustrácie. Funguje aj bez JavaScriptu; hráč dostane odkaz až po finále.
+- `sales-page.js`, `sales.css`: predajný funnel so skutočnými PDF ukážkami. `checkout.html`, `checkout.js`, `checkout.css`: výber bonusových misií a súhrn; finálne Kúpiť je podľa zadania neaktívne. `site-config.js` je spoločný katalóg, ceny, 14-dňová garancia a výpočet balíka. `site-content.js` obsahuje materiály, prípravu a storyboard.
+- `atlas.html`: sedem literárnych kapitol, encyklopédia siedmich postáv a spoločné aktivity. Funguje aj bez JavaScriptu; hráč dostane odkaz až po finále.
 - `print-materials.js`, `printables.html`, `signal-print.css`: upraviteľný zdroj všetkých PDF aj zhodného storyboardu. Každý list má jednu A4. Balík má deväť strán: rodičovský návod prvý, úloh 1–7, diplom.
 
 ## Zachované hádanky
@@ -102,3 +102,5 @@ Po overení SVETLO sa priamo zobrazí iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, m
 Guardyho dodaná nahrávka `assets/Guardy.mp3` je dostupná cez `GAME.guardyAudio` v hre aj storyboarde. Počas zadávania kódu šestky sa potichu prednačíta na tom istom prehrávači, ktorý sa zachová pri úspechu. Správny kód spustí prehrávanie v obslužnom kóde odoslania. Ovládanie podporuje pauzu, pokračovanie, opakovanie a retry; prepis ostáva zbalený. Obnovenie už vyriešenej šestky neprehráva automaticky, odchod nahrávku zastaví a uvoľní.
 
 Finálny QR `signal=navrat` vždy najprv otvorí zadanie hesla, aj pri uloženom dokončení úlohy 7. Správne heslo v aktuálnom otvorení zobrazí pôvodné finále s videom, Koniec hry a oneskoreným KONIEC. Po opätovnom načítaní QR sa heslo vyžaduje znovu; splnenia úloh zostávajú zachované. Na vstupnej obrazovke je priehľadná ilustrácia siedmich kamarátov držiacich sa za ruky.
+
+Predajný funnel, výskum, ceny a overenie: [docs/predajny-funnel.md](docs/predajny-funnel.md).

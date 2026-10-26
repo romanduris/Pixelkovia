@@ -3,12 +3,13 @@
   'use strict';
   const money = cents => new Intl.NumberFormat('sk-SK', {style:'currency', currency:'EUR'}).format(cents / 100).replace(/\u00a0/g, ' ');
   const products = [
-    {id:'episode-1', name:'Pixelkovia: Stratený signál', priceCents:1499, pricing:{plannedRegularPriceCents:2999, referencePriceCents:null, campaign:null}, status:'coming-soon', description:'Celá prvá epizóda, tlačoviny, rodičovský návod, checklist a nápovedy.'},
-    {id:'bedtime-book', name:'Tajný svet Pixelkov – rozprávková knižka', priceCents:499, status:'coming-soon', character:'piko', description:'Pracovný návrh: približne desať minút čítania pred spaním o svete Pixelkov, ich domovoch, vzniku a živote.'},
-    {id:'piko-mission', name:'Piko – bonusová misia', priceCents:299, status:'coming-soon', character:'piko', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
-    {id:'listok-mission', name:'Pingy – bonusová misia', priceCents:299, status:'coming-soon', character:'pingy', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
-    {id:'kvak-mission', name:'Miky – bonusová misia', priceCents:299, status:'coming-soon', character:'miky', description:'Pracovný návrh samostatnej približne 15-minútovej misie.'},
-    {id:'complete', name:'Kompletné dobrodružstvo Pixelkov', priceCents:1999, status:'coming-soon', description:'Základná hra, rozprávková knižka a tri bonusové misie. Pracovná cena balíka nie je schválená na predaj.'}
+    {id:'episode-1', name:'Pixelkovia: Stratený signál', priceCents:1499, pricing:{referencePriceCents:null, campaign:null}, status:'coming-soon', description:'Celá prvá epizóda, 7 pracovných listov, rodičovský návod, diplom, checklist a nápovedy.'},
+    {id:'bedtime-book', name:'Tajný svet Pixelkov – knižka a encyklopédia', priceCents:490, status:'coming-soon', character:'piko', description:'Ilustrovaná rozprávka na spoločné čítanie a encyklopédia siedmich kamarátov. K hlavnej hre zdarma.'},
+    {id:'piko-mission', name:'Piko – bonusová misia', priceCents:290, status:'coming-soon', character:'piko', description:'Ďalšie dobrodružstvo s modrým sprievodcom. Doplnkový obsah pripravujeme.'},
+    {id:'listok-mission', name:'Pingy – bonusová misia', priceCents:290, status:'coming-soon', character:'pingy', description:'Ďalšie dobrodružstvo s dátovým poslom. Doplnkový obsah pripravujeme.'},
+    {id:'kvak-mission', name:'Miky – bonusová misia', priceCents:290, status:'coming-soon', character:'miky', description:'Ďalšie dobrodružstvo s malým mikrofónom. Doplnkový obsah pripravujeme.'},
+    {id:'mission-bundle', name:'Balík 3 bonusových misií', priceCents:490, status:'coming-soon', description:'Tri doplnkové dobrodružstvá s Pikom, Pingym a Mikym.'},
+    {id:'complete', name:'Kompletné dobrodružstvo Pixelkov', priceCents:1989, status:'coming-soon', description:'Základná hra, tri bonusové misie a knižka s encyklopédiou zdarma.'}
   ];
   const product = id => products.find(p => p.id === id);
   const states = {'not-purchased':'Nezakúpené', purchased:'Zakúpené', available:'Dostupné', 'coming-soon':'Pripravujeme'};
@@ -19,7 +20,15 @@
     if (!p || p.status === 'coming-soon') return 'coming-soon';
     return verifiedEntitlements[id]?.available ? 'available' : verifiedEntitlements[id]?.purchased ? 'purchased' : 'not-purchased';
   };
-  const purchase = {action:'purchase', label:`ZAŽIŤ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'coming-soon'};
+  const purchase = {action:'purchase', url:'checkout.html', label:`CHCEM SPOLOČNÉ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'coming-soon'};
+  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', missionIds:['piko-mission','listok-mission','kvak-mission'], paymentsEnabled:false};
+  // All arithmetic is in integer cents. Selecting all three applies the bundle automatically.
+  const quote = (selected = []) => {
+    const missions = offer.missionIds.filter(id => selected.includes(id));
+    const individualCents = missions.reduce((sum,id) => sum + product(id).priceCents, 0);
+    const extrasCents = missions.length === offer.missionIds.length ? product('mission-bundle').priceCents : individualCents;
+    return {missions, extrasCents, savingsCents:individualCents-extrasCents, totalCents:product('episode-1').priceCents+extrasCents};
+  };
   // Production is deliberately fail-closed until real server purchase verification exists.
   const access = {mode:'test', canLaunch: preparationReady => access.mode === 'test' && preparationReady};
   const management = {url:'https://treasurequest-admin.livingstones-romanduris.workers.dev', localPreviewUrl:'http://127.0.0.1:8787'};
@@ -29,6 +38,5 @@
     if (!value) return null;
     try {const url = new URL(value);return url.protocol === 'https:' || (local && url.origin === management.localPreviewUrl) ? url.href : null;} catch (_) {return null;}
   };
-  const purchaseHTML = () => `<div class="purchase-preview"><span class="section-kicker">PIXELKOVIA / VAŠA RODINNÁ VÝPRAVA</span><h2>Predaj pripravujeme</h2><p>Dobrodružstvo u vás doma bude dostupné za <strong>${money(product('episode-1').priceCents)}</strong>.</p><p>Predaj ešte nie je spustený. Na tejto stránke neprijímame platby ani nevytvárame objednávky.</p><div class="purchase-summary">✉ Papierové stopy doma<br>▷ Interaktívny príbeh na telefóne<br>♡ Spoločný čas s rodinou</div><button class="btn" data-action="close">Rozumiem, teším sa na dobrodružstvo</button></div>`;
-  window.SITE_CONFIG = {products, product, money, states, productState, purchase, access, purchaseHTML, management, managementUrl};
+  window.SITE_CONFIG = {products, product, money, states, productState, purchase, offer, quote, access, management, managementUrl};
 })();

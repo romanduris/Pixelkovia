@@ -568,7 +568,7 @@
       document.querySelector('.scene-panel')?.focus({preventScroll:true});
       document.querySelector('.scene-reader')?.scrollIntoView({block:'start',behavior:'instant'});return;
     }
-    if(a==='purchase'){showDialog(SITE_CONFIG.purchaseHTML());return;}
+    if(a==='purchase'){location.assign(SITE_CONFIG.purchase.url);return;}
     if(a==='preview-media'){
       const id=b.dataset.media,isPiko=id==='piko',isVideo=isPiko||id==='finale',name=isPiko?'Piko':id==='plugy'?'Plugy':id==='guardy'?'Guardy':'Miky';
       const title=id==='finale'?'Záverečná rozlúčka':isPiko?'Pikova videospráva':id==='plugy'?'Plugyho hlasová správa':id==='guardy'?'Guardyho hlasová správa':'Mikyho hlasová správa';

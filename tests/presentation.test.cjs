@@ -11,19 +11,17 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE);
   assert.equal(await page.locator('.site-header [data-view]').count(),0);
-  assert.equal(await page.locator('.hero-background').getAttribute('src'),'assets/pixelkovia-room.png');
-  assert.equal(await page.locator('.faq-list details').count(),9);
-  assert.equal(await page.locator('.activity-story img').count(),2);
+  assert.equal(await page.locator('.funnel-hero picture img').getAttribute('src'),'assets/pixelkovia-room-desktop.webp');
+  assert.equal(await page.locator('.faq-list details').count(),19);
+  assert.equal(await page.locator('.funnel-activity img').count(),2);
   assert.ok(!(await page.locator('#app').textContent()).includes('741296'));
   assert.equal(await page.locator('a[href="atlas.html"]').count(),0);
   assert.equal(await page.locator('a[href="parent.html"],a[href="storyboard.html"],a[href="game.html"],[data-action="start"],[data-view]').count(),0);
-  assert.equal(await page.locator('.offer-price strong').textContent(),'14,99 €');
-  for(const button of await page.locator('[data-action="purchase"]').all()){
-    await button.click();
-    assert.ok((await page.locator('.purchase-preview').textContent()).includes('Predaj pripravujeme'));
-    assert.equal(await page.locator('dialog a,dialog [data-action="preview-customer"]').count(),0);
-    await page.locator('.dialog-close').click();
-  }
+  assert.equal(await page.locator('.funnel-price strong').textContent(),'14,99 €');
+  assert.ok(await page.locator('.funnel-cta[href="checkout.html"]').count()>=3);
+  await page.locator('.funnel-hero .funnel-cta').click();
+  await page.waitForURL('**/checkout.html');
+  assert.ok(await page.locator('.checkout-buy').isDisabled());
   await page.goto(BASE+'/parent.html');
   assert.equal(await page.locator('.portal-header').count(),1);
   assert.equal(await page.locator('.material-card').count(),7);
@@ -143,7 +141,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   ]){
    await page.evaluate(saved=>{localStorage.setItem('zahada-v1-progress',JSON.stringify(saved));location.hash='gm-envelope';scrollTo(0,1000);},saved);
    await page.goto(BASE);
-   assert.equal(await page.locator('.sales-hero').count(),1);assert.equal(await page.locator('dialog[open]').count(),0);
+   assert.equal(await page.locator('.funnel-hero').count(),1);assert.equal(await page.locator('dialog[open]').count(),0);
    assert.equal(await page.evaluate(()=>location.hash),'');assert.equal(await page.evaluate(()=>scrollY),0);
    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('zahada-v1-progress')));assert.deepEqual(stored,saved,'refresh does not change saved progress');
   }
