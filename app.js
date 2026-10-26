@@ -12,6 +12,7 @@
   let success = false;
   let plugyRevealTimer = null;
   let finaleEndTimer = null;
+  let finaleStartTimer = null;
   try {
     let saved = JSON.parse(localStorage.getItem(KEY));
     // Only this legacy property is retained for already saved symbol selections.
@@ -65,31 +66,70 @@
   function fullScene(panels){return panels.map((lines,i)=>`<section class="gm-scene"><span class="section-kicker">OBRAZ ${i+1}</span>${linesHTML(lines)}</section>`).join('');}
   function finaleMediaHTML(){
     if(!GAME.finaleVideo&&!GAME.finaleAudio)return '';
-    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<div class="finale-video-frame" data-playback="idle"><video id="finale-video" playsinline preload="metadata" poster="assets/finale-production/start-a.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje toto video.</video><div class="finale-end-title" hidden aria-live="polite">KONIEC</div><button class="finale-video-toggle" data-action="finale-video-toggle" data-icon="▶" aria-controls="finale-video">Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p></div>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
+    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<div class="finale-video-frame" data-playback="idle"><video id="finale-video" playsinline preload="auto" poster="assets/finale-production/start-a.png" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje toto video.</video><div class="finale-end-title" hidden aria-live="polite">KONIEC</div><button class="finale-video-toggle" data-action="finale-video-toggle" data-icon="▶" aria-controls="finale-video">Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p></div>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
   }
-  function bindFinaleVideo(){
+  function primeFinaleVideo(){
+    const video=app.querySelector('#finale-preload-video');if(!video)return;
+    // Prepare the same player in the trusted submit gesture, then pause synchronously
+    // before any frame or sound can play. A Web Audio media source shifts MP4 time on Safari.
+    video.finalePrimeError=null;
+    video.play().catch(error=>{if(error.name!=='AbortError')video.finalePrimeError=error;});
+    video.pause();
+  }
+  function releaseFinaleVideo(video){
+    if(!video)return;
+    video.pause();video.finaleEvents?.abort();video.removeAttribute('src');video.load();
+  }
+  function bindFinaleVideo(autoplay=false){
     const video=app.querySelector('#finale-video'),button=app.querySelector('[data-action="finale-video-toggle"]'),status=app.querySelector('#finale-video-status');
     if(!video||!button||!status)return;
+    const events=new AbortController();video.finaleEvents=events;
+    const listen=(name,handler)=>video.addEventListener(name,handler,{signal:events.signal});
     const endTitle=app.querySelector('.finale-end-title'),frame=video.parentElement;
+    video.finaleStarting=autoplay;
     const playback=(state,icon)=>{frame.dataset.playback=state;button.dataset.icon=icon;};
     const hideEnd=()=>{clearTimeout(finaleEndTimer);finaleEndTimer=null;if(endTitle)endTitle.hidden=true;};
-    for(const event of ['play','seeking','emptied'])video.addEventListener(event,hideEnd);
-    const failed=()=>{hideEnd();playback('error','↻');button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Ťuknutím skúste načítať video znova.';};
-    video.addEventListener('playing',()=>{playback('playing','❚❚');button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';});
-    video.addEventListener('waiting',()=>{status.textContent='Video sa načítava…';});
-    video.addEventListener('pause',()=>{if(!video.ended&&!video.error){playback('paused','▶');button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
-    video.addEventListener('ended',()=>{playback('ended','↻');button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';
+    for(const event of ['play','seeking','emptied'])listen(event,hideEnd);
+    const failed=()=>{clearTimeout(finaleStartTimer);finaleStartTimer=null;video.finaleStarting=false;hideEnd();playback('error','↻');button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Ťuknutím skúste načítať video znova.';};
+    listen('playing',()=>{if(video.finaleStarting)return;playback('playing','❚❚');button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';});
+    listen('waiting',()=>{status.textContent='Video sa načítava…';});
+    listen('pause',()=>{if(!video.finaleStarting&&!video.ended&&!video.error){playback('paused','▶');button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
+    listen('ended',()=>{playback('ended','↻');button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';
       hideEnd();
       finaleEndTimer=setTimeout(()=>{finaleEndTimer=null;if(video.isConnected&&video.ended&&!video.error&&endTitle)endTitle.hidden=false;},1000);
     });
-    video.addEventListener('error',failed);
+    listen('error',failed);
     video.finalePlay=()=>{
+      clearTimeout(finaleStartTimer);finaleStartTimer=null;
+      if(video.finaleStarting&&video.readyState>=1)video.currentTime=0;
+      video.finaleStarting=false;
       hideEnd();
       if(video.error)video.load();
       if(video.ended)video.currentTime=0;
       status.textContent='Video sa načítava…';
       video.play().catch(error=>{if(!video.isConnected)return;if(error.name==='NotAllowedError'){playback('paused','▶');button.textContent='▶ Prehrať rozlúčku';status.textContent='Ťuknutím spustíte video so zvukom.';}else failed();});
     };
+    if(autoplay){
+      playback('starting','▶');status.textContent='Rozlúčka sa o chvíľu spustí…';
+      finaleStartTimer=setTimeout(()=>{
+        finaleStartTimer=null;if(!video.isConnected)return;
+        const error=video.finalePrimeError;
+        if(error){
+          video.finaleStarting=false;video.pause();
+          if(error.name!=='NotAllowedError')failed();
+          else{playback('paused','▶');status.textContent='Ťuknutím spustíte video so zvukom.';}
+          return;
+        }
+        const reveal=()=>{
+          if(!video.isConnected||!video.finaleStarting)return;
+          video.finaleStarting=false;
+          if(video.paused)video.finalePlay();
+          else{playback('playing','❚❚');button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';}
+        };
+        if(video.readyState>=1&&video.currentTime>0){video.pause();video.addEventListener('seeked',reveal,{once:true,signal:events.signal});video.currentTime=0;}
+        else reveal();
+      },1000);
+    }
   }
   function atlasInvitation(t){return `<section class="atlas-invitation">${sprite('piko')}<span class="section-kicker">PIKOV DARČEK PRE VÁŠ TÍM</span>${t.invitation.map(line=>line==='[OBJAVIŤ TAJNÝ SVET PIXELKOV]'?'<a class="btn atlas-cta" href="atlas.html" target="_blank" rel="noopener">OBJAVIŤ TAJNÝ SVET PIXELKOV ↗</a>':lineHTML(line)).join('')}</section>`;}
   function landing(){return SITE_CONTENT.sales({sprite});}
@@ -136,7 +176,7 @@
     const prompt={3:'Zadajte výsledok z karty symbolov.',4:'Zadajte miesto zo zloženého odkazu.',6:'Zadajte sedemmiestny kód z opravených správ.',7:'Zadajte spoločné návratové heslo.'}[n];
     const title=done?(t.id==='search'?'SPRÁVY OPRAVENÉ':t.character?'SPOJENIE OBNOVENÉ!':'NÁVRATOVÝ SIGNÁL PRIJATÝ'):t.label;
     const controls=`<form class="answer-form signal-form"><label for="answer">${t.id==='code'?'Návratové heslo':n===6?'Sedemmiestny kód':'Odpoveď vášho tímu'}</label><input id="answer" name="answer" type="text" inputmode="${n===3||n===6?'numeric':'text'}" maxlength="40" autocomplete="off" spellcheck="false" placeholder="${esc(t.placeholder)}" aria-describedby="feedback" required><button class="btn" type="submit">Overiť odpoveď →</button></form>`;
-    if((n===6||n===7)&&!done)return `<section class="signal-screen signal-task code-check-screen ${n===6?'guardy':'return'}-check-screen" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',n===6?'OVERENIE KÓDU':'NÁVRATOVÁ BRÁNA')}<div class="signal-content"><h1 id="stage-title" tabindex="-1">${esc(title)}</h1><img class="code-check-party ${n===6?'guardy-happy-party':''}" src="${n===6?'assets/guardy-party-transparent.png':'assets/return-party-holding-hands.png'}" alt="${n===6?'Celá veselá partia siedmich Pixelkov je spolu.':'Všetci siedmi Pixelkovia sa usmievajú a držia za ruky.'}"><div class="code-check-entry"><p>${n===6?'Číslice pri opravených správach prečítajte zhora nadol a vzniknutý sedemmiestny kód zadajte tu:':'Zadajte návratové heslo zo získaných znakov.'}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${n===6&&GAME.guardyAudio?'<span data-guardy-audio-slot hidden></span>':''}</div></div></section>`;
+    if((n===6||n===7)&&!done)return `<section class="signal-screen signal-task code-check-screen ${n===6?'guardy':'return'}-check-screen" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',n===6?'OVERENIE KÓDU':'NÁVRATOVÁ BRÁNA')}<div class="signal-content"><h1 id="stage-title" tabindex="-1">${esc(title)}</h1><img class="code-check-party ${n===6?'guardy-happy-party':''}" src="${n===6?'assets/guardy-party-transparent.png':'assets/return-party-holding-hands.png'}" alt="${n===6?'Celá veselá partia siedmich Pixelkov je spolu.':'Všetci siedmi Pixelkovia sa usmievajú a držia za ruky.'}"><div class="code-check-entry"><p>${n===6?'Číslice pri opravených správach prečítajte zhora nadol a vzniknutý sedemmiestny kód zadajte tu:':'Zadajte návratové heslo zo získaných znakov.'}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${n===6&&GAME.guardyAudio?'<span data-guardy-audio-slot hidden></span>':''}${n===7&&GAME.finaleVideo?'<span data-finale-preload-slot hidden></span>':''}</div></div></section>`;
     return `<section class="signal-screen ${done?'signal-stage-result success-card'+(n===6?' guardy-result':''):'signal-task'}" aria-labelledby="stage-title">${signalHeader(preview?'exit-test':'home',done?'ODPOVEĎ PRIJATÁ':'OVERENIE ODPOVEDE')}<div class="signal-content">${STORY_TEXT.party(t,done?'success-character':'')}<div class="eyebrow">${esc(t.title)}</div><h1 id="stage-title" tabindex="-1">${esc(title)}</h1>${done?`${t.reward?`<div class="signal-reward"><span>${t.id==='code'?'BRÁNA OTVORENÁ':'VÁŠ NÁVRATOVÝ ZNAK'}</span><strong>${esc(t.reward)}</strong>${t.id==='code'?'':'<small>Tento návratový znak si dobre zapamätajte. Budete ho potrebovať neskôr.</small>'}</div>`:''}${n===6?`<p>Spojenie s ochrancom je obnovené. Čaká vás jeho správa.</p>${GAME.guardyAudio?'<span data-guardy-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="guardy-audio-toggle" aria-controls="guardy-audio">▶ Prehrať Guardyho správu</button></div><p id="guardy-audio-status" role="status">Ťuknutím spustíte Guardyho správu.</p>':''}<button class="text-link guardy-transcript-link" data-action="read-guardy-message">Prečítať Guardyho správu</button>`:STORY_TEXT.html(t,'after')}<button class="btn" data-action="${n===6?'close-window':'next'}">${n===6?'Zavrieť okno':(t.id==='code'?'Prečítať rozlúčku':'Pokračovať')+' →'}</button>${t.id==='code'?taskCompletionNote('Návratová brána je otvorená. Pokračujte k rozlúčke celej partie.'):taskCompletionNote()}`:`${n===6?'':STORY_TEXT.html(t)}<p class="task-question">${esc(t.task)}</p><p class="answer-prompt">${prompt}</p>${controls}<p class="feedback" id="feedback" role="status"></p>${n===6?'':taskHints()}`}</div></section>`;
   }
   function taskCompletionNote(text='Po vypočutí alebo prečítaní správy môžete telefón odložiť a ísť hľadať ďalšiu indíciu.') {return `<p class="task-completion-note">${esc(text)}</p>`;}
@@ -303,8 +343,9 @@
       if(Math.abs(delta)>1)app.scrollTop+=delta;
     });
   }
-  function render({autoplayMiky=false,autoplayPlugy=false,autoplayGuardy=false}={}){
+  function render({autoplayMiky=false,autoplayPlugy=false,autoplayGuardy=false,autoplayFinale=false}={}){
     clearTimeout(finaleEndTimer);finaleEndTimer=null;
+    clearTimeout(finaleStartTimer);finaleStartTimer=null;
     clearTimeout(plugyRevealTimer);plugyRevealTimer=null;
     // Old saves on the removed phone stage resume at the next playable task.
     if(view==='player'&&state().stage===2&&state().completed.includes(1)){
@@ -323,9 +364,15 @@
     const previousGuardyAudio=app.querySelector('#guardy-audio');
     const retainedGuardyAudio=view==='player'&&state().stage===6?previousGuardyAudio:null;
     previousGuardyAudio?.mikyEvents?.abort();
+    const previousFinaleVideo=app.querySelector('#finale-preload-video,#finale-video');
+    const retainedFinaleVideo=view==='player'&&(state().stage===7||state().stage===FINAL_STAGE)?previousFinaleVideo:null;
+    previousFinaleVideo?.finaleEvents?.abort();
     app.querySelectorAll('video,audio').forEach(media=>{
+      if(autoplayFinale&&media===retainedFinaleVideo)return;
       if(!(autoplayPlugy&&media===retainedPlugyAudio&&media.plugySound?.revealing))media.pause();
     });
+    if(retainedFinaleVideo)document.body.append(retainedFinaleVideo);
+    else releaseFinaleVideo(previousFinaleVideo);
     // Keep the buffered element attached while replacing the code form with the result.
     if(retainedAudio)document.body.append(retainedAudio);
     else if(previousAudio){previousAudio.removeAttribute('src');previousAudio.load();}
@@ -362,7 +409,21 @@
       guardySlot.replaceWith(audio);if(!retainedGuardyAudio)audio.load();
     }else retainedGuardyAudio?.remove();
     bindMessageAudio(autoplayGuardy,'guardy','Guardy');
-    bindFinaleVideo();
+    const finalePlaceholder=app.querySelector('#finale-video'),finaleSlot=app.querySelector('[data-finale-preload-slot]');
+    if(finalePlaceholder&&retainedFinaleVideo){
+      retainedFinaleVideo.id='finale-video';retainedFinaleVideo.hidden=false;
+      retainedFinaleVideo.setAttribute('aria-label','Rozlúčkové video Pixelkov');
+      finalePlaceholder.replaceWith(retainedFinaleVideo);
+    }else if(finalePlaceholder){
+      finalePlaceholder.src=GAME.finaleVideo;finalePlaceholder.load();
+    }else if(finaleSlot){
+      const video=retainedFinaleVideo||document.createElement('video');
+      video.id='finale-preload-video';video.hidden=true;video.preload='auto';video.playsInline=true;
+      video.poster='assets/finale-production/start-a.png';
+      if(!retainedFinaleVideo)video.src=GAME.finaleVideo;
+      finaleSlot.replaceWith(video);if(!retainedFinaleVideo)video.load();
+    }else if(retainedFinaleVideo){releaseFinaleVideo(retainedFinaleVideo);retainedFinaleVideo.remove();}
+    bindFinaleVideo(autoplayFinale);
     if(view==='prep'){app.querySelectorAll('[data-check]').forEach(el=>{el.checked=PREP_STORE.read(el.dataset.check);});updatePreparation();}
   }
   function start(){
@@ -434,7 +495,7 @@
     modal.querySelector(opened?'.message-actions [data-action="replay-message"]':'[data-action="accept-call"]')?.focus({preventScroll:true});
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
-  function completeTask(){const n=state().stage;recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3,autoplayGuardy:n===6});goTop();}
+  function completeTask(){const n=state().stage;if(n===7)primeFinaleVideo();recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3,autoplayGuardy:n===6,autoplayFinale:n===7});goTop();}
   function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||state().stage===5)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:[...t.answer,...(t.legacyAnswers||[])].some(a=>normalize(raw)===normalize(a));
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
@@ -455,6 +516,7 @@
     if(a==='end-game'||a==='close-window'){
       app.querySelectorAll('video,audio').forEach(media=>media.pause());
       clearTimeout(finaleEndTimer);finaleEndTimer=null;
+      clearTimeout(finaleStartTimer);finaleStartTimer=null;
       if(preview){preview=null;navigate('designer');return;}
       window.close();
       setTimeout(()=>{if(!window.closed&&b.isConnected){b.textContent=a==='end-game'?'Hra skončila. Kartu môžete zavrieť.':'Okno môžete zavrieť.';b.setAttribute('aria-live','polite');}},350);return;

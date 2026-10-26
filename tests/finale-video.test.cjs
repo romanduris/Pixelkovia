@@ -8,14 +8,21 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE+'/game.html?signal=navrat');
   assert.equal(await page.locator('#finale-video').count(),0);
+  await page.waitForFunction(()=>document.querySelector('#finale-preload-video').readyState>=3);
+  assert.ok(await page.locator('#finale-preload-video').evaluate(v=>v.paused&&v.currentTime===0),'preloading is silent');
+  await page.evaluate(()=>{window.preloadedFinaleVideo=document.querySelector('#finale-preload-video');document.addEventListener('submit',()=>window.finaleSubmittedAt=performance.now(),{capture:true,once:true});});
   await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();
   const video=page.locator('#finale-video'),button=page.locator('[data-action="finale-video-toggle"]'),status=page.locator('#finale-video-status');
   await video.evaluate(v=>v.readyState>=1?null:new Promise((resolve,reject)=>{v.addEventListener('loadedmetadata',resolve,{once:true});v.addEventListener('error',()=>reject(new Error(v.error?.message||'Video load failed')),{once:true});}));
+  assert.ok(await video.evaluate(v=>v===window.preloadedFinaleVideo),'retain the buffered player');
+  await page.waitForFunction(()=>document.querySelector('.finale-video-frame').dataset.playback==='playing');
+  const start=await video.evaluate(v=>({elapsed:performance.now()-window.finaleSubmittedAt,time:v.currentTime}));
+  assert.ok(start.elapsed>=950&&start.elapsed<2500&&start.time<.75,JSON.stringify(start));
   const meta=await video.evaluate(v=>({duration:v.duration,width:v.videoWidth,height:v.videoHeight,paused:v.paused,muted:v.muted,inline:v.playsInline}));
-  assert.equal(meta.width,480);assert.equal(meta.height,854);assert.ok(meta.duration>=9&&meta.duration<=11);assert.ok(meta.paused&&meta.inline&&!meta.muted);
+  assert.equal(meta.width,480);assert.equal(meta.height,854);assert.ok(meta.duration>=9&&meta.duration<=11);assert.ok(!meta.paused&&meta.inline&&!meta.muted);
   const saved=await page.evaluate(key=>localStorage.getItem(key),KEY);
   assert.ok(await page.locator('.finale-end-title').isHidden());
-  await button.tap();await page.waitForFunction(()=>document.querySelector('#finale-video').currentTime>.2);assert.match(await status.innerText(),/prehráva/);
+  await page.waitForFunction(()=>document.querySelector('#finale-video').currentTime>.2);assert.match(await status.innerText(),/prehráva/);
   await button.tap();assert.ok(await video.evaluate(v=>v.paused));await page.waitForFunction(()=>document.querySelector('#finale-video-status').textContent.includes('pozastavené'));
   const pausedAt=await video.evaluate(v=>v.currentTime);await button.tap();await page.waitForFunction(t=>document.querySelector('#finale-video').currentTime>t+.15,pausedAt);
   await video.evaluate(v=>{v.addEventListener('ended',()=>{window.finalVideoEndedAt=performance.now();},{once:true});const title=document.querySelector('.finale-end-title');new MutationObserver(()=>{if(!title.hidden)window.finalTitleShownAt=performance.now();}).observe(title,{attributes:true,attributeFilter:['hidden']});});
@@ -39,7 +46,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),saved);
   await video.evaluate(v=>{v.currentTime=v.duration-.15;});await page.locator('.finale-end-title').waitFor({state:'visible'});
   await page.reload();assert.equal(await page.locator('#finale-video').count(),0,'refresh requires the final password again');await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();assert.ok(await page.locator('.finale-end-title').isHidden(),'refresh clears ending title');
-  await button.tap();await page.waitForFunction(()=>document.querySelector('#finale-video').currentTime>.1);
+  await page.waitForFunction(()=>document.querySelector('.finale-video-frame').dataset.playback==='playing'&&document.querySelector('#finale-video').currentTime>.1);
   await video.evaluate(v=>{window.departingFinaleVideo=v;});await page.evaluate(()=>{window.close=()=>{window.closeAttempted=true};});await page.locator('[data-action="end-game"]').tap();await page.waitForFunction(()=>document.querySelector('[data-action="end-game"]').textContent.includes('Kartu môžete zavrieť'));assert.ok(await page.evaluate(()=>window.closeAttempted));assert.ok(await page.evaluate(()=>window.departingFinaleVideo.paused));
   assert.deepEqual(errors,[]);console.log('PASS '+engine.name()+': real 480x854 dubbed finale video, touch play/pause/resume/replay, denied play, retry, progress, delayed title over the retained final frame, replay/refresh and leaving.');
  }finally{await browser.close();}

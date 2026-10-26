@@ -469,3 +469,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .finale-end-title{z-index:1}
 
 .cipko-finish-exit{width:100%;min-height:54px;margin-top:20px}
+
+.finale-video-frame[data-playback="starting"]{background:#080d1d url("assets/finale-production/start-a.png") center/contain no-repeat}
+.finale-video-frame[data-playback="starting"] video,.finale-video-frame[data-playback="starting"] .finale-video-toggle{opacity:0;pointer-events:none}
