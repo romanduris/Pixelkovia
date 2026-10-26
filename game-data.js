@@ -137,7 +137,7 @@ window.GAME = {
         "before": [
           "Ahojte! Ja som Pixi, malý svietiaci pixel. Obrázky na televízore, tablete aj telefóne sa skladajú z miliónov maličkých svetielok. Hovoríme im pixely a práve o ne sa starám ja!",
           "Po záhadnom bliknutí niektoré svetielka zhasli. Už som však zachytila správu, že Miky našiel Pika. Pri hľadaní ostatných som objavila odkaz od Plugyho, ktorý spája naše digitálne cestičky. Pri výpadku sa všetky písmená posunuli a správe nerozumiem.",
-          "Pomôže nám môj dekódovací stroj! Vystrihnite dva papierové kruhy a menší položte na väčší. Nastavte vonkajšie D oproti vnútornému A. Pomocou kruhov rozlúštite správu a choďte podľa nej hľadať ďalšiu indíciu."
+          "Pomôže nám môj dekódovací stroj! Pomocou kruhov rozlúštite správu a choďte podľa nej hľadať ďalšiu indíciu."
         ],
         "after": []
       },
@@ -180,7 +180,7 @@ window.GAME = {
         "before": [
           "Ahojte! Ja som Plugy, malý živý konektor. Mám krátke káblikové ruky a spájam digitálne cestičky, po ktorých putujú zvuky, obrázky a odkazy. Keď sa spojenie preruší, pomáham ho opraviť.",
           "Dnes sa po záhadnom bliknutí zamkol náš najdôležitejší digitálny most. Bez neho sa nedostanem ku kamarátom. Už počujem Mikyho signál a vidím, že Pixi rozsvietila cestu. Teraz potrebujem odomknúť most!",
-          "Na zámku svietia trojuholník, kruh a štvorec. Vyriešte tri rovnice a zistite hodnotu každého tvaru. Potom naskenujte QR kód a v telefóne označte všetky políčka s týmito číslami. Rozsvieti sa tajný znak a zámok povolí."
+          "Na zámku svietia trojuholník, kruh a štvorec. Kamaráti, pomôžte nám odomknúť zámok!"
         ],
         "after": [
           "Podarilo sa! Zámok povolil a most stále drží!",
