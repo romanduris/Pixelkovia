@@ -315,8 +315,8 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .plugy-connected .plugy-unlock{flex-shrink:0;gap:8px;padding:10px;border:1px solid #86dfbc40;border-radius:12px;background:#8fdfba0a;font-size:8px;letter-spacing:.03em}
 .plugy-connected .plugy-unlock strong{font-size:24px}
 .plugy-connected .plugy-unlock-sign{grid-template-columns:repeat(5,3px);grid-template-rows:repeat(7,3px);gap:1px}
-.plugy-celebration{width:100%;overflow:hidden;border:1px solid #405474;border-radius:16px;background:#17233a}
-.plugy-connected .plugy-party-scene{width:100%;max-width:none;border:0;border-radius:0}
+.plugy-celebration{width:100%;overflow:hidden;border:1px solid #405474;border-radius:16px;background:rgb(0 0 0 / 25%)}
+.plugy-connected .plugy-party-scene{width:100%;max-width:none;border:0;border-radius:0;background:transparent}
 .plugy-connected .plugy-thanks{max-width:none;padding:14px 16px;text-align:left}
 .plugy-connected .plugy-message{padding:16px 16px 4px;border:1px solid #8675bc55;border-radius:16px;background:linear-gradient(145deg,#272340,#192238)}
 .plugy-connected .signal-audio-controls{margin:0}
