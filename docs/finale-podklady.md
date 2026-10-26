@@ -15,18 +15,10 @@ Celý návod s obrázkami, nastaveniami a kopírovaním zadania je priamo v stor
 
 ## Obrazové referencie
 
-Na jeden 10-sekundový beh použi hotový Start Image. Samostatné portréty sú záložné podklady; nekombinujú sa s týmto režimom. Názvy sú len označením súborov; do videa sa nepíšu.
+Na jeden 10-sekundový beh použi Start Image. Voliteľný End Image určuje rovnakú izbu po odchode partie. Ak ho vybraný model nesprístupní, stačí Start Image a rovnaký prompt. Samostatné referenčné portréty sa nepridávajú.
 
 - assets/finale-production/start-a.png
-
-- assets/characters/piko.png
-- assets/characters/miky.png
-- assets/characters/pixi.png
-- assets/characters/plugy.png
-- assets/characters/pingy.png
-- assets/characters/cipko.png
-- assets/characters/guardy.png
-- assets/printable-scenes/p7-navrat-portrait.png
+- assets/finale-production/end-empty-room.png
 
 ## Prompt na vloženie do OpenGen
 
@@ -35,20 +27,13 @@ OpenGen — jeden 10-sekundový klip 9:16
 1. OTVOR OPENGEN
 https://opengen.ai/video-generator
 
-2. ŠTARTOVACÍ OBRÁZOK
+2. START IMAGE — ZAČIATOK
 https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/finale-production/start-a.png
-Stiahni PNG a nahraj ho do Start Image. End Image nechaj prázdne.
+Stiahni PNG a nahraj ho do Start Image. Tento obrázok určuje vzhľad celej partie aj izby.
 
-3. REFERENCIE
-Pre tento postup nepridávaj samostatné portréty do References. Celá partia je už v štartovacom obrázku.
-Voliteľné záložné portréty na otvorenie a stiahnutie:
-Piko: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/piko.png
-Miky: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/miky.png
-Pixi: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/pixi.png
-Plugy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/plugy.png
-Pingy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/pingy.png
-Čipko: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/cipko.png
-Guardy: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/characters/guardy.png
+3. END IMAGE — VOLITEĽNÝ KONIEC
+https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/finale-production/end-empty-room.png
+Rovnaká izba po odchode všetkých, brána dohasína. Nahraj ho do End Image, ak je toto pole dostupné pri vybranom modeli. Ak nie je dostupné, použi len Start Image a rovnaký prompt. Samostatné referenčné portréty nepridávaj.
 
 4. NASTAVENIA
 Model: Seedance 2.0 (na snímke bol vybraný Fast; skontroluj výber).
@@ -56,7 +41,8 @@ Režim: Start Image / Image to Video.
 Pomer: 9:16. Dĺžka: 10 sekúnd.
 Rozlíšenie: 1080p, ak je dostupné, inak 720p. Fast: 720p.
 Zvuk: ON — iba nehovorené pixelkové zvuky.
-End Image a References: prázdne.
+End Image: nahraj end-empty-room.png, ak ho vybraný model sprístupní.
+References: prázdne.
 Pred spustením skontroluj cenu v OpenGen.
 
 5. SKOPÍRUJ IBA NASLEDUJÚCI ANGLICKÝ TEXT DO PROMPTU
@@ -66,7 +52,7 @@ Animate the supplied start image as one continuous 10-second vertical 9:16 farew
 0-2 seconds: the blue membrane inside the gateway dissolves inward into a clear luminous passage. The arch stays fixed. The friends make one small joyful bounce; the tiny yellow pixel gently bobs.
 2-6 seconds: the six companions take short cheerful steps through the opening in three loose pairs, giving small waves toward the viewer as they go. Keep separate silhouettes and a clear path. The yellow pixel floats through beside the microphone. Each disappears only after crossing the threshold. The blue guide stays in the room nearest the camera, facing the viewer while his companions leave; he does not follow yet.
 6-9 seconds: with all six companions through, the blue guide looks toward the viewer and gives two slow warm waves with his free right hand. Preserve his cloud-shaped head and original cyan eye marks.
-9-10 seconds: the blue guide turns and takes a quick final step through the nearby gateway. Only after he crosses, the passage light gently dims. Keep the arch visible.
+9-10 seconds: the blue guide turns and takes a quick final step through the nearby gateway. Only after he crosses, the passage softly closes to a subdued deep-blue pixel membrane and the cyan arch light dims, leaving one tiny cyan twinkle at the threshold. Keep the arch visible. Finish with the empty warm apartment; all seven friends and their accessories are gone. If an End Image is supplied, match that final composition precisely without an abrupt cut, dissolve of characters or camera movement.
 
 OPTIONAL SPEECH COMPATIBILITY, 0.5-8.5 seconds: keep the blue guide facing the viewer with a warm, relaxed expression. Animate ONLY his existing small cyan mouth line with gentle short pulses, slightly opening and closing with brief pauses, then settling back to its original resting shape by 8.5 seconds. Keep the screen-face design intact: no human lips, teeth, tongue, new mouth or exaggerated talking. The movement must read as a friendly electronic expression when there is no voice, and as loosely speaking if a short voiceover is added later. Do not attempt word-level lip synchronization or generate dialogue. At 9 seconds he turns and leaves as described.
 
@@ -84,6 +70,7 @@ KONTROLA VÝSLEDKU
 - Zvuk obsahuje iba tiché elektronické efekty, bez slov a spevu.
 - Video má 10 sekúnd; posledné mávanie má priestor a odchod zostáva zrozumiteľný.
 - Modrý sprievodca sa do 8,5 s pozerá k divákovi a jemne pohybuje iba pôvodnou tyrkysovou čiarou úst. Záber funguje s voliteľným hlasom aj bez neho.
+- Na poslednom zábere je rovnaká prázdna izba s dohasínajúcou bránou; postavičky zmiznú až po prechode cez otvor.
 
 VOLITEĽNÝ HLAS PRI STRIHU
 Voliteľná samostatná TTS stopa: cieľ 7–8 sekúnd, v obraze približne 0,5–8,5 s. Pridať až pri strihu, podľa skutočnej dĺžky nahrávky. OpenGen generuje iba pixelkové efekty. Pohyb úst je jemný a orientačný, bez presného lip-syncu.

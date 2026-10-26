@@ -8,8 +8,7 @@ const fs=require('node:fs/promises'),path=require('node:path'),vm=require('node:
  const plan=game.finaleProduction;
  await fs.mkdir(path.join(root,'assets/finale-production'),{recursive:true});
  for(const clip of plan.clips)await fs.writeFile(path.join(root,clip.promptFile),clip.prompt+'\n');
- const references=game.characters.map(character=>`- ${character.image}`).join('\n');
- const kit=game.finaleVideoPrompt+'\n\nV ZIP balíku je start-a.png, prompt-a.txt a záložné portréty v priečinku references/.\n';
+ const kit=game.finaleVideoPrompt+'\n\nV ZIP balíku je start-a.png, voliteľný end-empty-room.png, prompt-a.txt a README.txt. Samostatné referenčné portréty sa nepoužívajú.\n';
  await fs.writeFile(path.join(root,'assets/finale-production/README.txt'),kit);
  const notes=`# Záverečná rozlúčka a scenár pre OpenGen
 
@@ -28,12 +27,10 @@ Celý návod s obrázkami, nastaveniami a kopírovaním zadania je priamo v stor
 
 ## Obrazové referencie
 
-Na jeden 10-sekundový beh použi hotový Start Image. Samostatné portréty sú záložné podklady; nekombinujú sa s týmto režimom. Názvy sú len označením súborov; do videa sa nepíšu.
+Na jeden 10-sekundový beh použi Start Image. Voliteľný End Image určuje rovnakú izbu po odchode partie. Ak ho vybraný model nesprístupní, stačí Start Image a rovnaký prompt. Samostatné referenčné portréty sa nepridávajú.
 
 - assets/finale-production/start-a.png
-
-${references}
-- assets/printable-scenes/p7-navrat-portrait.png
+- assets/finale-production/end-empty-room.png
 
 ## Prompt na vloženie do OpenGen
 
