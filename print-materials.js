@@ -207,6 +207,7 @@
       return heading.outerHTML+story.outerHTML;
     }
     const sheet=document.querySelector('.sheet');
+    if(id==='p3')sheet.querySelector('.worksheet-next')?.remove();
     sheet.querySelectorAll('.quest-party figcaption').forEach(node=>node.remove());
     sheet.querySelector('.worksheet-heading .label')?.remove();
     sheet.querySelector('.worksheet-heading .print-wave')?.remove();
