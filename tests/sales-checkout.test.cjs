@@ -69,12 +69,13 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.ok(Math.abs(image.ratio-.8)<.01&&image.fit==='contain','portrait photograph remains uncropped');
     if(width<600)assert.ok(image.rendered>width*.85,'paper and phone remain large on narrow screens');
     assert.equal(await page.locator('.evidence-screen img').count(),1,'actual game frame visible without accordion');
-    assert.equal(await page.locator('img[src*="game-lock-partial"],img[src*="family-lock"]').count(),0,'no revealed grid answer');
+    assert.equal(await page.locator('.evidence-screen img[src="assets/sales/game-lock-partial.webp"]').count(),1,'user-approved real puzzle preview');
+    assert.equal(await page.locator('img[src*="opening-video-frame"],img[src*="family-lock"]').count(),0,'the sad close-up is replaced by the approved puzzle still');
     assert.equal(await page.locator('.compact-materials a,.compact-materials button,a[href$=".pdf"]').count(),0,'worksheets cannot be enlarged or downloaded from funnel');
     for(const sheet of await page.locator('.worksheet-window>img').all()){
      await sheet.evaluate(img=>img.decode());
      const preview=await sheet.evaluate(img=>({sourceWidth:img.naturalWidth,width:img.clientWidth,clipped:img.clientHeight>img.parentElement.clientHeight,overflow:getComputedStyle(img.parentElement).overflow}));
-     assert.ok(preview.sourceWidth>=700&&preview.width<=110,'sharp but intentionally small worksheet preview');
+     assert.ok(preview.sourceWidth>=700&&preview.width<=(width<=700?141:110),'sharp but intentionally small worksheet preview');
      assert.ok(preview.clipped&&preview.overflow==='hidden','bottom reward/footer is outside public preview');
     }
     const previewButton=page.locator('[data-sales-open-preview]');

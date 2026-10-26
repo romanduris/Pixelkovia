@@ -48,7 +48,7 @@ export async function prepareFunnel(output){
   const assets=[
     'assets/pixelkovia-room-desktop.webp','assets/pixelkovia-room-mobile.webp',
     'assets/sales/family-opening-mobile.webp','assets/sales/family-opening-mobile-medium.webp','assets/sales/family-opening-mobile-small.webp',
-    'assets/sales/opening-video-frame.webp','assets/atlas/cover.webp','assets/fonts/Caveat.ttf',
+    'assets/sales/game-lock-partial.webp','assets/atlas/cover.webp','assets/fonts/Caveat.ttf',
     ...characters.map(c=>`assets/sales/characters/${c.id}.webp`),...Object.values(previews)
   ];
   for(const asset of assets){await mkdir(path.dirname(path.join(output,asset)),{recursive:true});await cp(path.join(root,asset),path.join(output,asset));}

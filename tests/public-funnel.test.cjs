@@ -30,6 +30,8 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await page.goto(BASE+'/');await page.evaluate(()=>document.fonts.ready);
    assert.equal(await page.locator('#app>section').count(),8);assert.equal(await page.locator('.faq-item').count(),19);
    assert.equal(await page.locator('.character-card').count(),7);
+   assert.equal(await page.locator('.evidence-screen img[src="assets/sales/game-lock-partial.webp"]').count(),1);
+   assert.equal(await page.locator('.bonus-book-art .book-cover-title').count(),1);
    assert.equal(await page.evaluate(()=>typeof window.GAME),'undefined');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    const art=await page.locator('.funnel-hero').evaluate(el=>{const a=el.getBoundingClientRect(),b=el.querySelector('picture').getBoundingClientRect();return Math.abs((a.height-2)-b.height)<1&&getComputedStyle(el.querySelector('img')).objectFit==='cover'});
