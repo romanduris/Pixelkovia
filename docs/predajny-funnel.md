@@ -51,6 +51,6 @@ Obmedzenia: miestny WebKit padá aj na samostatnom HTML `<h1>Test</h1>` bez proj
 
 Následná mobilná úprava s novými fotografickými scénami a skutočnými zábermi hry: [mobile-sales.md](mobile-sales.md).
 
-## Náhľady bez prezradenia úloh
+## Neinteraktívne náhľady pracovných listov
 
-Podľa následného zadania sú listy na predajnej stránke neklikateľné a neodkazujú na PDF. Zachovávajú pôvodné malé rozloženie, ale používajú samostatné miniatúry `assets/sales/worksheet-teasers/{p1,p2,p4}.webp` so šírkou len 180 px. Aj ilustrácia listu pri ponuke používa miniatúru. Text už nevyzýva na otvorenie PDF. Originálne tlačoviny a sťahovanie v rodičovskej príprave zostávajú nezmenené. Táto úprava rieši verejnú prezentáciu; nepridáva overovanie prístupu k existujúcim statickým herným súborom.
+Listy na predajnej stránke zostávajú neklikateľné a neodkazujú na PDF. Po následnej vizuálnej korekcii používajú opäť pôvodné ostré náhľady `assets/miky-sheet-preview.webp`, `assets/printables/p2-preview.webp` a `assets/printables/p4-preview.webp`; rovnaký ostrý list sa vrátil aj do ilustrácie ponuky. Pôvodné malé rozloženie zostáva zachované. Predchádzajúce miniatúry so šírkou 180 px sa už nepoužívajú. Text nevyzýva na otvorenie PDF. Originálne tlačoviny a sťahovanie v rodičovskej príprave zostávajú nezmenené. Táto úprava rieši prezentáciu, nepridáva overovanie prístupu k existujúcim statickým herným súborom.
