@@ -3,7 +3,7 @@ html{scroll-behavior:smooth;scroll-padding-top:20px}
 .atlas-page{background:#10182b;color:#eaf0fa}
 .atlas-main{max-width:1080px;margin:auto;padding:0 24px}
 .atlas-header{max-width:1080px;min-height:68px;padding:10px 24px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.atlas-header .brand{font-size:14px}.atlas-header .brand-sub{font-size:8px}.atlas-header .brand-mark{width:34px;height:36px;font-size:26px;line-height:32px}
+.atlas-header .brand{font-size:14px}.atlas-header .brand-sub{font-size:7px}.atlas-header .brand-mark{width:34px;height:36px;font-size:26px;line-height:32px}
 .atlas-back{font-size:12px;color:#c4c4ef;text-decoration:none;display:flex;align-items:center;min-height:44px}
 .atlas-cover{position:relative;isolation:isolate;overflow:hidden;min-height:0;height:280px;margin:0 0 20px;border:1px solid #48516c;border-radius:12px;padding:24px 38px;display:flex;align-items:center;background:#121e35}
 .atlas-cover>img{position:absolute;inset:0;z-index:-2;display:block;width:100%;height:100%;object-fit:cover;object-position:center 15%}
@@ -15,7 +15,7 @@ html{scroll-behavior:smooth;scroll-padding-top:20px}
 .atlas-reading-time{display:block;font:10px/1.5 Manrope,Arial,sans-serif;color:#bec8dc}
 .book-chapter{background:#faf6ed;color:#303947;border:1px solid #d4cbb8;border-radius:12px;overflow:hidden;box-shadow:0 14px 40px #05091130}
 .book-section{max-width:710px;margin:auto;padding:36px 32px 12px;scroll-margin-top:24px}
-.book-section+.book-section{padding-top:32px}
+.book-section+.book-section{padding-top:30px}.book-section:not(.book-opening) h2{font-family:Georgia,serif;font-weight:400;font-size:26px;letter-spacing:-.025em;margin-bottom:20px}
 .chapter-number{font:700 10px/1.5 Manrope,Arial,sans-serif!important;letter-spacing:.14em;color:#82704e!important;margin:0 0 10px!important}
 .book-section h2{font-size:clamp(25px,3.3vw,32px);line-height:1.2;letter-spacing:-.035em;color:#303c4e;margin:0 0 22px;max-width:600px}
 .book-section>p{font:18px/1.85 Georgia,'Times New Roman',serif;color:#3e4650;margin:0 0 20px;overflow-wrap:break-word}
@@ -23,16 +23,8 @@ html{scroll-behavior:smooth;scroll-padding-top:20px}
 .book-illustration{margin:14px 0 0;padding:0}
 .book-illustration img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
 .book-illustration figcaption{font:11px/1.6 Manrope,Arial,sans-serif;color:#777064;text-align:center;padding:12px 24px;margin:0}
-.book-contents{max-width:646px;margin:18px auto 0;border-block:1px solid #ded5c5;color:#4e5360}
-.book-contents summary{cursor:pointer;min-height:52px;padding:15px 0;font:600 12px/1.7 Manrope,Arial,sans-serif}.book-contents summary span{font-weight:400;color:#80786a;margin-left:10px;font-size:10px}
-.book-contents nav{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding:0 0 16px}
-.book-contents a{font:12px/1.6 Manrope,Arial,sans-serif;color:#5c5578;text-decoration:none;min-height:44px;display:flex;align-items:center}
 .book-last-line{font-style:italic!important;color:#756044!important;border-top:1px solid #ded5c5;padding:22px 0 12px;margin-top:28px!important}
-.atlas-profiles{padding:48px 0 0;scroll-margin-top:20px}.friends-heading{max-width:570px;margin:0 auto 24px;text-align:center}.friends-heading h2{font-size:30px;line-height:1.2;margin:0 0 14px}.friends-heading>p:last-child{color:#b5c2d6;font-size:14px;line-height:1.7}
-.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.atlas-profile{display:grid;grid-template-columns:90px minmax(0,1fr);column-gap:20px;align-content:start;padding:24px;border:1px solid #3d4964;border-radius:12px;background:#172238;scroll-margin-top:20px}
-.atlas-profile>img{grid-column:1;grid-row:1/4;align-self:start;width:90px;height:90px;object-fit:contain}.atlas-profile h3{font-size:23px;margin:2px 0 5px;color:#edf1fa}.profile-role{font:11px/1.5 Manrope,Arial,sans-serif;color:#bfb3e8;margin-bottom:12px}.atlas-profile>p{font:15px/1.75 Georgia,serif;color:#c2cddd;margin:0;grid-column:2}
-.atlas-profile:last-child{grid-column:1/-1;max-width:620px;width:100%;justify-self:center}
-.atlas-end{text-align:center;padding:48px 16px 32px}.atlas-end h2{font-size:30px;line-height:1.25;margin:0 0 14px}.atlas-end>p:not(.atlas-kicker){font:14px/1.6 Georgia,serif;color:#b4c1d6}.atlas-end>div{display:flex;justify-content:center;gap:12px 28px;flex-wrap:wrap;margin-top:24px}.atlas-end a{display:flex;align-items:center;min-height:44px;font-size:12px;color:#c9bbfb}
+.atlas-end{text-align:center;padding:48px 16px 32px}.atlas-end h2{font-size:30px;line-height:1.25;margin:0 0 14px}.atlas-end>p:not(.atlas-kicker){font:14px/1.6 Georgia,serif;color:#b4c1d6}.atlas-end a{display:inline-flex;align-items:center;min-height:44px;font-size:12px;color:#c9bbfb}
 .skip-link{position:absolute;left:16px;top:-100px;z-index:10;background:#c3aeff;color:#10182b;padding:12px 18px}.skip-link:focus{top:8px}
 @media(max-width:600px){
  .atlas-main{padding:0 12px}.atlas-header{min-height:58px;padding:7px 16px;gap:10px}.atlas-header .brand{font-size:12px}.atlas-header .brand-mark{width:29px;height:31px;font-size:23px;line-height:27px}.atlas-back{font-size:11px}
@@ -40,11 +32,11 @@ html{scroll-behavior:smooth;scroll-padding-top:20px}
  .atlas-cover>img{object-position:56% center}.atlas-cover:before{background:linear-gradient(90deg,#0a1125ed,#0a1125aa 45%,#0a11252b 88%)}
  .atlas-cover .atlas-kicker{font-size:8px;letter-spacing:.12em;margin-bottom:10px}.atlas-cover h1{font-size:38px;margin-bottom:10px;max-width:240px}.atlas-cover h1 em{font-size:1.22em}.atlas-cover-copy>p:not(.atlas-kicker){font-size:12px;line-height:1.6;margin-bottom:8px}.atlas-reading-time{font-size:8px;max-width:240px}
  .book-chapter{border-radius:10px}.book-section{padding:25px 22px 6px}.book-section h2{font-size:25px;line-height:1.2;margin-bottom:18px}.book-section>p{font-size:17px;line-height:1.85;margin-bottom:18px}.chapter-number{font-size:9px!important}.book-opening>p:nth-of-type(2):first-letter{font-size:56px;margin-top:8px}
- .book-illustration{margin-top:12px}.book-illustration figcaption{font-size:10px;padding:10px 20px}.book-contents{margin:12px 22px 0}.book-contents summary span{display:block;margin-left:15px}.book-contents nav{grid-template-columns:1fr;gap:0}
- .atlas-profiles{padding-top:36px}.friends-heading{padding:0 16px}.friends-heading h2{font-size:27px}.friends-heading .atlas-kicker{font-size:9px}.friends-heading>p:last-child{font-size:13px}.profile-grid{grid-template-columns:1fr;gap:12px}.atlas-profile{padding:20px;grid-template-columns:72px minmax(0,1fr);column-gap:16px}.atlas-profile>img{width:72px;height:72px}.atlas-profile h3{font-size:22px}.profile-role{font-size:11px}.atlas-profile>p{grid-column:1/-1;font-size:16px;margin-top:6px}.atlas-end{padding:38px 14px 24px}.atlas-end h2{font-size:26px}
+ .book-section:not(.book-opening) h2{font-size:24px}
+ .book-illustration{margin-top:12px}.book-illustration figcaption{font-size:10px;padding:10px 20px}.atlas-end{padding:38px 14px 24px}.atlas-end h2{font-size:26px}
 }
 @media(max-width:360px){.atlas-cover{padding:18px 16px}.atlas-cover h1{font-size:35px}.book-section{padding-inline:18px}.book-section h2{font-size:23px}.atlas-reading-time{font-size:8px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-@media print{.atlas-header,.book-contents,.atlas-end,.skip-link{display:none}.atlas-main{max-width:none;padding:0}.atlas-cover{min-height:220px;margin-bottom:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.book-chapter{border:0;box-shadow:none;background:#fff}.book-section{max-width:none}.book-section>p,.atlas-profile>p{color:#222}.book-illustration{break-inside:avoid}.atlas-profiles{color:#222}.atlas-profile{background:#fff;border-color:#ccc;break-inside:avoid}.atlas-profile h3,.friends-heading>p:last-child{color:#222}.profile-role{color:#555}}
+@media print{.atlas-header,.atlas-end,.skip-link{display:none}.atlas-main{max-width:none;padding:0}.atlas-cover{min-height:220px;margin-bottom:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.book-chapter{border:0;box-shadow:none;background:#fff}.book-section{max-width:none}.book-section>p{color:#222}.book-illustration{break-inside:avoid}}
 
 @media(max-width:600px) and (max-height:700px){.atlas-cover{height:176px;padding:14px 18px}.atlas-cover h1{font-size:32px;margin-bottom:8px}.atlas-cover .atlas-kicker{font-size:7px;margin-bottom:7px}.atlas-cover-copy>p:not(.atlas-kicker){font-size:11px;margin-bottom:0}.atlas-reading-time{display:none}.book-opening{padding-top:20px}.book-opening h2{font-size:22px;margin-bottom:14px}.book-opening .chapter-number{margin-bottom:8px!important}}
