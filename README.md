@@ -2,6 +2,8 @@
 
 Rodinné dobrodružstvo v byte. Sedem kamarátov zo sveta za obrazovkami potrebuje obnoviť prerušené spojenie. Deti riešia papierové indície a spoločné heslo; telefón overuje odpovede a uchováva postup.
 
+Verejná predajná stránka a checkout sa nasadzujú samostatne na **https://pixelkovia.rodulab.com**. Postup, hranicu verejného obsahu a Cloudflare konfiguráciu opisuje [funnel/README.md](funnel/README.md). Verejný balík je `dist/funnel/`; hra, PDF a rodičovský portál sa na tento host nenahrávajú.
+
 ## Digitálna identita V6.1
 
 Schválená sada B: Piko je pôvodný modrý sprievodca s obláčikovou hlavou, obrazovkovou tvárou, oblekom a tyrkysovou kravatou. Miky je mikrofón, Pixi svietiaci pixel, Plugy živý USB konektor bez chvosta, Pingy dátový posol, Čipko mikročip s okuliarmi. Guardy používa posledný schválený oranžový štít s tyrkysovou kravatou a kľúčovou dierkou. Hlavný vizuál vychádza z obývačkového variantu 2; obrazové adaptácie pre mobil a desktop zachovávajú layout a veľkosti textov.

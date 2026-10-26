@@ -1,0 +1,9 @@
+{
+  "account_id": "033ec39e1948bd5785d92d1993a8036f",
+  "zone_id": "e21f155e1a6e43b9a57bd7a093f1ee42",
+  "zone_name": "rodulab.com",
+  "project_name": "pixelkovia-funnel",
+  "hostname": "pixelkovia.rodulab.com",
+  "production_branch": "main",
+  "directory": "dist/funnel"
+}

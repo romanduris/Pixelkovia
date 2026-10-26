@@ -9,3 +9,6 @@
 - Reuse the Site project ID in `.openai/hosting.json`; do not create a duplicate Site. Preserve the current audience unless the user requests a sharing change.
 - Build the static deployment with `node scripts/prepare-static.mjs`. The source of truth remains the root HTML/CSS/JS files and `assets/`; do not edit generated `dist/` files.
 - Keep the game playable and preserve progress compatibility when changing its appearance.
+- The public sales funnel is deployed separately to `https://pixelkovia.rodulab.com` using the Cloudflare Pages project configured in `funnel/cloudflare.json`. The game will have its own site; keep the existing Sites audience private.
+- For sales changes, also build and test `dist/funnel/`, commit and push `main`, then publish that directory with `scripts/deploy-funnel.mjs`. Follow `funnel/README.md` for credentials and the pinned Wrangler CLI. Never upload the complete `dist/` or repository to the public Pages project.
+- The public funnel must not contain game JavaScript, answers, complete worksheets/PDFs, the parent portal, audio/video files or administration. Use only its explicit public asset list and physically cropped worksheet previews; verify private routes return 404. Preserve the inactive payment behavior until separately authorized.

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /checkout.html
+Sitemap: https://pixelkovia.rodulab.com/sitemap.xml
