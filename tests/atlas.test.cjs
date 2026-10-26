@@ -16,8 +16,10 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    const broken=await page.locator('a[href^="#"]').evaluateAll(links=>links.filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash));assert.deepEqual(broken,[]);
    await page.locator('#kapitola-7').scrollIntoViewIfNeeded();
    await page.locator('img').evaluateAll(async imgs=>{for(const img of imgs){img.loading='eager';await img.decode();}});
+   const cutouts=await page.locator('.book-illustration img').evaluateAll(imgs=>imgs.map(img=>{const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);return ctx.getImageData(0,0,1,1).data[3]===0;}));
+   assert.equal(cutouts.length,7);assert.ok(cutouts.every(Boolean),'book pictures are transparent character cutouts');
    assert.deepEqual(errors,[]);await context.close();
   }
-  console.log('PASS '+engine.name()+': compact atlas cover, first-screen reading on phones and desktop, continuous bedtime reading, three illustrations and no profile cards or chapter menu.');
+  console.log('PASS '+engine.name()+': compact atlas cover, first-screen reading on phones and desktop, continuous bedtime reading, three groups of transparent characters and no profile cards or chapter menu.');
  }finally{await browser.close();}
 }})().catch(error=>{console.error(error);process.exit(1)});
