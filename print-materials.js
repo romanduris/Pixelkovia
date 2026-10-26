@@ -193,12 +193,12 @@
       const story=document.querySelector('.miky-print-story');story.querySelector('.sheet-avatar')?.remove();
       return story.innerHTML+document.querySelector('.miky-print-mission').innerHTML;
     }
-    if(id==='p5') {
+    if(id==='p2'||id==='p5') {
       const heading=document.querySelector('.worksheet-heading h2');
       const story=document.querySelector('.worksheet-story');
       story.querySelector('.worksheet-speaker')?.remove();
       // The printed key and answer boxes are already visible in the PDF preview.
-      return heading.outerHTML+story.outerHTML+document.querySelector('.worksheet-mission').outerHTML;
+      return heading.outerHTML+story.outerHTML+(id==='p5'?document.querySelector('.worksheet-mission').outerHTML:'');
     }
     if(id==='p6') {
       const heading=document.querySelector('.worksheet-heading h2');
