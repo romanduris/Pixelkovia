@@ -50,3 +50,7 @@ Samostatne prešla kontrola migrácie uloženého postupu. Rozloženie sa vizuá
 Obmedzenia: miestny WebKit padá aj na samostatnom HTML `<h1>Test</h1>` bez projektu; jeho overenie v tomto prostredí nie je spoľahlivé. Existujúce `mission-data.test.cjs` očakáva starú formuláciu „iba celý P1“ v nezmenených herných dátach, ktoré už používajú „iba celý list k úlohe 1“. Existujúci `narrative.test.cjs` čaká scénu pri úlohe `search`, ktorú aktuálny hráč nezobrazuje týmto spôsobom. Tieto staršie nezhody sa v rámci predajnej stránky nemenili.
 
 Následná mobilná úprava s novými fotografickými scénami a skutočnými zábermi hry: [mobile-sales.md](mobile-sales.md).
+
+## Náhľady bez prezradenia úloh
+
+Podľa následného zadania sú listy na predajnej stránke neklikateľné a neodkazujú na PDF. Zachovávajú pôvodné malé rozloženie, ale používajú samostatné miniatúry `assets/sales/worksheet-teasers/{p1,p2,p4}.webp` so šírkou len 180 px. Aj ilustrácia listu pri ponuke používa miniatúru. Text už nevyzýva na otvorenie PDF. Originálne tlačoviny a sťahovanie v rodičovskej príprave zostávajú nezmenené. Táto úprava rieši verejnú prezentáciu; nepridáva overovanie prístupu k existujúcim statickým herným súborom.
