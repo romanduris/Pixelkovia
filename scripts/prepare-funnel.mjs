@@ -47,7 +47,7 @@ export async function prepareFunnel(output){
   for(const file of code)await cp(path.join(root,file),path.join(output,file));
   const assets=[
     'assets/pixelkovia-room-desktop.webp','assets/pixelkovia-room-mobile.webp',
-    'assets/sales/family-opening-mobile.webp','assets/sales/family-opening-mobile-medium.webp','assets/sales/family-opening-mobile-small.webp',
+    ...['opening','lock','code'].flatMap(scene=>['','-medium','-small'].map(size=>`assets/sales/family-${scene}-mobile${size}.webp`)),
     'assets/sales/game-lock-partial.webp','assets/atlas/cover.webp','assets/fonts/Caveat.ttf',
     ...characters.map(c=>`assets/sales/characters/${c.id}.webp`),...Object.values(previews)
   ];

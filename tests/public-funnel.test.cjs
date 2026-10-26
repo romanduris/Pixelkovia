@@ -48,6 +48,8 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
     await page.locator('#ukazka').scrollIntoViewIfNeeded();await page.waitForTimeout(100);
     assert.ok(await page.locator('.mobile-buy').isVisible());
    }
+   await require('./helpers/family-gallery.cjs')(page,{swipe:width===390});
+   if(width===390)await page.locator('#ukazka').screenshot({path:'/tmp/pixelkovia-public-gallery-phone.png'});
    const preview=page.locator('[data-sales-open-preview]');await preview.click();
    assert.ok(await page.locator('#sales-preview').evaluate(el=>el.open));await page.keyboard.press('Escape');
    assert.ok(await preview.evaluate(el=>document.activeElement===el));
@@ -78,6 +80,6 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
   for(const route of [...forbidden,'admin/api/customers','assets/printables/p2-preview.webp','missing-page']){
    const response=await page.request.get(BASE+'/'+route);assert.equal(response.status(),404,'private/missing route returns 404: '+route);
   }
-  console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, preview, sticky CTA, all price combinations, inactive purchase, no submissions and unchanged game progress.');
+  console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, three-scene swipe/keyboard gallery, preview, sticky CTA, all price combinations, inactive purchase, no submissions and unchanged game progress.');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

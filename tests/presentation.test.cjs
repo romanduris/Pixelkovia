@@ -13,7 +13,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   assert.equal(await page.locator('.site-header [data-view]').count(),0);
   assert.equal(await page.locator('.funnel-hero picture img').getAttribute('src'),'assets/pixelkovia-room-desktop.webp');
   assert.equal(await page.locator('.faq-list details').count(),19);
-  assert.equal(await page.locator('.evidence-family>img').count(),1);
+  assert.equal(await page.locator('.evidence-family>img').count(),3);
   assert.equal(await page.locator('.evidence-screen img').count(),1);
   assert.ok(!(await page.locator('#app').textContent()).includes('741296'));
   assert.equal(await page.locator('a[href="atlas.html"]').count(),0);
