@@ -512,6 +512,8 @@
 .final-password-slots>div{display:grid;justify-items:center;gap:5px}
 .final-password-slots span{font:9px monospace}
 .final-password-slots b{display:block;width:34px;height:34px;border:1px solid #456a74;background:white}
+#p7 .final-gate-panel{display:grid;grid-template-columns:minmax(0,1fr) var(--sheet-qr);align-items:center;gap:15px}
+.final-gate-copy{min-width:0}
 @media print{
  #p6 .worksheet-story{padding:2mm 3mm;margin-bottom:2mm}
  #p6 .worksheet-story p{font-size:var(--sheet-copy);line-height:1.35}
@@ -552,6 +554,8 @@
  #p7 .final-sign-answer h3{font-size:9pt;margin:0 0 1mm}
  #p7 .final-sign-answer p{font-size:var(--sheet-copy);margin:0}
  #p7 .final-gate-panel{padding:2.5mm 3mm;margin:2mm 0}
+ #p7 .final-gate-panel{gap:3mm}
+ #p7 .final-gate-copy p{font-size:var(--sheet-copy);line-height:1.35}
  .final-password-slots{gap:3mm;margin:3mm 0}
  .final-password-slots span{font-size:7pt}
  .final-password-slots b{width:9mm;height:9mm}
@@ -584,6 +588,8 @@
  .final-password-slots{gap:6px}
  .final-password-slots b{width:28px;height:28px}
  .final-password-slots span{font-size:8px}
+ #p7 .final-gate-panel{grid-template-columns:1fr}
+ #p7 .final-gate-panel .worksheet-entry-qr{justify-self:center}
 }
 
 /* QR and mission share the left column; the portrait spans both on the right. */

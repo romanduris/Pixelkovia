@@ -5,13 +5,21 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
  const browser=await engine.launch();try{
   const context=await browser.newContext(device),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE+'/game.html');
-  for(const [signal,stage,selector,paperLetters] of [['kvak',1,'.signal-restore',[]],['miky',1,'.signal-restore',[]],['sutko',3,'.plugy-lock',[2]],['plugy',3,'.plugy-lock',[2]],['listok',4,'.signal-content',[]],['pingy',4,'.signal-content',[]],['cipko',5,'.cipko-screen',[4]],['guardy',6,'.signal-task',[]]]){
+  for(const [signal,stage,selector,paperLetters] of [['kvak',1,'.signal-restore',[]],['miky',1,'.signal-restore',[]],['sutko',3,'.plugy-lock',[2]],['plugy',3,'.plugy-lock',[2]],['listok',4,'.signal-content',[]],['pingy',4,'.signal-content',[]],['cipko',5,'.cipko-screen',[4]],['guardy',6,'.signal-task',[]],['navrat',7,'.signal-task',[]]]){
    await page.evaluate(KEY=>localStorage.removeItem(KEY),KEY);await page.goto(BASE+'/game.html?signal='+signal);
    assert.equal(await page.locator(selector).count(),1,signal+': direct entry without prerequisites');
    assert.equal(await page.locator('.qr-prerequisite,[data-action="resume-scanned-game"]').count(),0);
    let saved=await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)),KEY);assert.equal(saved.stage,stage);assert.deepEqual(saved.completed,paperLetters);
    await page.reload();saved=await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)),KEY);assert.equal(saved.stage,stage);assert.deepEqual(saved.completed,paperLetters,'non-contiguous paper discoveries survive reload');
   }
+  // The final QR asks for the password; it never jumps straight to the farewell.
+  await page.evaluate(KEY=>localStorage.removeItem(KEY),KEY);await page.goto(BASE+'/game.html?signal=navrat');
+  await page.locator('#answer').fill('NESPRAVNE');await page.locator('.answer-form button').tap();assert.equal(await page.locator('.finale').count(),0);
+  await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();await page.locator('[data-action="next"]').tap();
+  assert.equal(await page.locator('.finale').count(),1);assert.match(await page.locator('.finale .quest-story').innerText(),/Dokázali ste to/);
+  assert.equal(await page.locator('.finale audio,.finale video').count(),0,'undelivered media does not create broken players');
+  assert.deepEqual(await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)).completed,KEY),[7]);
+  await page.evaluate(KEY=>localStorage.removeItem(KEY),KEY);
   await page.goto(BASE+'/game.html?signal=cipko');await page.locator('[data-kind="pixel"][data-index="1"]').tap();
   await page.goto(BASE+'/game.html?signal=plugy');
   const cells=await page.evaluate(()=>GAME.plugyPuzzle.grid.flat().flatMap((v,i)=>GAME.plugyPuzzle.values.includes(v)?[i]:[]));

@@ -62,6 +62,10 @@
   function sceneIndex(t,phase){const panels=phase==='after'?t.resolution:t.story,key=`${t.id}:${phase}`,raw=state().scenePages?.[key];return Math.max(0,Math.min(panels.length-1,Number.isInteger(raw)?raw:0));}
   function sceneReader(t,phase){const panels=phase==='after'?t.resolution:t.story;if(!panels.length)return '';const index=sceneIndex(t,phase);return `<section class="scene-reader" aria-label="${phase==='after'?'Po vyriešení úlohy':'Príbehová scéna'}"><div class="reader-heading"><span class="story-label">${phase==='after'?'Spojenie obnovené':'Príbeh pokračuje'}</span><span class="reader-count">${index+1} / ${panels.length}</span></div><div class="scene-panel" tabindex="-1">${linesHTML(panels[index])}</div><div class="reader-controls"><button class="text-link" data-action="scene-page" data-phase="${phase}" data-page="${index-1}" ${index===0?'disabled':''}>← Späť</button>${index<panels.length-1?`<button class="btn small" data-action="scene-page" data-phase="${phase}" data-page="${index+1}">Čítať ďalej →</button>`:`<span class="reader-end">${phase==='before'&&state().stage<FINAL_STAGE?'Teraz je na rade váš tím.':'✦ Koniec scény'}</span>`}</div></section>`;}
   function fullScene(panels){return panels.map((lines,i)=>`<section class="gm-scene"><span class="section-kicker">OBRAZ ${i+1}</span>${linesHTML(lines)}</section>`).join('');}
+  function finaleMediaHTML(){
+    if(!GAME.finaleVideo&&!GAME.finaleAudio)return '';
+    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<video controls playsinline preload="metadata" poster="assets/printable-scenes/p7-navrat-portrait.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje video. Rozlúčku si môžete prečítať nižšie.</video>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
+  }
   function atlasInvitation(t){return `<section class="atlas-invitation">${sprite('piko')}<span class="section-kicker">PIKOV DARČEK PRE VÁŠ TÍM</span>${t.invitation.map(line=>line==='[OBJAVIŤ TAJNÝ SVET PIXELKOV]'?'<a class="btn atlas-cta" href="atlas.html" target="_blank" rel="noopener">OBJAVIŤ TAJNÝ SVET PIXELKOV ↗</a>':lineHTML(line)).join('')}</section>`;}
   function landing(){return SITE_CONTENT.sales({sprite});}
   const checklist = PREP_STORE.steps;
@@ -85,7 +89,7 @@
     if(n===4)return paperDeliveryScreen();
     if(n===5)return cipkoScreen();
     if(n===3)return success||s.completed.includes(3)?plugyConnectionScreen():plugyLockScreen();
-    if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${STORY_TEXT.html(t)}${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div>${taskCompletionNote('Telefón môžete odložiť. Všetci sú bezpečne doma.')}</div></section>`;
+    if(n===FINAL_STAGE)return `<section class="task-wrap">${toolbar}<div class="finale"><div class="final-icon">✧</div>${contactsHTML(true)}<div class="eyebrow" style="justify-content:center">VŠETKÝCH SEDEM JE DOMA</div><h1 class="screen-heading" tabindex="-1" style="text-align:center">${t.title}</h1>${finaleMediaHTML()}${STORY_TEXT.html(t)}${atlasInvitation(t)}<div class="button-row"><button class="btn secondary" data-action="${preview?'exit-test':'reset'}">${preview?'Ukončiť test':'Nové dobrodružstvo ↺'}</button></div>${taskCompletionNote('Telefón môžete odložiť. Všetci sú bezpečne doma.')}</div></section>`;
     return taskInteractionScreen(t,n);
   }
   function cipkoScreen(){
@@ -505,7 +509,7 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
   // Legacy printed QR payloads must keep working; new names are not storage keys.
-  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4,cipko:5,guardy:6}[new URLSearchParams(location.search).get('signal')];
+  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4,cipko:5,guardy:6,navrat:7}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     progress.stage=scannedSignal;

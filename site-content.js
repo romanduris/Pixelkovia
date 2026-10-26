@@ -81,7 +81,7 @@
   }
   function finaleProduction() {
     const script=GAME.voiceScripts.finale;
-    return `<section class="miky-message storyboard-message"><h3>Pikova rozlúčka a video</h3><p class="script-status">${esc(script.recordingStatus)} Video je voliteľné, bez hovorenia, najviac 30 sekúnd.</p><div class="miky-message-controls">${copyButton('finale-message-tts','Text na nahovorenie','tts-copy')}${copyButton('finale-video-prompt','Zadanie na video','message-text')}</div><div id="finale-message-tts" class="message-copy tts-copy" hidden><h4>${esc(script.model)} · ${esc(script.duration)}</h4><p>${esc(script.direction)}</p>${ttsEditorLink}<pre>${esc(script.prompt)}</pre></div><div id="finale-video-prompt" class="message-copy message-text-copy" hidden><pre>${esc(GAME.finaleVideoPrompt)}</pre></div></section>`;
+    return `<section class="miky-message storyboard-message"><h3>Pikova rozlúčka a video</h3><p class="script-status">${esc(script.recordingStatus)} Scenár pre OpenGen: 25 sekúnd, päť záberov, spoločné mávanie. Video je bez hovorenia; hlasová rozlúčka vznikne samostatne.</p><div class="miky-message-controls">${copyButton('finale-message-tts','Text na nahovorenie','tts-copy')}${copyButton('finale-video-prompt','Scenár pre OpenGen','message-text')}</div><div id="finale-message-tts" class="message-copy tts-copy" hidden><h4>${esc(script.model)} · ${esc(script.duration)}</h4><p>${esc(script.direction)}</p>${ttsEditorLink}<pre>${esc(script.prompt)}</pre></div><div id="finale-video-prompt" class="message-copy message-text-copy" hidden><p><a href="assets/finale-opengen-scenar.txt" download>Stiahnuť scenár pre OpenGen</a></p><pre>${esc(GAME.finaleVideoPrompt)}</pre></div></section>`;
   }
   function stageBody(s,i,fullScene){
     const sheet=sheetForStage[i];
