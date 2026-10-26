@@ -506,9 +506,9 @@
     }
     if(a==='purchase'){showDialog(SITE_CONFIG.purchaseHTML());return;}
     if(a==='preview-media'){
-      const id=b.dataset.media,isPiko=id==='piko',name=isPiko?'Piko':id==='plugy'?'Plugy':'Miky';
-      const title=isPiko?'Pikova videospráva':id==='plugy'?'Plugyho hlasová správa':'Mikyho hlasová správa';
-      const source=isPiko?GAME.video:id==='plugy'?GAME.plugyAudio:GAME.audio;
+      const id=b.dataset.media,isPiko=id==='piko',name=isPiko?'Piko':id==='plugy'?'Plugy':id==='guardy'?'Guardy':'Miky';
+      const title=isPiko?'Pikova videospráva':id==='plugy'?'Plugyho hlasová správa':id==='guardy'?'Guardyho hlasová správa':'Mikyho hlasová správa';
+      const source=isPiko?GAME.video:id==='plugy'?GAME.plugyAudio:id==='guardy'?GAME.guardyAudio:GAME.audio;
       showDialog(`<section class="media-preview ${isPiko?'piko-media-preview':''}"><span class="section-kicker">KONTROLA NAHRÁVKY</span><h2>${title}</h2>${isPiko?`<video controls playsinline preload="metadata" src="${esc(source)}" aria-label="Náhľad Pikovej videosprávy"></video>`:`<audio controls playsinline preload="auto" src="${esc(source)}" aria-label="${name} – náhľad hlasovej správy"></audio>`}${isPiko?`<p class="preview-message-instructions">${esc(GAME.stages[0].task)}</p>`:''}<p role="status" class="preview-media-status">Načítava sa nahrávka…</p></section>`);
       const media=modal.querySelector('video,audio'),status=modal.querySelector('.preview-media-status');
       media.addEventListener('playing',()=>{status.textContent='Správa sa prehráva.';});
