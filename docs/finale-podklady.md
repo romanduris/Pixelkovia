@@ -12,6 +12,8 @@ Keď nabudúce zabliká malé svetielko, možno vás len zdravíme. Majte sa kr�
 
 Prednes: Rovnaký hlas ako v úvode. Srdečne, s úľavou a radosťou. Záver povedať pokojne, bez naliehavosti. cca 25–30 sekúnd.
 
+Celý návod s obrázkami, nastaveniami a kopírovaním zadania je priamo v storyboard.html po rozbalení „Scenár pre OpenGen“ pri finále.
+
 ## Obrazové referencie
 
 Na jeden 10-sekundový beh použi hotový Start Image. Samostatné portréty sú záložné podklady; nekombinujú sa s týmto režimom. Názvy sú len označením súborov; do videa sa nepíšu.

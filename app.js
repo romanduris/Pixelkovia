@@ -401,6 +401,13 @@
     if(b.dataset.view){preview=null;navigate(b.dataset.view);return;}
     const a=b.dataset.action;if(!a)return;
     if(a==='cipko'){if(cipkoSuppressClick){cipkoSuppressClick=false;return;}if(view!=='player'||state().stage!==5||state().completed.includes(5))return;CIPKO_GAME.act(state(),b.dataset.kind,Number(b.dataset.index));if(CIPKO_GAME.ready(state())){completeTask();return;}save();render();return;}
+    if(a==='copy-opengen-prompt'){
+      const field=document.getElementById('finale-opengen-text'),status=document.getElementById('opengen-copy-status');
+      if(!field||!status)return;
+      const fallback=()=>{field.focus();field.select();status.textContent='Zadanie je označené. Skopíruj ho pomocou Ctrl+C alebo ponuky telefónu.';};
+      if(!navigator.clipboard?.writeText){fallback();return;}
+      navigator.clipboard.writeText(field.value).then(()=>{status.textContent='Celé zadanie je skopírované.';}).catch(fallback);return;
+    }
     if(a==='toggle-copy'){
       const content=document.getElementById(b.dataset.target);if(!content)return;
       content.hidden=!content.hidden;b.setAttribute('aria-expanded',String(!content.hidden));return;

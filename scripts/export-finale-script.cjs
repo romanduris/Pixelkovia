@@ -21,6 +21,8 @@ ${finale.narrative.before.join('\n\n')}
 
 Prednes: ${game.voiceScripts.finale.direction} ${game.voiceScripts.finale.duration}.
 
+Celý návod s obrázkami, nastaveniami a kopírovaním zadania je priamo v storyboard.html po rozbalení „Scenár pre OpenGen“ pri finále.
+
 ## Obrazové referencie
 
 Na jeden 10-sekundový beh použi hotový Start Image. Samostatné portréty sú záložné podklady; nekombinujú sa s týmto režimom. Názvy sú len označením súborov; do videa sa nepíšu.
