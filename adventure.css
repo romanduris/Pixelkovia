@@ -446,3 +446,7 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 
 .finale-media>[data-action="finale-video-toggle"]{width:100%;margin-top:12px;min-height:48px;white-space:normal}
 .finale-media #finale-video-status{font-size:12px;line-height:1.5;min-height:36px;margin:8px 0 0;color:#aebed8}
+
+.finale-video-frame{position:relative;overflow:hidden;border-radius:12px}
+.finale-end-title{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;color:#fff;font:800 clamp(32px,9vw,58px)/1.1 var(--font-body,Arial,sans-serif);letter-spacing:.12em;text-indent:.12em;text-shadow:0 2px 8px #000,0 0 28px #000}
+.finale-end-title[hidden]{display:none}

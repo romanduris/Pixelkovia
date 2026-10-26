@@ -11,6 +11,7 @@
   let progress = fresh(), view = environment === 'player' ? 'prep' : environment, preview = null, messageReturn = false, pingTimer = null, soundContext = null;
   let success = false;
   let plugyRevealTimer = null;
+  let finaleEndTimer = null;
   try {
     let saved = JSON.parse(localStorage.getItem(KEY));
     // Only this legacy property is retained for already saved symbol selections.
@@ -64,18 +65,25 @@
   function fullScene(panels){return panels.map((lines,i)=>`<section class="gm-scene"><span class="section-kicker">OBRAZ ${i+1}</span>${linesHTML(lines)}</section>`).join('');}
   function finaleMediaHTML(){
     if(!GAME.finaleVideo&&!GAME.finaleAudio)return '';
-    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<video id="finale-video" controls playsinline preload="metadata" poster="assets/finale-production/start-a.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje video. Rozlúčku si môžete prečítať nižšie.</video><button class="btn" data-action="finale-video-toggle" aria-controls="finale-video">▶ Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
+    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<div class="finale-video-frame"><video id="finale-video" controls playsinline preload="metadata" poster="assets/finale-production/start-a.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje video. Rozlúčku si môžete prečítať nižšie.</video><div class="finale-end-title" hidden aria-live="polite">KONIEC</div></div><button class="btn" data-action="finale-video-toggle" aria-controls="finale-video">▶ Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
   }
   function bindFinaleVideo(){
     const video=app.querySelector('#finale-video'),button=app.querySelector('[data-action="finale-video-toggle"]'),status=app.querySelector('#finale-video-status');
     if(!video||!button||!status)return;
-    const failed=()=>{button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Skúste znova alebo si prečítajte rozlúčku nižšie.';};
+    const endTitle=app.querySelector('.finale-end-title');
+    const hideEnd=()=>{clearTimeout(finaleEndTimer);finaleEndTimer=null;if(endTitle)endTitle.hidden=true;};
+    for(const event of ['play','seeking','emptied'])video.addEventListener(event,hideEnd);
+    const failed=()=>{hideEnd();button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Skúste znova alebo si prečítajte rozlúčku nižšie.';};
     video.addEventListener('playing',()=>{button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';});
     video.addEventListener('waiting',()=>{status.textContent='Video sa načítava…';});
     video.addEventListener('pause',()=>{if(!video.ended&&!video.error){button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
-    video.addEventListener('ended',()=>{button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';});
+    video.addEventListener('ended',()=>{button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';
+      hideEnd();
+      finaleEndTimer=setTimeout(()=>{finaleEndTimer=null;if(video.isConnected&&video.ended&&!video.error&&endTitle)endTitle.hidden=false;},1000);
+    });
     video.addEventListener('error',failed);
     video.finalePlay=()=>{
+      hideEnd();
       if(video.error)video.load();
       if(video.ended)video.currentTime=0;
       status.textContent='Video sa načítava…';
@@ -290,6 +298,7 @@
     });
   }
   function render({autoplayMiky=false,autoplayPlugy=false}={}){
+    clearTimeout(finaleEndTimer);finaleEndTimer=null;
     clearTimeout(plugyRevealTimer);plugyRevealTimer=null;
     // Old saves on the removed phone stage resume at the next playable task.
     if(view==='player'&&state().stage===2&&state().completed.includes(1)){

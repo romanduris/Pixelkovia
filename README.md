@@ -94,3 +94,5 @@ Podklady pre Seedance: `GAME.finaleProduction` obsahuje presný anglický prompt
 Telefónna stránka QR šestky zobrazuje veselú spoločnú ilustráciu, jeden pokyn na čítanie číslic zhora nadol a formulár. Úvodné zadanie sa prispôsobuje výške obrazovky; úspech a kompatibilita starých odpovedí zostávajú zachované.
 
 Záverečná reč má cieľ 7–8 sekúnd do 10-sekundového videa. Video prompt ponecháva iba jemný pohyb pôvodnej čiary úst modrého sprievodcu a nehovorené pixelkové efekty. Voliteľný hlas z ElevenLabs sa pridá až pri strihu; rozhodnutie o jeho použití zostáva otvorené. Dĺžku skutočnej nahrávky treba overiť.
+
+Po dohraní záverečného videa zostane dekódovaný posledný záber a po 1 sekunde sa nad ním zobrazí KONIEC. Pri opakovanom spustení, posunutí prehrávania a obnovení stránky sa nápis skryje; stav titulku sa neukladá do postupu.

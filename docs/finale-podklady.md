@@ -78,6 +78,6 @@ Text: Dokázali ste to! Ďakujeme, kamaráti. Už môžeme ísť domov. Majte sa
 
 ## Zapojenie hotových médií
 
-GAME.finaleVideo: assets/EndScene.mp4. GAME.finaleAudio: null (samostatná hlasová stopa ešte nie je dodaná). Používa sa pôvodná zvuková stopa dodaného MP4, bez pridanej TTS nahrávky. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
+GAME.finaleVideo: assets/EndScene.mp4. GAME.finaleAudio: null (samostatná hlasová stopa ešte nie je dodaná). Používa sa pôvodná zvuková stopa dodaného MP4, bez pridanej TTS nahrávky. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Po dohraní ostáva posledný záber; po 1 sekunde sa cezň zobrazí KONIEC. Pri opakovaní, posunutí a obnovení stránky sa titulok skryje. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
 
 Zdroj textu je game-data.js. Po jeho úprave spusti node scripts/export-finale-script.cjs.
