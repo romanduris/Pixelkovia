@@ -1,5 +1,7 @@
 # Pixelkovia — CRO audit a úprava funnelu
 
+> Historický záznam CRO iterácie. Po nej nasledovala [oprava ilustrácie cez celú plochu úvodu](../hero-background-2026-10-26/README.md); pôvodné merania a screenshoty nižšie zostali zachované ako porovnávací záznam.
+
 26. október 2026 · Základ porovnania: `1c2bbd4a976a51f85271f417e74f92326cfcdfaf`
 
 [Publikovaná stránka](https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site) · [Vizuálne porovnanie](compare.html) · [Pôvodné merania](before.json) · [Nové merania](after.json)
