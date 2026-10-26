@@ -21,6 +21,7 @@ if(zone?.name!==config.zone_name||zone.account?.id!==config.account_id||zone.sta
 const verified=await api('GET','/user/tokens/verify');
 if(verified?.status!=='active')throw Error('Inactive token.');
 let project=await api('GET',projectPath);
+if(project&&config.project_id&&project.id!==config.project_id)throw Error('Unexpected Pages project ID.');
 const existingDns=await api('GET',zonePath+'/dns_records?name='+encodeURIComponent(config.hostname));
 console.log(JSON.stringify({account:zone.account.name,zone:zone.name,project:project?.name||'(new) '+config.project_name,hostname:config.hostname,existingDns:existingDns.map(({type,name,content})=>({type,name,content})),artifact:config.directory}));
 if(process.argv.includes('--check'))process.exit(0);
@@ -39,8 +40,12 @@ if(!project){
  console.log('Created Pages project '+project.name+' ('+project.id+').');
 }
 if(project.production_branch!==config.production_branch)throw Error('Unexpected production branch.');
-const result=spawnSync(process.execPath,[wrangler,'pages','deploy',config.directory,'--project-name',config.project_name,'--branch',config.production_branch,'--commit-hash',sha,'--commit-dirty=false'],{stdio:'inherit',env:{...process.env,CLOUDFLARE_API_TOKEN:token,CLOUDFLARE_ACCOUNT_ID:config.account_id,WRANGLER_SEND_METRICS:'false'}});
-if(result.status!==0)throw Error('Pages upload failed; DNS was not changed.');
+if(project.canonical_deployment?.deployment_trigger?.metadata?.commit_hash===sha&&project.canonical_deployment?.latest_stage?.status==='success'){
+ console.log('Reusing the successful Pages deployment for this exact source commit.');
+}else{
+ const result=spawnSync(process.execPath,[wrangler,'pages','deploy',config.directory,'--project-name',config.project_name,'--branch',config.production_branch,'--commit-hash',sha,'--commit-dirty=false'],{stdio:'inherit',env:{...process.env,CLOUDFLARE_API_TOKEN:token,CLOUDFLARE_ACCOUNT_ID:config.account_id,WRANGLER_SEND_METRICS:'false'}});
+ if(result.status!==0)throw Error('Pages upload failed; DNS was not changed.');
+}
 project=await api('GET',projectPath);
 const deployed=project.canonical_deployment;
 if(deployed?.latest_stage?.status!=='success')throw Error('Deployment is not successful; DNS was not changed.');
@@ -50,8 +55,14 @@ const cnameTarget=project.subdomain;
 // Verify uploaded boundary on the stable Pages origin before directing the domain.
 const pagesOrigin='https://'+cnameTarget;
 for(const [route,status]of [['/',200],['/checkout',200],['/game.html',404],['/game-data.js',404],['/assets/printables/p1.pdf',404]]){
- const response=await fetch(pagesOrigin+route,{signal:AbortSignal.timeout(30000)});
- if(response.status!==status)throw Error('Pages HTTP boundary failed: '+route+' '+response.status);
+ for(let attempt=0;attempt<4;attempt++){
+  let actual;
+  try{actual=(await fetch(pagesOrigin+route,{signal:AbortSignal.timeout(15000)})).status;}catch{actual='network';}
+  if(actual===status)break;
+  if(attempt===3||![502,503,504,522,530,'network'].includes(actual))throw Error('Pages HTTP boundary failed: '+route+' '+actual);
+  console.log('Waiting for the Pages origin to activate ('+route+', '+actual+').');
+  await new Promise(resolve=>setTimeout(resolve,2000*(attempt+1)));
+ }
 }
 let domain=await api('GET',projectPath+'/domains/'+config.hostname);
 if(!domain)domain=await api('POST',projectPath+'/domains',{name:config.hostname});

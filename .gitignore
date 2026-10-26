@@ -1,2 +1,4 @@
 # Generated static deployment output
 dist/
+# Cloudflare CLI cache, never deployment source
+/.wrangler/

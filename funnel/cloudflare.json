@@ -3,6 +3,7 @@
   "zone_id": "e21f155e1a6e43b9a57bd7a093f1ee42",
   "zone_name": "rodulab.com",
   "project_name": "pixelkovia-funnel",
+  "project_id": "ea7dab2c-f7fe-42ef-954d-9f982607cdf4",
   "hostname": "pixelkovia.rodulab.com",
   "production_branch": "main",
   "directory": "dist/funnel"
