@@ -1,6 +1,6 @@
 # Záverečná rozlúčka a scenár pre OpenGen
 
-QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. Kým nie sú dodané médiá, hra používa text rozlúčky; nevytvára sa zástupné video ani nahrávka.
+QR na pracovnom liste úlohy 7 otvorí zadanie hesla. Rozlúčka sa sprístupní po jeho správnom overení. Dodané video assets/EndScene.mp4 sa prehráva po ťuknutí, so zvukom a ovládaním pauzy i opakovania. Text rozlúčky zostáva dostupný.
 
 ## Reč na nahovorenie
 
@@ -78,6 +78,6 @@ Text: Dokázali ste to! Ďakujeme, kamaráti. Už môžeme ísť domov. Majte sa
 
 ## Zapojenie hotových médií
 
-Hotové video MP4 s nehovorenými pixelkovými zvukmi a prípadný samostatný hlas MP3 patria do assets/. Polia GAME.finaleVideo a GAME.finaleAudio zatiaľ zostávajú null. Po dodaní sa uvedú skutočné cesty; ovládanie je ručné, prehrávanie neopúšťa stránku a text rozlúčky zostáva dostupný. Nevkladaj cestu k neexistujúcemu súboru.
+GAME.finaleVideo: assets/EndScene.mp4. GAME.finaleAudio: null (samostatná hlasová stopa ešte nie je dodaná). Používa sa pôvodná zvuková stopa dodaného MP4, bez pridanej TTS nahrávky. Prehrávanie je ručné, zostáva na stránke a nezmení uložený postup. Video sa pri odchode zastaví. Pri chybe ostáva opakovanie pokusu aj text rozlúčky.
 
 Zdroj textu je game-data.js. Po jeho úprave spusti node scripts/export-finale-script.cjs.

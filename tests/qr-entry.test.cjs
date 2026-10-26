@@ -17,7 +17,9 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   await page.locator('#answer').fill('NESPRAVNE');await page.locator('.answer-form button').tap();assert.equal(await page.locator('.finale').count(),0);
   await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();await page.locator('[data-action="next"]').tap();
   assert.equal(await page.locator('.finale').count(),1);assert.match(await page.locator('.finale .quest-story').innerText(),/Dokázali ste to/);
-  assert.equal(await page.locator('.finale audio,.finale video').count(),0,'undelivered media does not create broken players');
+  assert.equal(await page.locator('.finale video').count(),1,'delivered finale video is available after password verification');
+  assert.equal(await page.locator('.finale audio').count(),0,'undelivered standalone voice does not create a broken player');
+  assert.ok(await page.locator('.finale video').evaluate(video=>video.paused),'entering the finale does not autoplay');
   assert.deepEqual(await page.evaluate(KEY=>JSON.parse(localStorage.getItem(KEY)).completed,KEY),[7]);
   await page.evaluate(KEY=>localStorage.removeItem(KEY),KEY);
   await page.goto(BASE+'/game.html?signal=cipko');await page.locator('[data-kind="pixel"][data-index="1"]').tap();

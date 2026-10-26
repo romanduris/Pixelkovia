@@ -443,3 +443,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .code-check-party{height:210px;grid-column:1}
  .code-check-entry{grid-column:2;align-self:center}
 }
+
+.finale-media>[data-action="finale-video-toggle"]{width:100%;margin-top:12px;min-height:48px;white-space:normal}
+.finale-media #finale-video-status{font-size:12px;line-height:1.5;min-height:36px;margin:8px 0 0;color:#aebed8}

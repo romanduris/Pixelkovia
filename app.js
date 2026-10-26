@@ -64,7 +64,23 @@
   function fullScene(panels){return panels.map((lines,i)=>`<section class="gm-scene"><span class="section-kicker">OBRAZ ${i+1}</span>${linesHTML(lines)}</section>`).join('');}
   function finaleMediaHTML(){
     if(!GAME.finaleVideo&&!GAME.finaleAudio)return '';
-    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<video controls playsinline preload="metadata" poster="assets/printable-scenes/p7-navrat-portrait.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje video. Rozlúčku si môžete prečítať nižšie.</video>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
+    return `<section class="finale-media" aria-label="Rozlúčka celej partie">${GAME.finaleVideo?`<video id="finale-video" controls playsinline preload="metadata" poster="assets/finale-production/start-a.png" src="${esc(GAME.finaleVideo)}" aria-label="Rozlúčkové video Pixelkov">Váš prehliadač nepodporuje video. Rozlúčku si môžete prečítať nižšie.</video><button class="btn" data-action="finale-video-toggle" aria-controls="finale-video">▶ Prehrať rozlúčku</button><p id="finale-video-status" role="status">Ťuknutím spustíte video so zvukom.</p>`:''}${GAME.finaleAudio?`<audio controls playsinline preload="auto" src="${esc(GAME.finaleAudio)}" aria-label="Záverečná hlasová rozlúčka"></audio>`:''}</section>`;
+  }
+  function bindFinaleVideo(){
+    const video=app.querySelector('#finale-video'),button=app.querySelector('[data-action="finale-video-toggle"]'),status=app.querySelector('#finale-video-status');
+    if(!video||!button||!status)return;
+    const failed=()=>{button.textContent='↻ Skúsiť prehrať znova';status.textContent='Video sa nepodarilo načítať. Skúste znova alebo si prečítajte rozlúčku nižšie.';};
+    video.addEventListener('playing',()=>{button.textContent='❚❚ Pozastaviť rozlúčku';status.textContent='Video sa prehráva.';});
+    video.addEventListener('waiting',()=>{status.textContent='Video sa načítava…';});
+    video.addEventListener('pause',()=>{if(!video.ended&&!video.error){button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
+    video.addEventListener('ended',()=>{button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';});
+    video.addEventListener('error',failed);
+    video.finalePlay=()=>{
+      if(video.error)video.load();
+      if(video.ended)video.currentTime=0;
+      status.textContent='Video sa načítava…';
+      video.play().catch(error=>{if(!video.isConnected)return;if(error.name==='NotAllowedError'){button.textContent='▶ Prehrať rozlúčku';status.textContent='Ťuknutím spustíte video so zvukom.';}else failed();});
+    };
   }
   function atlasInvitation(t){return `<section class="atlas-invitation">${sprite('piko')}<span class="section-kicker">PIKOV DARČEK PRE VÁŠ TÍM</span>${t.invitation.map(line=>line==='[OBJAVIŤ TAJNÝ SVET PIXELKOV]'?'<a class="btn atlas-cta" href="atlas.html" target="_blank" rel="noopener">OBJAVIŤ TAJNÝ SVET PIXELKOV ↗</a>':lineHTML(line)).join('')}</section>`;}
   function landing(){return SITE_CONTENT.sales({sprite});}
@@ -319,6 +335,7 @@
       plugyAudioSlot.replaceWith(audio);if(!retainedPlugyAudio)audio.load();
     }else if(retainedPlugyAudio){releasePlugyAudio(retainedPlugyAudio);retainedPlugyAudio.remove();}
     bindPlugyAudio(autoplayPlugy);
+    bindFinaleVideo();
     if(view==='prep'){app.querySelectorAll('[data-check]').forEach(el=>{el.checked=PREP_STORE.read(el.dataset.check);});updatePreparation();}
   }
   function start(){
@@ -407,6 +424,10 @@
       const fallback=()=>{field.focus();field.select();status.textContent='Zadanie je označené. Skopíruj ho pomocou Ctrl+C alebo ponuky telefónu.';};
       if(!navigator.clipboard?.writeText){fallback();return;}
       navigator.clipboard.writeText(field.value).then(()=>{status.textContent='Celé zadanie je skopírované.';}).catch(fallback);return;
+    }
+    if(a==='finale-video-toggle'){
+      const video=app.querySelector('#finale-video');
+      if(video){if(!video.paused&&!video.ended)video.pause();else video.finalePlay();}return;
     }
     if(a==='toggle-copy'){
       const content=document.getElementById(b.dataset.target);if(!content)return;

@@ -4,7 +4,7 @@ window.GAME = {
   "audio": "assets/Miky.mp3",
   "video": "assets/PicoVideo.mp4",
   "finaleQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=navrat",
-  "finaleVideo": null,
+  "finaleVideo": "assets/EndScene.mp4",
   "finaleAudio": null,
   "mikyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
   "plugyThanks": "Ďakujem vám, kamaráti! Ste skvelí. Pomáhate nám znovu spojiť celú partiu.",
@@ -393,7 +393,7 @@ window.GAME = {
       "action": "Prečítajte si rozlúčku celej partie. Dobrodružstvo je úspešne dokončené.",
       "task": "Všetci sú bezpečne doma. Telefón môžete odložiť.",
       "materials": "Voliteľný diplom záchrancov Pixelkov na tlačovej stránke. Žiadne ďalšie pomôcky netreba.",
-      "mobile": "Záverečná ďakovná správa bez ďalšieho zadávania a úloh. Nahrávka a voliteľné video sa doplnia po dodaní.",
+      "mobile": "Záverečné video s ovládaním prehrávania a textová rozlúčka bez ďalšieho zadávania a úloh. Samostatná hlasová nahrávka zatiaľ nie je dodaná.",
       "solution": "Úspech tímu. Hra nemá prehratý koniec.",
       "hints": [
         "Každý z vás pomohol iným spôsobom."
