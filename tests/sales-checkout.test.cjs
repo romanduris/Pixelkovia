@@ -8,9 +8,16 @@ const config=c.window.SITE_CONFIG;
 for(let mask=0;mask<4;mask++){
  const selected=config.offer.bookIds.filter((_,i)=>mask&(1<<i));
  assert.equal(config.quote(selected).totalCents,[1499,1998,1998,1999][mask]);
+ const free=config.quote(selected,'episode-1',' FREE ');
+ assert.equal(free.totalCents,0);assert.equal(free.voucherDiscountCents,[1499,1998,1998,1999][mask]);
+ assert.equal(config.quote(selected,'episode-1','not-free').totalCents,[1499,1998,1998,1999][mask]);
 }
 assert.equal(config.offer.refundDays,14);assert.equal(config.offer.paymentsEnabled,false);
 assert.equal(config.access.mode,'test','sales changes cannot simulate purchase entitlements');
+for(const baseId of config.offer.bookIds){
+ assert.equal(config.quote([],baseId,'free').totalCents,0);
+ assert.equal(config.quote(config.offer.bookIds,baseId,'free').voucherDiscountCents,998);
+}
 (async()=>{
  for(const engine of (process.env.BROWSER==='webkit'?[webkit]:process.env.BROWSER==='chromium'?[chromium]:[chromium,webkit])){
   const browser=await engine.launch();
@@ -101,6 +108,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
     const offerRect=await page.locator('.base-product').boundingBox();assert.ok(offerRect.y<height,'offer is immediately visible after the header');
     await require('./helpers/book-offer.cjs').checkout(page);
+    await require('./helpers/checkout-voucher.cjs')(page,{standalone:width===390,screenshotPrefix:width===390?`/tmp/pixelkovia-voucher-${engine.name()}`:undefined});
     await page.locator('#customer-name').fill('Rodinný tím');await page.locator('#customer-email').fill('test@example.com');
     const outgoing=[];page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url());});
     await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());

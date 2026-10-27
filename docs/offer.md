@@ -12,4 +12,6 @@ Samostatne stojí každá kniha 4,99 €, obe bez hry 9,98 €. Atlas je automat
 
 Dva platené doplnky sa nepredvyberajú. Výber oboch kníh automaticky zapína zľavu; odobratie jednej ju ruší. Ukážkové okná nemenia cenu ani výber. Hra aj knihy fungujú samostatne. Platby a odosielanie objednávok sú vypnuté.
 
+Pod nákupným tlačidlom je odkaz **Voucher** s dialógom. Dočasný vývojový kód `free` odpočíta 100 % ceny po zľave za balík, vrátane vybraných kníh; funguje aj pri samostatnom nákupe kníh. Okolité medzery ani veľkosť písmen nerozhodujú. Výber doplnkov ponechá výsledok 0 €, odstránenie voucheru obnoví aktuálnu cenu. Kód zostáva iba v otvorenej stránke a po obnovení sa odstráni. Nevytvára objednávku ani prístup k obsahu. Návrh skutočného checkoutu a doručovania je v [pláne platieb](payment-setup.md).
+
 Verejné ukážky obsahujú obálky, anotácie, odhad čítania a po dva úvodné odseky prvej rozprávky. Plné knihy ani herné súbory sa do verejného balíka nekopírujú.

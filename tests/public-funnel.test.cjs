@@ -15,6 +15,11 @@ assert.deepEqual(Array.from(compiled.window.SITE_CONFIG.products,p=>p.id),['epis
 for(let mask=0;mask<4;mask++){
  const ids=source.window.SITE_CONFIG.offer.bookIds.filter((_,i)=>mask&(1<<i));
  assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids)),JSON.stringify(source.window.SITE_CONFIG.quote(ids)));
+ for(const baseId of ['episode-1',...source.window.SITE_CONFIG.offer.bookIds]){
+  for(const code of ['','free',' FREE ','not-free']){
+   assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids,baseId,code)),JSON.stringify(source.window.SITE_CONFIG.quote(ids,baseId,code)),'public voucher quote matches the source');
+  }
+ }
 }
 assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled.window.SITE_CONFIG.management,undefined);
 (async()=>{
@@ -74,6 +79,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    await require('./helpers/book-offer.cjs').checkout(page);
+   await require('./helpers/checkout-voucher.cjs')(page,{standalone:width===390,screenshotPrefix:width===390?'/tmp/pixelkovia-voucher-public':undefined});
    await page.locator('#customer-name').fill('Rodinný tím');await page.locator('#customer-email').fill('test@example.com');
    await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
    assert.deepEqual(outgoing,[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);

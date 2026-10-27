@@ -18,16 +18,19 @@
     return verifiedEntitlements[id]?.available ? 'available' : verifiedEntitlements[id]?.purchased ? 'purchased' : 'not-purchased';
   };
   const purchase = {action:'purchase', url:'checkout.html', label:`CHCEM SPOLOČNÉ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'coming-soon'};
-  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1999, campaign:'early-bird', paymentsEnabled:false};
+  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1999, campaign:'early-bird', paymentsEnabled:false, developmentVoucher:'free'};
   // All prices are calculated in integer cents.
   // Standalone books remain independent; the complete offer applies only to the game.
-  const quote = (selected = [], baseId = 'episode-1') => {
+  const quote = (selected = [], baseId = 'episode-1', voucherCode = '') => {
     if(!offer.bookIds.includes(baseId))baseId='episode-1';
     const books=offer.bookIds.filter(id=>id!==baseId&&selected.includes(id));
     const booksCents=books.reduce((sum,id)=>sum+product(id).priceCents,0);
     const subtotalCents=product(baseId).priceCents+booksCents;
     const bundleDiscountCents=baseId==='episode-1'&&books.length===2?subtotalCents-offer.completeBundleCents:0;
-    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasCents:0, totalCents:subtotalCents-bundleDiscountCents};
+    // Development price preview only. A future server must verify real vouchers.
+    const voucher=String(voucherCode).trim().toLowerCase()===offer.developmentVoucher?offer.developmentVoucher:null;
+    const voucherDiscountCents=voucher?subtotalCents-bundleDiscountCents:0;
+    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasCents:0, voucher, voucherDiscountCents, totalCents:subtotalCents-bundleDiscountCents-voucherDiscountCents};
   };
   // Production is deliberately fail-closed until real server purchase verification exists.
   const access = {mode:'test', canLaunch: preparationReady => access.mode === 'test' && preparationReady};
