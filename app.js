@@ -15,16 +15,7 @@
   let finaleStartTimer = null;
   try {
     let saved = JSON.parse(localStorage.getItem(KEY));
-    // Only this legacy property is retained for already saved symbol selections.
-    if(saved && Object.hasOwn(saved,'sutkoCells')){if(!Object.hasOwn(saved,'plugyCells'))saved.plugyCells=saved.sutkoCells;delete saved.sutkoCells;}
-    if(saved&&saved.progressVersion===undefined&&Array.isArray(saved.completed)){
-      // V1 had a separate symbol task at 6. Shift later discoveries once.
-      if(!Number.isInteger(saved.stage)||saved.stage<0||saved.stage>9||!saved.completed.every((index,i)=>Number.isInteger(index)&&index===i+1&&index<=8))throw new Error('Invalid legacy progress');
-      const shift=index=>index>6?index-1:index;
-      const hints=Object.fromEntries(Object.entries(saved.hints||{}).filter(([key])=>Number(key)!==6).map(([key,value])=>[shift(Number(key)),value]));
-      saved={...saved,progressVersion:PROGRESS_VERSION,stage:shift(saved.stage),completed:saved.completed.filter(index=>index!==6).map(shift),hints};
-    }
-    if (saved && Number.isInteger(saved.stage) && saved.stage >= 0 && saved.stage <= FINAL_STAGE && Array.isArray(saved.completed)) {
+    if (saved && saved.progressVersion===PROGRESS_VERSION && Number.isInteger(saved.stage) && saved.stage >= 0 && saved.stage <= FINAL_STAGE && Array.isArray(saved.completed)) {
       const completed = saved.completed.filter((n,i,a) => Number.isInteger(n) && n >= 1 && n <= TASK_COUNT && a.indexOf(n) === i);
       // QR links can open tasks independently; retain completed tasks even with gaps.
       if (saved.stage === 0 || saved.callDone) {
@@ -57,7 +48,7 @@
     return `<div class="chapter-grid">${allTasks.map((t,i)=>{const unlocked=s.callDone;return `<button class="chapter-card ${unlocked?'':'locked'} ${s.stage===i+1?'current':''}" ${unlocked?'':'disabled'} data-action="stage" data-stage="${i+1}"><span class="chapter-top"><span class="chapter-icon" aria-hidden="true">${SITE_CONTENT.stageIcon(t)}</span><span class="chapter-number">${String(i+1).padStart(2,'0')} / ${String(TASK_COUNT).padStart(2,'0')}</span></span><h3>${t.title}</h3><p>${s.completed.includes(i+1)?'✓ Vyriešené':unlocked?'Pripravené na objavenie':'Čaká na odomknutie'} <span class="lock" aria-hidden="true">${unlocked?'↗':'·'}</span></p></button>`;}).join('')}</div>`;
   }
   const character = id => GAME.characters.find(c=>c.id===id);
-  const sprite = (id,cls='') => {const c=character(id);return `<span class="pixel-sprite ${cls}" role="img" aria-label="${c.name}" style="--character-image:url('${c.image}');--sprite-x:${c.tile%4*100/3}%;--sprite-y:${c.tile>=4?100:0}%"></span>`;};
+  const sprite = (id,cls='') => {const c=character(id);return `<span class="pixel-sprite ${cls}" role="img" aria-label="${c.name}" style="--character-image:url('${c.image}')"></span>`;};
   function contactsHTML(includePiko=false){const s=state();return `<div class="contacts ${includePiko?'whole-party':''}" aria-label="Kontakty Pixelkov">${(includePiko?GAME.characters:GAME.characters.slice(1)).map(c=>{const task=GAME.stages.findIndex(t=>t.character===c.id),done=s.stage===FINAL_STAGE||s.completed.includes(task);return `<div class="contact ${done?'connected':''}">${sprite(c.id)}<strong>${c.name}</strong><small>${s.stage===FINAL_STAGE?'Doma ✓':done?'Na linke ✓':'Bez signálu'}</small></div>`;}).join('')}</div>`;}
   function lineHTML(line){const cls=line.startsWith('„')?'scene-dialogue':line===line.toUpperCase()&&/[A-ZÁČĎÉÍĽŇÓÔŔŠŤÚÝŽ]/.test(line)?'scene-signal':'scene-narration';return `<p class="${cls}">${esc(line)}</p>`;}
   const linesHTML = lines => lines.map(lineHTML).join('');
@@ -194,7 +185,7 @@
   function plugyConnectionScreen(){
     app.classList.add('signal-mode');
     const sign=GAME.plugyPuzzle.grid.flat().map(value=>`<i class="${GAME.plugyPuzzle.values.includes(value)?'lit':''}"></i>`).join('');
-    return `<section class="signal-screen plugy-screen plugy-connected signal-stage-result success-card" aria-labelledby="plugy-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><div class="plugy-result-heading"><h1 id="plugy-title" tabindex="-1">Most je odomknutý!</h1><div class="plugy-unlock"><span class="plugy-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div></div><div class="plugy-celebration"><img class="plugy-party-scene" src="assets/plugy-party-transparent.png" alt="Piko, Miky, Pixi a Plugy sú spolu pri opravenom moste." width="1536" height="512"><p class="plugy-thanks">${esc(GAME.plugyThanks)}</p></div><div class="plugy-message">${GAME.plugyAudio?`<span data-plugy-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="plugy-audio-toggle" aria-controls="plugy-audio">▶ Prehrať Plugyho správu</button></div><p id="plugy-audio-status" role="status">Ťuknutím spustíte správu${GAME.plugyAudioPlaceholder?' · Testovacia nahrávka: Miky.':'.'}</p>`:'<p class="message-text-status">Za mostom čaká ďalší odkaz.</p>'}<button class="${GAME.plugyAudio?'text-link':'btn'}" data-action="read-plugy-message">${GAME.plugyAudio?'Čítať Plugyho správu':'Prečítať správu →'}</button></div><div class="signal-reward"><strong>E</strong><div><span>VÁŠ NÁVRATOVÝ ZNAK</span><small>Tento návratový znak si dobre zapamätajte. Budete ho potrebovať neskôr.</small></div></div>${taskCompletionNote()}</div></section>`;
+    return `<section class="signal-screen plugy-screen plugy-connected signal-stage-result success-card" aria-labelledby="plugy-title">${signalHeader(preview?'exit-test':'home','MOST ODOMKNUTÝ')}<div class="signal-content"><div class="plugy-result-heading"><h1 id="plugy-title" tabindex="-1">Most je odomknutý!</h1><div class="plugy-unlock"><span class="plugy-unlock-sign" role="img" aria-label="Odomykací znak: číslica 9">${sign}</span><span>ODOMYKACÍ ZNAK <strong>9</strong></span></div></div><div class="plugy-celebration"><img class="plugy-party-scene" src="assets/plugy-party-transparent.png" alt="Piko, Miky, Pixi a Plugy sú spolu pri opravenom moste." width="1536" height="512"><p class="plugy-thanks">${esc(GAME.plugyThanks)}</p></div><div class="plugy-message">${GAME.plugyAudio?`<span data-plugy-audio-slot hidden></span><div class="signal-audio-controls"><button class="btn" data-action="plugy-audio-toggle" aria-controls="plugy-audio">▶ Prehrať Plugyho správu</button></div><p id="plugy-audio-status" role="status">Ťuknutím spustíte správu.</p>`:'<p class="message-text-status">Za mostom čaká ďalší odkaz.</p>'}<button class="${GAME.plugyAudio?'text-link':'btn'}" data-action="read-plugy-message">${GAME.plugyAudio?'Čítať Plugyho správu':'Prečítať správu →'}</button></div><div class="signal-reward"><strong>E</strong><div><span>VÁŠ NÁVRATOVÝ ZNAK</span><small>Tento návratový znak si dobre zapamätajte. Budete ho potrebovať neskôr.</small></div></div>${taskCompletionNote()}</div></section>`;
   }
   function readPlugyMessage(){showDialog(`<section id="plugy-transcript" class="miky-message-reading"><h2>Plugyho správa</h2>${GAME.plugyMessage.map(line=>`<p>${esc(line)}</p>`).join('')}</section>`);}
   function selectPlugyCell(button){
@@ -282,7 +273,7 @@
     const listen=(name,handler)=>audio.addEventListener(name,handler,{signal:events.signal});
     let failed=false,attempted=false;
     const idle=()=>{button.textContent=audio.ended||audio.plugyReplayReady?'↻ Prehrať znova':audio.currentTime>0?'▶ Pokračovať v správe':'▶ Prehrať Plugyho správu';};
-    const speaking=()=>{if(failed||audio.paused||audio.ended||audio.plugySound?.gain.gain.value===0)return;const text=GAME.plugyAudioPlaceholder?'Testovacia nahrávka: hovorí Miky…':'Hovorí Plugy…';if(status.textContent!==text)messageAudioStatus(status,text);};
+    const speaking=()=>{if(failed||audio.paused||audio.ended||audio.plugySound?.gain.gain.value===0)return;const text='Hovorí Plugy…';if(status.textContent!==text)messageAudioStatus(status,text);};
     const fallback=()=>{if(!audio.isConnected||failed)return;failed=true;audio.pause();idle();button.textContent='↻ Skúsiť prehrať znova';messageAudioStatus(status,'Správu sa nepodarilo prehrať. Môžete si ju prečítať.');};
     listen('play',()=>{attempted=true;failed=false;audio.plugyReplayReady=false;button.textContent='Ⅱ Pozastaviť';messageAudioStatus(status,'Načítavam Plugyho správu…');});
     listen('playing',speaking);
@@ -496,7 +487,7 @@
   }
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
   function completeTask(){const n=state().stage;if(n===7)primeFinaleVideo();recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3,autoplayGuardy:n===6,autoplayFinale:n===7});goTop();}
-  function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||state().stage===5)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:[...t.answer,...(t.legacyAnswers||[])].some(a=>normalize(raw)===normalize(a));
+  function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||state().stage===5)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
   }
@@ -638,8 +629,7 @@
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   // Printed QR codes open their signal without an on-screen continue action.
-  // Legacy printed QR payloads must keep working; new names are not storage keys.
-  const scannedSignal={kvak:1,sutko:3,listok:4,miky:1,plugy:3,pingy:4,cipko:5,guardy:6,navrat:7}[new URLSearchParams(location.search).get('signal')];
+  const scannedSignal={miky:1,plugy:3,pingy:4,cipko:5,guardy:6,navrat:7}[new URLSearchParams(location.search).get('signal')];
   if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     progress.stage=scannedSignal;

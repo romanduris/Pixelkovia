@@ -10,17 +10,15 @@ for(const key of ['before','after']){
  assert.ok(!fs.existsSync('dist/funnel/book-'+key+'.html'));for(let i=1;i<=3;i++)assert.ok(!fs.existsSync(`dist/funnel/assets/books/${key}-${i}.webp`));
 }
 assert.equal(hash(fs.readFileSync('books-content/atlas.json')),manifest.atlas.contentSha256);assert.equal(require('../books-content/atlas.json').profiles.length,7);
-assert.equal(hash(fs.readFileSync('legacy-atlas.html','utf8').replace('href="legacy-atlas.css"','href="atlas.css"')),manifest.legacy['atlas.html'].originalSha256);assert.equal(hash(fs.readFileSync('legacy-atlas.css')),manifest.legacy['atlas.css'].originalSha256);
 const c={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),c);const cfg=c.window.SITE_CONFIG;
-assert.equal(cfg.offer.paymentsEnabled,false);assert.equal(cfg.product('episode-1').priceCents,1499);assert.equal(cfg.product('bedtime-book').priceCents,490);
+assert.equal(cfg.offer.paymentsEnabled,false);assert.equal(cfg.product('episode-1').priceCents,1499);
 for(const id of cfg.offer.bookIds){assert.equal(cfg.product(id).priceCents,499);assert.equal(cfg.product(id).pricing.status,'draft');assert.equal(cfg.product(id).pricing.campaign,null);assert.equal(cfg.quote([],id).totalCents,499);assert.equal(cfg.quote(['episode-1',id],id).totalCents,499);}
 assert.equal(cfg.quote(cfg.offer.bookIds).totalCents,1999);assert.equal(cfg.quote(['story-book-after'],'story-book-before').totalCents,998);
 for(let mask=0;mask<4;mask++){
  const ids=cfg.offer.bookIds.filter((_,i)=>mask&(1<<i)),q=cfg.quote(ids);
  assert.equal(q.totalCents,[1499,1998,1998,1999][mask]);assert.equal(q.bundleDiscountCents,mask===3?498:0);
- assert.equal(cfg.quote([...ids,...ids,'piko-mission','listok-mission','kvak-mission','mission-bundle','complete','bad-id']).totalCents,q.totalCents,'obsolete IDs, duplicates and unknown IDs do not affect current offer');
+ assert.equal(cfg.quote([...ids,...ids,'bad-id']).totalCents,q.totalCents,'duplicates and unknown IDs do not affect the quote');
 }
-for(const id of ['piko-mission','listok-mission','kvak-mission','mission-bundle','complete'])assert.ok(cfg.product(id),'historical ID retained');
 assert.equal(cfg.product(cfg.offer.atlasId).priceCents,299);assert.equal(cfg.product('episode-1').pricing.plannedStandardPriceCents,2999);
-for(const file of ['books-content','books-preview.html','legacy-atlas.html','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
-console.log('PASS: complete 3+3 author texts, 7 Atlas profiles, byte-preserved legacy archive, draft independent SKUs, all four Early Bird combinations and public artifact boundary.');
+for(const file of ['books-content','books-preview.html','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
+console.log('PASS: complete 3+3 author texts, 7 Atlas profiles, draft independent SKUs, all four Early Bird combinations and public artifact boundary.');

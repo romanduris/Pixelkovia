@@ -14,11 +14,11 @@ export async function seedDemo(db,{local=false,at=Date.now()}={}){
     if(type===0)continue;
     await portalVisit(db,customerId,right.id,'demo-visit-'+index,purchase+60000);
     await portalVisit(db,customerId,right.id,'demo-visit-'+index,purchase+3600000);
-    await saveChecklist(db,customerId,right.id,Object.fromEntries(checklist.slice(0,type===1?5:13).map(s=>[s.id,true])),purchase+120000);
+    await saveChecklist(db,customerId,right.id,Object.fromEntries(checklist.slice(0,type===1?5:checklist.length).map(s=>[s.id,true])),purchase+120000);
     if(type===1)continue;
     const session=await activate(db,customerId,right.id,'demo-activation-'+index,{at:purchase+7200000});
     let run=await first(db,'SELECT * FROM game_runs WHERE id=?',session.runId),cursor=run.started_at;
-    const max=type===2?4:8;
+    const max=type===2?4:stages.length;
     for(let stage=1;stage<=max;stage++){
       cursor+=45000;
       await gameEvent(db,run,{eventId:`demo-open-${index}-${stage}`,type:'opened',stage},cursor);

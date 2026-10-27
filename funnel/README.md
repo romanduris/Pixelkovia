@@ -8,7 +8,7 @@ Samostatná predajná stránka a checkout: **https://pixelkovia.rodulab.com**. H
 
 - Predajný HTML obsah sa vykreslí pri builde z `sales-page.js`. Pri zostavení sa zo súkromných herných dát čítajú iba verejné mená, roly a ID postáv. Herné zdroje sa neposielajú návštevníkovi.
 - `sales-interactions.js` zabezpečuje spodnú lištu, otvorenie ukážky a galériu troch rodinných scén a desať jasne označených ilustračných hodnotení; nepoužíva herný postup.
-- `atlas.html` je verejný bonus zdarma s kompletnými siedmimi profilmi. `library.html` a `book-before-sample.html` / `book-after-sample.html` obsahujú iba anotácie, obálky a po dva úvodné odseky prvej rozprávky. Plné knihy, archív pôvodnej rozprávky, `books-preview.html`, `books-content/` a šesť príbehových ilustrácií sa nikdy nekopírujú.
+- `atlas.html` je verejný bonus zdarma s kompletnými siedmimi profilmi. `library.html` a `book-before-sample.html` / `book-after-sample.html` obsahujú iba anotácie, obálky a po dva úvodné odseky prvej rozprávky. Plné knihy, `books-preview.html`, `books-content/` a šesť príbehových ilustrácií sa nikdy nekopírujú.
 - Checkout používa odvodený `purchase-config.js` s rovnakými cenami a rovnakou funkciou výpočtu z `site-config.js`, bez administrácie a oprávnení na hranie. Platby zostávajú vypnuté, kontakty sa neodosielajú ani neukladajú.
 - Kopíruje sa presný zoznam 40 schválených obrázkov a fontov. Používateľ schválil skutočný statický záber rozpracovanej mriežky s deviatkou (`assets/sales/game-lock-partial.webp`) namiesto detailu Pika; herný JavaScript ani ďalšie riešenia sa nenahrávajú. Náhľady listov sú fyzicky orezané na rovnakú viditeľnú časť ako v predajnej galérii; celý pôvodný list ani jeho spodný odmenový znak sa nenahrávajú. Originály sú nedotknuté. Štyri súbory `assets/sales/books/*-page-*.webp` sú náhľady strán s pôvodnými ilustráciami a iba dvoma už zverejnenými úvodnými odsekmi každej knihy. Plné obrázky príbehov sa nekopírujú. Obnova výrezov: `SHARP_MODULE=/cesta/k/sharp node scripts/generate-funnel-previews.cjs`.
 - Vlastná `404.html` vypína implicitný SPA fallback Pages. Neexistujúce herné a administrátorské adresy vracajú 404. CSP povoľuje potrebné obrázky/fonty a blokuje odoslanie formulára aj nové sieťové API volania.
@@ -20,7 +20,7 @@ Samostatná predajná stránka a checkout: **https://pixelkovia.rodulab.com**. H
 node scripts/prepare-static.mjs
 # Statický server s koreňom dist/funnel na porte 8081.
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/public-funnel.test.cjs
-node scripts/verify-cro-scope.cjs
+node tests/books-content.test.cjs
 node tests/static-assets.test.cjs
 node scripts/deploy-funnel.mjs --check
 # Po commite a pushi presnej verzie na main:
@@ -35,8 +35,6 @@ Prístup k súkromnej Site zostáva owner-private. Táto zmena nespúšťa platb
 
 Technické podklady: [Cloudflare Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/), [vlastné domény Pages](https://developers.cloudflare.com/pages/configuration/custom-domains/), [statické routovanie a 404](https://developers.cloudflare.com/pages/configuration/serving-pages/).
 
-## Uvádzacia ponuka a historické produkty
+## Ponuka
 
-Hra stojí 14,99 €, plánovaná cena po úvodnej ponuke je 29,99 € (nie minulá cena). Checkout ukazuje presne tri doplnky: dve voliteľné knihy po 4,99 € a neodoberateľný Atlas zdarma s plánovanou samostatnou cenou 2,99 €. Pri oboch knihách k hre `quote()` automaticky odpočíta 498 centov a vráti 19,99 €. S jednou knihou je súčet 19,98 €, bez kníh 14,99 €. Samostatné knihy zostávajú 4,99 €, spolu bez hry 9,98 €. Žiadny platený doplnok sa nepredvyberá ani cez URL.
-
-Historické misie zostávajú v súkromnom katalógu a v databáze bez migrácie. Verejný odvodený katalóg obsahuje iba hru, obe knihy a Atlas; staré ID nemajú vplyv na dnešný výpočet. Spoločné `book-previews.js` / `.css` otvárajú prístupné ukážky na funneli, checkoute a v knižnici bez zmeny výberu či ceny.
+Platné ceny, doplnky a pravidlá automatickej zľavy sú v [aktuálnej ponuke](../docs/offer.md). Katalóg má presne štyri produkty: hru, dve knihy a Atlas. Funkcia `quote()` je spoločná pre súkromný aj verejný build. Spoločné `book-previews.js` / `.css` otvárajú ukážky na funneli, checkoute a v knižnici bez zmeny výberu alebo ceny.

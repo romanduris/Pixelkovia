@@ -4,12 +4,12 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
 const fs=require('node:fs');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 const KEY='zahada-v1-progress';
-const saved={started:true,callDone:true,stage:3,completed:[1,2],hints:{}};
+const saved={progressVersion:2,started:true,callDone:true,stage:3,completed:[1,2],hints:{}};
 const normal=text=>text.replace(/\s+/g,' ').trim();
 async function open(context){
  const errors=[],page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
  await page.addInitScript(()=>{HTMLElement.prototype.requestFullscreen=async()=>{};});
- await page.goto(BASE+'/game.html');await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
+ await page.goto(BASE+'/game.html');await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=plugy');
  return {page,errors};
 }
 async function solve(page,inspectAudio=false){
@@ -89,8 +89,8 @@ async function fits(page,label){
   }
   await page.reload();assert.equal(await page.locator('.plugy-connected').count(),1,'saved completion does not need repeating');
   assert.equal(await page.locator('[data-action="next"]').count(),0);assert.equal(await page.locator('.plugy-thanks').textContent(),await page.evaluate(()=>GAME.plugyThanks));
-  await page.goto(BASE+'/game.html?signal=listok');assert.equal(await page.locator('.signal-content h1').textContent(),'Pokračujte na papieri');
-  await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify({...saved,completed:[1,2,3]})),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');assert.equal(await page.locator('.plugy-connected').count(),1,'old completed task 3 remains valid');
+  await page.goto(BASE+'/game.html?signal=pingy');assert.equal(await page.locator('.signal-content h1').textContent(),'Pokračujte na papieri');
+  await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify({...saved,completed:[1,2,3]})),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=plugy');assert.equal(await page.locator('.plugy-connected').count(),1,'old completed task 3 remains valid');
   // Isolated StoryBoard tests never write the family's save or partial selections.
   const family=await page.evaluate(key=>localStorage.getItem(key),KEY);await page.goto(BASE+'/storyboard.html');await page.locator('[data-action="test"][data-stage="3"]').click();await solve(page);await page.locator('[data-action="exit-test"]').click();assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),family);
   assert.equal(await page.getByRole('button',{name:'Vývojárske podklady',exact:true}).count(),0);
@@ -139,17 +139,17 @@ async function fits(page,label){
    await button.click();await page.locator('[data-action="home"]').click();assert.equal(await page.locator('audio').count(),0);
    assert.ok(await page.evaluate(()=>window.preloadedPlugy.paused&&window.preloadedPlugy.plugySound===null),'leaving releases the primed output');
    // A denied first play remains retryable with the same explicit control.
-   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
+   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=plugy');
    await page.evaluate(()=>{const audio=document.querySelector('#plugy-audio'),play=audio.play.bind(audio);let blocked=true;audio.play=()=>{if(blocked){blocked=false;return Promise.reject(new DOMException('Blocked','NotAllowedError'));}return play();};});
    await solve(page);await page.waitForFunction(()=>document.querySelector('#plugy-audio-status').textContent.includes('Ťuknutím'));await page.locator('[data-action="plugy-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#plugy-audio').currentTime>0);
    // A denied audio-context unlock must leave the entire message ready at zero.
-   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');
+   await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=plugy');
    await page.evaluate(()=>{const Context=window.AudioContext;window.AudioContext=function(){const context=new Context(),resume=context.resume.bind(context);let blocked=true;context.resume=()=>{if(blocked){blocked=false;return Promise.reject(new DOMException('Blocked','NotAllowedError'));}return resume();};return context;};});
    await solve(page);await page.waitForFunction(()=>document.querySelector('#plugy-audio-status').textContent.includes('Ťuknutím'));
    assert.ok(await page.locator('audio').evaluate(audio=>audio.paused&&audio.currentTime===0),'a denied context does not consume the start of the message');
    await page.locator('[data-action="plugy-audio-toggle"]').tap();await page.waitForFunction(()=>document.querySelector('#plugy-audio').currentTime>0);
    // Network failure leaves the transcript available; retry can recover.
-   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=sutko');await solve(page);await page.waitForFunction(()=>document.querySelector('#plugy-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#plugy-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-plugy-message"]').click();await page.locator('#plugy-transcript').waitFor();assert.match(await page.locator('#plugy-transcript').textContent(),/cestovateľov/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="plugy-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#plugy-audio').currentTime>0);
+   fail=true;await page.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:KEY,saved});await page.goto(BASE+'/game.html?signal=plugy');await solve(page);await page.waitForFunction(()=>document.querySelector('#plugy-audio-status').textContent.includes('nepodarilo'));assert.equal(await page.locator('#plugy-transcript').count(),0,'failed audio must not open text automatically');await page.locator('[data-action="read-plugy-message"]').click();await page.locator('#plugy-transcript').waitFor();assert.match(await page.locator('#plugy-transcript').textContent(),/cestovateľov/);await page.locator('.dialog-close').click();fail=false;await page.locator('[data-action="plugy-audio-toggle"]').click();await page.waitForFunction(()=>document.querySelector('#plugy-audio').currentTime>0);
    assert.deepEqual(errors,[]);await context.close();console.log('PASS: '+engine.name()+' real mobile MP3 preload, tap-unlocked automatic playback after reveal, pause/resume/replay, release, denied play and network retry.');
   }finally{await browser.close();}
  }

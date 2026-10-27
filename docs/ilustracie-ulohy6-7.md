@@ -1,6 +1,6 @@
 # Ilustrácie pre úlohy 6 a 7
 
-Vytvorené vstavaným nástrojom imagegen. Referencie: `assets/printable-scenes/p6-spolocny-navrat.png` a `assets/characters/piko.png`. Pôvodné obrázky sú zachované. Ilustrácie neobsahujú mená ani jazykovo závislé popisky.
+Vytvorené vstavaným nástrojom imagegen. Referencie: schválené portréty v `assets/characters/`. Ilustrácie neobsahujú mená ani jazykovo závislé popisky.
 
 ## Úloha 6
 

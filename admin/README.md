@@ -4,7 +4,7 @@ Samostatná administrácia a Worker API v existujúcom repozitári Pixelkovia. F
 
 **Stav nasadenia a presné identifikátory:** pozri [DEPLOYMENT.md](docs/DEPLOYMENT.md). Používateľ schválil vytvorenie oddelených zdrojov, prihlásenie iba heslom a následne presné nové D1 UUID pred migráciami.
 
-[Ukážka dashboardu s fiktívnymi dátami](docs/dashboard-preview.png) · [Plán nasadenia a inventúra](docs/DEPLOYMENT.md)
+[Nasadenie a prístup](docs/DEPLOYMENT.md)
 
 ## Lokálne spustenie
 
@@ -32,7 +32,7 @@ Seed vytvorí 18 fiktívnych rodín s adresami `@example.invalid`: zakúpené/ne
 - Desať metrík: unikátni zákazníci, zaplatené objednávky, tržby po menách, zakúpené oprávnenia, neaktivované/aktivované, aktívne/dokončené relácie, priemer a medián trvania.
 - Grafy nákupov, prvých aktivácií a dokončení, priechod ôsmimi úlohami; dostupné sú aj tabuľky grafových dát.
 - Zákazníci: vyhľadávanie, stavové filtre, bezpečné radenie, DB stránkovanie po 20 položkách. Jeden riadok predstavuje produkt objednávky. Zákazník môže mať viac oprávnení.
-- Detail: objednávky a rozšírenia, návštevy portálu, checklist, aktivácie, expirácia, každé samostatné hranie, osem etáp s časmi/pokusmi/chybami/nápovedami a najnovších 200 udalostí.
+- Detail: objednávky a rozšírenia, návštevy portálu, checklist, aktivácie, expirácia, každé samostatné hranie, sedem úloh s časmi/pokusmi/chybami/nápovedami a najnovších 200 udalostí.
 - Objednávky: najnovších 200 filtrovaných objednávok, bez checkoutu alebo ručnej simulácie platieb v admin UI.
 - Analytika úloh: začaté/vyriešené relácie, úspešnosť, priemer/medián elapsed, priemer active, nesprávne odpovede, priemerné nápovedy a posledné nedokončené hrania.
 - Osem e-mailových konceptov, história udalostí a príznak vypnutého odosielania. Marketingové koncepty majú zástupný odhlasovací odkaz. Poskytovateľ ani produkčné odosielanie nie sú zapojené.
@@ -96,7 +96,7 @@ Prvé úspešné dokončenie nastaví pevnú hranicu `first_completed_at + 24 ho
 | `CUSTOMER_AUTH` | Nie je pripojený; Magic Link ani zákaznícke účty sa neimplementujú |
 | `createOrder()` | Serverová funkcia testovaná pre budúce overené platobné webhooky; nie je verejný platobný endpoint |
 | E-mailový poskytovateľ, doručovanie, odhlásenie, personalizované PDF | Koncepty a DB pripravené; nevykonávajú sa |
-| Klientské sledovanie na existujúcom webe | Nie je zapnuté; interné náhľady a staré hrania neposielajú falošné udalosti |
+| Klientské sledovanie na existujúcom webe | Nie je zapnuté; interné náhľady neposielajú falošné udalosti |
 | QR odkazy | Model počíta so spoločnými QR a bezpečnou serverovou reláciou; pôvodná maketa Úloha 1 sa nemení |
 
 Prepojenie aktuálnej Site s budúcou zákazníckou cookie vyžaduje samostatne navrhnutý same-origin gateway/doménu. Budúci zákaznícky hostname/gateway musí mať zákaznícke overenie oddelené od ochrany admin hosta. Nepovoľujeme všeobecný CORS ani treťostranné cookies ako skratku.
@@ -111,16 +111,15 @@ PLAYWRIGHT_MODULE=/tmp/pixelkovia-qa/node_modules/playwright node admin/tests/br
 
 Backendové testy používajú lokálny SQLite adaptér a samostatný integračný test v skutočnom `workerd`/D1 simulátore Miniflare. Integrácia vyžaduje predchádzajúci `build:check`; nepoužíva Cloudflare účet ani API token. Testuje migrácie, objednávku, checklist, aktiváciu, cookie telefónu, overenie odpovede a duplicitu. Testy overujú aj heslový login/logout, cookies, zneplatnenie relácií, expiráciu, limity pokusov, zmenu hesla a odmietnutie CSRF. Testy overujú tiež prázdny stav, 18 demo rodín, izoláciu zákazníkov, anonymný a podvrhnutý Access, platné aj neplatné RS256 JWT, radenie/SQL injection, stránkovanie, transakčný rollback, elapsed/active čas, opakovanie a pevných 24 hodín.
 
-Browser test vyžaduje bežiaci lokálny demo Worker na 8787. Overuje reálne D1 dáta, vyhľadávanie, stavové aj produktové filtre, detail, grafy/analytiku, mobilné karty a šírky 320/390/768/1512. Pôvodné testy `tests/` zostávajú samostatné a overujú celú hru, portál, PDF, médiá, staré uloženia a navigáciu.
+Browser test vyžaduje bežiaci lokálny demo Worker na 8787. Overuje reálne D1 dáta, vyhľadávanie, stavové aj produktové filtre, detail, grafy/analytiku, mobilné karty a šírky 320/390/768/1512. Testy `tests/` overujú hru, portál, PDF, médiá, uložený postup a navigáciu.
 
 ## Inventúra bez zmien
 
 ```bash
 node admin/scripts/inventory-cloudflare.mjs
-node admin/scripts/deployment-plan.mjs
 ```
 
-Token je v Codespaces secret premennej `PIXELKOVIA_TOKEN`, štandardnej premennej `CLOUDFLARE_API_TOKEN` alebo v chránenom súbore `/tmp/treasurequest-cloudflare-token`; nikdy v argumentoch, zdrojovom kóde alebo Git commitoch. Inventúra podporuje oba názvy premenných. Wrangler používa štandardný názov `CLOUDFLARE_API_TOKEN`; pri nasadzovaní sa hodnota z `PIXELKOVIA_TOKEN` odovzdá procesu v pamäti bez vypisovania. Inventarizačný skript odosiela iba GET, nečíta hodnoty secrets a výsledok ukladá do ignorovaného `admin/docs/cloudflare-inventory.local.json`. Účel existujúcich projektov neháda. Pri viacerých účtoch sa zastaví pred inventúrou a vyžiada konkrétne Account ID. Nasadzovací plán je iba výpis – nenasadzuje ani nemigruje nič.
+Token je v Codespaces secret premennej `PIXELKOVIA_TOKEN`, štandardnej premennej `CLOUDFLARE_API_TOKEN` alebo v chránenom súbore `/tmp/treasurequest-cloudflare-token`; nikdy v argumentoch, zdrojovom kóde alebo Git commitoch. Inventúra podporuje oba názvy premenných. Wrangler používa štandardný názov `CLOUDFLARE_API_TOKEN`; pri nasadzovaní sa hodnota z `PIXELKOVIA_TOKEN` odovzdá procesu v pamäti bez vypisovania. Inventarizačný skript odosiela iba GET, nečíta hodnoty secrets a výsledok ukladá do ignorovaného `admin/docs/cloudflare-inventory.local.json`. Účel existujúcich projektov neháda. Pri viacerých účtoch sa zastaví pred inventúrou a vyžiada konkrétne Account ID.
 
 Heslový browser test je výslovne spúšťaný proti zvolenému hostu; číta heslo iba z chráneného súboru, neprijíma ho v argumentoch a po overení sa odhlási:
 
@@ -131,19 +130,12 @@ TQ_ADMIN_PASSWORD_FILE=/tmp/treasurequest-admin-password \
 node admin/tests/password-browser.test.cjs
 ```
 
-## Výslovne vyžiadaných 15 FAKE zákazníkov
-
-Používateľ po nasadení výslovne požiadal o 15 fiktívnych zákazníkov v produkčnej TreasureQuest DB: päť iba s nákupom, päť s rozhranou hrou (úlohy 2–6) a päť s dokončenými ôsmimi úlohami. Toto je samostatná výnimka na označené skúšobné dáta; pôvodný 18-členný lokálny demo seed ostáva výhradne lokálny.
-
-Zákazníci majú vymyslené slovenské mená a priezviská, napríklad `FAKE · Jana Kováčová`, `FAKE · Peter Novák` a `FAKE · Tomáš Baláž`. Úplný zoznam je vo fixture `FAKE_NAMES`. Adresy sú `@example.invalid`, objednávky majú FAKE referencie. Každý zákazník má audit `fake_customer_created`; administrácia podľa neho zobrazuje trvalé upozornenie, že prehľady vrátane tržieb zahŕňajú simulované údaje. Neuskutočnia sa platby, odosielanie e-mailov ani zákaznícke prihlásenia.
-
-`node admin/scripts/prepare-fake-customers.mjs` vygeneruje fixture iba v pamäti a exportuje INSERT-only `/tmp/treasurequest-fake-customers.sql`. Overí import a cudzie kľúče lokálne; sám nekontaktuje Cloudflare. Vzdialený import je samostatná výslovne autorizovaná operácia iba proti presnému `treasurequest-db` UUID z deployment dokumentácie, po kontrole existujúcich záznamov a kolízií. Žiadne DROP, UPDATE alebo mazanie existujúcich zákazníkov. Opakovaný import sa nesmie slepo opakovať; najprv preveriť audit a prefix `fake-tq-15-v1-`, aby nevznikli duplicity. Preview DB zostáva bez týchto zákazníkov.
 
 ## Digital Product Administration
 
 Administrácia má produktové záložky: Pixelkovia je predvolený aktívny produkt; Phone Off a QR Apartments sú neaktívne vzory. V navigácii ostávajú Overview, Objednávky a Herná analýza. Pôvodné odkazy `#customers`, `#emails` a `#events` otvoria spoločnú hernú analýzu.
 
-`GET /api/admin/customers?view=journey` vracia jeden riadok na zákazníka, najnovšie aktívne hranie (inak posledné hranie), skutočné návštevy rodičovskej stránky a osem herných úloh. Existujúci formát API bez `view=journey` ostáva zachovaný. Filtre `state`, `version=base|extensions|full`, `portal=opened|unopened`, vyhľadávanie a nákupná kohorta sa kombinujú pred stránkovaním; aktívni zákazníci majú prednosť, dokončení sú na konci. Dokončenie sa zachová aj po uplynutí času na opakovanie. Žiadne záznamy sa automaticky nemažú.
+`GET /api/admin/customers?view=journey` vracia jeden riadok na zákazníka, najnovšie aktívne hranie (inak posledné hranie), skutočné návštevy rodičovskej stránky a sedem herných úloh. Zoznam zákazníkov vždy vracia jeden riadok na zákazníka. Filtre `state`, `version=base|extensions|full`, `portal=opened|unopened`, vyhľadávanie a nákupná kohorta sa kombinujú pred stránkovaním; aktívni zákazníci majú prednosť, dokončení sú na konci. Dokončenie sa zachová aj po uplynutí času na opakovanie. Žiadne záznamy sa automaticky nemažú.
 
 Hviezdička základu a hviezdičky jednotlivých rozšírení vychádzajú z unikátnych zaplatených produktov, vrátane obsahu kompletného balíka. Vrátené a nezaplatené objednávky ich nepridávajú. Detail sa načíta až po rozbalení riadku a obsahuje nákupy, rodičovské návštevy/checklist, jednotlivé hrania a pokusy, e-mailové udalosti a históriu. Čas rodičovských návštev je interval medzi prvou a poslednou zaznamenanou aktivitou, nie presne meraný aktívny čas; história checklistu predstavuje jeho posledný uložený stav. Nové meranie, zákaznícke prihlásenie ani odosielanie e-mailov sa touto úpravou nezapínajú.
 

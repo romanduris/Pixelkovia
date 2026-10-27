@@ -8,11 +8,8 @@
   const pipeTargets=[0,2,1,1,3,1,0,0,3],pipeElbows=new Set([1,2,3,4,6,8]);
   const pipeStart=[1,0,2,2,1,0,2,1,0];
   function data(state){
-    const old=state.cipko;
-    if(!old||old.version!==2){
-      const previousRound=old?.version===1?Math.max(0,Math.min(4,old.round||0)):0;
-      const finished=previousRound>=4||(previousRound===3&&old?.won);
-      state.cipko={version:2,round:finished?4:previousRound,won:!!old?.won&&!finished,pixels:[],tiles:Array(9).fill(null),selected:null,matched:[],open:[],turns:[...pipeStart]};
+    if(!state.cipko||state.cipko.version!==2){
+      state.cipko={version:2,round:0,won:false,pixels:[],tiles:Array(9).fill(null),selected:null,matched:[],open:[],turns:[...pipeStart]};
     }
     return state.cipko;
   }

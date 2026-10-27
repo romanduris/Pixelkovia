@@ -13,3 +13,5 @@
 - For sales changes, also build and test `dist/funnel/`, commit and push `main`, then publish that directory with `scripts/deploy-funnel.mjs`. Follow `funnel/README.md` for credentials and the pinned Wrangler CLI. Never upload the complete `dist/` or repository to the public Pages project.
 - The public funnel must not contain game JavaScript, answers, complete worksheets/PDFs, the parent portal, audio/video files or administration. Use only its explicit public asset list and physically cropped worksheet previews; verify private routes return 404. Preserve the inactive payment behavior until separately authorized.
 - The user approved `assets/sales/game-lock-partial.webp` as the public still preview of the nine puzzle. This is the only deliberate puzzle-preview exception; full game files, answer data and complete worksheets stay excluded.
+
+- Keep only the current prelaunch content, catalog and media. Remove superseded pages, archive copies, retired product IDs and compatibility code for abandoned drafts; no order-history migration is needed at this stage. Do not rewrite Git history.

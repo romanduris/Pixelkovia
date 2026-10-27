@@ -3,7 +3,7 @@
   'use strict';
   const steps = [
     {id:'printed', revision:'numeric-seals-final-letter-v7', label:'Vytlačil som pracovné listy úloh 1–7 jednostranne na A4; Úloha 2 obsahuje oba kruhy.'},
-    {id:'supplies', legacy:1, label:'Pripravil som telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a pásku.'},
+    {id:'supplies', label:'Pripravil som telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a pásku.'},
     {id:'cut-p4', revision:'paper-puzzles-v2', label:'Listy úloh 4 a 7 som nechal celé, bez strihania. Pripravil som tmavú pastelku. List úlohy 1 a kruhy z úlohy 2 strihajú deti.'},
     {id:'envelope-1', label:'Indícia k úlohe 1 obsahuje celý list, bez strihania.'},
     {id:'bathroom', label:'Indícia k úlohe 1 je medzi uterákmi na suchom dostupnom mieste.'},
@@ -16,7 +16,6 @@
     {id:'media', label:'Overil som čitateľnosť správ v telefóne; video a zvuk sú voliteľným doplnkom.'},
     {id:'phone', label:'Telefón je nabitý, pripravený a tím môže začať.'}
   ].map(step => ({...step, required:true}));
-  // Old paper preparation cannot attest the swapped worksheets; game progress is unchanged.
   const storageKey = id => {const revision=steps.find(step=>step.id===id)?.revision;return 'zahada-prep-v5-'+id+(revision?'-'+revision:'');};
   const memory = {};
   const adapter = {
@@ -25,9 +24,7 @@
       try {
         const saved = localStorage.getItem(storageKey(id));
         if (saved !== null) return saved === '1';
-        // Only equivalent old checks migrate. Old global placement does not attest each hiding place.
-        const legacy = steps.find(step => step.id === id)?.legacy;
-        return legacy !== undefined && localStorage.getItem('zahada-prep-' + legacy) === '1';
+        return false;
       } catch (_) { return memory[id] === true; }
     },
     write(id, checked) {memory[id] = checked;try { localStorage.setItem(storageKey(id), checked ? '1' : '0'); } catch (_) {}}

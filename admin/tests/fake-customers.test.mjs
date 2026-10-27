@@ -16,7 +16,7 @@ test('explicit FAKE fixture has 15 labelled customers, five purchased/playing/co
   for(const state of ['purchased','playing','completed'])assert.equal(list.rows.filter(c=>c.state===state).length,5,state);
   const running=list.rows.filter(c=>c.state==='playing').map(c=>c.current_stage).sort();assert.deepEqual(running,[2,3,4,5,6]);
   assert.equal((await first(db,'SELECT COUNT(*) n FROM game_runs')).n,10);
-  assert.equal((await first(db,"SELECT COUNT(*) n FROM game_stage_progress sp JOIN game_runs r ON r.id=sp.run_id WHERE r.status='completed' AND sp.completed_at IS NOT NULL")).n,40);
+  assert.equal((await first(db,"SELECT COUNT(*) n FROM game_stage_progress sp JOIN game_runs r ON r.id=sp.run_id WHERE r.status='completed' AND sp.completed_at IS NOT NULL")).n,35);
   assert.equal((await first(db,'SELECT COUNT(*) n FROM game_events WHERE occurred_at>?',at)).n,0);
   assert.equal((await first(db,'SELECT COUNT(*) n FROM email_events')).n,0);
   const summary=await dashboard(db,filters(new URLSearchParams()));assert.equal(summary.metrics.customers,15);

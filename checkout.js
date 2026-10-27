@@ -7,7 +7,7 @@
   const requested=new URLSearchParams(location.search).get('product');
   const baseId=offer.bookIds.includes(requested)?requested:'episode-1',isGame=baseId==='episode-1';
   const bookInfo=id=>PIXELKOVIA_LIBRARY.find(book=>book.id===id);
-  // No query parameter preselects a paid add-on, including obsolete mission URLs.
+  // Paid books are selected only through their controls.
   document.querySelectorAll('[data-base-price]').forEach(el=>el.textContent=money(product(baseId).priceCents));
   document.querySelector('[data-planned-price]').textContent=money(product('episode-1').pricing.plannedStandardPriceCents);
   if(!isGame){

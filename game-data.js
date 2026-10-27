@@ -6,10 +6,10 @@ window.GAME = {
   "finaleQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=navrat",
   "finaleVideo": "assets/EndScene-Dabing.mp4",
   "finaleAudio": null,
-  "mikyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=kvak",
+  "mikyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=miky",
   "plugyThanks": "Ďakujem vám, kamaráti! Ste skvelí. Pomáhate nám znovu spojiť celú partiu.",
-  "pingyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=listok",
-  "plugyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=sutko",
+  "pingyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=pingy",
+  "plugyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=plugy",
   "stages": [
     {
       "id": "intro",
@@ -331,12 +331,7 @@ window.GAME = {
           "Choďte sa tam pozrieť. Nájdete posledný návratový znak do spoločného hesla. Pridajte ho k návratovým znakom, ktoré ste získali cestou. Už sme naozaj blízko!"
         ]
       },
-      "character": "guardy",
-      "legacyAnswers": [
-        "POD GAUC",
-        "PODGAUC",
-        "SPOLU"
-      ]
+      "character": "guardy"
     },
     {
       "id": "code",
@@ -429,7 +424,6 @@ window.GAME = {
       "name": "Piko",
       "role": "Koordinátor spojení",
       "description": "Modrý sprievodca drží spojenie a pomáha celej partii spolupracovať.",
-      "tile": 0,
       "image": "assets/characters/piko.png"
     },
     {
@@ -437,7 +431,6 @@ window.GAME = {
       "name": "Miky",
       "role": "Malý mikrofón",
       "description": "Zachytáva aj tiché zvuky a volania, ktoré ostatní nepočujú.",
-      "tile": 1,
       "image": "assets/characters/miky.png"
     },
     {
@@ -445,7 +438,6 @@ window.GAME = {
       "name": "Pixi",
       "role": "Svietiaci pixel",
       "description": "Stará sa o maličké svetielka, farby a obrazy za vašou obrazovkou.",
-      "tile": 2,
       "image": "assets/characters/pixi.png"
     },
     {
@@ -453,7 +445,6 @@ window.GAME = {
       "name": "Plugy",
       "role": "Spoľahlivý konektor",
       "description": "Spája prerušené digitálne cestičky, aby po nich opäť putovali odkazy.",
-      "tile": 3,
       "image": "assets/characters/plugy.png"
     },
     {
@@ -461,7 +452,6 @@ window.GAME = {
       "name": "Pingy",
       "role": "Dátový posol",
       "description": "Doručuje odkazy a pomáha znovu poskladať poškodené správy.",
-      "tile": 4,
       "image": "assets/characters/pingy.png"
     },
     {
@@ -469,7 +459,6 @@ window.GAME = {
       "name": "Čipko",
       "role": "Šikovný mikročip",
       "description": "Premýšľa, kadiaľ vedie správna cesta, a kontroluje spojenia.",
-      "tile": 5,
       "image": "assets/characters/cipko.png"
     },
     {
@@ -477,7 +466,6 @@ window.GAME = {
       "name": "Guardy",
       "role": "Digitálny ochranca",
       "description": "Spravuje Ochranné pole a čaká, kým bude v bezpečí celá partia.",
-      "tile": 6,
       "image": "assets/characters/guardy.png"
     }
   ],
@@ -594,7 +582,6 @@ window.GAME = {
     "Ah—"
   ],
   "plugyAudio": "assets/Plugy.mp3",
-  "plugyAudioPlaceholder": false,
   "plugyPuzzle": {
     "grid": [
       [
@@ -679,10 +666,6 @@ window.GAME = {
       "expectedFile": "assets/Guardy.mp3",
       "status": "available"
     }
-  },
-  "archivedAudio": {
-    "miky": "assets/KvakMessage.mp3",
-    "plugy": "assets/Sutko.mp3"
   },
   "mazeQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=cipko",
   "paperPuzzles": {

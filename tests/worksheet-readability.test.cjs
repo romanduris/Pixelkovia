@@ -38,7 +38,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
    },file);
    assert.equal(qr.level,2,file+': actual QR format bits encode level H');assert.equal(qr.quiet,true,file+': four clear modules on every side');
    const target=await page.evaluate(key=>GAME[key],key);
-   for(const variant of ['clean','damaged'])assert.equal(jsQR(new Uint8ClampedArray(qr[variant]),qr.side,qr.side)?.data,target,file+': '+variant+' QR retains its exact legacy destination');
+   for(const variant of ['clean','damaged'])assert.equal(jsQR(new Uint8ClampedArray(qr[variant]),qr.side,qr.side)?.data,target,file+': '+variant+' QR retains its current destination');
   }
   await page.emulateMedia({media:'screen'});await page.setViewportSize({width:390,height:844});
   for(const id of ['p1','p3','p5','p6']){await page.goto(BASE+'/printables.html?sheet='+id);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),id+': larger QR does not overflow the phone view');}

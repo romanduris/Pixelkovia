@@ -57,12 +57,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(await printed.locator('#p5 .paper-reward>strong').innerText(),'L');
  assert.match(await printed.locator('#p5>.instructions').innerText(),/do odhaleného úkrytu/);
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.evaluate(()=>{const box=document.createElement('div');box.innerHTML=PRINT_MATERIALS.summary('p7','code');return box.textContent;})),'final password shows the printed ordering card');
- for(const stage of await page.evaluate(()=>GAME.stages.slice(2).filter(s=>!['symbols','maze','search'].includes(s.id)&&!s.paperOnly).map(s=>({id:s.id,lines:[...s.story,...s.resolution].flat()})))){
-  const toggle=page.locator(`[data-target="stage-${stage.id}-story"]`),panel=page.locator(`#stage-${stage.id}-story`);
-  assert.ok(await panel.isHidden());await toggle.click();assert.ok(await panel.isVisible());
-  const text=await panel.textContent();for(const line of stage.lines)assert.ok(text.includes(line),stage.id+': full authored story retained');
-  await toggle.click();assert.ok(await panel.isHidden());
- }
+ for(const id of ['code','finale'])assert.equal(await page.locator('#gm-'+id+' [data-target^="stage-"]').count(),0,'no duplicate story panel');
  const guideText=await printed.locator('#rodicovsky-navod').innerText();
  assert.match(guideText,/Farebne alebo čiernobielo/);assert.match(guideText,/chladničke/);assert.equal(await printed.locator('.guide-hint').count(),7);assert.match(await printed.evaluate(()=>PRINT_MATERIALS.stageSolution('maze',true)),/7294 → CHLADNIČKA/);
  assert.deepEqual(await printed.locator('.guide-intro h3').allTextContents(),['1. Vytlačte','2. Ukryte','3. Spustite']);assert.match(await printed.locator('.guide-tools').innerText(),/Deti potrebujú:[\s\S]*nožnice[\s\S]*ceruzku[\s\S]*pastelku[\s\S]*telefón/);
@@ -80,7 +75,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  await printed.goto(BASE+'/printables.html?sheet=p1');assert.equal(await printed.locator('.sheet:visible').count(),1);assert.ok(await printed.locator('#rodicovsky-navod').isHidden());assert.ok(!(await printed.locator('#p1').innerText()).includes('741296'));
  await printed.close();
  // Every collapsed header starts a real isolated test, including the intro and bathroom.
- const saved=JSON.stringify({started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}});
+ const saved=JSON.stringify({progressVersion:2,started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}});
  await page.evaluate(saved=>localStorage.setItem('zahada-v1-progress',saved),saved);await page.reload();
  for(let stage=0;stage<9;stage++){
   if(stage===2||stage===4){const id=stage===2?'document':'cipher';assert.equal(await page.locator('#gm-'+id+' [data-action="test"]').count(),0);assert.equal(await page.locator('#gm-'+id+' .storyboard-continuation').count(),0);continue;}

@@ -30,7 +30,7 @@ export async function seedFakeCustomers(db,{local=false,at=Date.now()}={}){
     await saveChecklist(db,key+'-customer',right.id,Object.fromEntries(checklist.map(s=>[s.id,true])),started-600000);
     const session=await activate(db,key+'-customer',right.id,key+'-activation',{at:started});
     let run=await first(db,'SELECT * FROM game_runs WHERE id=?',session.runId),cursor=started;
-    const lastStage=type==='playing'?2+(index-5):8;
+    const lastStage=type==='playing'?2+(index-5):stages.length;
     for(let stage=1;stage<=lastStage;stage++){
       cursor+=15000;
       const event=(type,offset,extra={})=>gameEvent(db,run,{eventId:`${key}-${stage}-${type}-${offset}`,type,stage,...extra},cursor+offset);

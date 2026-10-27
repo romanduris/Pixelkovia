@@ -6,7 +6,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 const KEY='zahada-v1-progress';
 const engines={chromium,webkit};
 (async()=>{
- assert.deepEqual(fs.readFileSync('assets/KvakMessage.mp3'),fs.readFileSync('assets/KvakMessage.mpeg'),'the supplied recording must stay unchanged');
+ assert.ok(fs.statSync('assets/Miky.mp3').size>0,'current delivered recording exists');
  for(const engine of (process.env.AUDIO_BROWSERS||'chromium,webkit').split(',')){
   const browser=await engines[engine].launch({headless:true});
   try{
@@ -22,7 +22,7 @@ const engines={chromium,webkit};
     return {context,page,errors};
    }
    async function solve(page){
-    await page.goto(BASE+'/game.html?signal=kvak');
+    await page.goto(BASE+'/game.html?signal=miky');
     await page.locator('#answer').fill('741296');
     await page.locator('button[type="submit"]').tap();
     await page.locator('.signal-connected').waitFor();
@@ -33,7 +33,7 @@ const engines={chromium,webkit};
     assert.ok(await page.locator('audio').evaluate(a=>!a.muted&&a.volume>0&&a.duration>40&&a.duration<70));
    }
    const normal=await phone(),p=normal.page;
-   await p.goto(BASE+'/game.html?signal=kvak');
+   await p.goto(BASE+'/game.html?signal=miky');
    const media=await p.request.get(BASE+'/assets/Miky.mp3',{headers:process.env.SITE_ACCESS_TOKEN?{'OAI-Sites-Authorization':'Bearer '+process.env.SITE_ACCESS_TOKEN}:{}});
    assert.equal(media.status(),200);assert.match(media.headers()['content-type'],/^audio\/mpeg\b/,'MP3 must be served as audio on the actual server');
    assert.deepEqual(Buffer.from(await media.body()),fs.readFileSync('assets/Miky.mp3'),'browser receives the actual new recording');
@@ -70,7 +70,7 @@ const engines={chromium,webkit};
     if(process.env.SITE_ACCESS_TOKEN)headers['OAI-Sites-Authorization']='Bearer '+process.env.SITE_ACCESS_TOKEN;
     await route.continue({headers});
    });
-   await warm.page.goto(BASE+'/game.html?signal=kvak',{waitUntil:'domcontentloaded'});
+   await warm.page.goto(BASE+'/game.html?signal=miky',{waitUntil:'domcontentloaded'});
    await Promise.race([started,new Promise((_,reject)=>setTimeout(()=>reject(Error('Audio was not requested while the code form was open')),10000))]);
    assert.ok(await warm.page.locator('audio').evaluate(a=>a.paused&&a.currentTime===0));
    await warm.page.waitForTimeout(1200);release();

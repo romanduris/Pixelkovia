@@ -1,116 +1,56 @@
 # Pixelkovia: Stratený signál
 
-Rodinné dobrodružstvo v byte. Sedem kamarátov zo sveta za obrazovkami potrebuje obnoviť prerušené spojenie. Deti riešia papierové indície a spoločné heslo; telefón overuje odpovede a uchováva postup.
+Rodinná hra pre deti 7–13 rokov a rodičov: sedem úloh, tlačiteľné indície a spoločný telefón. Repozitár obsahuje aktuálnu hru, rodičovskú prípravu, storyboard, dve knihy, Atlas a predajnú ponuku.
 
-Verejná predajná stránka a checkout sa nasadzujú samostatne na **https://pixelkovia.rodulab.com**. Postup, hranicu verejného obsahu a Cloudflare konfiguráciu opisuje [funnel/README.md](funnel/README.md). Verejný balík je `dist/funnel/`; hra, PDF a rodičovský portál sa na tento host nenahrávajú.
+## Stránky a zdroje
 
-## Digitálna identita V6.1
+- `index.html`, `sales-page.js`, `sales.css`: predajná stránka.
+- `checkout.html`, `checkout.js`, `checkout.css`, `site-config.js`: aktuálny katalóg a výpočet ponuky v centoch. Platby a odosielanie formulára sú vypnuté.
+- `parent.html`, `prep-store.js`: príprava a materiály pre rodiča.
+- `game.html`, `app.js`, `game-data.js`, `story-text.js`, `cipko-game.js`: hráčska časť a uložený postup aktuálnej hry.
+- `storyboard.html`, `site-content.js`: interný redakčný prehľad, prehrávanie dodaných nahrávok a video podklady.
+- `print-materials.js`, `signal-print.css`, `printables.html`: spoločný zdroj pracovných listov, rodičovského ťaháka a diplomu.
+- `library.html`, `atlas.html`, `book-*-sample.html`: knižnica, sedem profilov Atlasu a krátke ukážky.
+- `book-before.html`, `book-after.html`, `books-preview.html`, `books-content/`: plné knihy iba v súkromnej Site.
+- `book-previews.js` / `.css`: spoločné prístupné okná s ukážkami.
+- `admin/`: samostatná chránená administrácia; pravidlá siedmich úloh a checklist sa odvodzujú z aktuálnych herných zdrojov.
 
-Schválená sada B: Piko je pôvodný modrý sprievodca s obláčikovou hlavou, obrazovkovou tvárou, oblekom a tyrkysovou kravatou. Miky je mikrofón, Pixi svietiaci pixel, Plugy živý USB konektor bez chvosta, Pingy dátový posol, Čipko mikročip s okuliarmi. Guardy používa posledný schválený oranžový štít s tyrkysovou kravatou a kľúčovou dierkou. Hlavný vizuál vychádza z obývačkového variantu 2; obrazové adaptácie pre mobil a desktop zachovávajú layout a veľkosti textov.
+V projekte zostávajú iba aktuálne produkty, nahrávky a stránky. Priečinok `MD/` slúži na vstupné zadania; po zapracovaní sa ich súbory odstránia.
 
-Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML textom mimo artworku. Nové hovorené prepisy a TTS prompty nepoužívajú konkrétne mená postáv. Zdrojové prompty sú v `assets/characters/` a `assets/printable-scenes/PROMPTS.json`.
+## Ponuka
 
-## Spoločné zdroje
+Hra stojí 14,99 € v uvádzacej ponuke; plánovaná cena po jej skončení je 29,99 €. Každá kniha stojí 4,99 €. S jednou knihou je cena 19,98 €, s oboma sa automaticky odpočíta 4,98 € a celok stojí 19,99 €. Atlas je automaticky zahrnutý zdarma, s plánovanou samostatnou cenou 2,99 €. Samostatné knihy fungujú bez hry. Podrobnosti: [aktuálna ponuka](docs/offer.md).
 
-- `game-data.js`: príbeh, postavy, odpovede a hlasové podklady. `story-text.js` vykresľuje tie isté odseky v hre, storyboarde a tlačovinách.
-- `app.js`: oddelený funnel, príprava, hranie, uložený postup a izolované testy zo storyboardu. `cipko-game.js` obsahuje štyri dotykové hry úlohy 5.
-- `sales-page.js`, `sales.css`: predajný funnel so skutočnými PDF ukážkami. `checkout.html`, `checkout.js`, `checkout.css`: výber dvoch kníh, automaticky zahrnutý Atlas a súhrn s uvádzacou zľavou; finálne Kúpiť je podľa zadania neaktívne. `site-config.js` je spoločný katalóg, ceny, 14-dňová garancia a výpočet balíka. `site-content.js` obsahuje materiály, prípravu a storyboard.
-- `atlas.html`: nový verejný Atlas zdarma so siedmimi dodanými profilmi a aktivitami. `library.html` a dve stránky `book-*-sample.html` obsahujú iba anotácie a krátke ukážky. Plné autorské knihy sú v súkromných `book-before.html` / `book-after.html`; pôvodná sedemkapitolová rozprávka aj encyklopédia sú zachované v `legacy-atlas.html` s pôvodným štýlom `legacy-atlas.css`. Rozhodnutia o cenách, starých oprávneniach a serverovom doručovaní sú v [MASTER DESIGNER](docs/books/MASTER_DESIGNER.md).
-- `print-materials.js`, `printables.html`, `signal-print.css`: upraviteľný zdroj všetkých PDF aj zhodného storyboardu. Každý list má jednu A4. Balík má deväť strán: rodičovský návod prvý, úloh 1–7, diplom.
+## Hra a médiá
 
-## Zachované hádanky
+QR vstupy: `signal=miky`, `plugy`, `pingy`, `cipko`, `guardy`, `navrat`. Otvárajú priamo príslušnú úlohu. Rozpracované úlohy a dokončenia aktuálnej verzie sa ukladajú lokálne v tom istom prehliadači; postup sa nesynchronizuje medzi zariadeniami.
 
-| Krok | Riešenie |
-| --- | --- |
-| Úvod | Prvé miesto odhalí iba schválené video, písaný úvod ho neprezrádza. |
-| Úloha 1, kúpeľňa | Šesť dátumových záznamov → 741296, S, ďalšia indícia pri okne. |
-| Úloha 2, okno | D → A, KODGDM SRG VWROLFNDPL → HĽADAJ POD STOLIČKAMI. Iba papier, bez QR; V sa zachová pri vstupe na liste k úlohe 3. |
-| Úloha 3, pod stoličkou | △ 3, ○ 2, □ 4; tabuľka 5 × 7 odhalí 9, E, hádanka smeruje k topánkam. |
-| Úloha 4, topánka | Oprava 12 mostíkov podľa trojbodového servisného kľúča, potom 14 presunov cez svetelné uzly → POSTELI a kartička T. Iba papier, bez QR a overovania. Úloha 5 pod vankúšom v detskej posteli. |
-| Úloha 5, posteľ | Pixely 1–16 po poradí, obrázok 3 × 3, pexeso 6 párov, potrubie 3 × 3 → 7, 2, 9, 4 → CH – LAD – NIČ – KA → CHLADNIČKA, L. List k úlohe 6 je v chladničke; List k úlohe 7 je samostatne pod gaučom. |
-| Úloha 6, chladnička | Deväť poškodených správ pod sebou a sedem doplnkových vzorov. Dve správy bez vhodnej opravy sa prečiarknu. Číslice pri opravených správach sa čítajú zhora nadol → 5817264, bez prepisovania či preskupovania. Úkryt pod gaučom prezradí až Guardyho správa po overení. Ochranné pole partiu chráni, nie je nepriateľom. |
-| Úloha 7, pod gaučom | Jedna obrazovka 9 × 9: presné dvojice ○★, △□ a +◇ odhalia posledný návratový znak O. Spolu s písmenami z úloh 1–5 vytvorí SVETLO; potvrdenie v návratovej bráne. Vráti sa všetkých sedem, Piko posledný. |
+Aktuálne médiá: `PicoVideo.mp4`, `Miky.mp3`, `Plugy.mp3`, `Guardy.mp3`, `EndScene-Dabing.mp4`. Správy majú prehrávanie, pauzu, opakovanie a prepis. Nahrávky sa potichu pripravujú už pri riešení; automatický štart pri úspechu je autorizovaný gestom. Finále sa po správnom hesle spustí s oneskorením 1 s. Po dohraní ostane posledný záber a po 1 s sa zobrazí KONIEC; opakovanie ho skryje.
 
-Úkryty sú suché a dostupné bez presúvania nábytku; okno sa neotvára. List úlohy 1 a kruhy z úlohy 2 strihajú deti, Úloha 4 a Úloha 7 zostávajú celé. Čiernobiela tlač je plne hrateľná.
+## Tlačoviny
 
-## Video a dabing
+Deväť strán A4: rodičovský ťahák, sedem indícií a diplom. Tlač jednostranne v mierke 100 %. Čiernobiela tlač je podporovaná. QR majú korekciu H a štyri moduly bieleho okraja. Tlačové texty a geometria zostávajú vektorové, ilustrácie sa v PDF optimalizujú podľa rozmeru.
 
-`assets/PicoVideo.mp4` a obe pôvodné MP3 zostávajú byte po byte nezmenené. Storyboard zobrazuje iba aktuálne nahrávky, bez prehrávačov pôvodných verzií.
+Autorské nástroje inštalujte mimo repozitára. Premenné `PLAYWRIGHT_MODULE`, `QRCODE_MODULE` a `SHARP_MODULE` určujú cesty k modulom; `pypdf` je potrebný na spojené PDF.
 
-**Nové nahrávky Mikyho a Plugyho sú zapojené** cez `GAME.audio = assets/Miky.mp3` a `GAME.plugyAudio = assets/Plugy.mp3`; pôvodné súbory zostávajú v archíve. Miky sa prehrá po správnom kóde. Plugy sa počas odhalenia deviatky pripraví potichu a po odomknutí mosta sa automaticky prehrá od začiatku. Obe správy majú pauzu, pokračovanie, opakovanie a dostupný prepis. `GAME.recordings` určuje stav jednotlivých nahrávok. Testy používajú priamo dodané MP3 v dotykovom Chrome aj WebKite. Prehrávač zachováva prednačítanie, gesto, automatický štart pri úspechu, pauzu, pokračovanie, opakovanie a retry. Chyba sama neotvára prepis ani nemení postup.
-
-## Kompatibilita a administrácia
-
-Kľúč `zahada-v1-progress`, verzia uloženia 2, poradie úloh, číselné dokončenia a písmená zostávajú zachované. Už dokončený Úloha 5 zostáva splnený; rozpracovaný Úloha 5 používa náročnejšie hry. Po poslednej hre sa automaticky uloží návratový znak L; obrazovka ukáže iba číslice 7294 a pokyn pokračovať na papieri, bez zadávania miesta. Úloha 6 má samostatný QR `signal=guardy` na ďalšiu úlohu. Stav každej hry sa ukladá do `cipko` v existujúcom postupe. Verzia 2 zachová dohrané minihry zo staršej verzie; aktuálna rozpracovaná plocha sa prispôsobí novému počtu dielikov. Pôvodné QR payloady a URL sú nezmenené pre už vytlačené papiere. Nový List k úlohe 4 nemá QR; nájdený Úloha 5 obsahuje nový QR `signal=cipko`. Ten zaznamená papierový krok 4 a návratový znak T bez zadávania odpovede; QR na liste k úlohe 3 rovnako zachová návratový znak V z listu k úlohe 2. Starý vstup Úloha 4 zobrazí pokyn pokračovať na papieri. Ich historické hodnoty zostávajú iba v kompatibilnom vstupnom mapovaní a QR dátach. Každý platný QR otvorí priamo svoju úlohu bez overovania predchádzajúcich dokončení. Už vyriešené úlohy aj rozpracované hry sa zachovajú; uložené dokončenia môžu mať medzery. V prehľade sa po spustení dajú otvoriť všetky úlohy. Starý výber políčok sa prevedie na novú vlastnosť bez straty výberu. Nové tlačoviny vyžadujú opätovné potvrdenie vytlačenia, nie reset hry.
-
-Administrácia ponecháva historické obchodné kľúče produktov, pretože ich používajú objednávky a nákupné práva. Dopredná migrácia `0003_digital_identity_names.sql` mení iba viditeľné názvy. Historická migrácia zostáva historickým záznamom. Autentifikácia, ceny, platby a serverové relácie sa nemenia. Starší osem-etapový serverový kontrakt sa nesmie slepo regenerovať zo samostatného sedemúlohového browserového prototypu. Administrácia sa touto publikáciou statického Site nenasadzuje.
-
-## Export a overenie
-
-Autorské závislosti sa inštalujú mimo repozitára: Playwright s Chromium/WebKit, qrcode, jsqr a Python pypdf. `PLAYWRIGHT_MODULE` určuje absolútnu cestu k modulu. Lokálny server: `python3 -m http.server 8080`.
-
-```sh
-PLAYWRIGHT_MODULE=/cesta/k/playwright JSQR_MODULE=/cesta/k/jsqr node tests/worksheet-readability.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/print-pagination.test.cjs
-node tests/paper-puzzles.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/cipko.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/paper-flow.test.cjs
-node tests/mission-data.test.cjs
-node tests/digital-identity.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/qr-entry.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/progress-migration.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/narrative.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/storyboard-print.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/presentation.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/stage1.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright JSQR_MODULE=/cesta/k/jsqr node tests/intro-qr.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/prototype.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/miky-audio.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/plugy.test.cjs
+```bash
+QRCODE_MODULE=/cesta/k/qrcode node scripts/generate-qr.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node scripts/export-printables.cjs
+# Export podporuje aj jednotlivé ID, napríklad p1 p3.
+node admin/scripts/sync-game.mjs
+node admin/scripts/sync-checklist.mjs
 node scripts/prepare-static.mjs
+node tests/books-content.test.cjs
+node tests/paper-puzzles.test.cjs
+node tests/static-assets.test.cjs
 ```
-
-Zvukové regresné testy pripájajú pôvodné nahrávky iba ako výslovné testovacie podklady; nepredstierajú nový dabing. Backend: `npm run build:check` a `npm test` v `admin/`.
 
 ## Publikovanie
 
-Existujúci Site: https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site
+Pracuje sa na `main`, po dokončení zmeny nasleduje commit a push do `origin/main`. `dist/` sa generuje; neupravuje sa ručne.
 
-ID aj publikum sú zachované. Build vzniká cez `node scripts/prepare-static.mjs`; `dist/` nie je zdrojom obsahu. Zmeny sa commitnú a pushnú do `origin/main`, potom sa publikuje existujúci Site. Trvalý odkaz funguje aj po vypnutí Codespace.
+- Súkromná hra a redakčné stránky: [existujúca Site](https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site), identita v `.openai/hosting.json`, prístup iba vlastníkovi.
+- Verejná ponuka: [pixelkovia.rodulab.com](https://pixelkovia.rodulab.com). Cloudflare sa odovzdáva výhradne `dist/funnel/`, nikdy celý repozitár alebo celý `dist/`. [Postup](funnel/README.md).
+- Administrácia sa zostavuje samostatne podľa [admin/README.md](admin/README.md); statické nasadenie ju neobsahuje.
 
-Priama tlač webových listov zachováva samostatné strany aj pri voľbe kratšieho papiera Letter: celé rozloženie vrátane pätičky sa rovnomerne prispôsobí. A4 aj stiahnutý deväťstranový PDF balík zostávajú v pôvodnej mierke. Regresný test overuje kompletnú tlač s hlavičkami aj bez nich a samostatný list Úloha 2.
-
-Tlačové listy používajú spoločné typografické roly v `signal-print.css`: hlavné správy a pracovné pokyny 9 pt Arial, doplňujúce vysvetlenia 8 pt, hlavné nadpisy 21 pt. Menšie popisky a pätičky sú oddelené od hráčskych pokynov; samotné šifry, rovnice a získané písmená zostávajú zámerne výraznejšie. QR kódy na listoch k úlohám 1, 3 a 5 majú jednotne 32 × 32 mm vrátane bieleho okraja štyroch modulov. Generátor používa korekciu H; pôvodné URL sa nemenia. Test číta korekčnú úroveň priamo z formátových bitov vygenerovaných SVG, dekóduje aj vzorku s vymazanou plochou a porovnáva typografiu i rozmery v Chromium a WebKite.
-
-Podklady pre Pikovu záverečnú nahrávku a voliteľné video bez hovorenia (10 s) sú v [docs/finale-podklady.md](docs/finale-podklady.md) aj v storyboarde pri finále. Dodané video `assets/EndScene-Dabing.mp4` je zapojené do finále a storyboardu; text rozlúčky zostáva v storyboarde. Úlohy majú jednotné označenia Úloha 1–7; v štvorčekoch rodičovského ťaháka sú skrátené na U1–U7.
-
-Aktuálna šestka overuje sedemmiestny kód 5817264 cez číselnú klávesnicu. Správa po úspechu prezradí miesto pod gaučom. Staré odpovede POD GAUC a SPOLU sa prijímajú pre už vytlačené listy; uložené splnenia sa nemenia. Šestka už nepridáva O: posledný návratový znak deti odhalia na papieri v sedmičke. Celé heslo SVETLO sa zadáva iba raz. Podklady na nahovorenie: [Guardy](docs/guardy-nahravka.md), [záverečná rozlúčka a video](docs/finale-podklady.md). Guardyho hlasová nahrávka je dodaná a zapojená; finálové video `assets/EndScene-Dabing.mp4` je zapojené.
-
-Zbierané písmená S, V, E, T, L, O označujeme ako návratové znaky. Prvý získaný znak vysvetľuje ich použitie v spoločnom hesle. Bežné písmená šifier a názvy fyzických indícií majú vlastný význam.
-
-QR na pracovnom liste úlohy 7 otvára `game.html?signal=navrat`. Heslo sa overuje pred rozlúčkou. Balík pre OpenGen má jeden 10-sekundový klip 9:16 a štartovací obrázok a voliteľný koncový obrázok prázdnej izby, spoločné mávanie, nehovorené pixelkové zvuky a návrat celej partie cez bránu. Je priamo v storyboarde po rozbalení „Scenár pre OpenGen“ a na stiahnutie ako `assets/finale-production/opengen-balik.zip`. Celý scenár zostáva aj v `assets/finale-opengen-scenar.txt`. Text a autorské poznámky sa synchronizujú príkazom `node scripts/export-finale-script.cjs`. `GAME.finaleVideo` odkazuje na dodané `assets/EndScene-Dabing.mp4`; `GAME.finaleAudio` zostáva `null`. Video hrá so slovenským dabingom zo zvukovej stopy MP4 po ťuknutí, má pauzu, opakovanie a opakovanie pokusu pri chybe. Pri odchode sa zastaví. Text rozlúčky zostáva v storyboarde.
-
-Podklady pre Seedance: `GAME.finaleProduction` obsahuje presný anglický prompt jedného klipu. Exportuj texty cez `node scripts/export-finale-script.cjs` a zabaľ ich so štartovacím a koncovým obrázkom cez `python3 scripts/bundle-finale-production.py`. Start Image určuje začiatok a voliteľný End Image prázdnu izbu po odchode partie. Ak model End Image neponúka, použije sa len Start Image. Samostatné portréty nie sú v návode ani ZIP balíku. Žiadna platená generácia videa sa týmito skriptmi nespúšťa.
-
-Telefónna stránka QR šestky zobrazuje veselú spoločnú ilustráciu, jeden pokyn na čítanie číslic zhora nadol a formulár. Úvodné zadanie sa prispôsobuje výške obrazovky; úspech a kompatibilita starých odpovedí zostávajú zachované.
-
-Záverečná reč má cieľ 7–8 sekúnd do 10-sekundového videa. Video prompt ponecháva iba jemný pohyb pôvodnej čiary úst modrého sprievodcu a nehovorené pixelkové efekty. Slovenský dabing je už vložený v dodanom EndScene-Dabing.mp4 (10,07 s, 480 × 854). Pôvodné EndScene.mp4 zostáva archívnou verziou.
-
-Po dohraní záverečného videa zostane dekódovaný posledný záber a po 1 sekunde sa nad ním zobrazí KONIEC. Pri opakovanom spustení, posunutí prehrávania a obnovení stránky sa nápis skryje; stav titulku sa neukladá do postupu.
-
-Po overení SVETLO sa priamo zobrazí iba nadpis NÁVRATOVÝ SIGNÁL PRIJATÝ, maximálne video a tlačidlo Koniec hry. Ovládanie prehrávania je priamo nad videom. Koniec hry zastaví prehrávanie a pokúsi sa zavrieť kartu; ak prehliadač zavretie nepovolí, tlačidlo vyzve na ručné zatvorenie. Uložené splnenia sa nemenia; staré finálové uloženia otvoria rovnakú obrazovku.
-
-Guardyho dodaná nahrávka `assets/Guardy.mp3` je dostupná cez `GAME.guardyAudio` v hre aj storyboarde. Počas zadávania kódu šestky sa potichu prednačíta na tom istom prehrávači, ktorý sa zachová pri úspechu. Správny kód spustí prehrávanie v obslužnom kóde odoslania. Ovládanie podporuje pauzu, pokračovanie, opakovanie a retry; prepis ostáva zbalený. Obnovenie už vyriešenej šestky neprehráva automaticky, odchod nahrávku zastaví a uvoľní.
-
-Finálny QR `signal=navrat` vždy najprv otvorí zadanie hesla, aj pri uloženom dokončení úlohy 7. Správne heslo v aktuálnom otvorení zobrazí pôvodné finále s videom, Koniec hry a oneskoreným KONIEC. Po opätovnom načítaní QR sa heslo vyžaduje znovu; splnenia úloh zostávajú zachované. Na vstupnej obrazovke je priehľadná ilustrácia siedmich kamarátov držiacich sa za ruky.
-
-Predajný funnel, výskum, ceny a overenie: [docs/predajny-funnel.md](docs/predajny-funnel.md).
-
-## Dve samostatné knihy a Atlas zdarma
-
-Dodaný obsah: Kniha I *Ako vznikli Pixelkovia* (tri uzavreté rozprávky), Kniha II *Po veľkom záblesku* (tri nové rozprávky a samostatný úvod) a sedem bezplatných profilov Atlasu. Literárne dáta v `books-content/` zostávajú doslovné; kontrolné súčty pôvodných príloh sú v `docs/books/content-integrity.json`. Pôvodný Atlas sa nemaže, je archivovaný.
-
-Katalóg má nové ID `story-book-before` a `story-book-after`, každé s pracovnou cenou 4,99 €. Pôvodné ID a ceny vrátane `bedtime-book` sa nemenia. Samostatná pripravovaná ponuka knihy neobsahuje povinnú hru. Všetky platby ostávajú vypnuté; akcia oboch kníh za cenu jednej nie je aktivovaná. Plné knihy nesmú byť verejne publikované bez budúceho serverového overenia nákupných práv.
-
-Overenie: `node tests/books-content.test.cjs`, `PLAYWRIGHT_MODULE=/cesta/k/playwright BASE_URL=http://127.0.0.1:8083 PUBLIC_BASE_URL=http://127.0.0.1:8084 node tests/library.test.cjs`, existujúce testy funnelu, checkoutu a chránených herných súborov.
+Verejný balík vylučuje hru, odpovede, celé PDF, rodičovský portál, administráciu, nahrávky, videá a plné knihy. Platby, bezpečné zákaznícke doručovanie kníh a prepojenie hráča na server ostávajú samostatné nezapojené funkcie.

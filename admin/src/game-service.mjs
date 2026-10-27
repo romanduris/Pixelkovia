@@ -68,16 +68,16 @@ export async function gameEvent(db,run,input,at=Date.now()){
   if(run.status!=='active')throw new HttpError(409,'Táto relácia už nie je aktívna.');
   if(type==='complete'){
     const count=await first(db,'SELECT COUNT(*) count FROM game_stage_progress WHERE run_id=? AND completed_at IS NOT NULL',run.id);
-    if(count.count!==8)throw new HttpError(409,'Najskôr vyriešte všetkých osem úloh.');
+    if(count.count!==stages.length)throw new HttpError(409,'Najskôr vyriešte všetkých sedem úloh.');
     const result=await db.batch([
-      statement(db,"INSERT INTO game_events SELECT ?,id,NULL,'completed',?,?,'{}' FROM game_runs WHERE id=? AND status='active' AND current_stage=9",eventId,at,fingerprint,run.id),
+      statement(db,"INSERT INTO game_events SELECT ?,id,NULL,'completed',?,?,'{}' FROM game_runs WHERE id=? AND status='active' AND current_stage=8",eventId,at,fingerprint,run.id),
       statement(db,"UPDATE game_runs SET status='completed',completed_at=?,last_at=? WHERE id=? AND EXISTS(SELECT 1 FROM game_events WHERE id=?)",at,at,run.id,eventId),
       statement(db,'UPDATE entitlements SET expires_at=CASE WHEN first_completed_at IS NULL THEN NULL ELSE expires_at END,first_completed_at=COALESCE(first_completed_at,?),replay_until=COALESCE(replay_until,?) WHERE id=? AND EXISTS(SELECT 1 FROM game_events WHERE id=?)',at,at+DAY,run.entitlement_id,eventId)
     ]);
     if(!result[0].meta.changes)throw new HttpError(409,'Relácia sa medzičasom zmenila.');
     return {completed:true,run:await publicRun(db,run.id)};
   }
-  if(!Number.isInteger(stage)||stage<1||stage>8||stage!==run.current_stage)throw new HttpError(409,'Udalosť nepatrí do aktuálnej úlohy.');
+  if(!Number.isInteger(stage)||stage<1||stage>stages.length||stage!==run.current_stage)throw new HttpError(409,'Udalosť nepatrí do aktuálnej úlohy.');
   const existing=await first(db,'SELECT * FROM game_stage_progress WHERE run_id=? AND stage=?',run.id,stage);
   if(type!=='opened'&&!existing)throw new HttpError(409,'Najskôr otvorte aktuálnu úlohu.');
   if(existing?.completed_at!==null&&existing?.completed_at!==undefined)throw new HttpError(409,'Úloha je už vyriešená.');

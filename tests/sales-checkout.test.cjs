@@ -4,7 +4,7 @@ const vm=require('node:vm');
 const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 const c={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),c);
-const config=c.window.SITE_CONFIG,ids=config.offer.missionIds;
+const config=c.window.SITE_CONFIG;
 for(let mask=0;mask<4;mask++){
  const selected=config.offer.bookIds.filter((_,i)=>mask&(1<<i));
  assert.equal(config.quote(selected).totalCents,[1499,1998,1998,1999][mask]);

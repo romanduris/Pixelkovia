@@ -135,10 +135,10 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
   await page.evaluate(()=>document.fullscreenElement?document.exitFullscreen():undefined);
   // Refresh must stay on the sales page regardless of saved game, tab or hash.
   for(const saved of [
-   {started:true,callDone:false,stage:0,completed:[],messageOpened:true},
-   {started:true,callDone:true,stage:1,completed:[],mikyScan:true},
-   {started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}},
-   {started:true,callDone:true,stage:9,completed:[1,2,3,4,5,6,7,8]}
+   {progressVersion:2,started:true,callDone:false,stage:0,completed:[],messageOpened:true},
+   {progressVersion:2,started:true,callDone:true,stage:1,completed:[],mikyScan:true},
+   {progressVersion:2,started:true,callDone:true,stage:4,completed:[1,2,3],hints:{4:1}},
+   {progressVersion:2,started:true,callDone:true,stage:9,completed:[1,2,3,4,5,6,7,8]}
   ]){
    await page.evaluate(saved=>{localStorage.setItem('zahada-v1-progress',JSON.stringify(saved));location.hash='gm-envelope';scrollTo(0,1000);},saved);
    await page.goto(BASE);

@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
-(async()=>{for(const [engine,device] of [[chromium,devices['Pixel 7']],[webkit,devices['iPhone 13']]]){
+(async()=>{for(const [engine,device] of (process.env.BROWSER==='chromium'?[[chromium,devices['Pixel 7']]]:process.env.BROWSER==='webkit'?[[webkit,devices['iPhone 13']]]:[[chromium,devices['Pixel 7']],[webkit,devices['iPhone 13']]])){
  const browser=await engine.launch();try{
   const page=await browser.newPage(device),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(BASE+'/storyboard.html');assert.equal(await page.locator('.recording-archive').count(),0);

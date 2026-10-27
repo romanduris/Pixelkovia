@@ -2,9 +2,8 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const phase=process.argv[2]||'before';
-if(!['before','after'].includes(phase))throw new Error('Use before or after');
-const output=path.resolve('docs/cro-audit-2026-10-26');
+const phase='current';
+const output=path.resolve('/tmp/pixelkovia-sales-audit');
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 fs.mkdirSync(path.join(output,phase),{recursive:true});
 const viewports=[[320,568],[360,640],[390,844],[430,932],[768,1024],[1366,768],[1440,900]];

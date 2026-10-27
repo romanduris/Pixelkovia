@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=(process.env.BASE_URL||'http://127.0.0.1:8081').replace(/\/$/,'');
 const root='dist/funnel';
-const forbidden=['atlas-reading.js','atlas-reading.css','game.html','parent.html','storyboard.html','book-before.html','book-after.html','books-preview.html','legacy-atlas.html','books-content/before.json','books-content/after.json','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
+const forbidden=['game.html','parent.html','storyboard.html','book-before.html','book-after.html','books-preview.html','books-content/before.json','books-content/after.json','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
 for(const file of forbidden)assert.ok(!fs.existsSync(path.join(root,file)),'public artifact excludes '+file);
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 assert.ok(index.includes('Dnes večer budeme'),'landing is rendered without JavaScript');
@@ -26,7 +26,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    page.on('pageerror',e=>errors.push(e.message));
    page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(BASE))missing.push(r.url())});
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url())});
-   await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"stage":3,"started":true}'));
+   await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"progressVersion":2,"stage":3,"started":true}'));
    await page.goto(BASE+'/');await page.evaluate(()=>document.fonts.ready);
    assert.equal(await page.locator('#app>section').count(),10);assert.equal(await page.locator('.faq-item').count(),19);
    assert.equal(await page.locator('.character-card').count(),7);
@@ -77,7 +77,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await page.locator('#customer-name').fill('Rodinný tím');await page.locator('#customer-email').fill('test@example.com');
    await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
    assert.deepEqual(outgoing,[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);
-   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"stage":3,"started":true}');
+   assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"progressVersion":2,"stage":3,"started":true}');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);
    if(width===390)await page.screenshot({path:'/tmp/pixelkovia-public-checkout.png',fullPage:true});

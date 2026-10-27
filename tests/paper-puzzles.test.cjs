@@ -42,7 +42,6 @@ assert.notDeepEqual(solved.map(row=>row[0]),[0,1,2,3,4,5,6],'repair numbers iden
 assert.doesNotMatch(sheets.p6,/peča[ťt]|pečat|seal-code-slot|seal-code-boxes/i,'no seal terminology or result transcription on the player sheet');
 assert.equal(new Set(solved.map(row=>row[0])).size,7,'every repair is used exactly once');
 assert.ok(game.stages[6].answer.includes('5817264'));
-assert.ok(game.stages[6].legacyAnswers.includes('SPOLU'),'old printed worksheets remain playable');
 assert.ok(!sheets.p6.includes('POD GAUČ'),'the hiding place is only revealed after verification');
 assert.equal((sheets.p6.match(/class="seal-row"/g)||[]).length,9);
 // Independently decode the ordered pairs into the single final return sign.

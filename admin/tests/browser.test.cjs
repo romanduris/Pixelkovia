@@ -10,7 +10,7 @@ const BASE=process.env.ADMIN_BASE_URL||'http://127.0.0.1:8787';
  assert.equal(await page.locator('.product-tab[aria-selected="true"]').innerText(),'P\nPixelkovia\nAktívny produkt');
  assert.equal(await page.locator('.product-tab:disabled').count(),2);
  assert.equal(await page.locator('#page-title').innerText(),'Overview');
- assert.equal(await page.locator('.metric').count(),10);assert.equal(await page.locator('.funnel-cell').count(),8);
+ assert.equal(await page.locator('.metric').count(),10);assert.equal(await page.locator('.funnel-cell').count(),7);
  assert.equal(await page.locator('#external-links a').count(),3);
  for(const link of await page.locator('#external-links a').all())assert.ok((await link.getAttribute('href')).includes('internalPreview=1'));
  await page.screenshot({path:'/tmp/treasurequest-admin-dashboard.png',fullPage:true});
@@ -43,10 +43,10 @@ const BASE=process.env.ADMIN_BASE_URL||'http://127.0.0.1:8787';
  await page.keyboard.press('Escape');assert.equal(await page.locator('body.analysis-wide').count(),0);
  await page.locator('[data-page="orders"]').click();await wait();await page.locator('[data-customer]').first().click();await page.locator('#detail-content .detail-summary').waitFor();await page.locator('#close-detail').click();
  await page.locator('[data-page="dashboard"]').click();await wait();
- await page.locator('#product').selectOption('kvak-mission');await page.locator('#filters .button[type="submit"]').click();await page.waitForFunction(()=>document.querySelector('.metric strong')?.textContent==='0');
+ await page.locator('#product').selectOption('story-book-after');await page.locator('#filters .button[type="submit"]').click();await page.waitForFunction(()=>document.querySelector('.metric strong')?.textContent==='0');
  await page.locator('#clear-filters').click();await page.waitForFunction(()=>document.querySelector('.metric strong')?.textContent!=='0');
  for(const width of [320,390,768,1512]){await page.setViewportSize({width,height:950});for(const route of ['dashboard','orders','analytics']){await page.goto(BASE+'/#'+route);await wait();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route+' '+width);}}
- for(const legacy of ['customers','emails','events']){await page.goto(BASE+'/#'+legacy);await wait();assert.equal(await page.locator('#page-title').innerText(),'Herná analýza');}
+ await page.goto(BASE+'/#unknown');await wait();assert.equal(await page.locator('#page-title').innerText(),'Herná analýza');
  await page.setViewportSize({width:390,height:844});await page.goto(BASE+'/#analytics');await wait();await page.screenshot({path:'/tmp/treasurequest-admin-phone.png',fullPage:true});
  assert.deepEqual(errors,[]);console.log('PASS: product tabs, overview, real D1 journey, inline details, keyboard access, status/portal/version filters, wide view, orders and mobile layouts.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

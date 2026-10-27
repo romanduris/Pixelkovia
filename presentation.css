@@ -67,12 +67,6 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
 .extra-price{display:block;font-size:30px;color:#e1d5ff;white-space:nowrap;margin:12px 0 20px}
 .extra-price small{font-size:13px;font-weight:400}
 .extra-card .btn{font-size:12px;width:100%}
-.bundle-card{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;padding:32px;border:1px solid #7561ab;border-radius:12px;background:linear-gradient(140deg,#24213d,#14243a)}
-.bundle-card h3{font-size:27px;color:#ece6fc;margin:12px 0 18px}
-.bundle-card p,.bundle-card li{font-size:14px;line-height:1.8;color:#b7c6df}
-.bundle-card>div:last-child{min-width:240px}
-.bundle-card .extra-price{font-size:37px}
-.bundle-card .btn{width:100%}
 .management-placeholder{font-size:12px;color:#b6bfd3;border:1px dashed #516080;border-radius:5px;padding:12px 16px}
 .purchase-summary{line-height:2.2;padding:18px 22px;background:#202b46;border:1px solid #415273;border-radius:8px;margin:22px 0 28px;color:#c9d9ed;font-size:14px}
 .purchase-preview .btn{white-space:normal;text-align:center;font-size:12px;gap:10px}
@@ -109,10 +103,9 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}.site-header{justify-conten
   .portal-checklist .checklist label{font-size:14px;line-height:1.7}.checklist li{margin:18px 0}.portal-section p{font-size:14px}.download-choices{flex-direction:column}.download-choices .btn{font-size:11px;min-height:52px}
   .portal-launch{display:block}.portal-launch>.pixel-sprite{display:none}.device-notice{padding:18px 14px}.device-confirmation{font-size:13px;line-height:1.7}.portal-launch .button-row{display:block}.portal-launch .button-row .text-link{white-space:normal}.portal-launch h2{font-size:29px}.portal-launch .button-row .btn{font-size:11px}
   .extras-grid{grid-template-columns:1fr;gap:16px}.extra-card{padding:24px;display:grid;grid-template-columns:72px 1fr;column-gap:18px}.extra-card>.pixel-sprite{grid-row:1/3;width:72px;margin:0}.extra-card .product-status{margin:0 0 8px;font-size:11px}.extra-card h3{font-size:20px;margin:0 0 16px}.extra-card p,.extra-card .extra-price,.extra-card .btn{grid-column:1/3}.extra-card p{font-size:14px;margin:0}.extra-card .extra-price{margin:16px 0}.extra-card .btn{min-height:48px}
-  .bundle-card{grid-template-columns:1fr;gap:12px;padding:25px}.bundle-card h3{font-size:25px}.bundle-card>div:last-child{min-width:0}.bundle-card .extra-price{font-size:35px}.bundle-card .btn{font-size:12px}
   .purchase-preview h2{font-size:29px}.purchase-preview p{font-size:14px}.purchase-summary{padding:16px;font-size:13px}.sales-finale .btn{font-size:11px;gap:5px}
 }
-@media(max-width:360px){.sales-hero{padding:18px 16px 0;min-height:0}.sales-hero h1.adventure-title{font-size:54px}.hero-value{font-size:23px}.sales-hero .hero-copy>.hero-description{font-size:13px}.sales-hero .button-row>.btn{font-size:10px}.sales-hero .hero-meta{gap:7px;left:16px;right:16px}.sales-hero .hero-meta>span>span{font-size:9px}.hero-format{font-size:11px}.bundle-card{padding:20px}}
+@media(max-width:360px){.sales-hero{padding:18px 16px 0;min-height:0}.sales-hero h1.adventure-title{font-size:54px}.hero-value{font-size:23px}.sales-hero .hero-copy>.hero-description{font-size:13px}.sales-hero .button-row>.btn{font-size:10px}.sales-hero .hero-meta{gap:7px;left:16px;right:16px}.sales-hero .hero-meta>span>span{font-size:9px}.hero-format{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.prep-progress progress::-webkit-progress-value{transition:none}}
 @media print{.download-choices,.device-notice,.extras-section,.environment-label{display:none}}
 
@@ -288,3 +281,5 @@ body[data-environment="designer"] .storyboard-stage-icon img{display:block;width
 .opengen-prompt{display:block;width:100%;min-height:300px;resize:vertical;margin:8px 0 14px;padding:14px;font:13px/1.6 monospace;border:1px solid var(--copy-border);border-radius:6px;background:#fff;color:#214b3e}
 .opengen-prompt:focus-visible{outline:2px solid #214b3e;outline-offset:3px}#opengen-copy-status{min-height:24px;margin-top:8px}
 @media(max-width:650px){.opengen-start{grid-template-columns:1fr;gap:16px}.opengen-start>a{max-width:180px}.opengen-settings{grid-template-columns:110px minmax(0,1fr)}}
+
+.extras-grid .extra-card{display:flex;flex-direction:column;gap:16px}.portal-book-heading{display:grid;grid-template-columns:88px minmax(0,1fr);gap:18px;align-items:center}.portal-book-heading>img{display:block;width:88px;height:126px;object-fit:contain;border-radius:5px}.portal-book-heading>h3{margin:0;font-size:20px;line-height:1.35}.extras-grid .extra-card>p{margin:0;flex:1}.extras-grid .extra-card>.extra-price{margin:0}.extras-grid .extra-card>.btn{width:100%}

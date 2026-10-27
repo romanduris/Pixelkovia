@@ -1,9 +1,8 @@
-// Existing server-run contract (eight stages). Identity titles updated without changing active-run mechanics.
-// The seven-task browser game is separate. Never regenerate this contract blindly.
+// Generated from root game-data.js. Server source; never part of admin/public.
 export const stages = [
   {
     "stage": 1,
-    "title": "Mikyho rozhádzané signály",
+    "title": "Miky – stratené signály",
     "answers": [
       "741296"
     ],
@@ -15,88 +14,74 @@ export const stages = [
   },
   {
     "stage": 2,
-    "title": "Pixiin dekódovací stroj",
+    "title": "Pixi – zašifrovaná správa",
     "answers": [
-      "OKNO",
-      "POD OKNOM"
+      "HLADAJ POD STOLICKAMI"
     ],
     "digital": false,
     "hints": [
-      "Vonkajšie D nastavte oproti vnútornému A. Pre každé vonkajšie písmeno čítajte vnútorné písmeno o tri dozadu.",
-      "S sa prečíta ako P, R ako O a G ako D. Prvé slovo je POD."
+      "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
+      "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
     ]
   },
   {
     "stage": 3,
-    "title": "Plugyho uzavretý priechod",
+    "title": "Plugy – zamknutý digitálny most",
     "answers": [
       "9"
     ],
     "digital": false,
     "hints": [
-      "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3.",
-      "Kruh má hodnotu 2 a štvorec 4. Sčítajte 3 + 2 + 4."
+      "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
+      "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
     ]
   },
   {
     "stage": 4,
-    "title": "Pingyho roztrhaný odkaz",
+    "title": "Pingy – doručte stratenú správu",
     "answers": [
-      "STOL",
-      "STÔL"
+      "POSTELI"
     ],
     "digital": false,
     "hints": [
-      "Malé čísla v rohoch určujú poradie štyroch pásikov.",
-      "Začnite pásikom s číslom 1. Veta sa začína slovom STÔL."
+      "Uzol je veľký kruh a mostík je cesta medzi kruhmi. V prázdnom rámiku mostíka svieti jeden z troch bodov. V servisnom kľúči nájdite rovnakú polohu a na bodkovanú čiaru dokreslite symbol.",
+      "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte písmená z prejdených kruhov. Kruh bez písmena do odpovede nič nepridá."
     ]
   },
   {
     "stage": 5,
-    "title": "Čipkova cesta domov",
+    "title": "Čipko – štyri opravy signálu",
     "answers": [
-      "246"
+      "7294"
     ],
     "digital": false,
     "hints": [
-      "Slepé odbočky nepatria do kódu. Môžete začať aj pri jadre a ísť naspäť.",
-      "Na správnej ceste sú čísla 2, 4 a 6."
+      "Číslice z hier zapisujte zľava doprava. Každú nájdite v kľúči na tomto liste.",
+      "Časti slova v poradí sú CH – LAD – NIČ – KA."
     ]
   },
   {
     "stage": 6,
-    "title": "Guardyho tajomstvo",
+    "title": "Guardy – Poškodené správy",
     "answers": [
-      "moon,sun,star"
+      "5817264"
     ],
-    "digital": true,
+    "digital": false,
     "hints": [
-      "Nočný pokoj predstavuje mesiac. Čo svieti cez deň?",
-      "Poradie je mesiac, slnko, hviezda."
+      "Čierne políčka opravy presne zaplnia biele políčka poškodenej správy. Vzory neotáčajte; dve správy nemajú vhodnú opravu.",
+      "Prvú správu s číslicou 5 doplní oprava 3. Správy s 9 a 0 prečiarknite. Zostávajúce číslice čítajte zhora nadol; nič neprepisujte ani nepreskupujte."
     ]
   },
   {
     "stage": 7,
-    "title": "Sľub Pixelkov",
-    "answers": [
-      "SPOLU"
-    ],
-    "digital": false,
-    "hints": [
-      "Piko zdôraznil začiatky. Pozrite sa na prvé písmeno každého riadka.",
-      "Písmená sú S, P, O, L, U."
-    ]
-  },
-  {
-    "stage": 8,
-    "title": "Heslo, ktoré spája",
+    "title": "Posledný návratový znak a návratová brána",
     "answers": [
       "SVETLO"
     ],
     "digital": false,
     "hints": [
-      "Použite len šesť písmen. Šípka a fajka nie sú súčasťou hesla.",
-      "V poradí úloh čítajte S – V – E – T – L – O."
+      "Porovnávajte oba symboly aj ich poradie. Dvojice ★○, □△ a ◇+ nechajte biele.",
+      "Vyfarbené políčka vytvoria obrys písmena O. To je posledný návratový znak."
     ]
   }
 ];

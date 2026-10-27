@@ -2,47 +2,51 @@
 export const checklist = [
   {
     "id": "printed",
-    "label": "Vytlačil som P1–P6 jednostranne na A4; P2 obsahuje oba kruhy."
+    "label": "Vytlačil som pracovné listy úloh 1–7 jednostranne na A4; Úloha 2 obsahuje oba kruhy."
   },
   {
     "id": "supplies",
-    "label": "Pripravil som štyri obálky, dva samostatné obaly, ceruzku, pásku a detské nožnice."
+    "label": "Pripravil som telefón s internetom, detské nožnice, ceruzku, tmavú pastelku a pásku."
   },
   {
     "id": "cut-p4",
-    "label": "Rozstrihal som iba P4 na štyri pásiky. P1 a kruhy P2 vystrihujú až deti."
+    "label": "Listy úloh 4 a 7 som nechal celé, bez strihania. Pripravil som tmavú pastelku. List úlohy 1 a kruhy z úlohy 2 strihajú deti."
   },
   {
     "id": "envelope-1",
-    "label": "Pripravil som obálku Kúpeľňa: obsahuje iba celý P1."
+    "label": "Indícia k úlohe 1 obsahuje celý list, bez strihania."
   },
   {
     "id": "bathroom",
-    "label": "Ukryl som obálku Kúpeľňa na suchej dostupnej poličke alebo medzi uterákmi."
+    "label": "Indícia k úlohe 1 je medzi uterákmi na suchom dostupnom mieste."
   },
   {
     "id": "envelope-2",
-    "label": "Pripravil som druhú obálku s celým Pixiiným dekódovacím strojom P2."
+    "label": "Indícia k úlohe 2 obsahuje oba nestrihané kruhy."
   },
   {
     "id": "window",
-    "label": "Obálka 2 je pri okne na bezpečnom mieste na dosah detí."
+    "label": "Indícia k úlohe 2 je pri zatvorenom okne na dosah detí."
   },
   {
     "id": "symbols",
-    "label": "P3 je nízko pod oknom v samostatnom obale označenom „Úloha 3 – otvoriť po dekódovaní odkazu“."
+    "label": "Indícia k úlohe 3 je prilepená pod sedadlom stoličky."
+  },
+  {
+    "id": "shoes",
+    "label": "Indícia k úlohe 4 je v čistej suchej topánke."
   },
   {
     "id": "table",
-    "label": "Obálka 3 je na stole: štyri premiešané pásiky P4 a osobitne uzavretý P5 označený „Úloha 5 – otvoriť po zložení odkazu“."
+    "label": "List s QR k úlohe 5 je pod vankúšom v detskej posteli."
   },
   {
     "id": "chair",
-    "label": "Obálka 4 s P6 je pod sedadlom dostupnej stoličky pri stole."
+    "label": "Indícia k úlohe 6 je v suchom uzavretom obale v chladničke, označená „Úloha 6“. Indícia k úlohe 7 je samostatne pod gaučom na dosah ruky."
   },
   {
     "id": "media",
-    "label": "Overil som Pikovo video a čitateľnosť textových správ na telefóne."
+    "label": "Overil som čitateľnosť správ v telefóne; video a zvuk sú voliteľným doplnkom."
   },
   {
     "id": "phone",
