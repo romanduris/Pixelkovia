@@ -1,0 +1,50 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const BASE=process.env.BASE_URL||'http://127.0.0.1:8083';
+const before=require('../books-content/before.json'),after=require('../books-content/after.json');
+(async()=>{const engine=process.env.BROWSER==='webkit'?webkit:chromium,browser=await engine.launch();try{
+ for(const width of [320,390,1440]){
+  const context=await browser.newContext({viewport:{width,height:900},isMobile:width<600,hasTouch:width<600});
+  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  let owned=true,ownedAfter=false,available=true,readerAllowed=true,failureStatus=0;
+  await page.route(/\/api\/customer\/library(?:\/[^?]*)?(?:\?.*)?$/,route=>{
+   const id=new URL(route.request().url()).pathname.split('/')[4];
+   const content=id===before.id?before:after,hasAccess=id===before.id?owned:id===after.id&&ownedAfter;
+   const response=failureStatus?{status:failureStatus,json:{error:'Unavailable'}}:!available?{status:501,json:{error:'Identity unavailable'}}:id?readerAllowed&&hasAccess?{status:200,json:content}:{status:403,json:{error:'Not purchased'}}:{status:200,json:{books:[{id:before.id,owned},{id:after.id,owned:ownedAfter}]}};
+   return route.fulfill({...response,headers:{'Access-Control-Allow-Origin':new URL(BASE).origin,'Access-Control-Allow-Credentials':'true'}});
+  });
+  await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"progressVersion":2,"started":false,"stage":0}'));
+  await page.goto(BASE+'/parent.html#kniznica');
+  const first=page.locator('[data-library-book="'+before.id+'"]'),second=page.locator('[data-library-book="'+after.id+'"]');
+  await first.getByRole('link',{name:'Čítať knihu'}).waitFor();
+  assert.equal(new URL(page.url()).hash,'#kniznica');await page.waitForFunction(()=>document.getElementById('kniznica').getBoundingClientRect().top<200);
+  assert.equal(await first.getByRole('link',{name:/Kúpiť/}).count(),0);
+  assert.ok((await second.getByRole('link',{name:/Kúpiť/}).getAttribute('href')).endsWith('?product='+after.id));
+  await second.getByRole('button',{name:/Pozrieť ukážku/}).click();assert.ok(await page.locator('#book-preview-dialog').isVisible());assert.equal(await page.locator('#book-preview-dialog .book-preview-pages img').count(),2);await page.locator('[data-close-book-preview]').click();
+  await first.scrollIntoViewIfNeeded();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  fs.mkdirSync('/tmp/pixelkovia-portal-library',{recursive:true});await page.screenshot({path:`/tmp/pixelkovia-portal-library/library-${width}.png`});
+  assert.ok(!(await page.locator('#kniznica').innerText()).includes(before.stories[0].paragraphs[5]));
+  await first.getByRole('link',{name:'Čítať knihu'}).click();await page.locator('.book-story').first().waitFor();
+  assert.equal(await page.locator('.book-story').count(),3);
+  for(const story of before.stories)assert.deepEqual(await page.locator('#'+story.id+' .authored-prose p').allTextContents(),story.paragraphs);
+  await page.locator('img').evaluateAll(async imgs=>{for(const img of imgs){img.loading='eager';await img.decode();}});
+  await page.screenshot({path:`/tmp/pixelkovia-portal-library/reader-${engine.name()}-${width}.png`});
+  await page.locator('.theme-toggle').click();assert.equal(await page.locator('html').getAttribute('data-reading-theme'),'dark');
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  readerAllowed=false;await page.reload();await page.getByRole('heading',{name:'Knihu zatiaľ nemôžeme otvoriť'}).waitFor();assert.equal(await page.locator('.authored-prose').count(),0);
+  await page.goto(BASE+'/library-read.html?book='+after.id);await page.getByRole('heading',{name:'Knihu zatiaľ nemôžeme otvoriť'}).waitFor();
+  readerAllowed=true;ownedAfter=true;await page.reload();await page.locator('.book-story').first().waitFor();
+  for(const story of after.stories)assert.deepEqual(await page.locator('#'+story.id+' .authored-prose p').allTextContents(),story.paragraphs);
+  failureStatus=503;await page.reload();await page.getByRole('button',{name:'Skúsiť znova'}).waitFor();assert.equal(await page.locator('.authored-prose').count(),0);
+  failureStatus=0;await page.getByRole('button',{name:'Skúsiť znova'}).click();await page.locator('.book-story').first().waitFor();
+  ownedAfter=false;
+  owned=false;await page.goto(BASE+'/parent.html#kniznica');await first.getByRole('link',{name:/Kúpiť/}).waitFor();assert.equal(await page.getByRole('link',{name:'Čítať knihu'}).count(),0);
+  await second.getByRole('link',{name:/Kúpiť/}).click();await page.locator('.checkout-buy').waitFor();assert.ok(await page.locator('.checkout-buy').isDisabled());assert.equal(await page.locator('#order-total').innerText(),'4,99 €');
+  available=false;await page.goto(BASE+'/parent.html#kniznica');await page.waitForFunction(()=>document.querySelector('[data-library-status]')?.textContent.includes('zatiaľ nie je pripojené'));assert.equal(await page.getByRole('link',{name:'Čítať knihu'}).count(),0);assert.equal(await page.getByRole('link',{name:/Kúpiť knihu/}).count(),2);
+  available=true;owned=true;failureStatus=503;await page.reload();await page.getByRole('button',{name:'Skúsiť znova'}).waitFor();
+  failureStatus=0;await page.getByRole('button',{name:'Skúsiť znova'}).click();await first.getByRole('link',{name:'Čítať knihu'}).waitFor();
+  await page.goto(BASE+'/library-read.html?book=unknown');await page.getByText('Táto kniha sa v knižnici nenachádza.').waitFor();assert.equal(await page.locator('.book-story').count(),0);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"progressVersion":2,"started":false,"stage":0}');assert.deepEqual(errors,[]);await context.close();
+ }
+ console.log('PASS '+engine.name()+': portal library on 320/390/1440px; both complete books, images/theme, unowned offers/previews, denied reader, retry recovery, unavailable identity and inactive checkout.');
+}finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1)});

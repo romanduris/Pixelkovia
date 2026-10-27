@@ -378,6 +378,7 @@
     document.querySelectorAll('.nav-purchase').forEach(button=>{button.textContent=SITE_CONFIG.purchase.label;});
     document.querySelectorAll('[data-management-link]').forEach(link=>{const url=SITE_CONFIG.managementUrl();link.hidden=!url;if(url)link.href=url;});
     app.innerHTML=view==='prep'?prep():view==='designer'?designer():view==='player'&&state().started&&state().stage>0?taskScreen():landing();
+    window.PORTAL_LIBRARY?.mount();
     const audioSlot=app.querySelector('[data-miky-audio-slot]');
     if(audioSlot){
       const audio=retainedAudio||document.createElement('audio');
@@ -641,6 +642,10 @@
   }
   render();
   // Each entry opens its own environment. Gameplay resumes only after an explicit prepared test launch.
-  if(location.hash){history.replaceState(null,'',location.pathname+location.search);}
-  window.scrollTo(0,0);
+  if(environment==='prep'&&location.hash==='#kniznica'){
+    requestAnimationFrame(()=>document.getElementById('kniznica')?.scrollIntoView({behavior:'instant'}));
+  }else{
+    if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+    window.scrollTo(0,0);
+  }
 })();

@@ -8,7 +8,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8083';
   await page.goto(BASE+'/parent.html');
   assert.equal(await page.locator('[data-check]').count(),14);
   const start=page.locator('[data-action=start]');assert.ok(await start.isDisabled());
-  assert.deepEqual(await page.locator('.extra-card').evaluateAll(cards=>cards.map(c=>c.dataset.product)),['story-book-before','story-book-after','atlas-pixelkov']);
+  assert.deepEqual(await page.locator('[data-library-book]').evaluateAll(cards=>cards.map(c=>c.dataset.libraryBook)),['story-book-before','story-book-after']);
+  assert.equal(await page.locator('#kniznica a[href="atlas.html"]').count(),1);
   assert.equal(await page.locator('.bundle-card').count(),0);
   for(const id of ['p1','p2','p3','p4','p5','p6','p7','rodicovsky-navod','diplom','vsetky-materialy']){
    const response=await page.request.get(BASE+`/assets/printables/${id}.pdf`);assert.equal(response.status(),200);assert.equal((await response.body()).subarray(0,5).toString(),'%PDF-');

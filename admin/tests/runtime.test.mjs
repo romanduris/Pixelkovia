@@ -10,6 +10,10 @@ test('actual workerd/D1 runtime: migrations, protected APIs, server checklist, d
   const at=Date.now();await execute(db,'INSERT INTO customers VALUES(?,?,?,?)','runtime-customer','runtime@example.invalid','Runtime Test',at);
   await createOrder(db,{customerId:'runtime-customer',productId:'episode-1',externalReference:'runtime-payment',at});
   const e=await first(db,'SELECT * FROM entitlements');
+  await createOrder(db,{customerId:'runtime-customer',productId:'story-book-before',externalReference:'runtime-book-payment',at});
+  const library=await mf.dispatchFetch('http://localhost/api/customer/library');assert.equal(library.status,200);assert.equal((await library.json()).books[0].owned,true);
+  const book=await mf.dispatchFetch('http://localhost/api/customer/library/story-book-before');assert.equal(book.status,200);assert.equal((await book.json()).stories.length,3);
+  assert.equal((await mf.dispatchFetch('http://localhost/api/customer/library/story-book-after')).status,403);
   const request=(path,body,cookie='')=>mf.dispatchFetch('http://localhost'+path,{method:'POST',headers:{origin:'http://localhost','content-type':'application/json',cookie},body:JSON.stringify(body)});
   assert.equal((await mf.dispatchFetch('http://localhost/api/admin/dashboard')).status,403);
   assert.equal((await request('/api/customer/activate',{entitlementId:e.id,activationKey:'runtime-activation'})).status,409);

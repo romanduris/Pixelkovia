@@ -6,12 +6,13 @@ Rodinná hra pre deti 7–13 rokov a rodičov: sedem úloh, tlačiteľné indíc
 
 - `index.html`, `sales-page.js`, `sales.css`: predajná stránka.
 - `checkout.html`, `checkout.js`, `checkout.css`, `site-config.js`: aktuálny katalóg a výpočet ponuky v centoch. Platby a odosielanie formulára sú vypnuté.
-- `parent.html`, `prep-store.js`: príprava a materiály pre rodiča.
+- `parent.html`, `prep-store.js`, `portal-library.js` / `.css`: príprava, materiály a knižnica pre rodiča.
 - `game.html`, `app.js`, `game-data.js`, `story-text.js`, `cipko-game.js`: hráčska časť a uložený postup aktuálnej hry.
 - `storyboard.html`, `site-content.js`: interný redakčný prehľad, prehrávanie dodaných nahrávok a video podklady.
 - `print-materials.js`, `signal-print.css`, `printables.html`: spoločný zdroj pracovných listov, rodičovského ťaháka a diplomu.
 - `library.html`, `atlas.html`, `book-*-sample.html`: knižnica, sedem profilov Atlasu a krátke ukážky.
 - `book-before.html`, `book-after.html`, `books-preview.html`, `books-content/`: plné knihy iba v súkromnej Site.
+- `library-read.html`: zákaznícka čítačka; obsah získa až po serverovom overení zaplateného nákupu. Bez pripojenej zákazníckej identity zostávajú dostupné ukážky a Atlas.
 - `book-previews.js` / `.css`: spoločné prístupné okná s ukážkami.
 - `admin/`: samostatná chránená administrácia; pravidlá siedmich úloh a checklist sa odvodzujú z aktuálnych herných zdrojov.
 
@@ -53,4 +54,4 @@ Pracuje sa na `main`, po dokončení zmeny nasleduje commit a push do `origin/ma
 - Verejná ponuka: [pixelkovia.rodulab.com](https://pixelkovia.rodulab.com). Cloudflare sa odovzdáva výhradne `dist/funnel/`, nikdy celý repozitár alebo celý `dist/`. [Postup](funnel/README.md).
 - Administrácia sa zostavuje samostatne podľa [admin/README.md](admin/README.md); statické nasadenie ju neobsahuje.
 
-Verejný balík vylučuje hru, odpovede, celé PDF, rodičovský portál, administráciu, nahrávky, videá a plné knihy. Platby, bezpečné zákaznícke doručovanie kníh a prepojenie hráča na server ostávajú samostatné nezapojené funkcie.
+Verejný balík vylučuje hru, odpovede, celé PDF, rodičovský portál, zákaznícku čítačku, administráciu, nahrávky, videá a plné knihy. Knižničné API kontroluje vlastníctvo a doručuje obsah; pripojenie zákazníckeho prihlasovania, platby a prepojenie hráča na server zostávajú nezapojené.

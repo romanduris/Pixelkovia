@@ -20,5 +20,5 @@ for(let mask=0;mask<4;mask++){
  assert.equal(cfg.quote([...ids,...ids,'bad-id']).totalCents,q.totalCents,'duplicates and unknown IDs do not affect the quote');
 }
 assert.equal(cfg.product(cfg.offer.atlasId).priceCents,299);assert.equal(cfg.product('episode-1').pricing.plannedStandardPriceCents,2999);
-for(const file of ['books-content','books-preview.html','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
+for(const file of ['books-content','books-preview.html','library-read.html','portal-library.js','portal-library.css','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
 console.log('PASS: complete 3+3 author texts, 7 Atlas profiles, draft independent SKUs, all four Early Bird combinations and public artifact boundary.');

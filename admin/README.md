@@ -87,6 +87,7 @@ Prvé úspešné dokončenie nastaví pevnú hranicu `first_completed_at + 24 ho
 | `POST /api/admin/login`, `/logout` | Prihlásenie heslom a zrušenie serverovej relácie, kontrola Origin |
 | `GET /api/admin/context`, `/products`, `/dashboard`, `/customers`, `/customers/:id`, `/orders`, `/analytics`, `/events`, `/emails` | Implementované; serverová admin autorizácia pri každej požiadavke |
 | `GET /api/customer/entitlements` | Implementované za budúcim overením zákazníka |
+| `GET /api/customer/library`, `/library/:product` | Zoznam vlastnených kníh a celý text po kontrole zaplateného nákupu, zákazníka, platnosti oprávnenia a pripravenosti obsahu; iba pôvod API a `WEB_URL` |
 | `GET/POST /api/customer/checklist` | Načítanie a serverové uloženie bez aktivácie |
 | `POST /api/customer/portal-visits` | Používateľské návštevy, nie asset requesty |
 | `POST /api/customer/activate`, `/replay` | Vedomá aktivácia; samostatné hranie a token telefónu |
@@ -100,6 +101,8 @@ Prvé úspešné dokončenie nastaví pevnú hranicu `first_completed_at + 24 ho
 | QR odkazy | Model počíta so spoločnými QR a bezpečnou serverovou reláciou; pôvodná maketa Úloha 1 sa nemení |
 
 Prepojenie aktuálnej Site s budúcou zákazníckou cookie vyžaduje samostatne navrhnutý same-origin gateway/doménu. Budúci zákaznícky hostname/gateway musí mať zákaznícke overenie oddelené od ochrany admin hosta. Nepovoľujeme všeobecný CORS ani treťostranné cookies ako skratku.
+
+Knižnica má v rodičovskom portáli vlastnú sekciu `#kniznica` a čítačku `library-read.html`. Knižné oprávnenie nezávisí od časového okna na opakovanie hry. Migrácia `0004_books_content_ready.sql` označuje obe dokončené knihy ako pripravený obsah aj v už nasadených databázach; pôvodné migrácie sa nemenia. Bez `CUSTOMER_AUTH` API vracia 501 a neposkytne text. Redakčné HTML náhľady zostávajú iba v súkromnej Site. Podrobnosti: [knižnica](../docs/books/README.md).
 
 ## Testy
 

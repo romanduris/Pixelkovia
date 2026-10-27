@@ -1,5 +1,6 @@
 import {HttpError,requireAdmin,requireCustomer,localRequest,sameOrigin} from './auth.mjs';
 import {query,first} from './db.mjs';
+import {customerLibrary,readBook} from './library-service.mjs';
 import {dashboard,analytics,customers,customerDetail,orders,filters} from './analytics.mjs';
 import {entitlement,readChecklist,saveChecklist,portalVisit,activate,requireRun,gameEvent,publicRun} from './game-service.mjs';
 import {templates} from './email-templates.mjs';
@@ -18,6 +19,10 @@ async function body(request){
 async function customerApi(request,env,path){
   const identity=await requireCustomer(request,env),db=env.TQ_DB,id=identity.customerId;
   sameOrigin(request);
+  if(path==='/api/customer/library'||path.startsWith('/api/customer/library/')){
+    if(request.method!=='GET')throw new HttpError(405,'Knižnica je dostupná iba na čítanie.');
+    return json(path==='/api/customer/library'?await customerLibrary(db,id):await readBook(db,id,path.slice('/api/customer/library/'.length)));
+  }
   const params=new URL(request.url).searchParams;
   if(path==='/api/customer/entitlements'&&request.method==='GET')return json(await query(db,`SELECT e.id,e.product_id,e.status,e.expires_at,e.activated_at,e.first_completed_at,e.replay_until FROM entitlements e JOIN order_items i ON i.id=e.order_item_id JOIN orders o ON o.id=i.order_id WHERE e.customer_id=? AND o.status='paid'`,id));
   const input=request.method==='GET'?null:await body(request),entitlementId=params.get('entitlement')||input?.entitlementId;
@@ -46,6 +51,7 @@ export default {async fetch(request,env){
   try{
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
+    if(path==='/api/customer/library'||path.startsWith('/api/customer/library/'))return await libraryApi(request,env,path);
     if(path.startsWith('/api/customer/'))return await customerApi(request,env,path);
     if(env.ADMIN_AUTH_MODE==='password' && ['/login','/login.html','/login.css','/login.js'].includes(path) && ['GET','HEAD'].includes(request.method)){
       // Assets resolves extensionless HTML itself; requesting /login.html redirects back to /login.
@@ -91,4 +97,26 @@ function secureAsset(response){
   for(const [key,value] of Object.entries(headers))if(key!=='Content-Type')secured.headers.set(key,value);
   secured.headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
   return secured;
+}
+
+// The parent portal may have a different origin from the customer API. Only its
+// configured origin receives credentialed, read-only access to the library.
+async function libraryApi(request,env,path){
+  const origin=request.headers.get('Origin'),ownOrigin=new URL(request.url).origin;
+  let portalOrigin;try{portalOrigin=new URL(env.WEB_URL).origin;}catch{}
+  if(origin&&origin!==ownOrigin&&origin!==portalOrigin)throw new HttpError(403,'Neplatný pôvod požiadavky.');
+  let response;
+  if(request.method==='OPTIONS'){
+    const method=request.headers.get('Access-Control-Request-Method');
+    const requestedHeaders=(request.headers.get('Access-Control-Request-Headers')||'').split(',').map(h=>h.trim().toLowerCase()).filter(Boolean);
+    if(method!=='GET'||requestedHeaders.some(h=>h!=='authorization'))throw new HttpError(403,'Knižnica je dostupná iba na čítanie.');
+    response=new Response(null,{status:204,headers:{'Cache-Control':'no-store','Access-Control-Allow-Methods':'GET','Access-Control-Allow-Headers':'Authorization'}});
+  }else if(request.method!=='GET'){
+    response=json({error:'Knižnica je dostupná iba na čítanie.'},405);
+  }else{
+    try{response=await customerApi(request,env,path);}catch(error){response=json({error:error instanceof HttpError?error.message:'Knižnicu sa nepodarilo načítať.'},error instanceof HttpError?error.status:500);}
+  }
+  response.headers.set('Vary','Origin');
+  if(origin){response.headers.set('Access-Control-Allow-Origin',origin);response.headers.set('Access-Control-Allow-Credentials','true');}
+  return response;
 }
