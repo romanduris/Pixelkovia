@@ -18,7 +18,10 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  const gallery=page.locator('[data-review-gallery]'),track=gallery.locator('[data-gallery-track]');
  assert.equal(await gallery.locator('.review-card').count(),10);
  assert.equal(await gallery.locator('.review-stars').count(),10);
- assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.textContent==='★★★★★')),true);
+ const ratings=await gallery.locator('.review-stars').allTextContents();
+ assert.equal(ratings.filter(text=>text==='★★★★★').length,8);
+ assert.equal(ratings.filter(text=>text==='★★★★☆').length,2);
+ assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.getAttribute('aria-label').includes(`${[...el.textContent].filter(c=>c==='★').length} z 5`))),true);
  assert.equal(await gallery.locator('.review-example').evaluateAll(nodes=>nodes.every(el=>el.textContent.includes('Ilustračné hodnotenie'))),true);
  assert.match(await page.locator('#hodnotenia .funnel-section-heading').innerText(),/Nejde o skutočné ani overené recenzie/);
  assert.equal(await page.locator('[itemtype*="Review"],[itemtype*="AggregateRating"],script[type="application/ld+json"]').count(),0,'examples are not structured customer ratings');
