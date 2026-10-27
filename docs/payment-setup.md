@@ -19,6 +19,16 @@ node scripts/configure-commerce.mjs --interactive
 
 Skript číta chýbajúce kľúče skrytým vstupom, overí účet Pixelkovia a prijímanie platieb, uloží kľúče ako Codespaces secrets, nastaví iba e-mailové DNS záznamy pre `pixelkovia.rodulab.com`, overí doménu Resend a vytvorí alebo opätovne použije platobný webhook. Následne nastaví Worker secrets. Existujúce konfliktné DNS neprepisuje. Hodnoty kľúčov nevypisuje.
 
+Resend je zriadený cez Stripe Projects v bezplatnom pláne. Pri prvom nastavení v aktuálnom Codespace možno použiť jeho vygenerované prostredie bez zobrazovania kľúča:
+
+```sh
+node --env-file=/tmp/pixelkovia-tools/.env scripts/configure-commerce.mjs --interactive
+```
+
+Súbor spravuje CLI; ručne ho neupravovať ani nevypisovať. Tento dočasný súbor nie je potrebný na prevádzku webu. `RESEND_API_KEY` je uložený aj v Codespaces secrets a Cloudflare. Po obnovení Codespace sa trvalé secrets načítajú do prostredia a stačí pôvodný príkaz bez `--env-file`.
+
+DNS názvy Resend, napríklad `send.pixelkovia`, sú relatívne k zóne `rodulab.com`. Skript ich prevedie na `send.pixelkovia.rodulab.com`, podporuje aj úplné názvy a CNAME bez proxy. Záznamy mimo odosielacej subdomény odmietne.
+
 Ak je DNS overenie ešte rozpracované, platby ostanú vypnuté. Opakovanie skriptu používa uložené secrets a existujúci webhook; nevytvára druhý endpoint. Web funguje aj po zastavení alebo prestavaní Codespace.
 
 ## Spracovanie nákupu
@@ -34,3 +44,5 @@ Vývojový voucher `free`, starý adaptér Payment Links a ručné doručovanie 
 ## Overenie
 
 `admin/tests/customer-access.test.mjs` kontroluje dva nezávislé nákupy rovnakého e-mailu, idempotenciu, prihlásenie, rozdielne knihy, podpis platobnej udalosti a odstránenie obsahu doručovacej fronty. `tests/customer-journey.test.cjs` overuje skutočný portál, všetkých sedem úloh a hodnotenie v izolovanom Workers/D1 prostredí. Tieto testy nenahrádzajú platbu kartou a doručenie cez živého poskytovateľa.
+
+`node --test tests/email-dns.test.mjs` overuje názvy odosielacích DNS záznamov vrátane ochrany ostatných subdomén.

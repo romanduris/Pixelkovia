@@ -2,6 +2,7 @@
 // prompt, persisted as Codespaces secrets and sent directly to Cloudflare.
 import Stripe from '../admin/node_modules/stripe/esm/stripe.esm.node.js';
 import {spawnSync} from 'node:child_process';
+import {emailRecordName} from './email-dns.mjs';
 const account='033ec39e1948bd5785d92d1993a8036f',zone='e21f155e1a6e43b9a57bd7a093f1ee42',worker='treasurequest-admin',host='pixelkovia.rodulab.com';
 const cfToken=process.env.PIXELKOVIA_TOKEN||process.env.CLOUDFLARE_API_TOKEN;
 if(!cfToken)throw Error('Missing PIXELKOVIA_TOKEN Codespaces secret.');
@@ -25,13 +26,13 @@ const resend=async(method,endpoint,body)=>{const r=await fetch('https://api.rese
 const domains=await resend('GET','/domains');let domain=domains.data.find(d=>d.name===host);
 if(!domain)domain=await resend('POST','/domains',{name:host,region:'eu-west-1'});
 domain=await resend('GET','/domains/'+domain.id);
-for(const record of domain.records.filter(r=>['TXT','MX'].includes(r.type))){
-  const name=record.name===host||record.name.endsWith('.'+host)?record.name:record.name+'.'+host;
-  if(!name.endsWith('.'+host))throw Error('Unexpected email DNS record outside Pixelkovia.');
+const dnsZone=await cf('GET',`/zones/${zone}`);
+for(const record of domain.records.filter(r=>['TXT','MX','CNAME'].includes(r.type))){
+  const name=emailRecordName(record.name,host,dnsZone.name);
   const existing=await cf('GET',`/zones/${zone}/dns_records?name=${encodeURIComponent(name)}&type=${record.type}`);
   const matches=existing.some(r=>r.content.replaceAll('"','')===record.value.replaceAll('"',''));
   if(existing.length&&!matches)throw Error('Conflicting DNS record; existing email settings were preserved.');
-  if(!matches)await cf('POST',`/zones/${zone}/dns_records`,{name,type:record.type,content:record.value,ttl:300,...(record.type==='MX'?{priority:record.priority||10}:{}),comment:'Pixelkovia transactional email sender'});
+  if(!matches)await cf('POST',`/zones/${zone}/dns_records`,{name,type:record.type,content:record.value,ttl:300,...(record.type==='MX'?{priority:record.priority||10}:{}),...(record.type==='CNAME'?{proxied:false}:{}),comment:'Pixelkovia transactional email sender'});
 }
 await resend('POST','/domains/'+domain.id+'/verify');
 let verified=domain.status==='verified';
