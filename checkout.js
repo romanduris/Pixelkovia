@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const {product,money,offer,quote}=SITE_CONFIG;
+  const {product,money,offer,quote,payments,checkoutLink}=SITE_CONFIG;
   const {cover,button}=PIXELKOVIA_BOOK_PREVIEWS;
   const complete=quote(offer.bookIds),single=quote([offer.bookIds[0]]);
   const form=document.querySelector('#checkout-form'),selected=new Set();
@@ -12,6 +12,13 @@
   const voucherDialog=document.querySelector('#voucher-dialog'),voucherInput=document.querySelector('#voucher-code');
   const voucherError=document.querySelector('#voucher-error'),voucherOpen=document.querySelector('#voucher-open');
   let previousOverflow;
+  if(offer.paymentsEnabled){
+    document.querySelector('.details-panel').hidden=true;
+    document.querySelectorAll('.details-panel input').forEach(input=>input.disabled=true);
+    document.querySelector('#payment-note').innerHTML=`<strong>${payments.mode==='test'?'Testovacia platba · peniaze sa nestrhnú.':'Bezpečná platba kartou cez Stripe.'}</strong>Kartu aj e-mail zadáte na stránke Stripe. Prístup vám po potvrdení platby pošleme osobne e-mailom.`;
+    document.querySelector('.checkout-privacy summary').textContent='Ako prebehne platba a doručenie?';
+    document.querySelector('.checkout-privacy p').textContent='Po kliknutí na Kúpiť sa otvorí zabezpečená platobná stránka Stripe. Tam zadáte kartu aj kontaktný e-mail. Prístup a materiály posielame osobne na e-mail z platby. Tento web neukladá údaje platobnej karty a samotný preklik ešte nepotvrdzuje nákup.';
+  }
   // Paid books require an explicit checkbox or complete-bundle selection.
   document.querySelectorAll('[data-base-price]').forEach(el=>el.textContent=money(product(baseId).priceCents));
   document.querySelector('[data-planned-price]').textContent=money(product('episode-1').pricing.plannedStandardPriceCents);
@@ -46,6 +53,7 @@
     voucher.innerHTML=q.voucher?`<span>Voucher ${q.voucher} · zľava 100 %</span><strong>−${money(q.voucherDiscountCents)}</strong>`:'';
     document.querySelector('#order-total').textContent=money(q.totalCents);
     document.querySelector('#button-total').textContent=money(q.totalCents);
+    document.querySelector('.checkout-buy').disabled=!checkoutLink(q);
     document.querySelector('#books-status').textContent=!isGame?'Knihy fungujú aj samostatne, bez hry.':q.books.length===2?`Balíková zľava ${money(q.bundleDiscountCents)} je započítaná.`:q.books.length===1?`S druhou knihou celý balík za ${money(complete.totalCents)} (+${money(complete.totalCents-single.totalCents)}).`:'';
   }
   form.addEventListener('change',event=>{
@@ -57,6 +65,10 @@
   bundleButton.addEventListener('click',()=>{
     if(!isGame)return;
     offer.bookIds.forEach(id=>selected.add(id));atlasSelected=true;update();
+  });
+  document.querySelector('.checkout-buy').addEventListener('click',()=>{
+    const link=checkoutLink(quote([...selected],baseId,voucherCode,atlasSelected));
+    if(link)location.assign(link);
   });
   form.addEventListener('submit',event=>event.preventDefault());
   form.addEventListener('keydown',event=>{if(event.key==='Enter'&&event.target.matches('input'))event.preventDefault();});

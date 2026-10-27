@@ -9,6 +9,9 @@
     {id:'atlas-pixelkov', name:'Atlas Pixelkov', priceCents:299, status:'coming-soon', description:'Sedem Pixelkov, ich schopnosti a aktivity. Plánovaná samostatná cena; v uvádzacej ponuke k hre zdarma.'}
   ];
   const product = id => products.find(p => p.id === id);
+  // Public Stripe links only. Never put API keys or webhook secrets here.
+  // Keep disabled until the connected Stripe account and every offer are verified.
+  const payments = {mode:'disabled', accountId:null, chargesEnabled:false, merchantNotificationsConfirmed:false, notificationEmail:'roman.duris@gmail.com', promotionCode:null, promotionVerified:false, links:{}};
   const states = {'not-purchased':'Nezakúpené', purchased:'Zakúpené', available:'Dostupné', 'coming-soon':'Pripravujeme'};
   // Future server adapter must supply verified entitlements and content URLs.
   // The static prototype never grants purchases locally.
@@ -32,6 +35,37 @@
     const voucherDiscountCents=voucher?subtotalCents-bundleDiscountCents:0;
     return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, voucher, voucherDiscountCents, totalCents:subtotalCents-bundleDiscountCents-voucherDiscountCents};
   };
+  const paymentKey = q => [q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])].sort().join('|');
+  const paymentVariants = () => [quote(),quote([offer.bookIds[0]]),quote([offer.bookIds[1]]),quote(offer.bookIds),quote([],offer.bookIds[0]),quote([],offer.bookIds[1]),quote([offer.bookIds[1]],offer.bookIds[0])].flatMap(q=>[q,{...q,atlasIncluded:false}]);
+  const validStripeLink = value => {
+    if(typeof value!=='string')return false;
+    try{
+      const url=new URL(value);
+      return url.protocol==='https:'&&url.hostname==='buy.stripe.com'&&!url.port&&!url.username&&!url.password&&!url.search&&!url.hash&&/^\/[a-zA-Z0-9_-]{6,}$/.test(url.pathname)&&(url.pathname.startsWith('/test_')===(payments.mode==='test'));
+    }catch{return false;}
+  };
+  const paymentsReady = () => {
+    if(!['test','live'].includes(payments.mode)||!/^acct_[a-zA-Z0-9]+$/.test(payments.accountId||''))return false;
+    if(payments.mode==='live'&&(payments.chargesEnabled!==true||payments.merchantNotificationsConfirmed!==true))return false;
+    const variants=paymentVariants();
+    return Object.keys(payments.links).length===variants.length&&variants.every(q=>{
+      const link=payments.links[paymentKey(q)];
+      return link?.verified===true&&link.accountId===payments.accountId&&link.livemode===(payments.mode==='live')&&link.currency==='eur'&&link.priceCents===q.totalCents&&validStripeLink(link.url);
+    });
+  };
+  const checkoutLink = q => {
+    if(!paymentsReady())return null;
+    const link=payments.links[paymentKey(q)];
+    if(!link||link.priceCents!==q.totalCents+q.voucherDiscountCents)return null;
+    const url=new URL(link.url);
+    if(q.voucher){
+      if(!payments.promotionVerified||payments.promotionCode!==q.voucher)return null;
+      url.searchParams.set('prefilled_promo_code',q.voucher);
+    }
+    return url.href;
+  };
+  offer.paymentsEnabled=paymentsReady();
+  if(offer.paymentsEnabled)offer.developmentVoucher=payments.promotionVerified?payments.promotionCode:null;
   // Production is deliberately fail-closed until real server purchase verification exists.
   const access = {mode:'test', canLaunch: preparationReady => access.mode === 'test' && preparationReady};
   const management = {url:'https://treasurequest-admin.livingstones-romanduris.workers.dev', localPreviewUrl:'http://127.0.0.1:8787'};
@@ -41,5 +75,5 @@
     if (!value) return null;
     try {const url = new URL(value);return url.protocol === 'https:' || (local && url.origin === management.localPreviewUrl) ? url.href : null;} catch (_) {return null;}
   };
-  window.SITE_CONFIG = {products, product, money, states, productState, purchase, offer, quote, access, management, managementUrl};
+  window.SITE_CONFIG = {products, product, money, states, productState, purchase, offer, quote, payments, paymentKey, paymentVariants, validStripeLink, paymentsReady, checkoutLink, access, management, managementUrl};
 })();

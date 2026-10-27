@@ -5,7 +5,7 @@ Rodinná hra pre deti 7–13 rokov a rodičov: sedem úloh, tlačiteľné indíc
 ## Stránky a zdroje
 
 - `index.html`, `sales-page.js`, `sales.css`: predajná stránka.
-- `checkout.html`, `checkout.js`, `checkout.css`, `site-config.js`: aktuálny katalóg a výpočet ponuky v centoch. Platby a odosielanie formulára sú vypnuté.
+- `checkout.html`, `checkout.js`, `checkout.css`, `site-config.js`: aktuálny katalóg a výpočet ponuky v centoch, pripravené presmerovanie na overené Stripe Payment Links. Aktivácia čaká na pripojený Stripe účet, cenové odkazy a potvrdenie upozornení majiteľovi; skutočné platby zostávajú vypnuté. Pozri [nastavenie platieb](docs/payment-setup.md).
 - `parent.html`, `prep-store.js`, `portal-library.js` / `.css`: príprava, materiály a knižnica pre rodiča.
 - `game.html`, `app.js`, `game-data.js`, `story-text.js`, `cipko-game.js`: hráčska časť a uložený postup aktuálnej hry.
 - `storyboard.html`, `site-content.js`: interný redakčný prehľad, prehrávanie dodaných nahrávok a video podklady.

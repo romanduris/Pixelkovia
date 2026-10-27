@@ -1,45 +1,45 @@
-# Platby a doručenie Pixelkovia
+# Platba kartou a upozornenie majiteľovi
 
-Odporúčaný postup pre existujúci checkout: **Stripe Checkout + Cloudflare Worker**, následne **Resend** na transakčné e-maily. Súčasný web zostáva na Cloudflare Pages. Toto je plán integrácie; živé platby, objednávky a odosielanie sa touto zmenou nezapínajú.
+Používateľ schválil reálne platby kartou, upozornenie na `roman.duris@gmail.com` a **ručné doručenie prístupu zákazníkovi**. Aktuálne je pripravený adaptér pre **Stripe Payment Links**; platby zostávajú vypnuté, pretože Stripe účet ešte nie je pripojený a neexistujú overené platobné odkazy. Pripojenie k Stripe bolo ponúknuté cez aplikáciu.
 
-## Výber najjednoduchšej cesty
+## Najkratší postup k spusteniu
 
-| Možnosť | Kedy sa hodí |
-| --- | --- |
-| Ko-fi Shop s pripojeným Stripe | Najrýchlejší samostatný obchod: Ko-fi spracuje nákup a ponúkne doručenie digitálneho súboru alebo odkazu. Znamená presun nákupu do Ko-fi a samostatné prepojenie prístupu do hry. |
-| Stripe Payment Link | Najrýchlejší pokus s jednou pevnou ponukou: v Stripe vytvoriť produkt/cenu a vložiť platobný odkaz. Doručenie a prístup treba prepojiť osobitne. |
-| Stripe Checkout cez Worker | Odporúčanie pre tento web: zachová výber samostatných kníh, doplnkov a automatický balík za 19,99 €. Worker z vybraných ID zostaví presný nákup a presmeruje na hotovú platobnú stránku Stripe. |
+1. Pripojiť existujúci Stripe účet. Overiť presný účet, jeho režim a možnosť prijímať reálne platby. Tajné kľúče nepatria do chatu, repozitára ani verejného JavaScriptu. Na samotné presmerovanie na Payment Links web žiadny API kľúč nepotrebuje.
+2. V pripojenom účte vytvoriť alebo použiť platobné odkazy pre aktuálne ponuky. Ceny sú nižšie; každá ponuka má variant s Atlasom aj bez neho, spolu 14 odkazov. Atlas sa započítava za 0 €. Množstvo položiek je pevné, bez ďalších platených doplnkov či nastaviteľných súm na platobnej stránke.
+3. Na Stripe stránke zbierať kartu aj kontaktný e-mail a uviesť: **„Prístup a materiály vám po potvrdení platby pošleme osobne e-mailom.“** Rovnaký text má byť aj v hostovanom potvrdení Stripe. Nepoužívať súkromný owner-only náhľad Sites ako zákaznícky prístup.
+4. V profile Stripe otvoriť **Communication preferences** a zapnúť upozornenia na **Successful payments** pre používateľa s e-mailom `roman.duris@gmail.com`. Stripe tieto preferencie spravuje osobitne pre každého člena tímu. Potvrdenie o nastavení zatiaľ chýba; aplikácia ho nenastavila a e-mail neodoslala.
+5. Overiť odkazy, produkty, sumy v EUR, účet a režim priamo zo Stripe. Záznamy uložiť do verejnej konfigurácie `payments` v `site-config.js`; obsahujú iba URL a overené údaje, žiadne credentials. Najprv overiť testovací nákup na Stripe a potom nastaviť reálny režim.
+6. Nastaviť `mode: 'live'`, skutočný `accountId`, `chargesEnabled: true` a `merchantNotificationsConfirmed: true` až po ich overení. `offer.paymentsEnabled` sa vypočíta automaticky; ak niektorá kombinácia chýba alebo nesedí jej cena, menu, účet či režim, celý checkout zostane vypnutý.
+7. Zostaviť súkromný aj verejný balík, otestovať, commitnúť a pushnúť na `origin/main`, zverejniť existujúcu súkromnú Site a samostatne `dist/funnel/`. Po reálnom nákupe majiteľ overí prijatú platbu v Stripe a odošle prístup zákazníkovi na e-mail z platby.
 
-## Krok 1 — testovanie platby kartou
+| Výber | Celkom |
+| --- | ---: |
+| Hra | 14,99 € |
+| Hra + prvá kniha | 19,98 € |
+| Hra + druhá kniha | 19,98 € |
+| Hra + obe knihy | 19,99 € |
+| Prvá kniha samostatne | 4,99 € |
+| Druhá kniha samostatne | 4,99 € |
+| Obe knihy bez hry | 9,98 € |
 
-1. V Stripe použiť sandbox a vytvoriť ceny pre aktuálnu hru a obe knihy. Atlas zostáva zahrnutý zdarma. Pre kompletný balík zachovať zľavu 4,98 € v serverovom výpočte. Serverový katalóg musí zodpovedať `site-config.js` a existujúcim produktovým ID.
-2. Pridať serverový endpoint na vytvorenie Checkout Session. Prehliadač odošle iba výber produktov a prípadný voucher. Worker overí povolené produkty, cenu a zľavu zo serverového katalógu; neprijíma výslednú sumu z HTML alebo klientského JavaScriptu.
-3. Tlačidlo presmeruje zákazníka na Stripe Checkout. Kartu zadáva na stránke Stripe. Stripe vyzbiera e-mail potrebný na potvrdenie a prístup; súčasný formulár treba napojiť alebo zjednodušiť tak, aby sa údaje nezadávali dvakrát.
-4. V testoch overiť všetky kombinácie doplnkov, samostatné knihy, úspech, zamietnutie karty, zrušenie a 3D Secure. Kým nie je pripravené skutočné doručenie a ochrana obsahu, zostať v sandboxe.
+Každý riadok má platobný variant s Atlasom a bez Atlasu za rovnakú cenu. `paymentVariants()` vráti všetkých 14 variantov a `paymentKey()` ich jedinečné kľúče. Každý záznam `payments.links[key]` obsahuje skutočné `url`, `accountId`, `livemode`, `currency: 'eur'`, `priceCents` a `verified: true`. Nesmú sa dopĺňať odhadnuté ani testovacie zástupné odkazy do produkčného zdroja.
 
-Tajný Stripe API kľúč patrí do Worker secrets. Verejný funnel teraz blokuje sieťové API volania cez CSP; pri integrácii cielene povoliť potrebný endpoint a presmerovanie. Herné súbory a platené materiály zostávajú mimo verejného `dist/funnel/`.
+## Správanie checkoutu
 
-## Krok 2 — potvrdenie objednávky a e-mail
+- Prijíma iba oficiálne HTTPS odkazy `buy.stripe.com`, zodpovedajúce testovaciemu alebo reálnemu režimu. Neznámy hostiteľ, zlá suma, iný účet či chýbajúca kombinácia neaktivujú tlačidlo.
+- Pri zapnutých platbách sa skryje duplicitný formulár mena a e-mailu. Údaje si zákazník vyplní priamo na Stripe; naša stránka iba vyberá obsah a presmeruje ho.
+- Testovací režim je výrazne označený ako test bez strhnutia peňazí. Úspech sa nesimuluje cez URL, localStorage ani návrat zo Stripe. Ručné doručenie vychádza z platby overenej v Stripe Dashboarde.
+- Vývojový voucher `free` naďalej funguje v neaktívnom náhľade ako nulový cenový prepočet. Pri spustených platbách funguje iba po vytvorení a overení zodpovedajúceho 100 % Stripe promo kódu, nastavení `promotionCode` a `promotionVerified: true`. Aplikácia ho vloží do `prefilled_promo_code`; bez overeného promo kódu sa ako aktívny voucher neponúka. Nulová cena v HTML sama neznamená bezplatnú objednávku.
+- Atlas, knižné voľby, kompletný balík a uložený herný postup zostávajú zachované. Verejný funnel naďalej neobsahuje hru, platené knihy, celé PDF ani administráciu.
 
-1. Stripe pošle podpísaný webhook `checkout.session.completed`. Worker overí podpis nad pôvodným telom požiadavky, prostredie, menu, produkty, sumu a stav platby. Prístup sa prizná iba pri stave `paid` alebo pri overenej nulovej objednávke `no_payment_required`.
-2. Checkout Session ID bude jedinečný kľúč objednávky. Opakovaný či súbežný webhook nesmie vytvoriť ďalšiu objednávku, oprávnenie ani e-mail. Nadviazať na existujúce serverové `createOrder()` a D1, upraviť model podľa overených Stripe identifikátorov.
-3. Uložiť objednávku, položky a oprávnenia spolu s požiadavkou na doručenie. Samostatné opakovanie neúspešného e-mailu nesmie znovu vytvárať nákup. Pri prípadnom rozšírení na oneskorené platobné metódy spracovať aj úspešné/asynchrónne zlyhanie; stav `unpaid` nesmie odomknúť obsah.
-4. Resend odošle potvrdenie s prehľadom nákupu a bezpečným odkazom do zákazníckeho portálu. Overiť odosielaciu doménu cez DNS v Cloudflare, API kľúč uložiť medzi Worker secrets a použiť existujúce e-mailové koncepty ako základ.
-5. Pred ostrým predajom dokončiť zákaznícke overenie, ktoré dnes chýba (`CUSTOMER_AUTH`), a chránené doručovanie hry, kníh a PDF. E-mail nemá obsahovať univerzálny verejný odkaz na platené súbory ani smerovať na súkromný owner-only náhľad Sites.
+## Overenie
 
-Návrat zákazníka na stránku „Ďakujeme“ môže ukázať stav objednávky. Objednávka a e-mail vznikajú z overeného webhooku, aj keď zákazník po platbe zatvorí kartu.
-
-## Vývojový voucher `free`
-
-Aktuálne iba upraví zobrazenú cenu v checkoutovej stránke na 0 €. Nákupné tlačidlo zostáva neaktívne a údaje sa neodosielajú. Kód nie je tajný a nedáva prístup do hry.
-
-Pri napojení Stripe vytvoriť v sandboxe 100 % kupón/promo kód a overovať ho serverovo. Stripe podporuje nulové objednávky bez zadania karty; takéto nákupy treba dokončiť cez Checkout Session, pretože nemajú PaymentIntent. Rovnaké overené vytvorenie objednávky a doručenie potom obslúži zaplatený aj bezplatný nákup. Vývojový kód vypnúť pred ostrým predajom; prípadné ostré vouchery spravovať oddelene.
+`node tests/payment-links.test.cjs` kontroluje kompletnosť a sumy všetkých variantov, bezpečné URL, režim, účet, menu, promo kód a podmienky reálneho spustenia. `tests/payment-checkout.test.cjs` používa iba pamäťovú konfiguráciu a zachytené presmerovania v prehliadači: overí mobil aj desktop v Chromium a WebKite, manuálne doručenie, výber Atlasu, voucher a zachovaný postup. **Tieto testy nevykonávajú reálnu Stripe platbu ani neoverujú doručenie e-mailu.** Tie čakajú na pripojenie účtu.
 
 ## Podklady
 
-- [Stripe Checkout](https://docs.stripe.com/payments/checkout)
 - [Stripe Payment Links](https://docs.stripe.com/payment-links)
-- [Overené doručenie cez webhook](https://docs.stripe.com/checkout/fulfillment)
-- [Nulové objednávky](https://docs.stripe.com/payments/checkout/no-cost-orders)
-- [Cloudflare Workers a Resend](https://developers.cloudflare.com/workers/tutorials/send-emails-with-resend/)
-- [Ko-fi Shop a digitálne produkty](https://help.ko-fi.com/hc/en-us/articles/360009712917-Ko-fi-Shop-Sell-digital-physical-products)
+- [Prispôsobenie platobnej stránky a promo kód v URL](https://docs.stripe.com/payment-links/customize)
+- [Upozornenia na úspešné platby majiteľovi](https://support.stripe.com/questions/set-up-account-email-notifications)
+
+Automatické doručovanie zákazníkom je samostatný ďalší krok: vyžaduje overené serverové platobné udalosti a zákaznícky prístup. Ručné doručenie zatiaľ nevytvára lokálne oprávnenia ani nenahrádza overenie nákupu.

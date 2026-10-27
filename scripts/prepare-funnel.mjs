@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 const root=fileURLToPath(new URL('../',import.meta.url));
 export async function prepareFunnel(output){
   await mkdir(output,{recursive:true});
-  const content={window:{}};
+  const content={window:{},URL};
   vm.createContext(content);
   // Authored sources are read only during the build, never published as game JS.
   vm.runInContext(await readFile(path.join(root,'site-config.js'),'utf8'),content);
@@ -46,7 +46,7 @@ export async function prepareFunnel(output){
   let checkout=await readFile(path.join(root,'checkout.html'),'utf8');
   checkout=checkout.replace('src="site-config.js"','src="purchase-config.js"');
   // Reuse the same price functions and data without publishing access/admin code.
-  const purchaseConfig=`/* Generated sales catalog: no game state or customer access. */\n(()=>{\nconst products=${JSON.stringify(config.products.filter(p=>['episode-1',...config.offer.bookIds,config.offer.atlasId].includes(p.id)))};\nconst offer=${JSON.stringify(config.offer)};\nconst money=(${config.money.toString()});\nconst product=(${config.product.toString()});\nconst quote=(${config.quote.toString()});\nwindow.SITE_CONFIG={products,offer,money,product,quote};\n})();\n`;
+  const purchaseConfig=`/* Generated sales catalog: no game state or customer access. */\n(()=>{\nconst products=${JSON.stringify(config.products.filter(p=>['episode-1',...config.offer.bookIds,config.offer.atlasId].includes(p.id)))};\nconst offer=${JSON.stringify(config.offer)};\nconst payments=${JSON.stringify(config.payments)};\nconst money=(${config.money.toString()});\nconst product=(${config.product.toString()});\nconst quote=(${config.quote.toString()});\nconst paymentKey=(${config.paymentKey.toString()});\nconst paymentVariants=(${config.paymentVariants.toString()});\nconst validStripeLink=(${config.validStripeLink.toString()});\nconst paymentsReady=(${config.paymentsReady.toString()});\nconst checkoutLink=(${config.checkoutLink.toString()});\nwindow.SITE_CONFIG={products,offer,money,product,quote,payments,paymentKey,paymentVariants,validStripeLink,paymentsReady,checkoutLink};\n})();\n`;
   await writeFile(path.join(output,'purchase-config.js'),purchaseConfig);
   const code=['book-previews.js','book-previews.css','styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js','library.css','library.js','library-catalog.js'];
   for(const file of code)await cp(path.join(root,file),path.join(output,file));
