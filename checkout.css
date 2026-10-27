@@ -61,7 +61,10 @@
 .checkout-input{border:1px solid #5c7187;border-radius:6px;background:#101b2d;color:#e7eef6;min-height:48px;width:100%;padding:10px 12px;font-size:16px}
 .checkout-input::placeholder{color:#9aaac0}
 .checkout-input:-webkit-autofill,.checkout-input:-webkit-autofill:hover,.checkout-input:-webkit-autofill:focus{-webkit-text-fill-color:#e7eef6;caret-color:#e7eef6;-webkit-box-shadow:0 0 0 1000px #101b2d inset;box-shadow:0 0 0 1000px #101b2d inset}
-#payment-slot{overflow:hidden;border-radius:8px;background:#142032}
+#payment-slot{max-width:560px;margin:20px auto 0;overflow:hidden;border-radius:8px;background:#142032}
+.embedded-payment>#payment-status{max-width:560px;margin:16px auto 0;color:#b2c2d3;font-size:14px;line-height:1.65}
+.embedded-payment>#payment-status:empty{display:none}
+.embedded-payment>#change-order{display:flex;margin:20px auto 0}
 .field-note{font-size:12px;line-height:1.6;margin:10px 0 0;color:#a9bacb}
 .checkout-summary{position:sticky;top:20px;min-width:0}
 .summary-inner{padding:22px;border:1px solid #758b78;border-radius:11px;background:linear-gradient(140deg,#23372f,#192437)}

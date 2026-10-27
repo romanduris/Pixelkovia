@@ -37,7 +37,9 @@ Ak je DNS overenie ešte rozpracované, platby ostanú vypnuté. Opakovanie skri
 
 E-mail je povinný pred vytvorením Checkout Session. Formulár karty je vložený na checkout stránke; banka môže vyžiadať overenie. Cenu a obsah objednávky určuje server, nie suma zaslaná prehliadačom.
 
-Aktuálna integrácia používa serverový režim `ui_mode: embedded_page`, Stripe.js `endive/stripe.js` a `createEmbeddedCheckoutPage`. Pôvodné názvy `embedded` a `initEmbeddedCheckout` sa nepoužívajú; živé API starý režim odmieta.
+Aktuálna integrácia používa serverový režim `ui_mode: form`, Stripe.js `endive/stripe.js` a `initCheckoutFormSdk`. Jednokrokový formulár vytvorený cez `createForm({layout: 'expanded'})` používa Appearance API s témou `night`, tmavými poľami a mätovým tlačidlom. Údaje karty zostávajú v iframe Stripe.
+
+Udalosť `confirm` odovzdáva `formConfirmEvent` do `actions.confirm` s `redirect: 'if_required'`. Počas potvrdenia je zmena objednávky blokovaná a druhé kliknutie sa ignoruje. Chyba ponechá formulár pripravený na opravu. Úspech SDK spustí overenie objednávky na serveri; sám neudelí prístup ani neoznačí nákup za zaplatený. Návrat od banky používa rovnaké serverové overenie a nevytvorí ďalšiu platobnú reláciu.
 
 Podpísané udalosti `checkout.session.completed` a `checkout.session.async_payment_succeeded` spúšťajú vytvorenie prístupu len po overení `payment_status=paid`, režimu, sumy, meny a väzby na serverovú objednávku. Opakovaná udalosť nevytvorí ďalší účet. Úplný refund zneplatní zaplatený stav objednávky. Návratová URL sama prístup neudelí.
 
@@ -52,3 +54,5 @@ Vývojový voucher `free`, starý adaptér Payment Links a ručné doručovanie 
 `node --test tests/email-dns.test.mjs` overuje názvy odosielacích DNS záznamov vrátane ochrany ostatných subdomén.
 
 `node --test tests/commerce-credentials.test.mjs` overuje skryté zadávanie, opakovanie výzvy, rozlíšenie chýb a obnovenie terminálu po zrušení bez vypísania zadanej hodnoty.
+
+`PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs` overuje stavový tok formulára v prehliadači s riadenou náhradou Stripe SDK: povinný e-mail, opakované kliknutie, chybu a opakovanie, zlyhanie načítania, potvrdenie serverom a návrat od banky. Tieto scenáre neposielajú skutočné platby.

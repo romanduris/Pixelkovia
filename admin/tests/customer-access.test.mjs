@@ -13,7 +13,7 @@ test('two purchases with the same email get isolated credentials, orders and boo
   await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email:''}),e=>e.status===400);
   const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,email});
   const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email});
-  assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'embedded_page','Stripe no longer accepts the retired embedded mode');
+  assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'form','the form SDK requires a form session to apply the dark Appearance theme');
   const order1=await fulfill(env,firstPurchase.sessionId),order2=await fulfill(env,secondPurchase.sessionId);
   assert.equal((await fulfill(env,firstPurchase.sessionId)).id,order1.id);
   assert.equal((await first(db,'SELECT COUNT(*) n FROM customers')).n,2);
