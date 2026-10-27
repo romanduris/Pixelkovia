@@ -8,7 +8,8 @@ function installStripeStub(scenario){
    state.calls.push({redirect:options.redirect,formEvent:options.formConfirmEvent?.fixture===true});
    return new Promise((resolve,reject)=>{state.finish=result=>result.throw?reject(Error('Fixture network outage')):resolve(result);});
   }}};},
-  createForm(){
+  createForm(options){
+   state.formOptions=options;
    let handler;const pay=document.createElement('button');pay.type='button';pay.textContent='Fixture pay';
    pay.addEventListener('click',()=>handler({fixture:true}));
    return {on(event,fn){assertEvent(event);handler=fn;state.stale=fn;},mount(selector){document.querySelector(selector).append(pay);},destroy(){state.destroyed++;pay.remove();}};
@@ -29,7 +30,8 @@ function installStripeStub(scenario){
    if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:true,publishableKey:'pk_test_fixture'}});
    if(url.pathname==='/api/checkout/session'){
     fixture.posts.push(route.request().postDataJSON());
-    return route.fulfill({json:{sessionId:'cs_test_fixture_session'+fixture.posts.length,clientSecret:'fixture-client-secret'}});
+    const input=fixture.posts.at(-1),totalCents=input.books.length===2?1999:input.books.length===1?1998:1499;
+    return route.fulfill({json:{sessionId:'cs_test_fixture_session'+fixture.posts.length,clientSecret:'fixture-client-secret',totalCents}});
    }
    if(url.pathname==='/api/checkout/status'){fixture.reads++;return route.fulfill({json:{paid:fixture.paid,delivered:fixture.delivered}});}
    let file=url.pathname==='/'?'index.html':url.pathname.slice(1);if(!path.extname(file))file+='.html';
@@ -48,6 +50,10 @@ function installStripeStub(scenario){
    await page.locator('.checkout-buy').click();assert.equal(fixture.posts.length,0,'email is required before a session exists');
    await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');await page.locator('#select-bundle').click();
    await page.locator('.checkout-buy').click();await page.getByRole('button',{name:'Fixture pay',exact:true}).waitFor();
+   assert.equal(await page.locator('#checkout-form').isHidden(),true,'payment is a compact step without the product picker');
+   assert.equal(await page.locator('#payment-order-total').innerText(),'19,99 €');
+   const methods=await page.evaluate(()=>checkoutFixture.formOptions.expressCheckout.paymentMethods);
+   assert.equal(methods.link,'never');assert.notEqual(methods.applePay,'never');assert.notEqual(methods.googlePay,'never');
    await page.getByRole('button',{name:'Fixture pay',exact:true}).click();
    assert.equal(await page.locator('#change-order').isDisabled(),true,'order changes are blocked while confirmation is in flight');
    await page.getByRole('button',{name:'Fixture pay',exact:true}).click();
@@ -58,6 +64,7 @@ function installStripeStub(scenario){
    await page.evaluate(()=>checkoutFixture.finish({throw:true}));await page.getByText('Platbu sa nepodarilo dokončiť. Skúste to znova.',{exact:true}).waitFor();
    await page.locator('#change-order').click();assert.equal(await page.locator('[name="email"]').inputValue(),'checkout-fixture@example.invalid');
    assert.equal(await page.locator('[name="email"]').isEnabled(),true);assert.equal(await page.locator('[name="book"]:checked').count(),2,'editing preserves the selected bundle');
+   assert.equal(await page.locator('#checkout-form').isVisible(),true);
    const before=await page.evaluate(()=>checkoutFixture.calls.length);await page.evaluate(()=>checkoutFixture.stale({fixture:true}));
    assert.equal(await page.evaluate(()=>checkoutFixture.calls.length),before,'destroyed forms cannot confirm a stale event');
    assert.deepEqual(await page.evaluate(()=>checkoutFixture.calls[0]),{redirect:'if_required',formEvent:true});

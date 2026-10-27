@@ -14,6 +14,8 @@ test('two purchases with the same email get isolated credentials, orders and boo
   const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,email});
   const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email});
   assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'form','the form SDK requires a form session to apply the dark Appearance theme');
+  assert.deepEqual(sessions.get(firstPurchase.sessionId).payment_method_types,['card'],'approved mobile checkout offers cards and their device wallets');
+  assert.equal(sessions.get(firstPurchase.sessionId).adaptive_pricing.enabled,false,'the advertised EUR amount has no extra currency decision');
   const order1=await fulfill(env,firstPurchase.sessionId),order2=await fulfill(env,secondPurchase.sessionId);
   assert.equal((await fulfill(env,firstPurchase.sessionId)).id,order1.id);
   assert.equal((await first(db,'SELECT COUNT(*) n FROM customers')).n,2);
@@ -31,6 +33,10 @@ test('two purchases with the same email get isolated credentials, orders and boo
   const refundedOrder=await fulfill(env,refunded.sessionId);
   assert.equal((await first(db,'SELECT status FROM orders WHERE id=?',refundedOrder.id)).status,'refunded');
   assert.equal(await first(db,'SELECT order_id FROM access_deliveries WHERE order_id=?',refundedOrder.id),null,'a refund arriving before checkout completion cannot deliver access');
+  for(const [baseId,books,total]of [['episode-1',[],1499],['episode-1',['story-book-before'],1998],['episode-1',['story-book-before','story-book-after'],1999],['story-book-before',[],499],['story-book-after',[],499],['story-book-before',['story-book-after'],998]]){
+    const created=await createCheckout(env,{baseId,books,atlasIncluded:true,email});
+    assert.equal(created.totalCents,total);assert.equal(sessions.get(created.sessionId).amount_total,total,'Stripe receives the unchanged server-calculated price');
+  }
   const originalFetch=globalThis.fetch;
   try{globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');const mail=JSON.parse(options.body);assert.equal(mail.from,'Adam · Pixelkovia <Adam@pixelkovia.rodulab.com>');assert.ok(mail.text.includes('/Supervisor'));return Response.json({id:'provider-'+options.headers['Idempotency-Key']});};await sendPending(env);assert.equal((await first(db,'SELECT status FROM access_deliveries WHERE order_id=?',order1.id)).status,'sent');assert.equal((await first(db,'SELECT encrypted_message FROM access_deliveries WHERE order_id=?',order1.id)).encrypted_message,null);}finally{globalThis.fetch=originalFetch;db.close();}
 });

@@ -39,6 +39,10 @@ E-mail je povinný pred vytvorením Checkout Session. Formulár karty je vložen
 
 Aktuálna integrácia používa serverový režim `ui_mode: form`, Stripe.js `endive/stripe.js` a `initCheckoutFormSdk`. Jednokrokový formulár vytvorený cez `createForm({layout: 'expanded'})` používa Appearance API s témou `night`, tmavými poľami a mätovým tlačidlom. Údaje karty zostávajú v iframe Stripe.
 
+Schválené [mobilné UX zadanie](stripe-checkout-mobile-ux.md) výslovne obmedzuje túto platbu na `payment_method_types: ['card']`. Karty zahŕňajú aj podporované Apple Pay/Google Pay peňaženky; ich dostupnosť určuje Stripe a zariadenie. Vo formulári je `expressCheckout.paymentMethods.link: 'never'`. Automatická konverzia meny je vypnutá pre túto reláciu, aby zostala zobrazená pôvodná cena v EUR. Globálna konfigurácia Stripe účtu sa nemení.
+
+Pri otvorení platby výber produktov nahradí stručný prehľad objednávky a formulár. Návrat k úprave obnoví výber aj e-mail. Prehľad pre návrat od banky sa dočasne uchováva v `sessionStorage` bez hesiel či údajov karty; slúži výhradne na zobrazenie. Cenu aj zaplatenie vždy overuje server.
+
 Udalosť `confirm` odovzdáva `formConfirmEvent` do `actions.confirm` s `redirect: 'if_required'`. Počas potvrdenia je zmena objednávky blokovaná a druhé kliknutie sa ignoruje. Chyba ponechá formulár pripravený na opravu. Úspech SDK spustí overenie objednávky na serveri; sám neudelí prístup ani neoznačí nákup za zaplatený. Návrat od banky používa rovnaké serverové overenie a nevytvorí ďalšiu platobnú reláciu.
 
 Podpísané udalosti `checkout.session.completed` a `checkout.session.async_payment_succeeded` spúšťajú vytvorenie prístupu len po overení `payment_status=paid`, režimu, sumy, meny a väzby na serverovú objednávku. Opakovaná udalosť nevytvorí ďalší účet. Úplný refund zneplatní zaplatený stav objednávky. Návratová URL sama prístup neudelí.

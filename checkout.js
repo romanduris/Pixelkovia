@@ -57,7 +57,38 @@
   const buy=document.querySelector('.checkout-buy'),panel=document.querySelector('#payment-panel');
   form.addEventListener('submit',event=>{event.preventDefault();buy.click();});
   function loadStripe(){if(window.Stripe)return Promise.resolve();return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://js.stripe.com/endive/stripe.js';script.onload=resolve;script.onerror=()=>reject(Error('Platobný formulár sa nepodarilo načítať. Skúste to znova.'));document.head.append(script);});}
-  async function paymentStatus(sessionId){panel.hidden=false;const target=document.querySelector('#payment-status');target.textContent='Overujem potvrdenie platby…';for(let i=0;i<8;i++){try{const r=await fetch('/api/checkout/status?session_id='+encodeURIComponent(sessionId),{cache:'no-store'});const value=await r.json();if(value.paid){completed=true;form.querySelectorAll('input,button').forEach(i=>i.disabled=true);update();target.textContent=value.delivered?'✓ Platba je potvrdená. E-mail s prístupom sme odovzdali na odoslanie. Skontrolujte aj priečinok Spam.':'✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.';document.querySelector('#change-order').hidden=true;return;}}catch{}await new Promise(resolve=>setTimeout(resolve,1500));}target.textContent='Potvrdenie platby sa ešte spracúva. Prístup vám po overení úhrady pošleme automaticky e-mailom.';}
+  function lockOrder(locked){form.querySelectorAll('input,button').forEach(i=>i.disabled=locked);if(!locked)document.querySelector(`[name="book"][value="${baseId}"]`)?.setAttribute('disabled','');}
+  function showSummary(summary){
+    const valid=summary&&Array.isArray(summary.labels)&&summary.labels.length<=4&&summary.labels.every(s=>typeof s==='string'&&s.length<160)&&Number.isInteger(summary.totalCents)&&summary.totalCents>0;
+    document.querySelector('#payment-summary').hidden=!valid;
+    if(valid){document.querySelector('#payment-order-items').textContent=summary.labels.join(' · ');document.querySelector('#payment-order-total').textContent=money(summary.totalCents);}
+  }
+  function rememberSummary(session){
+    // Presentation only. This cache never confirms payment or grants access.
+    const labels=[baseId,...selected,...(atlasSelected?[offer.atlasId]:[])].map(id=>product(id).name);
+    const summary={sessionId:session.sessionId,labels,totalCents:session.totalCents,at:Date.now()};
+    showSummary(summary);
+    try{sessionStorage.setItem('pixelkovia-checkout-summary',JSON.stringify(summary));}catch{}
+  }
+  async function paymentStatus(sessionId){
+    form.hidden=true;panel.hidden=false;lockOrder(true);document.querySelector('#change-order').disabled=true;
+    const target=document.querySelector('#payment-status');target.textContent='Overujem potvrdenie platby…';
+    for(let i=0;i<8;i++){
+      try{
+        const r=await fetch('/api/checkout/status?session_id='+encodeURIComponent(sessionId),{cache:'no-store'});const value=await r.json();
+        if(value.paid){
+          completed=true;update();document.querySelector('#payment-heading').textContent='Ďakujeme za nákup';
+          target.textContent=value.delivered?'✓ Platba je potvrdená. E-mail s prístupom sme odovzdali na odoslanie. Skontrolujte aj priečinok Spam.':'✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.';
+          document.querySelector('#change-order').hidden=true;
+          try{sessionStorage.removeItem('pixelkovia-checkout-summary');}catch{}
+          return;
+        }
+      }catch{}
+      await new Promise(resolve=>setTimeout(resolve,1500));
+    }
+    target.textContent='Potvrdenie platby sa ešte spracúva. Prístup vám po overení úhrady pošleme automaticky e-mailom.';
+    document.querySelector('#change-order').disabled=false;
+  }
   async function mountPayment(session){
     const checkout=Stripe(configuration.publishableKey).initCheckoutFormSdk({
       clientSecret:session.clientSecret,
@@ -68,7 +99,7 @@
     });
     const loaded=await checkout.loadActions();
     if(loaded.type!=='success')throw Error('Platobný formulár sa nepodarilo načítať. Skúste to znova.');
-    const paymentForm=checkout.createForm({layout:'expanded'});
+    const paymentForm=checkout.createForm({layout:'expanded',expressCheckout:{paymentMethods:{link:'never'}}});
     const change=document.querySelector('#change-order'),status=document.querySelector('#payment-status');
     let alive=true,confirming=false;
     paymentForm.on('confirm',async event=>{
@@ -90,18 +121,18 @@
         if(alive)change.disabled=false;
       }
     });
-    panel.hidden=false;
+    form.hidden=true;panel.hidden=false;
     paymentForm.mount('#payment-slot');
     return {destroy(){alive=false;paymentForm.destroy();}};
   }
   buy.addEventListener('click',async()=>{
     if(!configuration?.enabled||creating||!form.reportValidity())return;
-    creating=true;update();document.querySelector('#payment-note').textContent='Pripravujem zabezpečený formulár…';
-    try{const response=await fetch('/api/checkout/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseId,books:[...selected],atlasIncluded:atlasSelected,email:form.elements.email.value.trim(),name:form.elements.name.value.trim()})});const session=await response.json();if(!response.ok)throw Error(session.error||'Platbu sa nepodarilo pripraviť.');await loadStripe();document.querySelector('#payment-status').textContent='';embedded=await mountPayment(session);panel.hidden=false;form.querySelectorAll('input,button').forEach(i=>i.disabled=true);panel.scrollIntoView({behavior:'smooth',block:'start'});document.querySelector('#payment-note').textContent='Platbu dokončite v zabezpečenom formulári nižšie.';}
-    catch(error){embedded?.destroy();embedded=null;panel.hidden=true;document.querySelector('#payment-slot').replaceChildren();document.querySelector('#payment-note').textContent=error.message;creating=false;update();}
+    creating=true;lockOrder(true);update();document.querySelector('#payment-note').textContent='Pripravujem zabezpečený formulár…';
+    try{const response=await fetch('/api/checkout/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseId,books:[...selected],atlasIncluded:atlasSelected,email:form.elements.email.value.trim(),name:form.elements.name.value.trim()})});const session=await response.json();if(!response.ok)throw Error(session.error||'Platbu sa nepodarilo pripraviť.');await loadStripe();rememberSummary(session);document.querySelector('#payment-status').textContent='';embedded=await mountPayment(session);panel.scrollIntoView({behavior:'smooth',block:'start'});document.querySelector('#payment-note').textContent='Platbu dokončite v zabezpečenom formulári nižšie.';}
+    catch(error){embedded?.destroy();embedded=null;panel.hidden=true;form.hidden=false;lockOrder(false);document.querySelector('#payment-slot').replaceChildren();document.querySelector('#payment-note').textContent=error.message;creating=false;update();}
   });
-  document.querySelector('#change-order').addEventListener('click',()=>{embedded?.destroy();embedded=null;panel.hidden=true;creating=false;document.querySelector('#payment-status').textContent='';document.querySelector('#payment-note').textContent='Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.';form.querySelectorAll('input,button').forEach(i=>i.disabled=false);document.querySelector(`[name="book"][value="${baseId}"]`)?.setAttribute('disabled','');update();});
+  document.querySelector('#change-order').addEventListener('click',()=>{embedded?.destroy();embedded=null;panel.hidden=true;form.hidden=false;creating=false;document.querySelector('#payment-status').textContent='';document.querySelector('#payment-note').textContent='Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.';lockOrder(false);update();form.scrollIntoView({behavior:'smooth',block:'start'});});
   fetch('/api/checkout/config',{cache:'no-store'}).then(r=>r.json()).then(value=>{configuration=value;document.querySelector('#payment-note').textContent=value.enabled?'Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.':'Platby ešte pripravujeme. Objednávka ani platba sa teraz nespustí.';update();}).catch(()=>{document.querySelector('#payment-note').textContent='Platobnú službu sa nepodarilo načítať. Skúste stránku obnoviť.';});
-  const returned=new URLSearchParams(location.search).get('session_id');if(returned)paymentStatus(returned);
+  const returned=new URLSearchParams(location.search).get('session_id');if(returned){try{const summary=JSON.parse(sessionStorage.getItem('pixelkovia-checkout-summary'));if(summary?.sessionId===returned&&Date.now()-summary.at<86400000)showSummary(summary);}catch{}paymentStatus(returned);}
   update();
 })();

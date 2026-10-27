@@ -20,9 +20,10 @@ export async function createCheckout(env,input){
   const ids=[q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])];
   await execute(env.TQ_DB,'INSERT INTO checkout_attempts VALUES(?,?,?,?,?,?,NULL,NULL)',id,email,name,JSON.stringify(ids),q.totalCents,at);
   const lines=ids.map(productId=>({price_data:{currency:'eur',product_data:{name:product(productId).name},unit_amount:productId===offer.atlasId?0:productId===q.baseId?product(productId).priceCents-q.bundleDiscountCents:product(productId).priceCents},quantity:1}));
-  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:'form',customer_email:email,client_reference_id:id,line_items:lines,return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>String.fromCharCode(97+b%26)).join(''),metadata:{checkout_attempt:id},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
+  // The approved mobile brief explicitly selects card payments, including device wallets.
+  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:'form',payment_method_types:['card'],adaptive_pricing:{enabled:false},customer_email:email,client_reference_id:id,line_items:lines,return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>String.fromCharCode(97+b%26)).join(''),metadata:{checkout_attempt:id},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
   await execute(env.TQ_DB,'UPDATE checkout_attempts SET stripe_session_id=? WHERE id=?',session.id,id);
-  return {clientSecret:session.client_secret,sessionId:session.id};
+  return {clientSecret:session.client_secret,sessionId:session.id,totalCents:q.totalCents};
 }
 async function encryptionKey(secret){return crypto.subtle.importKey('raw',Uint8Array.from(secret.match(/../g),x=>parseInt(x,16)),'AES-GCM',false,['encrypt','decrypt']);}
 export async function seal(value,secret){const iv=crypto.getRandomValues(new Uint8Array(12));const bytes=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await encryptionKey(secret),enc.encode(JSON.stringify(value))));return btoa(String.fromCharCode(...iv,...bytes));}
