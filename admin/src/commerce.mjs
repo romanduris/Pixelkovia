@@ -4,6 +4,7 @@ import {first,query,statement,execute,uuid,randomToken,hash} from './db.mjs';
 import {credentials,emailAddress} from './customer-auth.mjs';
 import {quote,product,offer} from './catalog.mjs';
 const ORIGIN='https://pixelkovia.rodulab.com',enc=new TextEncoder();
+const checkoutBranding={background_color:'#142032',button_color:'#ace9cf',border_style:'rounded',font_family:'inter',display_name:'Pixelkovia'};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stripe=env=>env.STRIPE_CLIENT||new Stripe(env.STRIPE_SECRET_KEY,{apiVersion:'2026-08-26.dahlia',maxNetworkRetries:2,httpClient:Stripe.createFetchHttpClient()});
 export const commerceReady=env=>env.PAYMENTS_ENABLED==='true'&&!!(env.STRIPE_SECRET_KEY&&env.STRIPE_PUBLISHABLE_KEY&&env.STRIPE_WEBHOOK_SECRET&&env.CUSTOMER_AUTH_SECRET&&env.RESEND_API_KEY&&env.MAIL_DOMAIN_VERIFIED==='true');
@@ -20,7 +21,7 @@ export async function createCheckout(env,input){
   const ids=[q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])];
   await execute(env.TQ_DB,'INSERT INTO checkout_attempts VALUES(?,?,?,?,?,?,NULL,NULL)',id,email,name,JSON.stringify(ids),q.totalCents,at);
   const lines=ids.map(productId=>({price_data:{currency:'eur',product_data:{name:product(productId).name},unit_amount:productId===offer.atlasId?0:productId===q.baseId?product(productId).priceCents-q.bundleDiscountCents:product(productId).priceCents},quantity:1}));
-  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:'embedded_page',customer_email:email,client_reference_id:id,line_items:lines,redirect_on_completion:'if_required',return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>String.fromCharCode(97+b%26)).join(''),metadata:{checkout_attempt:id},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
+  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:'embedded_page',branding_settings:checkoutBranding,customer_email:email,client_reference_id:id,line_items:lines,redirect_on_completion:'if_required',return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>String.fromCharCode(97+b%26)).join(''),metadata:{checkout_attempt:id},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
   await execute(env.TQ_DB,'UPDATE checkout_attempts SET stripe_session_id=? WHERE id=?',session.id,id);
   return {clientSecret:session.client_secret,sessionId:session.id};
 }

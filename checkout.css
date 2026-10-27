@@ -1,4 +1,4 @@
-.checkout-page{background:#0d1424;color:#f1ede5;--checkout-line:#354654}
+.checkout-page{background:#0d1424;color:#f1ede5;color-scheme:dark;--checkout-line:#354654}
 .checkout-page [hidden]{display:none!important}
 .checkout-header{max-width:1080px;padding:16px 24px;margin:auto;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2c3a4e;gap:16px}
 .checkout-brand{display:flex;align-items:center;gap:9px;text-decoration:none;font:800 16px/1.3 Manrope,sans-serif;letter-spacing:.08em}
@@ -60,6 +60,8 @@
 .field-label span{font-size:11px;font-weight:400;color:#a9b9cb}
 .checkout-input{border:1px solid #5c7187;border-radius:6px;background:#101b2d;color:#e7eef6;min-height:48px;width:100%;padding:10px 12px;font-size:16px}
 .checkout-input::placeholder{color:#9aaac0}
+.checkout-input:-webkit-autofill,.checkout-input:-webkit-autofill:hover,.checkout-input:-webkit-autofill:focus{-webkit-text-fill-color:#e7eef6;caret-color:#e7eef6;-webkit-box-shadow:0 0 0 1000px #101b2d inset;box-shadow:0 0 0 1000px #101b2d inset}
+#payment-slot{overflow:hidden;border-radius:8px;background:#142032}
 .field-note{font-size:12px;line-height:1.6;margin:10px 0 0;color:#a9bacb}
 .checkout-summary{position:sticky;top:20px;min-width:0}
 .summary-inner{padding:22px;border:1px solid #758b78;border-radius:11px;background:linear-gradient(140deg,#23372f,#192437)}
