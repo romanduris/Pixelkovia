@@ -31,16 +31,19 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.match(await page.locator('.hero-price').innerText(),/14,99 €/);
     assert.match(await page.locator('.funnel-offer-card').innerText(),/Knižka \+ encyklopédia Pixelkov/);
     assert.equal(await page.locator('.faq-primary>.faq-item').count(),8);
-    assert.equal(await page.locator('.faq-more .faq-item').count(),11);
-    assert.equal(await page.locator('.faq-more').evaluate(el=>el.open),false);
-    const faqMore=page.locator('.faq-more>summary');
+    assert.equal(await page.locator('.faq-extra .faq-item').count(),11);
+    assert.equal(await page.locator('.faq-more').getAttribute('aria-expanded'),'false');
+    assert.ok(await page.locator('.faq-extra').isHidden());
+    const faqMore=page.locator('.faq-more');
     await faqMore.focus();await page.keyboard.press('Enter');
-    assert.ok(await page.locator('.faq-more').evaluate(el=>el.open),'keyboard opens all remaining answers');
-    const moreQuestion=page.locator('.faq-more .faq-item').first();
+    assert.equal(await faqMore.getAttribute('aria-expanded'),'true','keyboard reveals the rest of the same FAQ list');
+    assert.ok(await page.locator('.faq-extra .faq-item summary').first().evaluate(el=>el===document.activeElement),'focus reaches the first added question');
+    const moreQuestion=page.locator('.faq-extra .faq-item').first();
     await moreQuestion.locator('summary').focus();await page.keyboard.press('Space');
     assert.ok(await moreQuestion.evaluate(el=>el.open));
     await moreQuestion.locator('summary').press('Enter');
     await faqMore.focus();await page.keyboard.press('Enter');
+    assert.ok(await page.locator('.faq-extra').isHidden(),'collapse returns to the original eight questions');
     for(const cta of await page.locator('a[href="checkout.html"]').all()){
      assert.match(await cta.innerText(),/^Pozrieť ponuku/,'consistent checkout action');
      const rect=await cta.boundingBox();if(rect)assert.ok(rect.height>=44,'44px checkout targets');

@@ -40,8 +40,16 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    assert.deepEqual(await page.locator('a[href^="#"]').evaluateAll(as=>as.filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.hash)),[]);
    await page.locator('.faq-primary>details>summary').first().focus();await page.keyboard.press('Enter');
    assert.ok(await page.locator('.faq-primary>details').first().evaluate(el=>el.open));
-   await page.locator('.faq-more>summary').focus();await page.keyboard.press('Enter');
-   assert.equal(await page.locator('.faq-more .faq-item').count(),11);
+   await page.locator('.faq-more').focus();await page.keyboard.press('Enter');
+   assert.equal(await page.locator('.faq-extra .faq-item').count(),11);
+   assert.equal(await page.locator('.faq-list').count(),1,'all FAQ rows belong to one list');
+   assert.equal(await page.locator('.faq-more').getAttribute('aria-expanded'),'true');
+   const alignment=await page.locator('.faq-list').evaluate(list=>{
+    const first=list.querySelector('.faq-primary details').getBoundingClientRect();
+    return [...list.querySelectorAll('.faq-extra details')].every(el=>{const r=el.getBoundingClientRect();return Math.abs(r.left-first.left)<1&&Math.abs(r.width-first.width)<1;});
+   });
+   assert.ok(alignment,'new rows continue at the same width without inset framing');
+   assert.equal(await page.locator('.faq-extra').evaluate(el=>getComputedStyle(el).borderWidth),'0px');
    if(width<=700){
     await page.locator('.funnel-hero .funnel-cta').scrollIntoViewIfNeeded();await page.waitForTimeout(100);
     assert.ok(await page.locator('.mobile-buy').isHidden());

@@ -30,8 +30,25 @@
     new ResizeObserver(()=>{track.scrollTo({left:positions()[current],behavior:'instant'});update();}).observe(track);
     update();
   }
+  function initFaq(){
+    const button=document.querySelector('.faq-more'),extra=document.getElementById('faq-extra');
+    if(!button||!extra)return;
+    // Without JavaScript all questions remain available in the same list.
+    extra.hidden=true;button.hidden=false;
+    button.addEventListener('click',()=>{
+      const expanded=button.getAttribute('aria-expanded')!=='true';
+      extra.hidden=!expanded;button.setAttribute('aria-expanded',String(expanded));
+      button.querySelector('.faq-more-label').textContent=expanded?'Zobraziť menej otázok':'Ďalšie otázky';
+      button.querySelector('.faq-more-count').textContent=expanded?'−':'11 odpovedí +';
+      if(expanded){
+        const first=extra.querySelector('summary');
+        first.focus({preventScroll:true});first.scrollIntoView({block:'nearest',behavior:'instant'});
+      }
+    });
+  }
   function init(){
     if(document.body.dataset.environment!=='sales')return;
+    initFaq();
     document.querySelectorAll('[data-family-gallery],[data-review-gallery]').forEach(initGallery);
     const bar=document.querySelector('.mobile-buy'),dialog=document.querySelector('#sales-preview');
     if(!bar||bar.dataset.ready)return;

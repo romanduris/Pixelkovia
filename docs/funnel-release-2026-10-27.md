@@ -18,3 +18,5 @@ Vizuálne skontrolované skrátené úvody na mobiloch, desktop, prvé ukážkov
 Pôvodný kontrolný súčet 176 chránených súborov sa zachoval. Pri `atlas.html` kontrola odoberá iba päť presne povolených nových odkazov na zdroje a porovnáva zvyšok s historickým originálom; pôvodný `atlas.css`, obsah knihy, ilustrácie, PDF, hra, administrácia a checkout logika sa nemenili. Verejný balík používa explicitný zoznam 28 assetov a neobsahuje atlas ani hru.
 
 Neskoršia úprava vzorových hodnotení: pokojnejší, vecný tón, dve mierne výhrady k náročnosti a príprave. Označenie ilustračných textov zostáva viditeľné; nie sú im pripísané vymyslené zákaznícke mená.
+
+FAQ: tlačidlo Ďalšie otázky pridáva 11 ďalších riadkov priamo do rovnakého zoznamu bez vnoreného rámčeka. Klávesnica sa presunie na prvú pridanú otázku; ovládanie na konci umožní vrátiť sa k ôsmim otázkam. Bez JavaScriptu sú všetky odpovede dostupné. Pôvodné znenie 19 otázok a odpovedí zostáva zachované.
