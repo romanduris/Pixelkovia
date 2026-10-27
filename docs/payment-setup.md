@@ -37,6 +37,8 @@ Ak je DNS overenie ešte rozpracované, platby ostanú vypnuté. Opakovanie skri
 
 E-mail je povinný pred vytvorením Checkout Session. Formulár karty je vložený na checkout stránke; banka môže vyžiadať overenie. Cenu a obsah objednávky určuje server, nie suma zaslaná prehliadačom.
 
+Aktuálna integrácia používa serverový režim `ui_mode: embedded_page`, Stripe.js `endive/stripe.js` a `createEmbeddedCheckoutPage`. Pôvodné názvy `embedded` a `initEmbeddedCheckout` sa nepoužívajú; živé API starý režim odmieta.
+
 Podpísané udalosti `checkout.session.completed` a `checkout.session.async_payment_succeeded` spúšťajú vytvorenie prístupu len po overení `payment_status=paid`, režimu, sumy, meny a väzby na serverovú objednávku. Opakovaná udalosť nevytvorí ďalší účet. Úplný refund zneplatní zaplatený stav objednávky. Návratová URL sama prístup neudelí.
 
 Každý nákup má vlastné zákaznícke ID, zakúpené produkty a náhodné heslo, aj pri rovnakom e-maile. E-mail z **Adam@pixelkovia.rodulab.com** obsahuje iba krátke poďakovanie, odkaz na `/Supervisor`, prihlasovací e-mail a heslo pre daný nákup. Fronta je šifrovaná, úspešné odoslanie vymaže šifrovaný obsah a neúspešné odoslanie sa opakuje.
