@@ -3,22 +3,15 @@
 import Stripe from '../admin/node_modules/stripe/esm/stripe.esm.node.js';
 import {spawnSync} from 'node:child_process';
 import {emailRecordName} from './email-dns.mjs';
+import {readCredential} from './commerce-credentials.mjs';
 const account='033ec39e1948bd5785d92d1993a8036f',zone='e21f155e1a6e43b9a57bd7a093f1ee42',worker='treasurequest-admin',host='pixelkovia.rodulab.com';
 const cfToken=process.env.PIXELKOVIA_TOKEN||process.env.CLOUDFLARE_API_TOKEN;
 if(!cfToken)throw Error('Missing PIXELKOVIA_TOKEN Codespaces secret.');
-async function hidden(name){
-  if(process.env[name])return process.env[name].trim();
-  if(!process.stdin.isTTY||!process.argv.includes('--interactive'))return null;
-  process.stdout.write(name+': ');
-  return new Promise((resolve,reject)=>{let value='';const wasRaw=process.stdin.isRaw;process.stdin.setRawMode(true);process.stdin.resume();const stop=()=>{process.stdin.off('data',read);process.stdin.setRawMode(wasRaw);process.stdin.pause();process.stdout.write('\n');};const read=buffer=>{for(const char of buffer.toString()){if(char==='\u0003'){stop();reject(Error('Cancelled.'));return;}if(char==='\r'||char==='\n'){stop();resolve(value.trim());return;}if(char==='\u007f')value=value.slice(0,-1);else value+=char;}};process.stdin.on('data',read);});
-}
 async function cf(method,endpoint,body){const r=await fetch('https://api.cloudflare.com/client/v4'+endpoint,{method,headers:{Authorization:'Bearer '+cfToken,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok||d.success===false)throw Error('Cloudflare configuration failed: HTTP '+r.status);return d.result;}
 function persist(name,value){const r=spawnSync('gh',['secret','set',name,'--app','codespaces','--repo','romanduris/Pixelkovia'],{input:value,encoding:'utf8'});if(r.status!==0)throw Error('Could not persist '+name+' as a Codespaces secret.');console.log('Codespaces secret saved: '+name);}
 async function runtimeSecret(name,value){await cf('PUT',`/accounts/${account}/workers/scripts/${worker}/secrets`,{name,type:'secret_text',text:value});}
 async function main(){
-const key=await hidden('STRIPE_SECRET_KEY'),publicKey=await hidden('STRIPE_PUBLISHABLE_KEY'),mailKey=await hidden('RESEND_API_KEY');
-if(!key||!publicKey||!mailKey){console.log('Required Codespaces secrets: STRIPE_SECRET_KEY (prefer a restricted rk_live_ key), STRIPE_PUBLISHABLE_KEY, RESEND_API_KEY. Or run this script with --interactive to enter them invisibly and save them permanently.');process.exit(2);}
-if(!/^(?:rk|sk)_live_[a-zA-Z0-9]+$/.test(key)||!/^pk_live_[a-zA-Z0-9]+$/.test(publicKey)||!/^re_[a-zA-Z0-9_]+$/.test(mailKey))throw Error('Expected live Stripe keys and a Resend API key.');
+const key=await readCredential('STRIPE_SECRET_KEY'),publicKey=await readCredential('STRIPE_PUBLISHABLE_KEY'),mailKey=await readCredential('RESEND_API_KEY');
 const stripe=new Stripe(key,{apiVersion:'2026-08-26.dahlia'});
 const merchant=await stripe.accounts.retrieve();if(merchant.id!=='acct_1UVB5BGle1VvIsLT'||merchant.charges_enabled!==true)throw Error('Stripe account is not the approved, charge-enabled Pixelkovia account.');
 for(const [name,value]of Object.entries({STRIPE_SECRET_KEY:key,STRIPE_PUBLISHABLE_KEY:publicKey,RESEND_API_KEY:mailKey}))persist(name,value);

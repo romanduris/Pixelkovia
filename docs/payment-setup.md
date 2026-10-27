@@ -19,6 +19,8 @@ node scripts/configure-commerce.mjs --interactive
 
 Skript číta chýbajúce kľúče skrytým vstupom, overí účet Pixelkovia a prijímanie platieb, uloží kľúče ako Codespaces secrets, nastaví iba e-mailové DNS záznamy pre `pixelkovia.rodulab.com`, overí doménu Resend a vytvorí alebo opätovne použije platobný webhook. Následne nastaví Worker secrets. Existujúce konfliktné DNS neprepisuje. Hodnoty kľúčov nevypisuje.
 
+Každý kľúč kontroluje hneď po zadaní. Ak je testovací, zamenený alebo zamaskovaný, vypíše názov premennej a konkrétny dôvod a zopakuje iba jej výzvu. Vkladajte celý kľúč cez tlačidlo kopírovania v Stripe, bez názvu premennej. Okolité úvodzovky a značky vloženia terminálu skript odstráni. Platnosť a oprávnenia následne overí poskytovateľ.
+
 Resend je zriadený cez Stripe Projects v bezplatnom pláne. Pri prvom nastavení v aktuálnom Codespace možno použiť jeho vygenerované prostredie bez zobrazovania kľúča:
 
 ```sh
@@ -46,3 +48,5 @@ Vývojový voucher `free`, starý adaptér Payment Links a ručné doručovanie 
 `admin/tests/customer-access.test.mjs` kontroluje dva nezávislé nákupy rovnakého e-mailu, idempotenciu, prihlásenie, rozdielne knihy, podpis platobnej udalosti a odstránenie obsahu doručovacej fronty. `tests/customer-journey.test.cjs` overuje skutočný portál, všetkých sedem úloh a hodnotenie v izolovanom Workers/D1 prostredí. Tieto testy nenahrádzajú platbu kartou a doručenie cez živého poskytovateľa.
 
 `node --test tests/email-dns.test.mjs` overuje názvy odosielacích DNS záznamov vrátane ochrany ostatných subdomén.
+
+`node --test tests/commerce-credentials.test.mjs` overuje skryté zadávanie, opakovanie výzvy, rozlíšenie chýb a obnovenie terminálu po zrušení bez vypísania zadanej hodnoty.
