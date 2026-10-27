@@ -69,7 +69,8 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    }
    await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL(url=>/\/checkout(?:\.html)?$/.test(url.pathname));
    await page.locator('#mission-options input').first().waitFor();
-   assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('.checkout-status').innerText(),/Platby ešte nie sú spustené/);
+   assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('#payment-note').innerText(),/Platby zatiaľ nie sú spustené/);
+   assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    for(let mask=0;mask<8;mask++){
     for(let i=0;i<3;i++)await page.locator('[name="mission"]').nth(i).setChecked(Boolean(mask&(1<<i)));

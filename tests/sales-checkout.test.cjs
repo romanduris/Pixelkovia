@@ -99,8 +99,9 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await page.locator('.faq-list summary').first().click();assert.ok(await page.locator('.faq-list details').first().evaluate(el=>el.open));
     await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL('**/checkout.html');
     await page.locator('#mission-options input').first().waitFor();
-    assert.match(await page.locator('.checkout-status').innerText(),/Platby ešte nie sú spustené/);
-    const statusRect=await page.locator('.checkout-status').boundingBox();assert.ok(statusRect.y<height,'inactive status is immediately visible');
+    assert.match(await page.locator('#payment-note').innerText(),/Platby zatiaľ nie sú spustené/);
+    assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
+    const offerRect=await page.locator('.base-product').boundingBox();assert.ok(offerRect.y<height,'offer is immediately visible after the header');
     assert.equal(await page.locator('[name="mission"]:checked').count(),0,'no paid additions preselected');
     assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
     await page.locator('[name="mission"]').nth(0).check();assert.equal(await page.locator('#order-total').innerText(),'17,89 €');

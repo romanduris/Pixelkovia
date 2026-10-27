@@ -11,7 +11,6 @@
   const bookInfo=id=>PIXELKOVIA_LIBRARY.find(b=>b.id===id);
   if(baseId!=='episode-1'){
     const b=bookInfo(baseId);selected.clear();
-    document.querySelector('.checkout-intro p').textContent='Samostatná kniha bez povinnosti vlastniť hru alebo druhý zväzok. Pracovná ponuka, platby sú vypnuté.';
     document.querySelector('.base-product').innerHTML=`<span class="checkout-step">VAŠA SAMOSTATNÁ KNIHA</span><div class="base-product-heading"><img src="${b.cover}" width="100" height="143" alt="Obálka knihy ${b.title}"><div><h2>${b.title}</h2><p>${b.subtitle}</p><strong>${money(base.priceCents)} · pracovná cena</strong></div></div><p>Tri uzavreté textové rozprávky. Bez potreby kúpy alebo dohrania hry.</p><a href="book-${b.key}-sample.html">Prečítať krátku ukážku →</a>`;
     document.querySelector('#mission-panel').hidden=true;
     document.querySelector('.checkout-summary .summary-row').innerHTML=`<span>${b.title}<small>Samostatná kniha · pracovná cena</small></span><strong>${money(base.priceCents)}</strong>`;

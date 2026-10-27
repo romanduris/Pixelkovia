@@ -2,7 +2,7 @@
   "authority": "User-supplied MD/00_ZADANIE_PRE_CODEX.md: independent books, free Atlas, draft prices, no payments, preserved original content and legacy IDs.",
   "faqSourceSha256": "3c7544cf914db6318d9203f0fd379a2373e1d7510e0e024df473f4d6ddb37edf",
   "approvedFiles": {
-    "checkout.js": "d74fe71fc79d3932a8e35a3335ed874fa60c2b9b9d03b065be82e2ba45725b7f",
+    "checkout.js": "d6948a6def2d7847cb213b95825d492a0c33a0b09f05de3ceeb551e96a8bbd1e",
     "site-config.js": "982944a54b256c1aaa3379c00967b75b67578b13bbb9675636cb78dabbc5b789"
   },
   "originalTaskSha256": "e63c9c55ea7b4d7ddddce4870ec6d380d81c7eea007b471f2b287dd93a7c9bb9"
