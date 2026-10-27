@@ -21,7 +21,7 @@
   const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1999, campaign:'early-bird', paymentsEnabled:false, developmentVoucher:'free'};
   // All prices are calculated in integer cents.
   // Standalone books remain independent; the complete offer applies only to the game.
-  const quote = (selected = [], baseId = 'episode-1', voucherCode = '') => {
+  const quote = (selected = [], baseId = 'episode-1', voucherCode = '', includeAtlas = true) => {
     if(!offer.bookIds.includes(baseId))baseId='episode-1';
     const books=offer.bookIds.filter(id=>id!==baseId&&selected.includes(id));
     const booksCents=books.reduce((sum,id)=>sum+product(id).priceCents,0);
@@ -30,7 +30,7 @@
     // Development price preview only. A future server must verify real vouchers.
     const voucher=String(voucherCode).trim().toLowerCase()===offer.developmentVoucher?offer.developmentVoucher:null;
     const voucherDiscountCents=voucher?subtotalCents-bundleDiscountCents:0;
-    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasCents:0, voucher, voucherDiscountCents, totalCents:subtotalCents-bundleDiscountCents-voucherDiscountCents};
+    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, voucher, voucherDiscountCents, totalCents:subtotalCents-bundleDiscountCents-voucherDiscountCents};
   };
   // Production is deliberately fail-closed until real server purchase verification exists.
   const access = {mode:'test', canLaunch: preparationReady => access.mode === 'test' && preparationReady};

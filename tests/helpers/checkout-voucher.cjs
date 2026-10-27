@@ -31,6 +31,13 @@ module.exports=async(page,{screenshotPrefix,standalone=false}={})=>{
   assert.equal(await discount.locator('strong').innerText(),'−'+['14,99 €','19,98 €','19,98 €','19,99 €'][mask]);
   assert.equal(await page.locator('#summary-discount').isVisible(),mask===3,'bundle and voucher discounts are separate');
  }
+ await page.locator('#select-bundle').click();
+ assert.equal(await total.innerText(),'0,00 €','one-click bundle selection preserves free voucher');
+ assert.equal(await discount.locator('strong').innerText(),'−19,99 €');
+ await page.locator('[name="atlas"]').uncheck();assert.equal(await total.innerText(),'0,00 €');
+ assert.ok(await page.locator('.gift-row').isHidden());
+ await page.locator('#select-bundle').click();assert.ok(await page.locator('[name="atlas"]').isChecked());
+ for(const book of await page.locator('[name="book"]').all())await book.uncheck();
  if(screenshotPrefix){await page.locator('.checkout-summary').scrollIntoViewIfNeeded();await page.screenshot({path:screenshotPrefix+'-applied.png'});}
  await open.click();assert.equal(await input.inputValue(),'free');assert.ok(await remove.isVisible());
  await input.fill('not-free');await apply.click();assert.ok(await dialog.evaluate(el=>el.open));
@@ -53,6 +60,7 @@ module.exports=async(page,{screenshotPrefix,standalone=false}={})=>{
   const original=page.url();
   for(const id of ['story-book-before','story-book-after']){
    const url=new URL(original);url.searchParams.set('product',id);await page.goto(url.href);
+   assert.ok(await page.locator('#select-bundle').isHidden(),'standalone books do not offer a game bundle');
    await open.click();await input.fill('free');await input.press('Enter');
    assert.equal(await total.innerText(),'0,00 €','voucher also covers standalone books');
    await page.locator('[name="book"]:not(:disabled)').check();

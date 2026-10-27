@@ -20,7 +20,7 @@ V projekte zostávajú iba aktuálne produkty, nahrávky a stránky. Priečinok 
 
 ## Ponuka
 
-Hra stojí 14,99 € v uvádzacej ponuke; plánovaná cena po jej skončení je 29,99 €. Každá kniha stojí 4,99 €. S jednou knihou je cena 19,98 €, s oboma sa automaticky odpočíta 4,98 € a celok stojí 19,99 €. Atlas je automaticky zahrnutý zdarma, s plánovanou samostatnou cenou 2,99 €. Samostatné knihy fungujú bez hry. Podrobnosti: [aktuálna ponuka](docs/offer.md).
+Hra stojí 14,99 € v uvádzacej ponuke; plánovaná cena po jej skončení je 29,99 €. Každá kniha stojí 4,99 €. S jednou knihou je cena 19,98 €, s oboma sa automaticky odpočíta 4,98 € a celok stojí 19,99 €. Celý balík sa dá v checkoute vybrať jedným klikom; oproti súčtu aktuálnych samostatných cien 24,97 € ušetrí 4,98 €. Atlas je predvolene zaškrtnutý zdarma a možno ho odobrať bez zmeny ceny; jeho plánovaná samostatná cena je 2,99 €. Samostatné knihy fungujú bez hry. Podrobnosti: [aktuálna ponuka](docs/offer.md).
 
 ## Hra a médiá
 

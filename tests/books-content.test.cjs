@@ -18,6 +18,10 @@ for(let mask=0;mask<4;mask++){
  const ids=cfg.offer.bookIds.filter((_,i)=>mask&(1<<i)),q=cfg.quote(ids);
  assert.equal(q.totalCents,[1499,1998,1998,1999][mask]);assert.equal(q.bundleDiscountCents,mask===3?498:0);
  assert.equal(cfg.quote([...ids,...ids,'bad-id']).totalCents,q.totalCents,'duplicates and unknown IDs do not affect the quote');
+ const withoutAtlas=cfg.quote(ids,'episode-1','',false);
+ assert.equal(withoutAtlas.atlasIncluded,false);assert.equal(q.atlasIncluded,true);
+ assert.equal(withoutAtlas.totalCents,q.totalCents,'Atlas is optional and free');
+ assert.equal(cfg.quote(ids,'episode-1','free',false).totalCents,0);
 }
 assert.equal(cfg.product(cfg.offer.atlasId).priceCents,299);assert.equal(cfg.product('episode-1').pricing.plannedStandardPriceCents,2999);
 for(const file of ['books-content','books-preview.html','library-read.html','portal-library.js','portal-library.css','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
