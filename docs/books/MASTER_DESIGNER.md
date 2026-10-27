@@ -9,24 +9,26 @@ Zadanie: používateľom dodané `00_ZADANIE_PRE_CODEX.md` a tri finálne autors
 - Žiadny pôvodný dokument MASTER DESIGNER ani TREASUREQUEST_MASTER v tomto checkoute nebol. Tento záznam je konkrétny podklad na rozhodnutie, nie nové schválenie backendu.
 - `game-data.js`, herné odpovede, URL/QR, pracovné listy, postup, nahrávky, video a serverové migrácie sa nemenia. Pôvodná kontrola CRO naďalej kontroluje chránené súbory a pôvodný Atlas cez archív; samostatne zaznamenáva schválené nové doplnky katalógu a checkoutu.
 
-## Ponuka a historické práva
+## Schválený pracovný model MVP — aktualizácia Early Bird
 
-- Hra `episode-1` zostáva 14,99 €. Bonusové misie a ich balíkový výpočet zostávajú rovnaké a nie sú premenované na knihy.
-- Nové samostatné ID: `story-book-before` a `story-book-after`. Každé má pracovnú cenu 4,99 €, stav `coming-soon`, cenové označenie `draft` a žiadnu aktívnu kampaň.
-- Predvolený checkout hry má dva nezaškrtnuté knižné doplnky. Samostatná pripravovaná ponuka cez `?product=story-book-before` alebo `story-book-after` obsahuje iba príslušnú knihu, nie povinnú hru. Platby, vytvorenie objednávky a odosielanie údajov ostávajú vypnuté.
-- Historický produkt `bedtime-book` za 4,90 € a ostatné pôvodné produkty ostávajú bez zmeny. Neoznačujú sa za nový zväzok a neprideľujú nové práva. Ak existujú staré práva, budú sa pri riadnej implementácii viazať k zachovanej pôvodnej rozprávke; žiadna migračná operácia sa teraz nevykonáva.
-- Akcia oboch nových kníh za 4,99 € sa NEPOUŽÍVA. Bez schválenia sa ceny sčítajú: dve samostatné knihy 9,98 €; hra a obe knihy 24,97 €.
+Používateľ dodal a prikázal zapracovať `PIXELKOVIA_FUNNEL_EARLY_BIRD_A_KNIZKY_ZADANIE.md`. Kontrolný súčet zadania je v `scope-approval.json`. Týmto zadanie nahrádza pôvodný návrh s bonusovými misiami a sčítavaním cien bez akcie.
 
-## Blokujúce rozhodnutia pred predajom
+- Hra `episode-1`: 14,99 € teraz, plánovaná cena po úvodnej ponuke 29,99 €. Nie historická predchádzajúca cena. Bez časovača či vymysleného počtu dostupných kusov.
+- `story-book-before` a `story-book-after`: 4,99 € každá. Samostatný nákup nevyžaduje hru. Dve knihy bez hry 9,98 €.
+- Checkout má tri karty: dve štandardne nezaškrtnuté knihy a neodoberateľný Atlas zdarma. `atlas-pixelkov` má plánovanú samostatnú cenu 2,99 €; v aktuálnej ponuke sa účtuje 0 €.
+- Hra bez kníh 14,99 €, s jednou 19,98 €, s oboma automaticky 19,99 €. Viditeľný riadok zľavy −4,98 € existuje iba pri oboch knihách. Odobratie druhej knihy zľavu okamžite zruší. Plánovaná samostatná cenníková hodnota všetkého je 42,96 €, nie 49,99 € ani minulá cena.
+- Bonusové misie sa nevyrábajú ani neponúkajú. Ich pôvodné produkty, ceny a ID aj historický `bedtime-book` ostávajú v súkromnom katalógu a databáze bez migrácie alebo zmeny práv. Verejný katalóg ich neobsahuje a kalkulácia ich ignoruje.
+- Formulár, platby a doručovanie ostávajú neaktívne. Nová cenová prezentácia neudeľuje oprávnenia ani nespúšťa backend.
 
-1. Schváliť finálnu cenu každého zväzku a prípadnú kombinovanú akciu. Aktuálne hodnoty sú pracovné, nie spustená fakturácia.
-2. Schváliť serverové doručovanie na základe overených nezávislých oprávnení `story-book-before` / `story-book-after`. Nákup jednej knihy nesmie vyžadovať hru, druhú knihu ani herný postup. Existujúce statické prostredie nevie overiť nákup; jeho JavaScript nesmie slúžiť ako paywall.
-3. Schváliť migračný plán starých nákupných práv. Odporúčanie: žiadna automatická konverzia `bedtime-book`; zachovať pôvodný obsah, prípadný upgrade rozhodnúť osobitne. Pred migráciou audit počtu dotknutých objednávok, záloha a explicitná mapa SKU → obsah.
-4. Až potom možno samostatne aktivovať platby. Táto úloha ich neaktivuje a nerozširuje backend.
+## Pred aktiváciou predaja
+
+1. Serverové doručovanie založené na overených nezávislých oprávneniach `story-book-before` / `story-book-after`. Statické JavaScriptové prepnutie nie je paywall.
+2. Prípadné historické nákupné práva vyžadujú osobitný migračný plán, audit a zálohu. Žiadna automatická konverzia `bedtime-book`.
+3. Samostatné schválenie a implementácia platieb. Zatiaľ sa nič neobjednáva, neplatí ani neposiela.
 
 ## Hranica nasadenia
 
-Verejná Cloudflare Pages doména obsahuje `library.html`, bezplatný `atlas.html` a dve krátke ukážky `book-before-sample.html` / `book-after-sample.html` (dva prvé odseky prvej rozprávky). Verejné sú iba dve obálky a pôvodné portréty. Šesť príbehových ilustrácií sa nepovažuje za verejné ukážky.
+Verejná Cloudflare Pages doména obsahuje `library.html`, bezplatný `atlas.html` a dve krátke ukážky `book-before-sample.html` / `book-after-sample.html` (dva prvé odseky prvej rozprávky). Verejné sú dve obálky, pôvodné portréty a štyri nové screenshoty ukážkových strán v `assets/sales/books/`. Náhľady obsahujú len dva už verejné úvodné odseky a schválené ilustrácie. Šesť plných príbehových ilustrácií sa samostatne nekopíruje. Okná s ukážkou fungujú aj pre celú dvojknihu.
 
 Plné `book-before.html`, `book-after.html`, archív, `books-preview.html` a zdrojové JSON sú len v súkromnom pracovnom prostredí. Existujúca Sites audience sa nemení. Súkromná redakčná knižnica je dostupná zo storyboardu. Plné knihy sú pripravené na kontrolu, nie na anonymné produkčné doručovanie.
 

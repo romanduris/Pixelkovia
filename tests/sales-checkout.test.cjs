@@ -5,12 +5,10 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
 const BASE=process.env.BASE_URL||'http://127.0.0.1:8080';
 const c={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),c);
 const config=c.window.SITE_CONFIG,ids=config.offer.missionIds;
-for(let mask=0;mask<8;mask++){
- const chosen=ids.filter((_,i)=>mask&(1<<i)),quote=config.quote(chosen);
- const expected=chosen.length===3?490:chosen.length*290;
- assert.equal(quote.extrasCents,expected);assert.equal(quote.totalCents,1499+expected);
+for(let mask=0;mask<4;mask++){
+ const selected=config.offer.bookIds.filter((_,i)=>mask&(1<<i));
+ assert.equal(config.quote(selected).totalCents,[1499,1998,1998,1999][mask]);
 }
-assert.equal(config.quote([ids[0],ids[0],'invalid']).totalCents,1789);
 assert.equal(config.offer.refundDays,14);assert.equal(config.offer.paymentsEnabled,false);
 assert.equal(config.access.mode,'test','sales changes cannot simulate purchase entitlements');
 (async()=>{
@@ -26,7 +24,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await page.goto(BASE);await page.locator('.funnel-hero').waitFor();await page.evaluate(()=>document.fonts.ready);
     assert.equal(await page.locator('h1').count(),1);assert.equal(await page.locator('.faq-list details').count(),19);assert.equal(await page.locator('.character-card').count(),7);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'sales overflow '+width);
-    assert.equal(await page.locator('#app>section').count(),9);
+    assert.equal(await page.locator('#app>section').count(),10);
     assert.match(await page.locator('.hero-format').innerText(),/45–60 min[\s\S]*7–13 rokov[\s\S]*Jeden tím[\s\S]*2–5 hráčov/);
     assert.match(await page.locator('.hero-price').innerText(),/14,99 €/);
     assert.match(await page.locator('.funnel-offer-card').innerText(),/Atlas Pixelkov/);
@@ -45,7 +43,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await faqMore.focus();await page.keyboard.press('Enter');
     assert.ok(await page.locator('.faq-extra').isHidden(),'collapse returns to the original eight questions');
     for(const cta of await page.locator('a[href="checkout.html"]').all()){
-     assert.match(await cta.innerText(),/^Pozrieť ponuku/,'consistent checkout action');
+     assert.match(await cta.innerText(),/^(Získať uvádzaciu ponuku|Vybrať knihy k hre|Uvádzacia ponuka|Získať ponuku)/,'consistent checkout action');
      const rect=await cta.boundingBox();if(rect)assert.ok(rect.height>=44,'44px checkout targets');
     }
     if(width<=700){
@@ -98,19 +96,11 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.equal(await page.locator('a[href="parent.html"],a[href="storyboard.html"],a[href="game.html"]').count(),0);
     await page.locator('.faq-list summary').first().click();assert.ok(await page.locator('.faq-list details').first().evaluate(el=>el.open));
     await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL('**/checkout.html');
-    await page.locator('#mission-options input').first().waitFor();
+    await page.locator('#book-options input').first().waitFor();
     assert.match(await page.locator('#payment-note').innerText(),/Platby zatiaľ nie sú spustené/);
     assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
     const offerRect=await page.locator('.base-product').boundingBox();assert.ok(offerRect.y<height,'offer is immediately visible after the header');
-    assert.equal(await page.locator('[name="mission"]:checked').count(),0,'no paid additions preselected');
-    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
-    await page.locator('[name="mission"]').nth(0).check();assert.equal(await page.locator('#order-total').innerText(),'17,89 €');
-    await page.locator('[name="mission"]').nth(1).check();assert.equal(await page.locator('#order-total').innerText(),'20,79 €');
-    await page.locator('[name="mission"]').nth(2).check();assert.equal(await page.locator('#order-total').innerText(),'19,89 €','all three trigger the cheaper bundle');
-    assert.ok(await page.locator('#all-missions').isChecked());assert.match(await page.locator('#summary-extras').innerText(),/3,80/);
-    await page.locator('#all-missions').uncheck();assert.equal(await page.locator('[name="mission"]:checked').count(),0);assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
-    await page.locator('#all-missions').check();assert.equal(await page.locator('[name="mission"]:checked').count(),3);assert.equal(await page.locator('#order-total').innerText(),'19,89 €');
-    await page.locator('[name="mission"]').nth(1).uncheck();assert.equal(await page.locator('#order-total').innerText(),'20,79 €');
+    await require('./helpers/book-offer.cjs').checkout(page);
     await page.locator('#customer-name').fill('Rodinný tím');await page.locator('#customer-email').fill('test@example.com');
     const outgoing=[];page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url());});
     await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
@@ -120,11 +110,11 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false,'contact details are not stored');
     if(width===390){await page.screenshot({path:`/tmp/pixelkovia-checkout-${engine.name()}-phone.png`,fullPage:true});await page.goto(BASE);await page.screenshot({path:`/tmp/pixelkovia-home-${engine.name()}-phone.png`,fullPage:true});}
     if(width===1440){await page.screenshot({path:'/tmp/pixelkovia-checkout-desktop.png',fullPage:true});await page.goto(BASE);await page.screenshot({path:'/tmp/pixelkovia-home-desktop.png',fullPage:true});}
-    await page.goto(BASE+'/checkout.html?extras=all');assert.equal(await page.locator('#order-total').innerText(),'19,89 €');
+    await page.goto(BASE+'/checkout.html?extras=all');assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
     await page.goto(BASE+'/parent.html');await page.locator('.portal-header').waitFor();assert.equal(await page.locator('.material-card').count(),7);
     assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);await context.close();
    }
-   console.log('PASS '+engine.name()+': phone-first sales and checkout at 320/360/390/430/768/1366/1440px, 9 sections, 19 keyboard FAQs, conditional mobile bar, sharp protected worksheet previews, keyboard/touch game preview, pricing combinations, bundle discount, inactive payment, private form and preserved game progress.');
+   console.log('PASS '+engine.name()+': phone-first sales and checkout at 320/360/390/430/768/1366/1440px, 10 sections, 19 keyboard FAQs, conditional mobile bar, sharp protected worksheet previews, keyboard/touch game preview, pricing combinations, bundle discount, inactive payment, private form and preserved game progress.');
   }finally{await browser.close();}
  }
 })().catch(e=>{console.error(e);process.exit(1);});

@@ -14,7 +14,13 @@ assert.equal(hash(fs.readFileSync('legacy-atlas.html','utf8').replace('href="leg
 const c={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),c);const cfg=c.window.SITE_CONFIG;
 assert.equal(cfg.offer.paymentsEnabled,false);assert.equal(cfg.product('episode-1').priceCents,1499);assert.equal(cfg.product('bedtime-book').priceCents,490);
 for(const id of cfg.offer.bookIds){assert.equal(cfg.product(id).priceCents,499);assert.equal(cfg.product(id).pricing.status,'draft');assert.equal(cfg.product(id).pricing.campaign,null);assert.equal(cfg.quote([],id).totalCents,499);assert.equal(cfg.quote(['episode-1',id],id).totalCents,499);}
-assert.equal(cfg.quote(cfg.offer.bookIds).totalCents,2497);assert.equal(cfg.quote(['story-book-after'],'story-book-before').totalCents,998);
-for(let mask=0;mask<32;mask++){const ids=[...cfg.offer.missionIds,...cfg.offer.bookIds].filter((_,i)=>mask&(1<<i));const missions=ids.filter(id=>cfg.offer.missionIds.includes(id)).length;const books=ids.filter(id=>cfg.offer.bookIds.includes(id)).length;assert.equal(cfg.quote(ids).totalCents,1499+(missions===3?490:290*missions)+499*books);}
+assert.equal(cfg.quote(cfg.offer.bookIds).totalCents,1999);assert.equal(cfg.quote(['story-book-after'],'story-book-before').totalCents,998);
+for(let mask=0;mask<4;mask++){
+ const ids=cfg.offer.bookIds.filter((_,i)=>mask&(1<<i)),q=cfg.quote(ids);
+ assert.equal(q.totalCents,[1499,1998,1998,1999][mask]);assert.equal(q.bundleDiscountCents,mask===3?498:0);
+ assert.equal(cfg.quote([...ids,...ids,'piko-mission','listok-mission','kvak-mission','mission-bundle','complete','bad-id']).totalCents,q.totalCents,'obsolete IDs, duplicates and unknown IDs do not affect current offer');
+}
+for(const id of ['piko-mission','listok-mission','kvak-mission','mission-bundle','complete'])assert.ok(cfg.product(id),'historical ID retained');
+assert.equal(cfg.product(cfg.offer.atlasId).priceCents,299);assert.equal(cfg.product('episode-1').pricing.plannedStandardPriceCents,2999);
 for(const file of ['books-content','books-preview.html','legacy-atlas.html','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
-console.log('PASS: complete 3+3 author texts, 7 Atlas profiles, byte-preserved legacy archive, draft independent SKUs, all 32 combinations and public artifact boundary.');
+console.log('PASS: complete 3+3 author texts, 7 Atlas profiles, byte-preserved legacy archive, draft independent SKUs, all four Early Bird combinations and public artifact boundary.');

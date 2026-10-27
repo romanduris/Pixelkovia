@@ -1,9 +1,10 @@
 {
-  "authority": "User-supplied MD/00_ZADANIE_PRE_CODEX.md: independent books, free Atlas, draft prices, no payments, preserved original content and legacy IDs.",
-  "faqSourceSha256": "3c7544cf914db6318d9203f0fd379a2373e1d7510e0e024df473f4d6ddb37edf",
+  "authority": "User-supplied PIXELKOVIA_FUNNEL_EARLY_BIRD_A_KNIZKY_ZADANIE.md: Early Bird, only two optional books and included Atlas, automatic complete bundle; prior content preservation remains in force.",
+  "faqSourceSha256": "dfb572958888d87de5afe7693ac521ea044870073305fc4d4379024523519cb5",
   "approvedFiles": {
-    "checkout.js": "d6948a6def2d7847cb213b95825d492a0c33a0b09f05de3ceeb551e96a8bbd1e",
-    "site-config.js": "982944a54b256c1aaa3379c00967b75b67578b13bbb9675636cb78dabbc5b789"
+    "checkout.js": "6a6696b85aa158f94ed01eab072d8097fefd5a1e26eaa4872f726da5f9e0c23c",
+    "site-config.js": "4230c4c7f3ad9dbd7900784c1d5bc0a4e9b633842830bc4b4c4dffe5093b1576"
   },
-  "originalTaskSha256": "e63c9c55ea7b4d7ddddce4870ec6d380d81c7eea007b471f2b287dd93a7c9bb9"
+  "originalTaskSha256": "e63c9c55ea7b4d7ddddce4870ec6d380d81c7eea007b471f2b287dd93a7c9bb9",
+  "earlyBirdTaskSha256": "41e9753d87777018a3408eb421855bf62b0a369e62724a1a8e9f45372be01246"
 }

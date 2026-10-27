@@ -25,11 +25,15 @@ for(const [file,expected] of Object.entries(snapshot.files)){
 }
 const context={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),context);
 const config=context.window.SITE_CONFIG;
-const originalProducts=config.products.filter(p=>!['story-book-before','story-book-after'].includes(p.id));
-const {bookIds,...originalOffer}=config.offer;
+const originalProducts=config.products.filter(p=>!['story-book-before','story-book-after','atlas-pixelkov'].includes(p.id)).map(p=>p.id==='episode-1'?{...p,pricing:snapshot.commercial.products.find(p=>p.id==='episode-1').pricing}:p);
+const {bookIds,atlasId,completeBundleCents,campaign,...originalOffer}=config.offer;
+assert.deepEqual(Array.from(originalOffer.missionIds),[],'retired missions are not offered');
+originalOffer.missionIds=snapshot.commercial.offer.missionIds;
+assert.equal(config.product('episode-1').pricing.plannedStandardPriceCents,2999);
+assert.equal(campaign,'early-bird');assert.equal(completeBundleCents,1999);assert.equal(atlasId,'atlas-pixelkov');
 assert.equal(JSON.stringify({products:originalProducts,offer:originalOffer,access:config.access.mode}),JSON.stringify(snapshot.commercial),'legacy prices/products, guarantee, access mode and disabled payments preserved');
 assert.deepEqual(Array.from(bookIds),['story-book-before','story-book-after']);
 const faq=fs.readFileSync('sales-page.js','utf8').match(/const faq\s*=\s*\[[\s\S]*?\n  \];/)?.[0];
 assert.ok(faq,'FAQ source found');
-assert.equal(hash(faq),approved.faqSourceSha256,'approved free-Atlas wording remains unchanged');
-console.log('PASS: '+Object.keys(snapshot.files).length+' protected entries checked: original book/archive, PDFs, game, portal and administration preserved; approved catalog/checkout additions separately hashed; legacy commercial rules preserved; only the new independent books and approved Atlas offer wording added.');
+assert.equal(hash(faq),approved.faqSourceSha256,'approved Early Bird and books FAQ remains unchanged');
+console.log('PASS: '+Object.keys(snapshot.files).length+' protected entries checked: original book/archive, PDFs, game, portal and administration preserved; approved catalog/checkout additions separately hashed; historical IDs and data preserved; approved Early Bird, book bundle and Atlas presentation checked separately.');

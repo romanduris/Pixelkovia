@@ -1,45 +1,41 @@
 (() => {
   'use strict';
-  const {product,money,offer,quote} = SITE_CONFIG;
-  const form = document.querySelector('#checkout-form');
-  const selected = new Set();
-  if (new URLSearchParams(location.search).get('extras') === 'all') offer.missionIds.forEach(id => selected.add(id));
-  document.querySelectorAll('[data-base-price]').forEach(el=>{el.textContent=money(product('episode-1').priceCents);});
+  const {product,money,offer,quote}=SITE_CONFIG;
+  const {cover,button}=PIXELKOVIA_BOOK_PREVIEWS;
+  const complete=quote(offer.bookIds),single=quote([offer.bookIds[0]]);
+  const form=document.querySelector('#checkout-form'),selected=new Set();
   const requested=new URLSearchParams(location.search).get('product');
-  const baseId=offer.bookIds.includes(requested)?requested:'episode-1';
-  const base=product(baseId);
-  const bookInfo=id=>PIXELKOVIA_LIBRARY.find(b=>b.id===id);
-  if(baseId!=='episode-1'){
-    const b=bookInfo(baseId);selected.clear();
-    document.querySelector('.base-product').innerHTML=`<span class="checkout-step">VAŠA SAMOSTATNÁ KNIHA</span><div class="base-product-heading"><img src="${b.cover}" width="100" height="143" alt="Obálka knihy ${b.title}"><div><h2>${b.title}</h2><p>${b.subtitle}</p><strong>${money(base.priceCents)} · pracovná cena</strong></div></div><p>Tri uzavreté textové rozprávky. Bez potreby kúpy alebo dohrania hry.</p><a href="book-${b.key}-sample.html">Prečítať krátku ukážku →</a>`;
-    document.querySelector('#mission-panel').hidden=true;
-    document.querySelector('.checkout-summary .summary-row').innerHTML=`<span>${b.title}<small>Samostatná kniha · pracovná cena</small></span><strong>${money(base.priceCents)}</strong>`;
+  const baseId=offer.bookIds.includes(requested)?requested:'episode-1',isGame=baseId==='episode-1';
+  const bookInfo=id=>PIXELKOVIA_LIBRARY.find(book=>book.id===id);
+  // No query parameter preselects a paid add-on, including obsolete mission URLs.
+  document.querySelectorAll('[data-base-price]').forEach(el=>el.textContent=money(product(baseId).priceCents));
+  document.querySelector('[data-planned-price]').textContent=money(product('episode-1').pricing.plannedStandardPriceCents);
+  if(!isGame){
+    const book=bookInfo(baseId);
+    document.querySelector('.base-product').innerHTML=`<span class="checkout-step">VAŠA SAMOSTATNÁ KNIHA</span><div class="standalone-book">${cover(book)}<div><h2 id="base-heading">${book.title}</h2><p>${book.when}</p><strong>${money(product(baseId).priceCents)}</strong></div></div><p>Tri uzavreté rozprávky na spoločné čítanie. Bez potreby kúpy alebo dohrania hry.</p>${button(baseId)}`;
+    document.querySelector('.summary-base').innerHTML=`<span>${book.title}<small>Samostatná kniha</small></span><strong>${money(product(baseId).priceCents)}</strong>`;
     document.querySelector('.delivery-row small').textContent='Digitálna kniha, bez poštovného';
+    document.querySelector('.summary-price-note').textContent='Samostatné knihy · bez predplatného';
   }
-  document.querySelector('#book-options').innerHTML=offer.bookIds.filter(id=>id!==baseId).map(id=>{const p=product(id),b=bookInfo(id);return `<label class="book-choice"><input type="checkbox" name="book" value="${id}"><img src="${b.cover}" width="70" height="100" alt="Obálka: ${b.title}"><span><b>${p.name}</b><small>${b.when} · tri rozprávky</small><small>Pracovná cena · predaj pripravujeme</small></span><strong>+${money(p.priceCents)}</strong></label>`;}).join('');
-  document.querySelector('[data-bundle-price]').textContent='+'+money(product('mission-bundle').priceCents);
-  document.querySelector('[data-bundle-savings]').textContent=money(offer.missionIds.reduce((sum,id)=>sum+product(id).priceCents,0)-product('mission-bundle').priceCents);
-  document.querySelector('#mission-options').innerHTML=offer.missionIds.map(id=>{const p=product(id);return `<label class="mission-choice"><input type="checkbox" name="mission" value="${id}"><img src="assets/sales/characters/${p.character}.webp" alt="" width="52" height="52"><span><b>${p.name}</b><small>Samostatné doplnkové dobrodružstvo</small></span><strong>+${money(p.priceCents)}</strong></label>`;}).join('');
+  document.querySelector('#book-options').innerHTML=offer.bookIds.map(id=>{
+    const book=bookInfo(id),included=id===baseId;
+    return `<article class="checkout-addon book-addon"><div class="addon-main"><input type="checkbox" id="addon-${id}" name="book" value="${id}" ${included?'checked disabled':''} aria-describedby="info-${id}">${cover(book)}<div><label for="addon-${id}">${book.title}</label><small id="info-${id}">${book.when}${included?' · Vaša vybraná kniha':''}</small><strong>${included?'V hlavnej ponuke':'+'+money(product(id).priceCents)}</strong></div></div><p>${book.key==='before'?'Spoznajte prvé svetielko, vznik Pixelkov a tajomstvo bezpečnej brány.':'Tri nové príbehy o obnovenej mape, záhadných pípnutiach a odpočinku svetielok.'}</p>${button(id)}</article>`;
+  }).join('')+`<article class="checkout-addon atlas-addon"><div class="addon-main"><span class="included-icon" aria-hidden="true">✓</span><img src="assets/atlas/piko.webp" width="72" height="90" alt="Piko"><div><h3>Atlas Pixelkov</h3><small>Plánovaná samostatná cena ${money(product(offer.atlasId).priceCents)}</small><strong>ZDARMA${isGame?' K HRE':''}</strong></div></div><p>Sedem Pixelkov, ich schopnosti a malé aktivity.</p><p class="atlas-included">Zahrnuté automaticky – teraz zdarma. Túto položku nemožno odobrať; do súčtu sa započítava 0,00 €.</p><a href="atlas.html" class="book-sample-link">Pozrieť Atlas →</a></article>`;
   function update(){
-    const q=quote([...selected],baseId),all=q.missions.length===offer.missionIds.length;
-    document.querySelector('#all-missions').checked=all;
-    document.querySelector('#all-missions').indeterminate=q.missions.length>0&&!all;
-    document.querySelectorAll('[name="mission"]').forEach(input=>{input.checked=selected.has(input.value);});
-    document.querySelector('#summary-extras').innerHTML=all?`<div class="summary-row"><span>3 bonusové misie<small>Balík: Piko, Pingy, Miky</small></span><strong>${money(q.extrasCents)}</strong></div><p class="summary-savings">Vďaka balíku ušetríte ${money(q.savingsCents)}.</p>`:q.missions.map(id=>`<div class="summary-row"><span>${product(id).name}<small>Voliteľné rozšírenie</small></span><strong>${money(product(id).priceCents)}</strong></div>`).join('');
-    document.querySelectorAll('[name="book"]').forEach(input=>{input.checked=selected.has(input.value);});
-    document.querySelector('#summary-books').innerHTML=q.books.map(id=>`<div class="summary-row"><span>${product(id).name}<small>Voliteľná kniha · pracovná cena</small></span><strong>${money(product(id).priceCents)}</strong></div>`).join('');
+    const q=quote([...selected],baseId);
+    document.querySelectorAll('[name="book"]:not(:disabled)').forEach(input=>input.checked=selected.has(input.value));
+    document.querySelector('#summary-books').innerHTML=q.books.map(id=>`<div class="summary-row"><span>${product(id).name}<small>Voliteľná kniha</small></span><strong>${money(product(id).priceCents)}</strong></div>`).join('');
+    const discount=document.querySelector('#summary-discount');
+    discount.hidden=q.bundleDiscountCents===0;
+    discount.innerHTML=q.bundleDiscountCents?`<span>Zľava za kompletný balík</span><strong>−${money(q.bundleDiscountCents)}</strong>`:'';
     document.querySelector('#order-total').textContent=money(q.totalCents);
     document.querySelector('#button-total').textContent=money(q.totalCents);
-    document.querySelector('#extras-status').textContent=all?`Vybrané všetky 3 misie. Balíková cena ${money(q.extrasCents)} sa použila automaticky.`:q.missions.length?`Vybrané ${q.missions.length===1?'1 bonusové dobrodružstvo':'2 bonusové dobrodružstvá'} za ${money(q.extrasCents)}.${q.missions.length===2?' Všetky tri v balíku za '+money(product('mission-bundle').priceCents)+' vyjdú o '+money(q.extrasCents-product('mission-bundle').priceCents)+' menej.':''}`:'Zatiaľ ste nepridali žiadnu bonusovú misiu.';
+    document.querySelector('#books-status').textContent=!isGame?'Knihy sú samostatné. Vyberáte si len to, čo chcete čítať.':q.books.length===2?`Skvelá voľba! Obe knihy máte teraz v kompletnom balíku za zvýhodnenú cenu ${money(complete.totalCents)}.`:q.books.length===1?`S jednou knihou je cena ${money(single.totalCents)}. Pridaním druhej bude kompletný balík stáť ${money(complete.totalCents)} – rozdiel je ${money(complete.totalCents-single.totalCents)}.`:`Knihy sú voliteľné. Pri výbere oboch sa kompletný balík automaticky prepočíta na ${money(complete.totalCents)}.`;
   }
   form.addEventListener('change',event=>{
-    const input=event.target;
-    if(input.id==='all-missions'){offer.missionIds.forEach(id=>selected.delete(id));if(input.checked)offer.missionIds.forEach(id=>selected.add(id));}
-    else if(input.name==='mission'||input.name==='book'){if(input.checked)selected.add(input.value);else selected.delete(input.value);}
-    else return;
-    update();
+    const input=event.target;if(input.name!=='book'||input.disabled)return;
+    if(input.checked)selected.add(input.value);else selected.delete(input.value);update();
   });
-  // Payment intentionally stays disabled, including implicit Enter submissions.
   form.addEventListener('submit',event=>event.preventDefault());
   form.addEventListener('keydown',event=>{if(event.key==='Enter'&&event.target.matches('input'))event.preventDefault();});
   update();

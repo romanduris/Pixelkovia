@@ -11,9 +11,9 @@ assert.ok(index.includes('Dnes večer budeme'),'landing is rendered without Java
 assert.ok(!/741296|SVETLO/.test(index),'no authored answer codes');
 const compiled={window:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'purchase-config.js'),'utf8'),compiled);
 const source={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),source);
-assert.deepEqual(JSON.parse(JSON.stringify(compiled.window.SITE_CONFIG.products)),JSON.parse(JSON.stringify(source.window.SITE_CONFIG.products)));
-for(let mask=0;mask<8;mask++){
- const ids=source.window.SITE_CONFIG.offer.missionIds.filter((_,i)=>mask&(1<<i));
+assert.deepEqual(Array.from(compiled.window.SITE_CONFIG.products,p=>p.id),['episode-1','story-book-before','story-book-after','atlas-pixelkov']);
+for(let mask=0;mask<4;mask++){
+ const ids=source.window.SITE_CONFIG.offer.bookIds.filter((_,i)=>mask&(1<<i));
  assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids)),JSON.stringify(source.window.SITE_CONFIG.quote(ids)));
 }
 assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled.window.SITE_CONFIG.management,undefined);
@@ -28,7 +28,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url())});
    await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"stage":3,"started":true}'));
    await page.goto(BASE+'/');await page.evaluate(()=>document.fonts.ready);
-   assert.equal(await page.locator('#app>section').count(),9);assert.equal(await page.locator('.faq-item').count(),19);
+   assert.equal(await page.locator('#app>section').count(),10);assert.equal(await page.locator('.faq-item').count(),19);
    assert.equal(await page.locator('.character-card').count(),7);
    assert.equal(await page.locator('.evidence-screen img[src="assets/sales/game-lock-partial.webp"]').count(),1);
    assert.equal(await page.locator('.bonus-book-art .book-cover-title').count(),1);
@@ -67,16 +67,13 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
     const size=await img.evaluate(el=>({w:el.naturalWidth,h:el.naturalHeight}));
     assert.ok(size.w>=700&&size.h<=size.w*1.2,'only sharp physically cropped worksheets are public');
    }
+   await require('./helpers/book-offer.cjs').previews(page);
    await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL(url=>/\/checkout(?:\.html)?$/.test(url.pathname));
-   await page.locator('#mission-options input').first().waitFor();
+   await page.locator('#book-options input').first().waitFor();
    assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('#payment-note').innerText(),/Platby zatiaľ nie sú spustené/);
    assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
-   for(let mask=0;mask<8;mask++){
-    for(let i=0;i<3;i++)await page.locator('[name="mission"]').nth(i).setChecked(Boolean(mask&(1<<i)));
-    const count=mask.toString(2).replace(/0/g,'').length,total=1499+(count===3?490:count*290);
-    assert.equal(await page.locator('#order-total').innerText(),source.window.SITE_CONFIG.money(total));
-   }
+   await require('./helpers/book-offer.cjs').checkout(page);
    await page.locator('#customer-name').fill('Rodinný tím');await page.locator('#customer-email').fill('test@example.com');
    await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
    assert.deepEqual(outgoing,[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);

@@ -19,16 +19,12 @@ const plain=s=>s.replace(/\*\*/g,'').replace(/\*([^*]+)\*/g,'$1').replace(/\s+/g
   if(width===1440&&['library.html','atlas.html','book-after.html'].includes(path))await page.screenshot({path:'docs/books/screenshots/'+path.replace('.html','')+'-desktop.png'});
  }
  await page.goto(BASE+'/checkout.html');assert.equal(await page.locator('[name=book]').count(),2);assert.equal(await page.locator('[name=book]:checked').count(),0);
- for(let mask=0;mask<32;mask++){
-  for(let i=0;i<3;i++)await page.locator('[name=mission]').nth(i).setChecked(Boolean(mask&(1<<i)));
-  for(let i=0;i<2;i++)await page.locator('[name=book]').nth(i).setChecked(Boolean(mask&(1<<(i+3))));
-  const m=[0,1,2].filter(i=>mask&(1<<i)).length,b=[3,4].filter(i=>mask&(1<<i)).length;const expected=(1499+(m===3?490:290*m)+499*b)/100;assert.equal(await page.locator('#order-total').innerText(),expected.toFixed(2).replace('.',',')+' €');
- }
- for(const key of ['before','after']){await page.goto(BASE+'/checkout.html?product=story-book-'+key);assert.equal(await page.locator('#order-total').innerText(),'4,99 €');assert.ok(await page.locator('#mission-panel').isHidden());assert(!/Stratený signál/.test(await page.locator('.checkout-summary').innerText()),'standalone book does not require game');assert.ok(await page.locator('.checkout-buy').isDisabled());}
+ await require('./helpers/book-offer.cjs').checkout(page);
+ for(const key of ['before','after']){await page.goto(BASE+'/checkout.html?product=story-book-'+key);assert.equal(await page.locator('#order-total').innerText(),'4,99 €');assert.equal(await page.locator('[name=mission]').count(),0);assert(!/Stratený signál/.test(await page.locator('.checkout-summary').innerText()),'standalone book does not require game');assert.ok(await page.locator('.checkout-buy').isDisabled());}
  assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"stage":3,"started":true}');assert.deepEqual(errors,[]);await context.close();
  }
  const page=await browser.newPage();for(const path of ['book-before.html','book-after.html','books-preview.html','legacy-atlas.html','books-content/before.json','books-content/after.json','assets/books/before-1.webp','assets/books/after-3.webp'])assert.equal((await page.request.get(publicBase+'/'+path)).status(),404,'private production route '+path);
  for(const path of ['library.html','atlas.html','book-before-sample.html','book-after-sample.html'])assert.equal((await page.request.get(publicBase+'/'+path)).status(),200);
- console.log('PASS '+engine.name()+': exact 3+3 prose and Atlas profiles, mobile/desktop, theme, images, all 32 combinations, standalone book offers and 404 boundary.');
+ console.log('PASS '+engine.name()+': exact 3+3 prose and Atlas profiles, mobile/desktop, theme, images, all four Early Bird combinations, standalone book offers and 404 boundary.');
  }finally{await browser?.close();}}
 })().catch(e=>{console.error(e);process.exit(1)});
