@@ -1,0 +1,40 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {fresh} from './support.mjs';
+import {first,execute,hash} from '../src/db.mjs';
+import {credentials,customerLogin,customerSession} from '../src/customer-auth.mjs';
+import {createCheckout,fulfill,unseal,paymentWebhook,commerceReady,sendPending} from '../src/commerce.mjs';
+import {customerLibrary} from '../src/library-service.mjs';
+const secret='a'.repeat(64),origin='https://pixelkovia.rodulab.com';
+test('two purchases with the same email get isolated credentials, orders and books; fulfillment retries never duplicate access',async()=>{
+  const db=fresh(),email='family@example.invalid';
+  const sessions=new Map();let counter=0;
+  const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_live_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_test_fixture',RESEND_API_KEY:'re_test_fixture',STRIPE_CLIENT:{checkout:{sessions:{async create(input){const id='cs_live_fixture'+(++counter);sessions.set(id,{id,...input,amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:true,payment_status:'paid',payment_intent:'pi_'+counter});return {id,client_secret:'not-a-real-secret'};},async retrieve(id){return sessions.get(id);}}}}};
+  assert.equal(commerceReady(env),true);
+  await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email:''}),e=>e.status===400);
+  const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,email});
+  const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email});
+  const order1=await fulfill(env,firstPurchase.sessionId),order2=await fulfill(env,secondPurchase.sessionId);
+  assert.equal((await fulfill(env,firstPurchase.sessionId)).id,order1.id);
+  assert.equal((await first(db,'SELECT COUNT(*) n FROM customers')).n,2);
+  assert.equal((await first(db,'SELECT COUNT(*) n FROM orders')).n,2);
+  const d1=await first(db,'SELECT * FROM access_deliveries WHERE order_id=?',order1.id),d2=await first(db,'SELECT * FROM access_deliveries WHERE order_id=?',order2.id);
+  const m1=await unseal(d1.encrypted_message,secret),m2=await unseal(d2.encrypted_message,secret);
+  assert.notEqual(m1.password,m2.password);assert.ok(!d1.encrypted_message.includes(m1.password));
+  const login=await customerLogin(new Request(origin,{headers:{'CF-Connecting-IP':'192.0.2.1'}}),env,{email,password:m1.password});assert.equal(login.status,200);
+  const identity=await customerSession(new Request(origin,{headers:{cookie:'__Host-pixelkovia='+login.token}}),env);
+  assert.equal(identity.customerId,d1.customer_id);assert.notEqual(identity.customerId,d2.customer_id);
+  assert.deepEqual((await customerLibrary(db,identity.customerId)).books.map(b=>b.owned),[true,false]);
+  const bad=await customerLogin(new Request(origin),env,{email,password:'wrong-password-value'});assert.equal(bad.status,401);
+  const refunded=await createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:false,email});
+  await execute(db,'INSERT INTO payment_refunds VALUES(?,?)','pi_3',Date.now());
+  const refundedOrder=await fulfill(env,refunded.sessionId);
+  assert.equal((await first(db,'SELECT status FROM orders WHERE id=?',refundedOrder.id)).status,'refunded');
+  assert.equal(await first(db,'SELECT order_id FROM access_deliveries WHERE order_id=?',refundedOrder.id),null,'a refund arriving before checkout completion cannot deliver access');
+  const originalFetch=globalThis.fetch;
+  try{globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');const mail=JSON.parse(options.body);assert.equal(mail.from,'Adam · Pixelkovia <Adam@pixelkovia.rodulab.com>');assert.ok(mail.text.includes('/Supervisor'));return Response.json({id:'provider-'+options.headers['Idempotency-Key']});};await sendPending(env);assert.equal((await first(db,'SELECT status FROM access_deliveries WHERE order_id=?',order1.id)).status,'sent');assert.equal((await first(db,'SELECT encrypted_message FROM access_deliveries WHERE order_id=?',order1.id)).encrypted_message,null);}finally{globalThis.fetch=originalFetch;db.close();}
+});
+test('failed or forged payment notifications cannot grant access; unsigned webhook is rejected',async()=>{
+  const db=fresh(),env={TQ_DB:db,STRIPE_SECRET_KEY:'rk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture'};
+  await assert.rejects(()=>paymentWebhook(new Request(origin+'/api/stripe/webhook',{method:'POST',body:JSON.stringify({type:'checkout.session.completed',data:{object:{payment_status:'paid'}}}),headers:{'stripe-signature':'forged'}}),env),e=>e.status===400);
+  assert.equal((await first(db,'SELECT COUNT(*) n FROM orders')).n,0);db.close();
+});

@@ -46,9 +46,9 @@ export async function prepareFunnel(output){
   let checkout=await readFile(path.join(root,'checkout.html'),'utf8');
   checkout=checkout.replace('src="site-config.js"','src="purchase-config.js"');
   // Reuse the same price functions and data without publishing access/admin code.
-  const purchaseConfig=`/* Generated sales catalog: no game state or customer access. */\n(()=>{\nconst products=${JSON.stringify(config.products.filter(p=>['episode-1',...config.offer.bookIds,config.offer.atlasId].includes(p.id)))};\nconst offer=${JSON.stringify(config.offer)};\nconst payments=${JSON.stringify(config.payments)};\nconst money=(${config.money.toString()});\nconst product=(${config.product.toString()});\nconst quote=(${config.quote.toString()});\nconst paymentKey=(${config.paymentKey.toString()});\nconst paymentVariants=(${config.paymentVariants.toString()});\nconst validStripeLink=(${config.validStripeLink.toString()});\nconst paymentsReady=(${config.paymentsReady.toString()});\nconst checkoutLink=(${config.checkoutLink.toString()});\nwindow.SITE_CONFIG={products,offer,money,product,quote,payments,paymentKey,paymentVariants,validStripeLink,paymentsReady,checkoutLink};\n})();\n`;
+  const purchaseConfig=`/* Generated public catalog. Access and payment readiness are server-owned. */\n(()=>{\nconst products=${JSON.stringify(config.products)};\nconst offer=${JSON.stringify(config.offer)};\nconst payments=${JSON.stringify(config.payments)};\nconst money=(${config.money.toString()});\nconst product=(${config.product.toString()});\nconst quote=(${config.quote.toString()});\nconst managementUrl=()=>location.origin+'/admin';\nwindow.SITE_CONFIG={products,offer,money,product,quote,payments,managementUrl};\n})();\n`;
   await writeFile(path.join(output,'purchase-config.js'),purchaseConfig);
-  const code=['book-previews.js','book-previews.css','styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js','library.css','library.js','library-catalog.js'];
+  const code=['supervisor.js','supervisor.css','portal-library.js','portal-library.css','book-previews.js','book-previews.css','styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js','library.css','library.js','library-catalog.js'];
   for(const file of code)await cp(path.join(root,file),path.join(output,file));
   const assets=[
     'favicon.ico','assets/brand/piko-32.png','assets/brand/piko-192.png','assets/brand/piko-180.png',
@@ -69,7 +69,7 @@ export async function prepareFunnel(output){
   await writeFile(path.join(output,'index.html'),await versioned(index));
   await writeFile(path.join(output,'checkout.html'),await versioned(checkout));
   // The public library has only the free Atlas, metadata and two-paragraph samples.
-  for(const file of ['atlas.html','library.html','book-before-sample.html','book-after-sample.html']){
+  for(const file of ['supervisor.html','atlas.html','library.html','book-before-sample.html','book-after-sample.html']){
     await writeFile(path.join(output,file),await versioned(await readFile(path.join(root,file),'utf8')));
   }
   for(const file of ['404.html','_headers','robots.txt','sitemap.xml'])await cp(path.join(root,'funnel',file),path.join(output,file));

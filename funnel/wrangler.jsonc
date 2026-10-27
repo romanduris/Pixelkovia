@@ -1,0 +1,7 @@
+{
+  "name": "pixelkovia-funnel",
+  "account_id": "033ec39e1948bd5785d92d1993a8036f",
+  "pages_build_output_dir": "../dist/funnel",
+  "compatibility_date": "2026-10-18",
+  "services": [{"binding":"BACKEND","service":"treasurequest-admin"}]
+}

@@ -1,57 +1,55 @@
-# Pixelkovia: Stratený signál
+# Pixelkovia
 
-Rodinná hra pre deti 7–13 rokov a rodičov: sedem úloh, tlačiteľné indície a spoločný telefón. Repozitár obsahuje aktuálnu hru, rodičovskú prípravu, storyboard, dve knihy, Atlas a predajnú ponuku.
+Jediná aktívna aplikácia: **https://pixelkovia.rodulab.com**.
 
-## Stránky a zdroje
+- `/` a `/checkout`: predaj hry, dvoch kníh a bezplatného Atlasu.
+- `/Supervisor`: rodičovský portál, samostatné prihlasovacie údaje pre každý nákup, PDF materiály, knižnica, tri potvrdenia prípravy, postup siedmimi úlohami a hodnotenie.
+- `/hra`: pôvodná hra so siedmimi nezmenenými úlohami. QR odkazy smerujú sem s parametrom `signal`.
+- `/admin`: produktová administrácia, objednávky, priebeh hrania a hodnotenia. `/admin/storyboard` vyžaduje to isté administrátorské prihlásenie.
 
-- `index.html`, `sales-page.js`, `sales.css`: predajná stránka.
-- `checkout.html`, `checkout.js`, `checkout.css`, `site-config.js`: aktuálny katalóg a výpočet ponuky v centoch, pripravené presmerovanie na overené Stripe Payment Links. Aktivácia čaká na pripojený Stripe účet, cenové odkazy a potvrdenie upozornení majiteľovi; skutočné platby zostávajú vypnuté. Pozri [nastavenie platieb](docs/payment-setup.md).
-- `parent.html`, `prep-store.js`, `portal-library.js` / `.css`: príprava, materiály a knižnica pre rodiča.
-- `game.html`, `app.js`, `game-data.js`, `story-text.js`, `cipko-game.js`: hráčska časť a uložený postup aktuálnej hry.
-- `storyboard.html`, `site-content.js`: interný redakčný prehľad, prehrávanie dodaných nahrávok a video podklady.
-- `print-materials.js`, `signal-print.css`, `printables.html`: spoločný zdroj pracovných listov, rodičovského ťaháka a diplomu.
-- `library.html`, `atlas.html`, `book-*-sample.html`: knižnica, sedem profilov Atlasu a krátke ukážky.
-- `book-before.html`, `book-after.html`, `books-preview.html`, `books-content/`: plné knihy iba v súkromnej Site.
-- `library-read.html`: zákaznícka čítačka; obsah získa až po serverovom overení zaplateného nákupu. Bez pripojenej zákazníckej identity zostávajú dostupné ukážky a Atlas.
-- `book-previews.js` / `.css`: spoločné prístupné okná s ukážkami.
-- `admin/`: samostatná chránená administrácia; pravidlá siedmich úloh a checklist sa odvodzujú z aktuálnych herných zdrojov.
+## Zostavenie a nasadenie
 
-V projekte zostávajú iba aktuálne produkty, nahrávky a stránky. Priečinok `MD/` slúži na vstupné zadania; po zapracovaní sa ich súbory odstránia.
+Node.js 24+, Python s `pypdf`; závislosti backendu sú pripnuté v `admin/package-lock.json`.
 
-## Ponuka
-
-Hra stojí 14,99 € v uvádzacej ponuke; plánovaná cena po jej skončení je 29,99 €. Každá kniha stojí 4,99 €. S jednou knihou je cena 19,98 €, s oboma sa automaticky odpočíta 4,98 € a celok stojí 19,99 €. Celý balík sa dá v checkoute vybrať jedným klikom; oproti súčtu aktuálnych samostatných cien 24,97 € ušetrí 4,98 €. Atlas je predvolene zaškrtnutý zdarma a možno ho odobrať bez zmeny ceny; jeho plánovaná samostatná cena je 2,99 €. Samostatné knihy fungujú bez hry. Podrobnosti: [aktuálna ponuka](docs/offer.md).
-
-## Hra a médiá
-
-QR vstupy: `signal=miky`, `plugy`, `pingy`, `cipko`, `guardy`, `navrat`. Otvárajú priamo príslušnú úlohu. Rozpracované úlohy a dokončenia aktuálnej verzie sa ukladajú lokálne v tom istom prehliadači; postup sa nesynchronizuje medzi zariadeniami.
-
-Aktuálne médiá: `PicoVideo.mp4`, `Miky.mp3`, `Plugy.mp3`, `Guardy.mp3`, `EndScene-Dabing.mp4`. Správy majú prehrávanie, pauzu, opakovanie a prepis. Nahrávky sa potichu pripravujú už pri riešení; automatický štart pri úspechu je autorizovaný gestom. Finále sa po správnom hesle spustí s oneskorením 1 s. Po dohraní ostane posledný záber a po 1 s sa zobrazí KONIEC; opakovanie ho skryje.
-
-## Tlačoviny
-
-Deväť strán A4: rodičovský ťahák, sedem indícií a diplom. Tlač jednostranne v mierke 100 %. Čiernobiela tlač je podporovaná. QR majú korekciu H a štyri moduly bieleho okraja. Tlačové texty a geometria zostávajú vektorové, ilustrácie sa v PDF optimalizujú podľa rozmeru.
-
-Autorské nástroje inštalujte mimo repozitára. Premenné `PLAYWRIGHT_MODULE`, `QRCODE_MODULE` a `SHARP_MODULE` určujú cesty k modulom; `pypdf` je potrebný na spojené PDF.
-
-```bash
-QRCODE_MODULE=/cesta/k/qrcode node scripts/generate-qr.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node scripts/export-printables.cjs
-# Export podporuje aj jednotlivé ID, napríklad p1 p3.
-node admin/scripts/sync-game.mjs
-node admin/scripts/sync-checklist.mjs
+```sh
+npm ci --prefix admin
 node scripts/prepare-static.mjs
-node tests/books-content.test.cjs
-node tests/paper-puzzles.test.cjs
-node tests/static-assets.test.cjs
+npm run build:check --prefix admin
+npm test --prefix admin
+# Po commite a pushi na origin/main:
+node scripts/deploy-backend.mjs
+WRANGLER_BIN=admin/node_modules/wrangler/bin/wrangler.js node scripts/deploy-funnel.mjs
 ```
 
-## Publikovanie
+Zdroje sú koreňové HTML/CSS/JS, `books-content/` a `assets/`. `dist/funnel/` je jediný nasadzovaný balík aplikácie. Pages Worker povoľuje presný zoznam verejných súborov a pred každým chráneným súborom overuje serverové oprávnenie. Priame URL pod `_protected/` sa nikdy neobsluhujú. Backend používa pôvodnú produkčnú D1; nevzniká druhý zákaznícky systém.
 
-Pracuje sa na `main`, po dokončení zmeny nasleduje commit a push do `origin/main`. `dist/` sa generuje; neupravuje sa ručne.
+Pôvodná owner-private ChatGPT Site obsahuje iba oznam o presune, zostavený do `dist/retired-site/`. Nie je druhým náhľadom aplikácie.
 
-- Súkromná hra a redakčné stránky: [existujúca Site](https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site), identita v `.openai/hosting.json`, prístup iba vlastníkovi.
-- Verejná ponuka: [pixelkovia.rodulab.com](https://pixelkovia.rodulab.com). Cloudflare sa odovzdáva výhradne `dist/funnel/`, nikdy celý repozitár alebo celý `dist/`. [Postup](funnel/README.md).
-- Administrácia sa zostavuje samostatne podľa [admin/README.md](admin/README.md); statické nasadenie ju neobsahuje.
+## Platby a e-maily
 
-Verejný balík vylučuje hru, odpovede, celé PDF, rodičovský portál, zákaznícku čítačku, administráciu, nahrávky, videá a plné knihy. Knižničné API kontroluje vlastníctvo a doručuje obsah; pripojenie zákazníckeho prihlasovania, platby a prepojenie hráča na server zostávajú nezapojené.
+Kartu spracúva vložený Stripe Checkout. E-mail je povinný ešte pred vytvorením platby. Server vypočíta cenu podľa spoločného katalógu; podpis webhooku a skutočná zaplatená relácia rozhodujú o vytvorení objednávky. Jedna platba vytvorí iba jeden prístup. Dva nákupy s rovnakým e-mailom vytvoria dva oddelené účty s rôznymi heslami.
+
+Prístupový e-mail z `Adam@pixelkovia.rodulab.com` posiela Resend. Heslo sa uchováva ako hash; šifrovaná správa v doručovacej fronte sa po odoslaní odstráni. Worker opakuje neúspešné odoslania každých desať minút.
+
+Nastavenie: [docs/payment-setup.md](docs/payment-setup.md). Bez overených kľúčov a e-mailovej domény zostáva nákup vypnutý.
+
+## Overenie
+
+```sh
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
+node tests/books-content.test.cjs
+node tests/static-assets.test.cjs
+node tests/digital-identity.test.cjs
+node tests/paper-puzzles.test.cjs
+```
+
+Predvolený test používa Chromium; `QA_BROWSER=webkit` volí WebKit. Aktuálny WebKit v tomto Codespace pri lokálnych a zachytených URL padá, preto jeho úplné overenie zostáva otvorené. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Nevytvára produkčných zákazníkov ani platby. Prístupové údaje fixture zostávajú v testovacom procese.
+
+## QR a tlač
+
+```sh
+QRCODE_MODULE=/cesta/k/qrcode node scripts/generate-qr.cjs
+SHARP_MODULE=/cesta/k/sharp PLAYWRIGHT_MODULE=/cesta/k/playwright node scripts/export-printables.cjs
+```
+
+PDF má rodičovský návod ako prvú stranu, sedem pracovných listov a diplom, každé na jednej A4. Pri zmene QR sa obnovia aj dotknuté PDF, obrázkové náhľady a spoločný balík. Pravidlá servera a checklist sa odvodzujú zo spoločných zdrojov cez `admin/scripts/sync-game.mjs` a `sync-checklist.mjs`; ceny cez `scripts/sync-catalog.mjs` pri zostavení.

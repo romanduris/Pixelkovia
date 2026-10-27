@@ -3,13 +3,13 @@ window.GAME = {
   "version": 6,
   "audio": "assets/Miky.mp3",
   "video": "assets/PicoVideo.mp4",
-  "finaleQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=navrat",
+  "finaleQr": "https://pixelkovia.rodulab.com/hra?signal=navrat",
   "finaleVideo": "assets/EndScene-Dabing.mp4",
   "finaleAudio": null,
-  "mikyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=miky",
+  "mikyQr": "https://pixelkovia.rodulab.com/hra?signal=miky",
   "plugyThanks": "Ďakujem vám, kamaráti! Ste skvelí. Pomáhate nám znovu spojiť celú partiu.",
-  "pingyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=pingy",
-  "plugyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=plugy",
+  "pingyQr": "https://pixelkovia.rodulab.com/hra?signal=pingy",
+  "plugyQr": "https://pixelkovia.rodulab.com/hra?signal=plugy",
   "stages": [
     {
       "id": "intro",
@@ -667,7 +667,7 @@ window.GAME = {
       "status": "available"
     }
   },
-  "mazeQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=cipko",
+  "mazeQr": "https://pixelkovia.rodulab.com/hra?signal=cipko",
   "paperPuzzles": {
     "delivery": {
       "nodes": [
@@ -1216,42 +1216,7 @@ window.GAME = {
       "KA"
     ]
   },
-  "guardyQr": "https://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/game.html?signal=guardy",
-  "finaleProduction": {
-    "title": "Rozlúčka pri návratovej bráne",
-    "model": "Seedance 2.0",
-    "testModel": "Seedance 2.0 Fast",
-    "mode": "Image to Video / Start Image",
-    "aspectRatio": "9:16",
-    "resolution": "1080p pri Seedance 2.0, ak je dostupné; 720p pri Fast",
-    "sound": "ON — iba nehovorené pixelkové zvuky a jemné efekty",
-    "instructions": "Vytvor jeden 10-sekundový klip. Nahraj start-a.png do Start Image. Ak vybraný model sprístupní End Image, nahraj end-empty-room.png ako posledný záber. Samostatné referencie nepoužívaj. Nastav 9:16 a zvuk ON, vlož celý prompt-a.txt. Pred spustením skontroluj model, dĺžku a cenu v OpenGen.",
-    "clips": [
-      {
-        "id": "A",
-        "title": "Brána sa otvorí, kamaráti odídu a modrý sprievodca zamáva posledný",
-        "seconds": 10,
-        "image": "assets/finale-production/start-a.png",
-        "promptFile": "assets/finale-production/prompt-a.txt",
-        "prompt": "Animate the supplied start image as one continuous 10-second vertical 9:16 farewell shot. Preserve the exact warm apartment living room, painted pixel-art texture, lighting, fixed camera framing and all seven distinct electronic friends. Keep their original faces, bodies, colours, clothes and accessories. The blue cloud-headed screen-face guide keeps his black suit, teal tie and clipboard in his left hand. The USB character has arms and legs but no cable tail. The orange shield keeps its teal tie and cyan keyhole.\n\n0-2 seconds: the blue membrane inside the gateway dissolves inward into a clear luminous passage. The arch stays fixed. The friends make one small joyful bounce; the tiny yellow pixel gently bobs.\n2-6 seconds: the six companions take short cheerful steps through the opening in three loose pairs, giving small waves toward the viewer as they go. Keep separate silhouettes and a clear path. The yellow pixel floats through beside the microphone. Each disappears only after crossing the threshold. The blue guide stays in the room nearest the camera, facing the viewer while his companions leave; he does not follow yet.\n6-9 seconds: with all six companions through, the blue guide looks toward the viewer and gives two slow warm waves with his free right hand. Preserve his cloud-shaped head and original cyan eye marks.\n9-10 seconds: the blue guide turns and takes a quick final step through the nearby gateway. Only after he crosses, the passage softly closes to a subdued deep-blue pixel membrane and the cyan arch light dims, leaving one tiny cyan twinkle at the threshold. Keep the arch visible. Finish with the empty warm apartment; all seven friends and their accessories are gone. If an End Image is supplied, match that final composition precisely without an abrupt cut, dissolve of characters or camera movement.\n\nOPTIONAL SPEECH COMPATIBILITY, 0.5-8.5 seconds: keep the blue guide facing the viewer with a warm, relaxed expression. Animate ONLY his existing small cyan mouth line with gentle short pulses, slightly opening and closing with brief pauses, then settling back to its original resting shape by 8.5 seconds. Keep the screen-face design intact: no human lips, teeth, tongue, new mouth or exaggerated talking. The movement must read as a friendly electronic expression when there is no voice, and as loosely speaking if a short voiceover is added later. Do not attempt word-level lip synchronization or generate dialogue. At 9 seconds he turns and leaves as described.\n\nPrioritize clear farewell gestures and stable character identities over elaborate movement. Locked camera; no cuts, zoom, orbit or reframing. Start with exactly seven friends; no duplicates, new characters, merging bodies or changing accessories.\n\nAUDIO: soft synchronized 8-bit electronic chirps, short playful bleep-bloop notes and gentle digital boings, a shimmering ascending chime when the gateway opens, two delicate electronic greeting notes during the last wave, and a soft descending chime at the end. Synthetic nonverbal pixel sound effects only. No spoken words, dialogue, singing, human voices, speech-like gibberish or background music. Warm cheerful soft volume; no loud impacts or distortion. Only the blue guide has subtle expressive mouth-line movement as directed below; every other face stays unchanged. No text, names, captions, logos or watermarks.",
-        "endImage": "assets/finale-production/end-empty-room.png",
-        "endImageAlt": "Rovnaká pokojná obývačka po odchode všetkých Pixelkov, brána jemne dohasína."
-      }
-    ],
-    "review": [
-      "Na začiatku je presne sedem rôznych postavičiek; žiadna sa nespojí s inou ani sa nerozmnoží.",
-      "Všetky ruky a nohy zostávajú v obraze, tváre a oblečenie sa nemenia.",
-      "Brána sa otvára na rovnakom mieste a postavičky prechádzajú otvorom.",
-      "Šesť kamarátov odíde skôr; modrý sprievodca zostane posledný a zamáva do kamery.",
-      "Zvuk obsahuje iba tiché elektronické efekty, bez slov a spevu.",
-      "Video má 10 sekúnd; posledné mávanie má priestor a odchod zostáva zrozumiteľný.",
-      "Modrý sprievodca sa do 8,5 s pozerá k divákovi a jemne pohybuje iba pôvodnou tyrkysovou čiarou úst. Záber funguje s voliteľným hlasom aj bez neho.",
-      "Na poslednom zábere je rovnaká prázdna izba s dohasínajúcou bránou; postavičky zmiznú až po prechode cez otvor."
-    ],
-    "optionalVoiceover": "Dokázali ste to! Ďakujeme, kamaráti. Už môžeme ísť domov. Majte sa krásne!",
-    "voiceoverNote": "Voliteľná samostatná TTS stopa: cieľ 7–8 sekúnd, v obraze približne 0,5–8,5 s. Pridať až pri strihu, podľa skutočnej dĺžky nahrávky. OpenGen generuje iba pixelkové efekty. Pohyb úst je jemný a orientačný, bez presného lip-syncu."
-  },
-  "finaleVideoPrompt": "OpenGen — jeden 10-sekundový klip 9:16\n\n1. OTVOR OPENGEN\nhttps://opengen.ai/video-generator\n\n2. START IMAGE — ZAČIATOK\nhttps://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/finale-production/start-a.png\nStiahni PNG a nahraj ho do Start Image. Tento obrázok určuje vzhľad celej partie aj izby.\n\n3. END IMAGE — VOLITEĽNÝ KONIEC\nhttps://zahada-u-vas-doma.alert-coin-6330.chatgpt.site/assets/finale-production/end-empty-room.png\nRovnaká izba po odchode všetkých, brána dohasína. Nahraj ho do End Image, ak je toto pole dostupné pri vybranom modeli. Ak nie je dostupné, použi len Start Image a rovnaký prompt. Samostatné referenčné portréty nepridávaj.\n\n4. NASTAVENIA\nModel: Seedance 2.0 (na snímke bol vybraný Fast; skontroluj výber).\nRežim: Start Image / Image to Video.\nPomer: 9:16. Dĺžka: 10 sekúnd.\nRozlíšenie: 1080p, ak je dostupné, inak 720p. Fast: 720p.\nZvuk: ON — iba nehovorené pixelkové zvuky.\nEnd Image: nahraj end-empty-room.png, ak ho vybraný model sprístupní.\nReferences: prázdne.\nPred spustením skontroluj cenu v OpenGen.\n\n5. SKOPÍRUJ IBA NASLEDUJÚCI ANGLICKÝ TEXT DO PROMPTU\n\nAnimate the supplied start image as one continuous 10-second vertical 9:16 farewell shot. Preserve the exact warm apartment living room, painted pixel-art texture, lighting, fixed camera framing and all seven distinct electronic friends. Keep their original faces, bodies, colours, clothes and accessories. The blue cloud-headed screen-face guide keeps his black suit, teal tie and clipboard in his left hand. The USB character has arms and legs but no cable tail. The orange shield keeps its teal tie and cyan keyhole.\n\n0-2 seconds: the blue membrane inside the gateway dissolves inward into a clear luminous passage. The arch stays fixed. The friends make one small joyful bounce; the tiny yellow pixel gently bobs.\n2-6 seconds: the six companions take short cheerful steps through the opening in three loose pairs, giving small waves toward the viewer as they go. Keep separate silhouettes and a clear path. The yellow pixel floats through beside the microphone. Each disappears only after crossing the threshold. The blue guide stays in the room nearest the camera, facing the viewer while his companions leave; he does not follow yet.\n6-9 seconds: with all six companions through, the blue guide looks toward the viewer and gives two slow warm waves with his free right hand. Preserve his cloud-shaped head and original cyan eye marks.\n9-10 seconds: the blue guide turns and takes a quick final step through the nearby gateway. Only after he crosses, the passage softly closes to a subdued deep-blue pixel membrane and the cyan arch light dims, leaving one tiny cyan twinkle at the threshold. Keep the arch visible. Finish with the empty warm apartment; all seven friends and their accessories are gone. If an End Image is supplied, match that final composition precisely without an abrupt cut, dissolve of characters or camera movement.\n\nOPTIONAL SPEECH COMPATIBILITY, 0.5-8.5 seconds: keep the blue guide facing the viewer with a warm, relaxed expression. Animate ONLY his existing small cyan mouth line with gentle short pulses, slightly opening and closing with brief pauses, then settling back to its original resting shape by 8.5 seconds. Keep the screen-face design intact: no human lips, teeth, tongue, new mouth or exaggerated talking. The movement must read as a friendly electronic expression when there is no voice, and as loosely speaking if a short voiceover is added later. Do not attempt word-level lip synchronization or generate dialogue. At 9 seconds he turns and leaves as described.\n\nPrioritize clear farewell gestures and stable character identities over elaborate movement. Locked camera; no cuts, zoom, orbit or reframing. Start with exactly seven friends; no duplicates, new characters, merging bodies or changing accessories.\n\nAUDIO: soft synchronized 8-bit electronic chirps, short playful bleep-bloop notes and gentle digital boings, a shimmering ascending chime when the gateway opens, two delicate electronic greeting notes during the last wave, and a soft descending chime at the end. Synthetic nonverbal pixel sound effects only. No spoken words, dialogue, singing, human voices, speech-like gibberish or background music. Warm cheerful soft volume; no loud impacts or distortion. Only the blue guide has subtle expressive mouth-line movement as directed below; every other face stays unchanged. No text, names, captions, logos or watermarks.\n\nKONIEC TEXTU NA KOPÍROVANIE\n\nKONTROLA VÝSLEDKU\n- Na začiatku je presne sedem rôznych postavičiek; žiadna sa nespojí s inou ani sa nerozmnoží.\n- Všetky ruky a nohy zostávajú v obraze, tváre a oblečenie sa nemenia.\n- Brána sa otvára na rovnakom mieste a postavičky prechádzajú otvorom.\n- Šesť kamarátov odíde skôr; modrý sprievodca zostane posledný a zamáva do kamery.\n- Zvuk obsahuje iba tiché elektronické efekty, bez slov a spevu.\n- Video má 10 sekúnd; posledné mávanie má priestor a odchod zostáva zrozumiteľný.\n- Modrý sprievodca sa do 8,5 s pozerá k divákovi a jemne pohybuje iba pôvodnou tyrkysovou čiarou úst. Záber funguje s voliteľným hlasom aj bez neho.\n- Na poslednom zábere je rovnaká prázdna izba s dohasínajúcou bránou; postavičky zmiznú až po prechode cez otvor.\n\nVOLITEĽNÝ HLAS PRI STRIHU\nVoliteľná samostatná TTS stopa: cieľ 7–8 sekúnd, v obraze približne 0,5–8,5 s. Pridať až pri strihu, podľa skutočnej dĺžky nahrávky. OpenGen generuje iba pixelkové efekty. Pohyb úst je jemný a orientačný, bez presného lip-syncu.\nText: Dokázali ste to! Ďakujeme, kamaráti. Už môžeme ísť domov. Majte sa krásne!",
+  "guardyQr": "https://pixelkovia.rodulab.com/hra?signal=guardy",
   "guardyMessage": [
     "Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!",
     "Ďakujem vám, kamaráti. Opravili ste poškodené správy a odhalili aj tie, ktoré sa opraviť nedali. Teraz môžeme bezpečne otvoriť cestu domov.",

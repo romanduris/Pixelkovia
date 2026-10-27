@@ -8,3 +8,5 @@ export class LocalD1 {
   close(){this.sqlite.close();}
 }
 export const fresh=()=>{const db=new LocalD1();db.migrate();return db;};
+
+export async function sessionFor(db,customerId){const {randomToken,hash}=await import('../src/db.mjs');const token=randomToken(),at=Date.now();await db.prepare('INSERT INTO customer_sessions VALUES(?,?,?,?)').bind(await hash(token),customerId,at,at+3600000).run();return '__Host-pixelkovia='+token;}

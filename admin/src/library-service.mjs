@@ -3,6 +3,7 @@ import after from '../../books-content/after.json' with {type:'json'};
 import {query} from './db.mjs';
 import {HttpError} from './auth.mjs';
 const books=[before,after];
+export function editorBook(id){const book=books.find(b=>b.id===id);if(!book)throw new HttpError(404,'Kniha neexistuje.');return book;}
 export async function customerLibrary(db,customerId,at=Date.now()){
   const rows=await query(db,`SELECT DISTINCT e.product_id FROM entitlements e
     JOIN products p ON p.id=e.product_id

@@ -44,36 +44,26 @@
         </section>
         <section class="checkout-panel details-panel" aria-labelledby="details-heading">
           <span class="checkout-step">03 / VAŠE ÚDAJE</span><h2 id="details-heading">Kam pošleme prístup?</h2>
-          <div class="checkout-fields"><div><label class="field-label" for="customer-name">Meno <span>(nepovinné)</span></label><input class="checkout-input" id="customer-name" name="name" autocomplete="name" type="text" maxlength="120" placeholder="Vaše meno"></div><div><label class="field-label" for="customer-email">E-mail</label><input class="checkout-input" id="customer-email" name="email" autocomplete="email" type="email" inputmode="email" spellcheck="false" maxlength="254" placeholder="vas@email.sk" aria-describedby="email-note"></div></div>
-          <p id="email-note" class="field-note">Sem bude patriť prístup a materiály. Údaje sa zatiaľ neodosielajú ani neukladajú.</p>
+          <div class="checkout-fields"><div><label class="field-label" for="customer-name">Meno <span>(nepovinné)</span></label><input class="checkout-input" id="customer-name" name="name" autocomplete="name" type="text" maxlength="120" placeholder="Vaše meno"></div><div><label class="field-label" for="customer-email">E-mail</label><input class="checkout-input" id="customer-email" name="email" autocomplete="email" type="email" inputmode="email" spellcheck="false" maxlength="254" required placeholder="vas@email.sk" aria-describedby="email-note"></div></div>
+          <p id="email-note" class="field-note">Na tento e-mail po potvrdení platby pošleme odkaz do portálu a vaše prihlasovacie heslo.</p>
         </section>
       </div>
       <aside class="checkout-summary" aria-labelledby="summary-heading"><div class="summary-inner">
         <span class="checkout-step">VAŠA PONUKA</span><h2 id="summary-heading">Vaša spoločná výprava</h2>
         <div class="summary-row summary-base"><span>Stratený signál</span><strong data-base-price>14,99 €</strong></div><div id="summary-books"></div>
         <div class="summary-row gift-row"><span>Atlas Pixelkov</span><strong>ZDARMA</strong></div>
-        <div id="summary-discount" class="summary-discount" hidden></div><div id="summary-voucher" class="summary-discount" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+        <div id="summary-discount" class="summary-discount" hidden></div>
         <div class="summary-row delivery-row"><span>Doručenie online</span><strong>0 €</strong></div>
         <div class="summary-total"><span>Celkom</span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div><p class="summary-price-note">Uvádzacia ponuka · bez predplatného</p>
-        <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Kúpiť za <span id="button-total">14,99 €</span> <span aria-hidden="true">→</span></button><button class="checkout-voucher-link" id="voucher-open" type="button" aria-haspopup="dialog" aria-controls="voucher-dialog">Voucher</button>
+        <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Kúpiť za <span id="button-total">14,99 €</span> <span aria-hidden="true">→</span></button>
         <p class="payment-note" id="payment-note"><strong>Platby zatiaľ nie sú spustené.</strong> Objednávka ani platba nevznikne a e-mail sa neodošle.</p>
         <div class="checkout-guarantee"><span aria-hidden="true">14</span><p><strong>14-dňová garancia spokojnosti</strong><a href="index.html#garancia">Podmienky vrátenia peňazí →</a></p></div>
         <a class="checkout-help" href="mailto:roman.duris@gmail.com">Máte otázku? Napíšte nám ↗</a>
       </div></aside>
     </form>
-    <details class="checkout-privacy"><summary>Čo sa deje s údajmi vo formulári?</summary><p>Táto verzia slúži na výber ponuky. Vyplnené meno a e-mail zostávajú iba v otvorenom formulári. Stránka ich neodosiela na server, e-mailom ani do analytiky a neukladá ich do lokálneho úložiska. Nezadávajte údaje platobnej karty — na stránke nie je platobná brána. Automatické dopĺňanie môže spravovať váš vlastný prehliadač.</p></details>
+    <section id="payment-panel" class="checkout-panel embedded-payment" hidden aria-labelledby="payment-heading"><span class="checkout-step">04 / BEZPEČNÁ PLATBA</span><h2 id="payment-heading">Dokončite svoj nákup</h2><div id="payment-slot"></div><p id="payment-status" role="status"></p><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
+    <details class="checkout-privacy"><summary>Ako prebehne platba a doručenie?</summary><p>E-mail je povinný na doručenie prístupu. Kartu vyplníte v zabezpečenom formulári Stripe priamo na tejto stránke; údaje karty spracúva Stripe. Vaša banka môže vyžiadať potvrdenie platby. Po potvrdenej úhrade vám automaticky pošleme e-mail s odkazom na rodičovský portál a samostatným heslom pre tento nákup.</p></details>
   </main>
-  <dialog class="voucher-dialog" id="voucher-dialog" aria-labelledby="voucher-heading" aria-describedby="voucher-description">
-    <div class="voucher-heading"><h2 id="voucher-heading">Máte voucher?</h2><button id="voucher-close" type="button" aria-label="Zavrieť voucher">×</button></div>
-    <p id="voucher-description">Zadajte svoj kód. Zľavu hneď uvidíte v súhrne.</p>
-    <form id="voucher-form" novalidate>
-      <label class="field-label" for="voucher-code">Kód voucheru</label>
-      <input class="checkout-input" id="voucher-code" name="voucher" type="text" maxlength="64" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Váš kód" aria-describedby="voucher-error" required autofocus>
-      <p class="voucher-error" id="voucher-error" role="alert" hidden></p>
-      <button class="voucher-apply" type="submit">Uplatniť voucher <span aria-hidden="true">→</span></button>
-      <button class="voucher-remove" id="voucher-remove" type="button" hidden>Odstrániť voucher</button>
-    </form>
-  </dialog>
   <footer class="checkout-footer"><span>Malé postavičky. Veľké dobrodružstvo.</span><a href="index.html#otazky">Otázky a odpovede</a></footer>
 </body>
 </html>

@@ -1,43 +1,25 @@
-# Verejný funnel Pixelkovia
+# Nasadenie aplikácie Pixelkovia
 
-Samostatná predajná stránka a checkout: **https://pixelkovia.rodulab.com**. Hra bude mať vlastnú stránku; tento projekt jej kód, rodičovský portál, platené príbehy, riešenia, celé PDF, nahrávky ani administráciu nedoručuje. Pôvodná súkromná Site s testovaním hry zostáva zachovaná.
+**https://pixelkovia.rodulab.com** používa pôvodný Pages projekt `pixelkovia-funnel` v `cloudflare.json`. Obsahuje verejný predaj aj serverom chránené zákaznícke a administrátorské rozhrania. Pôvodná ChatGPT Site sa už na vývoj alebo predaj nepoužíva.
 
-## Build a hranica verejného obsahu
+`node scripts/prepare-static.mjs` zostaví:
 
-`node scripts/prepare-static.mjs` vytvorí existujúci súkromný výstup `dist/` a samostatný verejný balík **`dist/funnel/`**. Do Cloudflare Pages sa nahráva výhradne vnorený balík. Zdroj pravdy zostáva v koreňových súboroch, `assets/` a tomto adresári; generovaný výstup sa neupravuje.
+- explicitný verejný zoznam predajnej stránky, checkoutu, prihlasovacej schránky Supervisor, knižných ukážok a schválených obrázkov;
+- `_protected/` s aktuálnou hrou, nahrávkami, PDF a interným storyboardom;
+- `_worker.js` s presnou mapou rolí ku každému chránenému súboru a `_routes.json` zahrnujúcim všetky HTTP požiadavky.
 
-- Predajný HTML obsah sa vykreslí pri builde z `sales-page.js`. Pri zostavení sa zo súkromných herných dát čítajú iba verejné mená, roly a ID postáv. Herné zdroje sa neposielajú návštevníkovi.
-- `sales-interactions.js` zabezpečuje spodnú lištu, otvorenie ukážky a galériu troch rodinných scén a desať jasne označených ilustračných hodnotení; nepoužíva herný postup.
-- `atlas.html` je verejný bonus zdarma s kompletnými siedmimi profilmi. `library.html` a `book-before-sample.html` / `book-after-sample.html` obsahujú iba anotácie, obálky a po dva úvodné odseky prvej rozprávky. Plné knihy, `books-preview.html`, `books-content/` a šesť príbehových ilustrácií sa nikdy nekopírujú.
-- Checkout používa odvodený `purchase-config.js` s rovnakými cenami a rovnakou funkciou výpočtu z `site-config.js`, bez administrácie a oprávnení na hranie. Platby zostávajú vypnuté, kontakty sa neodosielajú ani neukladajú.
-- Odkaz **Voucher** pod tlačidlom otvorí dialóg; vývojový kód `free` upraví celý aktuálny výber na 0 €. Ide iba o prepočet ponuky v pamäti stránky, bez objednávky, odosielania alebo odomknutia obsahu. Rovnaký výpočet a správanie používa súkromný aj verejný build.
-- Checkout má kompaktné riadky doplnkov a ponuku celého balíka jedným klikom: 19,99 € oproti aktuálnemu súčtu samostatných položiek 24,97 €. Atlas má normálny checkbox, predvolene zaškrtnutý; jeho odobratie nemení cenu a skryje ho v súhrne. Funkcia `quote()` vracia aj túto voľbu.
-- Adaptér Stripe Payment Links je pripravený pre všetkých 14 kombinácií ponuky a Atlasu. Bez overených odkazov, cien, meny, účtu a režimu zostáva vypnutý. Pri reálnom spustení vyžaduje aj potvrdené upozornenia majiteľovi. Kartu a e-mail zbiera Stripe; prístup posiela majiteľ ručne. Nie sú zapnuté automatické zákaznícke oprávnenia ani odosielanie e-mailov z webu. Podrobnosti sú v [nastavení platieb](../docs/payment-setup.md).
-- Kopíruje sa presný zoznam 40 schválených obrázkov a fontov. Používateľ schválil skutočný statický záber rozpracovanej mriežky s deviatkou (`assets/sales/game-lock-partial.webp`) namiesto detailu Pika; herný JavaScript ani ďalšie riešenia sa nenahrávajú. Náhľady listov sú fyzicky orezané na rovnakú viditeľnú časť ako v predajnej galérii; celý pôvodný list ani jeho spodný odmenový znak sa nenahrávajú. Originály sú nedotknuté. Štyri súbory `assets/sales/books/*-page-*.webp` sú náhľady strán s pôvodnými ilustráciami a iba dvoma už zverejnenými úvodnými odsekmi každej knihy. Plné obrázky príbehov sa nekopírujú. Obnova výrezov: `SHARP_MODULE=/cesta/k/sharp node scripts/generate-funnel-previews.cjs`.
-- Vlastná `404.html` vypína implicitný SPA fallback Pages. Neexistujúce herné a administrátorské adresy vracajú 404. CSP povoľuje potrebné obrázky/fonty a blokuje odoslanie formulára aj nové sieťové API volania.
-- Root a checkout môžu zdieľať vzhľad s hrou, ale verejný balík nemá runtime závislosť od hráča, herných dát ani súkromného hostingu.
+`gateway.mjs` nepovolí priame čítanie `_protected/`. Pred vrátením materiálu overí zakúpený produkt cez `BACKEND`; samotné `/hra` navyše overí hernú reláciu daného telefónu. Storyboard vyžaduje administrátorské prihlásenie. Knihy sa čítajú cez serverové API z jediného zdroja `books-content/`, nie z druhých plných HTML kópií. Odpovede API a chránené súbory používajú `no-store`.
 
-## Overenie a publikovanie
-
-```bash
+```sh
 node scripts/prepare-static.mjs
-# Statický server s koreňom dist/funnel na porte 8081.
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/public-funnel.test.cjs
-node tests/books-content.test.cjs
-node tests/static-assets.test.cjs
-node scripts/deploy-funnel.mjs --check
-# Po commite a pushi presnej verzie na main:
-WRANGLER_BIN=/cesta/k/wrangler/bin/wrangler.js node scripts/deploy-funnel.mjs
+npm run build:check --prefix admin
+npm test --prefix admin
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
+# Po commite a pushi main:
+node scripts/deploy-backend.mjs
+WRANGLER_BIN=admin/node_modules/wrangler/bin/wrangler.js node scripts/deploy-funnel.mjs
 ```
 
-Wrangler je pripnutý na 4.151.1. Token sa číta z `PIXELKOVIA_TOKEN` alebo `CLOUDFLARE_API_TOKEN`, zostáva v prostredí procesu a nevypisuje sa. Cieľový účet, zóna, projekt a subdoména sú v `cloudflare.json`. Skript pred zápisom overí účet/zónu, čistý `main`, zhodu `origin/main`, hranicu artefaktu a úspešné nasadenie. Vytvorí alebo použije iba Pages projekt `pixelkovia-funnel` a presný CNAME `pixelkovia.rodulab.com`. Existujúci wildcard a ostatné DNS záznamy nemení; pri kolízii presného záznamu zastaví prácu. DNS smeruje na skutočný `subdomain` vrátený Cloudflare, nie na odhadnutý hostname.
+Nasadzuje sa iba **dist/funnel/**. Wrangler je pripnutý na **4.151.1** a číta Pages konfiguráciu `funnel/wrangler.jsonc` vrátane privátneho service bindingu na existujúci Worker. API token sa číta z `PIXELKOVIA_TOKEN` alebo `CLOUDFLARE_API_TOKEN`, nikdy sa nevypisuje. Skripty overujú účet, názvy zdrojov, čistý `main` a zhodu s `origin/main`; nedotýkajú sa iných aplikácií ani wildcard DNS.
 
-Test verejného funnelu overuje sedem viewportov, zachovanie celej ilustrácie v úvode, CTA, FAQ, galériu (šípky, bodky, klávesnicu aj dotykové posunutie), dialóg ukážky, ceny a všetky kombinácie doplnkov vrátane dvoch nezávislých kníh s pracovnou cenou, neaktívny nákup, nulové odoslanie údajov, zachovanie lokálneho postupu a 404 pre zakázané súbory. Rovnaký test sa spúšťa proti produkčnej doméne.
-
-Prístup k súkromnej Site zostáva owner-private. Táto zmena nespúšťa platby ani zákaznícke doručovanie a nevyberá adresu budúcej samostatnej hry.
-
-Technické podklady: [Cloudflare Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/), [vlastné domény Pages](https://developers.cloudflare.com/pages/configuration/custom-domains/), [statické routovanie a 404](https://developers.cloudflare.com/pages/configuration/serving-pages/).
-
-## Ponuka
-
-Platné ceny, doplnky a pravidlá automatickej zľavy sú v [aktuálnej ponuke](../docs/offer.md). Katalóg má presne štyri produkty: hru, dve knihy a Atlas. Funkcia `quote()` je spoločná pre súkromný aj verejný build. Spoločné `book-previews.js` / `.css` otvárajú ukážky na funneli, checkoute a v knižnici bez zmeny výberu alebo ceny.
+Verejné náhľady listov zostávajú fyzickými výrezmi bez celých riešení. Jediná výslovne schválená verejná herná snímka je `assets/sales/game-lock-partial.webp`.

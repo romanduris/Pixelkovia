@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {fresh} from './support.mjs';
+import {fresh,sessionFor} from './support.mjs';
 import {execute} from '../src/db.mjs';
 import {createOrder} from '../src/game-service.mjs';
 import {customerLibrary,readBook} from '../src/library-service.mjs';
@@ -37,16 +37,16 @@ test('library API authenticates reads, rejects forged identities and allows only
  const {db}=await fixture();try{
   await createOrder(db,{customerId:'parent',productId:before});
   const base='https://api.example.invalid',portal='https://portal.example.invalid';
-  const env={TQ_DB:db,WEB_URL:portal,CUSTOMER_AUTH:{fetch:async request=>request.headers.get('cookie')==='session=verified'?Response.json({customerId:'parent',role:'customer'}):new Response(null,{status:401})}};
+  const identityCookie=await sessionFor(db,'parent');const env={TQ_DB:db,WEB_URL:portal};
   const request=(path='',headers={},method='GET')=>worker.fetch(new Request(base+'/api/customer/library'+path,{method,headers:{origin:portal,...headers}}),env);
   const anonymous=await request('',{'X-Customer-ID':'parent'});assert.equal(anonymous.status,401);assert.equal(anonymous.headers.get('Access-Control-Allow-Origin'),portal);assert.ok(!(await anonymous.text()).includes('paragraphs'));
-  const list=await request('',{cookie:'session=verified'});assert.equal(list.status,200);assert.equal(list.headers.get('Cache-Control'),'no-store');assert.equal(list.headers.get('Access-Control-Allow-Credentials'),'true');assert.equal((await list.json()).books[0].owned,true);
-  const content=await request('/'+before,{cookie:'session=verified'});assert.equal(content.status,200);assert.equal((await content.json()).id,before);
-  assert.equal((await request('/'+after,{cookie:'session=verified'})).status,403);
-  assert.equal((await request('',{origin:'https://untrusted.example.invalid',cookie:'session=verified'})).status,403);
+  const list=await request('',{cookie:identityCookie});assert.equal(list.status,200);assert.equal(list.headers.get('Cache-Control'),'no-store');assert.equal(list.headers.get('Access-Control-Allow-Credentials'),'true');assert.equal((await list.json()).books[0].owned,true);
+  const content=await request('/'+before,{cookie:identityCookie});assert.equal(content.status,200);assert.equal((await content.json()).id,before);
+  assert.equal((await request('/'+after,{cookie:identityCookie})).status,403);
+  assert.equal((await request('',{origin:'https://untrusted.example.invalid',cookie:identityCookie})).status,403);
   assert.equal((await request('',{'Access-Control-Request-Method':'GET'},'OPTIONS')).status,204);
   assert.equal((await request('',{'Access-Control-Request-Method':'POST'},'OPTIONS')).status,403);
-  assert.equal((await request('',{cookie:'session=verified'},'POST')).status,405);
-  const unavailable=await worker.fetch(new Request(base+'/api/customer/library',{headers:{origin:portal}}),{TQ_DB:db,WEB_URL:portal});assert.equal(unavailable.status,501);assert.equal(unavailable.headers.get('Access-Control-Allow-Origin'),portal);
+  assert.equal((await request('',{cookie:identityCookie},'POST')).status,405);
+  const unavailable=await worker.fetch(new Request(base+'/api/customer/library',{headers:{origin:portal}}),{TQ_DB:db,WEB_URL:portal});assert.equal(unavailable.status,401);assert.equal(unavailable.headers.get('Access-Control-Allow-Origin'),portal);
  }finally{db.close();}
 });

@@ -2,6 +2,7 @@
 // PLAYWRIGHT_MODULE; root HTML/CSS and print-materials.js are the source of truth for all PDFs.
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const fs=require('node:fs/promises');
+const sharp=require(process.env.SHARP_MODULE||'sharp');
 const path=require('node:path');
 const {pathToFileURL,fileURLToPath}=require('node:url');
 (async()=>{
@@ -42,7 +43,7 @@ const {pathToFileURL,fileURLToPath}=require('node:url');
    const pdf=await page.pdf({path:path.join(root,'assets/printables',id+'.pdf'),format:'A4',printBackground:true});
    const count=(pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length;
    if(count!==1)throw new Error(`${id}: expected one A4 page, got ${count}`);
-   if(/^p[1-7]$/.test(id))await page.locator('#'+id).screenshot({path:path.join(root,id==='p1'?'assets/miky-sheet-preview.png':`assets/printables/${id}-preview.png`)});
+   if(/^p[1-7]$/.test(id))await sharp(await page.locator('#'+id).screenshot()).webp({quality:88}).toFile(path.join(root,id==='p1'?'assets/miky-sheet-preview.webp':`assets/printables/${id}-preview.webp`));
    console.log(`${id}: exported one A4 page`);
   }
   const result=require('node:child_process').spawnSync('python3',[path.join(root,'scripts/bundle-printables.py')],{stdio:'inherit'});

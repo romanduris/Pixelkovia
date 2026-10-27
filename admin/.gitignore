@@ -3,7 +3,6 @@ node_modules/
 .build-check/
 .dev.vars*
 !\.dev.vars.example
-wrangler.production.jsonc
 wrangler.preview.jsonc
 approval.local.json
 *.local.json

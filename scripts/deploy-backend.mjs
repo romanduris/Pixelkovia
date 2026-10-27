@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import {execFileSync,spawnSync} from 'node:child_process';
+const branch=execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim();
+if(branch!=='main'||execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim())throw Error('Commit the reviewed source on main before deploying.');
+const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+if(execFileSync('git',['ls-remote','origin','refs/heads/main'],{encoding:'utf8'}).split(/\s/)[0]!==sha)throw Error('Push main before deploying.');
+const token=process.env.PIXELKOVIA_TOKEN||process.env.CLOUDFLARE_API_TOKEN;if(!token)throw Error('Cloudflare token missing.');
+const config=JSON.parse(fs.readFileSync('admin/wrangler.production.jsonc','utf8'));
+if(config.name!=='treasurequest-admin'||config.account_id!=='033ec39e1948bd5785d92d1993a8036f'||config.d1_databases[0].database_id!=='a92475ad-b1e6-4a92-90dd-76e9b8e95b7a'||config.workers_dev!==false)throw Error('Unexpected backend target.');
+const env={...process.env,CLOUDFLARE_API_TOKEN:token,CLOUDFLARE_ACCOUNT_ID:config.account_id,WRANGLER_SEND_METRICS:'false'};
+const run=args=>{const r=spawnSync(process.execPath,['admin/node_modules/wrangler/bin/wrangler.js',...args],{env,stdio:'inherit'});if(r.status!==0)throw Error('Backend deployment failed.');};
+run(['d1','migrations','apply','treasurequest-db','--remote','--config','admin/wrangler.production.jsonc']);
+run(['deploy','--config','admin/wrangler.production.jsonc']);
+console.log('Backend deployed from '+sha+'. The former workers.dev address is disabled.');

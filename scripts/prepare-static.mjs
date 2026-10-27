@@ -1,31 +1,12 @@
-import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import {mkdir,rm,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { prepareFunnel } from './prepare-funnel.mjs';
-const root = fileURLToPath(new URL('../', import.meta.url));
-const output = path.join(root, 'dist');
-await rm(output, { recursive: true, force: true });
-await mkdir(output, { recursive: true });
-const entries = ['portal-library.js','portal-library.css','library-read.html','book-previews.js','book-previews.css','library.html','library.css','library.js','library-catalog.js','book-before-sample.html','book-after-sample.html','book-before.html','book-after.html','books-preview.html','favicon.ico', 'atlas.html',    'index.html', 'checkout.html', 'checkout.js', 'checkout.css', 'sales-page.js', 'sales-interactions.js', 'sales.css', 'parent.html', 'storyboard.html', 'game.html', 'site-config.js', 'prep-store.js', 'printables.html', 'signal-print.css', 'styles.css', 'adventure.css', 'party.css', 'presentation.css', 'site-content.js', 'print-materials.js', 'app.js', 'cipko-game.js', 'game-data.js', 'story-text.js', 'assets'];
-for (const entry of entries) {
-  await cp(path.join(root, entry), path.join(output, entry), { recursive: true });
-}
-// A changed script gets a new URL, so published pages cannot reuse an older
-// game configuration or player implementation from the browser cache.
-const versions = new Map();
-for (const entry of entries.filter(name => /\.(js|css)$/.test(name))) {
-  const bytes = await readFile(path.join(root, entry));
-  versions.set(entry, createHash('sha256').update(bytes).digest('hex').slice(0, 12));
-}
-for (const entry of entries.filter(name => name.endsWith('.html'))) {
-  const target = path.join(output, entry);
-  const html = await readFile(target, 'utf8');
-  await writeFile(target, html.replace(/\b(src|href)="([^"]+)"/g, (attribute, kind, url) => {
-    const pathname = url.split(/[?#]/)[0];
-    const version = versions.get(pathname.replace(/^\.\//, ''));
-    return version ? `${kind}="${pathname}?v=${version}"` : attribute;
-  }));
-}
-await prepareFunnel(path.join(output, 'funnel'));
-console.log('Static site prepared in dist/ with content-versioned scripts and styles.');
+import {prepareFunnel} from './prepare-funnel.mjs';
+import {prepareProtected} from './prepare-protected.mjs';
+import './sync-catalog.mjs';
+const root=fileURLToPath(new URL('../',import.meta.url)),output=path.join(root,'dist');
+await rm(output,{recursive:true,force:true});await mkdir(output,{recursive:true});
+await prepareFunnel(path.join(output,'funnel'));await prepareProtected(path.join(output,'funnel'));
+await mkdir(path.join(output,'retired-site'),{recursive:true});
+await writeFile(path.join(output,'retired-site/index.html'),'<!doctype html><html lang="sk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pixelkovia sa presťahovali</title></head><body><h1>Pixelkovia sú na novej adrese.</h1><p><a href="https://pixelkovia.rodulab.com/">Otvoriť Pixelkov →</a></p></body></html>');
+console.log('One active application built in dist/funnel; the former private Site contains only a move notice.');

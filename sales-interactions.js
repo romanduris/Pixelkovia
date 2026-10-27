@@ -71,5 +71,5 @@
       if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}
     });
   }
-  document.addEventListener('DOMContentLoaded',init,{once:true});
+  document.addEventListener('DOMContentLoaded',()=>{init();fetch('/api/checkout/config',{cache:'no-store'}).then(r=>r.json()).then(value=>{document.querySelectorAll('.sales-status').forEach(node=>node.textContent=value.enabled?'Bezpečná platba kartou · prístup automaticky e-mailom.':'Predaj ešte pripravujeme. Ponuku si môžete nezáväzne pozrieť.');}).catch(()=>{});},{once:true});
 })();

@@ -1,5 +1,6 @@
 import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {passwordSession} from './password-auth.mjs';
+import {customerSession} from './customer-auth.mjs';
 const keys=new Map();
 export class HttpError extends Error {constructor(status,message){super(message);this.status=status;}}
 export function localRequest(request,env){
@@ -31,13 +32,9 @@ export async function requireAdmin(request,env){
   }catch{throw new HttpError(403,'Prístup administrátora nebol overený.');}
 }
 export async function requireCustomer(request,env){
-  // Future identity service. Never trust an incoming customer ID/email header or localStorage.
-  if(!env.CUSTOMER_AUTH)throw new HttpError(501,'Zákaznícke prihlasovanie ešte nie je pripojené.');
-  const response=await env.CUSTOMER_AUTH.fetch(new Request('https://identity.internal/session',{headers:{cookie:request.headers.get('cookie')||'',authorization:request.headers.get('authorization')||''}}));
-  if(!response.ok)throw new HttpError(401,'Prihlásenie zákazníka sa nepodarilo overiť.');
-  const identity=await response.json();
-  if(!identity.customerId || identity.role!=='customer')throw new HttpError(403,'Vyžaduje sa zákaznícke oprávnenie.');
-  return identity;
+  const session=await customerSession(request,env);
+  if(session)return {...session,role:'customer'};
+  throw new HttpError(401,'Prihláste sa e-mailom a heslom z objednávky.');
 }
 export function sameOrigin(request){
   if(!['GET','HEAD'].includes(request.method) && request.headers.get('Origin')!==new URL(request.url).origin)throw new HttpError(403,'Neplatný pôvod požiadavky.');

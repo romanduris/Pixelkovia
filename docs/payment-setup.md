@@ -1,45 +1,36 @@
-# Platba kartou a upozornenie majiteľovi
+# Platby a automatické doručenie
 
-Používateľ schválil reálne platby kartou, upozornenie na `roman.duris@gmail.com` a **ručné doručenie prístupu zákazníkovi**. Aktuálne je pripravený adaptér pre **Stripe Payment Links**; platby zostávajú vypnuté, pretože Stripe účet ešte nie je pripojený a neexistujú overené platobné odkazy. Pripojenie k Stripe bolo ponúknuté cez aplikáciu.
+Používa sa účet Stripe **Pixelkovia**, `acct_1UVB5BGle1VvIsLT`, jednorazové platby v EUR. Predajné ceny zostávajú v spoločnom `site-config.js`: hra 14,99 €, každá kniha 4,99 €, kompletný balík 19,99 €, voliteľný Atlas zdarma.
 
-## Najkratší postup k spusteniu
+## Nastavenie kľúčov
 
-1. Pripojiť existujúci Stripe účet. Overiť presný účet, jeho režim a možnosť prijímať reálne platby. Tajné kľúče nepatria do chatu, repozitára ani verejného JavaScriptu. Na samotné presmerovanie na Payment Links web žiadny API kľúč nepotrebuje.
-2. V pripojenom účte vytvoriť alebo použiť platobné odkazy pre aktuálne ponuky. Ceny sú nižšie; každá ponuka má variant s Atlasom aj bez neho, spolu 14 odkazov. Atlas sa započítava za 0 €. Množstvo položiek je pevné, bez ďalších platených doplnkov či nastaviteľných súm na platobnej stránke.
-3. Na Stripe stránke zbierať kartu aj kontaktný e-mail a uviesť: **„Prístup a materiály vám po potvrdení platby pošleme osobne e-mailom.“** Rovnaký text má byť aj v hostovanom potvrdení Stripe. Nepoužívať súkromný owner-only náhľad Sites ako zákaznícky prístup.
-4. V profile Stripe otvoriť **Communication preferences** a zapnúť upozornenia na **Successful payments** pre používateľa s e-mailom `roman.duris@gmail.com`. Stripe tieto preferencie spravuje osobitne pre každého člena tímu. Potvrdenie o nastavení zatiaľ chýba; aplikácia ho nenastavila a e-mail neodoslala.
-5. Overiť odkazy, produkty, sumy v EUR, účet a režim priamo zo Stripe. Záznamy uložiť do verejnej konfigurácie `payments` v `site-config.js`; obsahujú iba URL a overené údaje, žiadne credentials. Najprv overiť testovací nákup na Stripe a potom nastaviť reálny režim.
-6. Nastaviť `mode: 'live'`, skutočný `accountId`, `chargesEnabled: true` a `merchantNotificationsConfirmed: true` až po ich overení. `offer.paymentsEnabled` sa vypočíta automaticky; ak niektorá kombinácia chýba alebo nesedí jej cena, menu, účet či režim, celý checkout zostane vypnutý.
-7. Zostaviť súkromný aj verejný balík, otestovať, commitnúť a pushnúť na `origin/main`, zverejniť existujúcu súkromnú Site a samostatne `dist/funnel/`. Po reálnom nákupe majiteľ overí prijatú platbu v Stripe a odošle prístup zákazníkovi na e-mail z platby.
+Kľúče patria do **Codespaces secrets**, s prístupom repozitára `romanduris/Pixelkovia`, a do Cloudflare Worker secrets. Nezadávajú sa do chatu, Git súborov ani argumentov príkazu.
 
-| Výber | Celkom |
-| --- | ---: |
-| Hra | 14,99 € |
-| Hra + prvá kniha | 19,98 € |
-| Hra + druhá kniha | 19,98 € |
-| Hra + obe knihy | 19,99 € |
-| Prvá kniha samostatne | 4,99 € |
-| Druhá kniha samostatne | 4,99 € |
-| Obe knihy bez hry | 9,98 € |
+- `PIXELKOVIA_TOKEN`: existujúci Cloudflare token.
+- `CUSTOMER_AUTH_SECRET`: existujúci náhodný autentifikačný a šifrovací kľúč; po začatí predaja ho neotáčať bez samostatného migračného postupu.
+- `STRIPE_SECRET_KEY`: preferovaný obmedzený `rk_live_` kľúč pre vlastný server. Potrebuje čítanie účtu a relácií, tvorbu Checkout Sessions a správu platobného webhooku.
+- `STRIPE_PUBLISHABLE_KEY`: verejný `pk_live_` kľúč rovnakého účtu.
+- `RESEND_API_KEY`: kľúč Resend s oprávnením na nastavenie odosielacej domény a odosielanie.
+- `STRIPE_WEBHOOK_SECRET`: vygeneruje sa pri vytvorení endpointu a musí zostať zachovaný.
 
-Každý riadok má platobný variant s Atlasom a bez Atlasu za rovnakú cenu. `paymentVariants()` vráti všetkých 14 variantov a `paymentKey()` ich jedinečné kľúče. Každý záznam `payments.links[key]` obsahuje skutočné `url`, `accountId`, `livemode`, `currency: 'eur'`, `priceCents` a `verified: true`. Nesmú sa dopĺňať odhadnuté ani testovacie zástupné odkazy do produkčného zdroja.
+```sh
+node scripts/configure-commerce.mjs --interactive
+```
 
-## Správanie checkoutu
+Skript číta chýbajúce kľúče skrytým vstupom, overí účet Pixelkovia a prijímanie platieb, uloží kľúče ako Codespaces secrets, nastaví iba e-mailové DNS záznamy pre `pixelkovia.rodulab.com`, overí doménu Resend a vytvorí alebo opätovne použije platobný webhook. Následne nastaví Worker secrets. Existujúce konfliktné DNS neprepisuje. Hodnoty kľúčov nevypisuje.
 
-- Prijíma iba oficiálne HTTPS odkazy `buy.stripe.com`, zodpovedajúce testovaciemu alebo reálnemu režimu. Neznámy hostiteľ, zlá suma, iný účet či chýbajúca kombinácia neaktivujú tlačidlo.
-- Pri zapnutých platbách sa skryje duplicitný formulár mena a e-mailu. Údaje si zákazník vyplní priamo na Stripe; naša stránka iba vyberá obsah a presmeruje ho.
-- Testovací režim je výrazne označený ako test bez strhnutia peňazí. Úspech sa nesimuluje cez URL, localStorage ani návrat zo Stripe. Ručné doručenie vychádza z platby overenej v Stripe Dashboarde.
-- Vývojový voucher `free` naďalej funguje v neaktívnom náhľade ako nulový cenový prepočet. Pri spustených platbách funguje iba po vytvorení a overení zodpovedajúceho 100 % Stripe promo kódu, nastavení `promotionCode` a `promotionVerified: true`. Aplikácia ho vloží do `prefilled_promo_code`; bez overeného promo kódu sa ako aktívny voucher neponúka. Nulová cena v HTML sama neznamená bezplatnú objednávku.
-- Atlas, knižné voľby, kompletný balík a uložený herný postup zostávajú zachované. Verejný funnel naďalej neobsahuje hru, platené knihy, celé PDF ani administráciu.
+Ak je DNS overenie ešte rozpracované, platby ostanú vypnuté. Opakovanie skriptu používa uložené secrets a existujúci webhook; nevytvára druhý endpoint. Web funguje aj po zastavení alebo prestavaní Codespace.
+
+## Spracovanie nákupu
+
+E-mail je povinný pred vytvorením Checkout Session. Formulár karty je vložený na checkout stránke; banka môže vyžiadať overenie. Cenu a obsah objednávky určuje server, nie suma zaslaná prehliadačom.
+
+Podpísané udalosti `checkout.session.completed` a `checkout.session.async_payment_succeeded` spúšťajú vytvorenie prístupu len po overení `payment_status=paid`, režimu, sumy, meny a väzby na serverovú objednávku. Opakovaná udalosť nevytvorí ďalší účet. Úplný refund zneplatní zaplatený stav objednávky. Návratová URL sama prístup neudelí.
+
+Každý nákup má vlastné zákaznícke ID, zakúpené produkty a náhodné heslo, aj pri rovnakom e-maile. E-mail z **Adam@pixelkovia.rodulab.com** obsahuje iba krátke poďakovanie, odkaz na `/Supervisor`, prihlasovací e-mail a heslo pre daný nákup. Fronta je šifrovaná, úspešné odoslanie vymaže šifrovaný obsah a neúspešné odoslanie sa opakuje.
+
+Vývojový voucher `free`, starý adaptér Payment Links a ručné doručovanie sa nepoužívajú.
 
 ## Overenie
 
-`node tests/payment-links.test.cjs` kontroluje kompletnosť a sumy všetkých variantov, bezpečné URL, režim, účet, menu, promo kód a podmienky reálneho spustenia. `tests/payment-checkout.test.cjs` používa iba pamäťovú konfiguráciu a zachytené presmerovania v prehliadači: overí mobil aj desktop v Chromium a WebKite, manuálne doručenie, výber Atlasu, voucher a zachovaný postup. **Tieto testy nevykonávajú reálnu Stripe platbu ani neoverujú doručenie e-mailu.** Tie čakajú na pripojenie účtu.
-
-## Podklady
-
-- [Stripe Payment Links](https://docs.stripe.com/payment-links)
-- [Prispôsobenie platobnej stránky a promo kód v URL](https://docs.stripe.com/payment-links/customize)
-- [Upozornenia na úspešné platby majiteľovi](https://support.stripe.com/questions/set-up-account-email-notifications)
-
-Automatické doručovanie zákazníkom je samostatný ďalší krok: vyžaduje overené serverové platobné udalosti a zákaznícky prístup. Ručné doručenie zatiaľ nevytvára lokálne oprávnenia ani nenahrádza overenie nákupu.
+`admin/tests/customer-access.test.mjs` kontroluje dva nezávislé nákupy rovnakého e-mailu, idempotenciu, prihlásenie, rozdielne knihy, podpis platobnej udalosti a odstránenie obsahu doručovacej fronty. `tests/customer-journey.test.cjs` overuje skutočný portál, všetkých sedem úloh a hodnotenie v izolovanom Workers/D1 prostredí. Tieto testy nenahrádzajú platbu kartou a doručenie cez živého poskytovateľa.

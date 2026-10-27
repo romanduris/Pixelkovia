@@ -1,20 +1,27 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+import {test} from 'node:test';import {sessionFor} from './support.mjs';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {Miniflare,convertV4MiniflareOptions} from 'miniflare';import {execute,first} from '../src/db.mjs';
 import {createOrder} from '../src/game-service.mjs';import {checklist} from '../src/checklist.mjs';
+import Stripe from 'stripe';
 test('actual workerd/D1 runtime: migrations, protected APIs, server checklist, device activation and answer transaction',async()=>{
  const bundle=new URL('../.build-check/worker.js',import.meta.url);assert.ok(fs.existsSync(bundle),'Run npm run build:check before the integration test.');
- const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:bundle.pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-runtime-test'},bindings:{ENVIRONMENT:'production'},serviceBindings:{CUSTOMER_AUTH:async()=>Response.json({customerId:'runtime-customer',role:'customer'})}}));
+ const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:bundle.pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-runtime-test'},bindings:{ENVIRONMENT:'production',STRIPE_SECRET_KEY:'sk_test_runtime_fixture',STRIPE_WEBHOOK_SECRET:'whsec_runtime_fixture'}}));
  try{
   const db=await mf.getD1Database('TQ_DB');
   for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
+  const payload=JSON.stringify({id:'evt_runtime_signed',type:'checkout.session.completed',data:{object:{id:'cs_test_runtime_fixture',payment_status:'unpaid'}}});
+  const signature=new Stripe('sk_test_runtime_fixture').webhooks.generateTestHeaderString({payload,secret:'whsec_runtime_fixture'});
+  const notification=await mf.dispatchFetch('http://localhost/api/stripe/webhook',{method:'POST',body:payload,headers:{'stripe-signature':signature}});
+  assert.equal(notification.status,200,'real Workers crypto verifies a signed Stripe notification');
+  assert.equal((await first(db,'SELECT COUNT(*) n FROM orders')).n,0,'a signed unpaid event grants no order');
   const at=Date.now();await execute(db,'INSERT INTO customers VALUES(?,?,?,?)','runtime-customer','runtime@example.invalid','Runtime Test',at);
+  const identityCookie=await sessionFor(db,'runtime-customer');
   await createOrder(db,{customerId:'runtime-customer',productId:'episode-1',externalReference:'runtime-payment',at});
   const e=await first(db,'SELECT * FROM entitlements');
   await createOrder(db,{customerId:'runtime-customer',productId:'story-book-before',externalReference:'runtime-book-payment',at});
-  const library=await mf.dispatchFetch('http://localhost/api/customer/library');assert.equal(library.status,200);assert.equal((await library.json()).books[0].owned,true);
-  const book=await mf.dispatchFetch('http://localhost/api/customer/library/story-book-before');assert.equal(book.status,200);assert.equal((await book.json()).stories.length,3);
-  assert.equal((await mf.dispatchFetch('http://localhost/api/customer/library/story-book-after')).status,403);
-  const request=(path,body,cookie='')=>mf.dispatchFetch('http://localhost'+path,{method:'POST',headers:{origin:'http://localhost','content-type':'application/json',cookie},body:JSON.stringify(body)});
+  const library=await mf.dispatchFetch('http://localhost/api/customer/library',{headers:{cookie:identityCookie}});assert.equal(library.status,200);assert.equal((await library.json()).books[0].owned,true);
+  const book=await mf.dispatchFetch('http://localhost/api/customer/library/story-book-before',{headers:{cookie:identityCookie}});assert.equal(book.status,200);assert.equal((await book.json()).stories.length,3);
+  assert.equal((await mf.dispatchFetch('http://localhost/api/customer/library/story-book-after',{headers:{cookie:identityCookie}})).status,403);
+  const request=(path,body,cookie='')=>mf.dispatchFetch('http://localhost'+path,{method:'POST',headers:{origin:'http://localhost','content-type':'application/json',cookie:identityCookie+(cookie?'; '+cookie:'')},body:JSON.stringify(body)});
   assert.equal((await mf.dispatchFetch('http://localhost/api/admin/dashboard')).status,403);
   assert.equal((await request('/api/customer/activate',{entitlementId:e.id,activationKey:'runtime-activation'})).status,409);
   const prep=await request('/api/customer/checklist',{entitlementId:e.id,values:Object.fromEntries(checklist.map(s=>[s.id,true]))});assert.equal(prep.status,200);

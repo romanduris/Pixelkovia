@@ -2,12 +2,12 @@
   'use strict';
   const app = document.querySelector('#app');
   const modal = document.querySelector('#modal');
-  const KEY = 'zahada-v1-progress';
+  const KEY = window.PIXELKOVIA_RUN ? 'pixelkovia-run-'+window.PIXELKOVIA_RUN.run.id : 'zahada-v1-progress';
   const FINAL_STAGE=GAME.stages.length-1,TASK_COUNT=FINAL_STAGE-1,PROGRESS_VERSION=2;
   const environment = document.body.dataset.environment || 'sales';
   const internal = environment !== 'sales';
   if('scrollRestoration' in history)history.scrollRestoration='manual';
-  const fresh = () => ({progressVersion:PROGRESS_VERSION, started:false, callDone:false, stage:0, completed:[], hints:{}, scenePages:{}});
+  const fresh = () => ({progressVersion:PROGRESS_VERSION, started:false, callDone:false, stage:0, completed:[], hints:{}, metrics:{}, scenePages:{}});
   let progress = fresh(), view = environment === 'player' ? 'prep' : environment, preview = null, messageReturn = false, pingTimer = null, soundContext = null;
   let success = false;
   let plugyRevealTimer = null;
@@ -24,16 +24,17 @@
     }
   } catch (_) { /* Local storage is optional, including in file:// mode. */ }
   const state = () => preview || progress;
-  const save = () => { if (!preview) try {localStorage.setItem(KEY, JSON.stringify(progress));} catch (_) {} };
+  const save = () => { if (!preview) {try {localStorage.setItem(KEY, JSON.stringify(progress));} catch (_) {} window.PIXELKOVIA_TRACK?.(JSON.parse(JSON.stringify(progress)));} };
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const normalize = s => s.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').toUpperCase();
   const total = s => s.time.reduce((a,b)=>a+b,0);
   const allTasks = GAME.stages.slice(1,-1);
   function goTop(){app.scrollTop=0;window.scrollTo({top:0,behavior:'instant'});app.querySelector('h1')?.focus({preventScroll:true});}
   function navigate(next){
+    if(window.PIXELKOVIA_RUN && next==='prep'){location.assign('/Supervisor');return;}
     if(!internal && next !== 'sales')return;
     view=next;success=false;
-    if(internal && !preview && next === 'prep' && location.protocol !== 'file:')history.replaceState(null,'','parent.html');
+    if(internal && !preview && next === 'prep' && location.protocol !== 'file:')history.replaceState(null,'','/Supervisor');
     render();goTop();
   }
   function stopPings(){clearInterval(pingTimer);pingTimer=null;}
@@ -372,9 +373,6 @@
     if(retainedGuardyAudio)document.body.append(retainedGuardyAudio);
     else if(previousGuardyAudio){previousGuardyAudio.removeAttribute('src');previousGuardyAudio.load();}
     document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(view==='player'?'prep':view)));
-    if(internal && SITE_CONFIG.access.mode !== 'test'){
-      app.innerHTML='<section class="portal-header"><div><h1>Prístup zatiaľ nie je dostupný</h1><p>Produkčná verzia vyžaduje serverové overenie nákupu. V tejto etape nie je implementované.</p></div></section>';return;
-    }
     document.querySelectorAll('.nav-purchase').forEach(button=>{button.textContent=SITE_CONFIG.purchase.label;});
     document.querySelectorAll('[data-management-link]').forEach(link=>{const url=SITE_CONFIG.managementUrl();link.hidden=!url;if(url)link.href=url;});
     app.innerHTML=view==='prep'?prep():view==='designer'?designer():view==='player'&&state().started&&state().stage>0?taskScreen():landing();
@@ -420,7 +418,7 @@
   }
   function start(){
     if(!internal || !SITE_CONFIG.access.canLaunch(PREP_STORE.ready()))return;
-    if(!preview && location.protocol !== 'file:')history.replaceState(null,'','game.html');
+    if(!preview && location.protocol !== 'file:')history.replaceState(null,'',window.PIXELKOVIA_RUN?'/hra':'game.html');
     view='player';state().started=true;save();
     if(!state().callDone)openCall();
     else{requestGameFullscreen();if(state().stage===0)state().stage=state().completed.length===TASK_COUNT?FINAL_STAGE:state().completed.length+1;save();render();goTop();}
@@ -489,6 +487,7 @@
   function recordTaskCompletion(){const n=state().stage;if(!state().completed.includes(n)){state().completed.push(n);state().completed.sort((a,b)=>a-b);}save();}
   function completeTask(){const n=state().stage;if(n===7)primeFinaleVideo();recordTaskCompletion();success=true;render({autoplayMiky:n===1,autoplayPlugy:n===3,autoplayGuardy:n===6,autoplayFinale:n===7});goTop();}
   function verify(raw){const t=GAME.stages[state().stage];if(t.paperOnly||state().stage===3||state().stage===5)return;const valid=state().stage===1?/^[0-9]{6}$/.test(raw)&&raw===t.answer[0]:t.answer.some(a=>normalize(raw)===normalize(a));
+    if(!preview){const metrics=state().metrics||(state().metrics={});const n=state().stage;metrics[n]||(metrics[n]={attempts:0,wrong:0});metrics[n].attempts++;if(!valid)metrics[n].wrong++;save();}
     if(valid){completeTask();}
     else{const fb=document.querySelector('#feedback');fb.textContent=state().stage===1?'Tento kód ešte nesedí. Skúste znova skontrolovať poradie záznamov.':'Tento kód ešte nesedí. Skúste sa poradiť v tíme alebo otvoriť nápovedu.';document.querySelector('#answer')?.setAttribute('aria-invalid','true');}
   }
@@ -498,18 +497,15 @@
     if(b.dataset.view){preview=null;navigate(b.dataset.view);return;}
     const a=b.dataset.action;if(!a)return;
     if(a==='cipko'){if(cipkoSuppressClick){cipkoSuppressClick=false;return;}if(view!=='player'||state().stage!==5||state().completed.includes(5))return;CIPKO_GAME.act(state(),b.dataset.kind,Number(b.dataset.index));if(CIPKO_GAME.ready(state())){completeTask();return;}save();render();return;}
-    if(a==='copy-opengen-prompt'){
-      const field=document.getElementById('finale-opengen-text'),status=document.getElementById('opengen-copy-status');
-      if(!field||!status)return;
-      const fallback=()=>{field.focus();field.select();status.textContent='Zadanie je označené. Skopíruj ho pomocou Ctrl+C alebo ponuky telefónu.';};
-      if(!navigator.clipboard?.writeText){fallback();return;}
-      navigator.clipboard.writeText(field.value).then(()=>{status.textContent='Celé zadanie je skopírované.';}).catch(fallback);return;
-    }
     if(a==='end-game'||a==='close-window'){
       app.querySelectorAll('video,audio').forEach(media=>media.pause());
       clearTimeout(finaleEndTimer);finaleEndTimer=null;
       clearTimeout(finaleStartTimer);finaleStartTimer=null;
       if(preview){preview=null;navigate('designer');return;}
+      if(window.PIXELKOVIA_FINISH){
+        save();b.disabled=true;b.textContent='Ukladám záver hry…';
+        window.PIXELKOVIA_FINISH().catch(error=>{b.disabled=false;b.textContent=error.message+' · Skúsiť znova';b.setAttribute('aria-live','polite');});return;
+      }
       window.close();
       setTimeout(()=>{if(!window.closed&&b.isConnected){b.textContent=a==='end-game'?'Hra skončila. Kartu môžete zavrieť.':'Okno môžete zavrieť.';b.setAttribute('aria-live','polite');}},350);return;
     }
@@ -629,9 +625,21 @@
   modal.addEventListener('cancel',e=>{e.preventDefault();modal.querySelector('[data-action="close"]')?.click();});
   modal.addEventListener('close',()=>{stopPings();modal.querySelectorAll('video,audio').forEach(media=>media.pause());});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
+  if(window.PIXELKOVIA_RUN){
+    const run=window.PIXELKOVIA_RUN.run;
+    let hasSaved=false;try{hasSaved=!!localStorage.getItem(KEY);}catch{}
+    if(!hasSaved){
+      progress.completed=run.stages.filter(s=>s.completed_at!==null).map(s=>s.stage);
+      progress.hints=Object.fromEntries(run.stages.map(s=>[s.stage,s.hints]));
+      progress.metrics=Object.fromEntries(run.stages.map(s=>[s.stage,{attempts:s.attempts,wrong:s.wrong_attempts}]));
+      progress.callDone=run.stages.length>0;
+      progress.stage=run.current_stage;
+    }
+    progress.started=true;view='player';
+  }
   // Printed QR codes open their signal without an on-screen continue action.
   const scannedSignal={miky:1,plugy:3,pingy:4,cipko:5,guardy:6,navrat:7}[new URLSearchParams(location.search).get('signal')];
-  if(environment==='player' && SITE_CONFIG.access.mode==='test' && Number.isInteger(scannedSignal)){
+  if(environment==='player' && (SITE_CONFIG.access.mode==='test'||window.PIXELKOVIA_RUN) && Number.isInteger(scannedSignal)){
     progress.started=true;progress.callDone=true;
     progress.stage=scannedSignal;
     // These two QR entries carry the preceding paper-only letter into saved progress.
@@ -641,6 +649,7 @@
     view='player';save();
   }
   render();
+  if(window.PIXELKOVIA_RUN){save();if(!progress.callDone)openCall();}
   // Each entry opens its own environment. Gameplay resumes only after an explicit prepared test launch.
   if(environment==='prep'&&location.hash==='#kniznica'){
     requestAnimationFrame(()=>document.getElementById('kniznica')?.scrollIntoView({behavior:'instant'}));
