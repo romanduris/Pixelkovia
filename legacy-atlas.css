@@ -1,0 +1,42 @@
+/* A compact illustrated cover followed immediately by a quiet, readable book. */
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+.atlas-page{background:#10182b;color:#eaf0fa}
+.atlas-main{max-width:1080px;margin:auto;padding:0 24px}
+.atlas-header{max-width:1080px;min-height:68px;padding:10px 24px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.atlas-header .brand{font-size:14px}.atlas-header .brand-sub{font-size:7px}.atlas-header .brand-mark{width:34px;height:36px;font-size:26px;line-height:32px}
+.atlas-back{font-size:12px;color:#c4c4ef;text-decoration:none;display:flex;align-items:center;min-height:44px}
+.atlas-cover{position:relative;isolation:isolate;overflow:hidden;min-height:0;height:280px;margin:0 0 20px;border:1px solid #48516c;border-radius:12px;padding:24px 38px;display:flex;align-items:center;background:#121e35}
+.atlas-cover>img{position:absolute;inset:0;z-index:-2;display:block;width:100%;height:100%;object-fit:cover;object-position:center 15%}
+.atlas-cover:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#0a1125f0,#0a1125ba 32%,#0a112530 65%,#0a112510)}
+.atlas-cover-copy{max-width:500px}.atlas-kicker{font:700 10px/1.5 Manrope,Arial,sans-serif;letter-spacing:.15em;color:#9de3dc;margin:0 0 12px}
+.atlas-cover h1{font-size:clamp(38px,5.5vw,52px);line-height:1.03;letter-spacing:-.055em;margin:0 0 14px;max-width:420px;text-shadow:0 2px 20px #0008}
+.atlas-cover h1 em{display:block;font-family:Caveat,Georgia,serif;font-size:1.25em;font-weight:500;line-height:1;color:#cfb8ff}
+.atlas-cover-copy>p:not(.atlas-kicker){font:500 15px/1.65 Manrope,Arial,sans-serif;color:#e6e8f3;margin:0 0 12px;text-shadow:0 2px 8px #000}
+.atlas-reading-time{display:block;font:10px/1.5 Manrope,Arial,sans-serif;color:#bec8dc}
+.book-chapter{background:#faf6ed;color:#303947;border:1px solid #d4cbb8;border-radius:12px;overflow:hidden;box-shadow:0 14px 40px #05091130}
+.book-section{max-width:710px;margin:auto;padding:36px 32px 12px;scroll-margin-top:24px}
+.book-section+.book-section{padding-top:30px}.book-section:not(.book-opening) h2{font-family:Georgia,serif;font-weight:400;font-size:26px;letter-spacing:-.025em;margin-bottom:20px}
+.chapter-number{font:700 10px/1.5 Manrope,Arial,sans-serif!important;letter-spacing:.14em;color:#82704e!important;margin:0 0 10px!important}
+.book-section h2{font-size:clamp(25px,3.3vw,32px);line-height:1.2;letter-spacing:-.035em;color:#303c4e;margin:0 0 22px;max-width:600px}
+.book-section>p{font:18px/1.85 Georgia,'Times New Roman',serif;color:#3e4650;margin:0 0 20px;overflow-wrap:break-word}
+.book-opening>p:nth-of-type(2):first-letter{float:left;font:64px/.85 Georgia,serif;color:#85704b;margin:9px 8px 0 0}
+ .book-illustration{display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,36px);max-width:620px;margin:12px auto 0;padding:20px 28px 12px}
+.book-characters img{display:block;min-width:0;width:min(26%,150px);height:auto;aspect-ratio:1;object-fit:contain}
+.book-last-line{font-style:italic!important;color:#756044!important;border-top:1px solid #ded5c5;padding:22px 0 12px;margin-top:28px!important}
+.atlas-end{text-align:center;padding:48px 16px 32px}.atlas-end h2{font-size:30px;line-height:1.25;margin:0 0 14px}.atlas-end>p:not(.atlas-kicker){font:14px/1.6 Georgia,serif;color:#b4c1d6}.atlas-end a{display:inline-flex;align-items:center;min-height:44px;font-size:12px;color:#c9bbfb}
+.skip-link{position:absolute;left:16px;top:-100px;z-index:10;background:#c3aeff;color:#10182b;padding:12px 18px}.skip-link:focus{top:8px}
+@media(max-width:600px){
+ .atlas-main{padding:0 12px}.atlas-header{min-height:58px;padding:7px 16px;gap:10px}.atlas-header .brand{font-size:12px}.atlas-header .brand-mark{width:29px;height:31px;font-size:23px;line-height:27px}.atlas-back{font-size:11px}
+ .atlas-cover{min-height:0;height:clamp(204px,26svh,240px);margin-bottom:12px;padding:20px;border-radius:10px}
+ .atlas-cover>img{object-position:56% center}.atlas-cover:before{background:linear-gradient(90deg,#0a1125ed,#0a1125aa 45%,#0a11252b 88%)}
+ .atlas-cover .atlas-kicker{font-size:8px;letter-spacing:.12em;margin-bottom:10px}.atlas-cover h1{font-size:38px;margin-bottom:10px;max-width:240px}.atlas-cover h1 em{font-size:1.22em}.atlas-cover-copy>p:not(.atlas-kicker){font-size:12px;line-height:1.6;margin-bottom:8px}.atlas-reading-time{font-size:8px;max-width:240px}
+ .book-chapter{border-radius:10px}.book-section{padding:25px 22px 6px}.book-section h2{font-size:25px;line-height:1.2;margin-bottom:18px}.book-section>p{font-size:17px;line-height:1.85;margin-bottom:18px}.chapter-number{font-size:9px!important}.book-opening>p:nth-of-type(2):first-letter{font-size:56px;margin-top:8px}
+ .book-section:not(.book-opening) h2{font-size:24px}
+ .book-illustration{margin-top:12px}.atlas-end{padding:38px 14px 24px}.atlas-end h2{font-size:26px}
+}
+@media(max-width:360px){.atlas-cover{padding:18px 16px}.atlas-cover h1{font-size:35px}.book-section{padding-inline:18px}.book-section h2{font-size:23px}.atlas-reading-time{font-size:8px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{.atlas-header,.atlas-end,.skip-link{display:none}.atlas-main{max-width:none;padding:0}.atlas-cover{min-height:220px;margin-bottom:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.book-chapter{border:0;box-shadow:none;background:#fff}.book-section{max-width:none}.book-section>p{color:#222}.book-illustration{break-inside:avoid}}
+
+@media(max-width:600px) and (max-height:700px){.atlas-cover{height:176px;padding:14px 18px}.atlas-cover h1{font-size:32px;margin-bottom:8px}.atlas-cover .atlas-kicker{font-size:7px;margin-bottom:7px}.atlas-cover-copy>p:not(.atlas-kicker){font-size:11px;margin-bottom:0}.atlas-reading-time{display:none}.book-opening{padding-top:20px}.book-opening h2{font-size:22px;margin-bottom:14px}.book-opening .chapter-number{margin-bottom:8px!important}}
+.book-encyclopedia{max-width:100%;margin:30px auto;padding:40px 35px;background:#f5f0e5;border:1px solid #d4cbb8;border-radius:12px;color:#233e42}.book-encyclopedia>.atlas-kicker{color:#6c785c}.book-encyclopedia>h2{font-size:clamp(30px,4vw,44px);line-height:1.2;margin:20px 0}.encyclopedia-intro{font-size:16px;line-height:1.8;max-width:650px;color:#56655e}.encyclopedia-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:35px}.encyclopedia-grid article{border:1px solid #c4c9b9;background:#faf8ed;border-radius:10px;padding:25px;display:flex;align-items:flex-start;gap:18px}.encyclopedia-grid article>img{width:90px;height:90px;object-fit:contain;flex:0 0 90px}.encyclopedia-grid article>div{min-width:0}.encyclopedia-grid article span{font-size:8px;color:#62766e;letter-spacing:.1em}.encyclopedia-grid h3{font-size:28px;color:#2b4c4d;margin:8px 0 15px}.encyclopedia-grid p{font-size:13px;line-height:1.85;color:#52665f}.encyclopedia-grid p.encyclopedia-question{font-size:12px;color:#735d38;border-top:1px solid #d9d6c4;padding-top:12px;margin-top:18px}.encyclopedia-grid article:last-child{grid-column:1/-1}.encyclopedia-grid article:last-child>img{width:125px;height:125px;flex-basis:125px}@media(max-width:700px){.book-encyclopedia{padding:30px 20px;margin-top:25px}.encyclopedia-grid{grid-template-columns:1fr;gap:18px}.encyclopedia-grid article{padding:24px 16px;gap:13px}.encyclopedia-grid article>img{width:60px;height:60px;flex-basis:60px}.encyclopedia-grid article:last-child>img{width:60px;height:60px;flex-basis:60px}.encyclopedia-grid h3{font-size:26px}.encyclopedia-grid p{font-size:13px}.encyclopedia-intro{font-size:14px}}

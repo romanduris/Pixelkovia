@@ -1,0 +1,81 @@
+{
+  "title": "Atlas Pixelkov",
+  "intro": [
+    "Za obrazovkami vášho bytu sa skrýva sedem malých kamarátov. Každý vyzerá inak a každý má vlastnú schopnosť. Niekto počúva, iný rozsvecuje obraz, ďalší prenáša odkazy, opravuje spojenia alebo stráži bezpečné cesty. Spoznajte Pixelkov, ich obľúbené veci aj to, čo sa od nich môžeme naučiť."
+  ],
+  "explanation": [
+    "Pixelkovia sú rozprávkové postavičky inšpirované tým, ako fungujú digitálne zariadenia. V ich príbehoch sa za obrazovkami skrýva maličký svet plný svetelných cestičiek a správ. Každý z kamarátov zároveň pripomína niečo zo skutočnej techniky: to, čo zachytáva zvuky, zobrazuje obrázky, prenáša odkazy alebo stráži bezpečné spojenia."
+  ],
+  "profiles": [
+    {
+      "id": "piko",
+      "title": "PIKO — koordinátor spojení",
+      "paragraphs": [
+        "Piko je modrý Pixelko s hlavičkou podobnou obláčiku, tmavou obrazovkovou tvárou a tyrkysovou kravatou. Na prvý pohľad vyzerá ako ten, ktorý má na všetko odpoveď. V skutočnosti však jeho najväčšou schopnosťou nie je vedieť všetko, ale počúvať ostatných a spájať ich nápady. Keď sa medzi obrazovkami stratí správa alebo sa zatvorí dôležitá cesta, najprv zisťuje, kto môže pomôcť. Potom vytvorí spoločný plán. Nikoho neposiela do nebezpečenstva len preto, aby sa veci podarili rýchlejšie.",
+        "Piko má rád malý zápisník, v ktorom si kreslí schémy spojení. Občas si robí starosti aj tam, kde by ostatní ešte pokojne oddychovali. Postupne sa učí, že koordinátor nemusí niesť všetko sám. Vďaka Mikymu, Pixi, Plugymu, Pingymu, Čipkovi a Guardymu vie, že dobrý tím nie je sedem rovnakých pomocníkov, ale sedem rôznych schopností."
+      ],
+      "ability": "**Jeho superschopnosť:** spájať ľudí a nápady do jedného plánu.",
+      "activity": "**Skús aj ty:** keď sa neviete rozhodnúť, vypočuj si dva rôzne návrhy a nájdi, v čom sa môžu dopĺňať."
+    },
+    {
+      "id": "miky",
+      "title": "MIKY — malý mikrofón",
+      "paragraphs": [
+        "Miky má na hlave tmavú mriežku mikrofónu a pri ušiach veľké slúchadlá. Je veselý, pohotový a zvedavý na každý nový zvuk. Zachytí jemné pípnutie, tiché zavolanie aj správu, ktorú prekryje veľký hluk. Keď sa niečo pokazí, často práve Miky ako prvý zistí, že z nejakého miesta prichádza prosba o pomoc.",
+        "Je dôležité vedieť, čo jeho schopnosť znamená. Mikrofón zvuk **zachytáva**, aby s ním zariadenie vedelo pracovať. Nie je to reproduktor, ktorý zvuk vysiela. Miky vie veľmi dobre načúvať, ale sám nepostaví most ani neopraví poškodený obrázok. Niekedy sa príliš ponáhľa oznámiť svoj objav a musí sa naučiť na chvíľu počkať, aby všetci počuli celú správu. Najradšej má chvíle, keď sa po dlhom tichu ozve známy priateľský signál."
+      ],
+      "ability": "**Jeho superschopnosť:** počuť to, čo si ostatní nevšimnú.",
+      "activity": "**Skús aj ty:** na pol minúty zatvor oči a spočítaj, koľko rôznych zvukov doma počuješ."
+    },
+    {
+      "id": "pixi",
+      "title": "PIXI — svietiaci pixel",
+      "paragraphs": [
+        "Pixi je malý žiarivý žlto-oranžový štvorček. Kam príde, tam sa rozsvieti kúsok farby alebo sa zreteľnejšie ukáže zabudnutý detail. Je odvážna, veselá a má rada obrázky, ktoré deti kreslia na obrazovkách. Svojím svetlom dokáže pomôcť kamarátom nájsť cestu alebo odhaliť miesto, ktoré v prítmí prehliadli.",
+        "Skutočný pixel je jeden maličký bod obrazu. Keď vedľa seba svietia milióny takýchto bodov, na televízore či tablete vidíme celý obrázok. Pixi preto netvorí všetko sama. Jej príbeh pripomína, že aj drobná bodka môže byť veľmi dôležitá, keď je súčasťou väčšieho celku. Niekedy sa nadchne tak, že svieti viac, než ostatní potrebujú. Pri odpočinku sa však vie stíšiť na príjemné teplé svetielko."
+      ],
+      "ability": "**Jej superschopnosť:** ukázať farby a nájsť skrytý detail.",
+      "activity": "**Skús aj ty:** vyfarbi na štvorčekovom papieri jednoduchý obrázok iba pomocou malých políčok."
+    },
+    {
+      "id": "plugy",
+      "title": "PLUGY — spoľahlivý konektor",
+      "paragraphs": [
+        "Plugy pripomína malý svetlý USB konektor s rukami a pevnými topánkami. Keď sa digitálna cestička preruší, dokáže preskúmať oba konce a pomôcť ich správne spojiť. Je trpezlivý, silný a nevzdáva sa pri prvom neúspechu. Jeho obľúbené miesto je pri dôležitých spojeniach, kadiaľ putujú správy medzi časťami zariadení.",
+        "Na rozdiel od uponáhľaných pomocníkov nič netlačí nasilu. Najprv sa pozrie, či spojenie naozaj patrí tam, kam ho chce niekto umiestniť. Aj v skutočnom svete konektory pomáhajú prenášať údaje alebo energiu podľa toho, na čo sú určené. Plugy je presvedčený, že pevný mostík je lepší než rýchla skratka. Má rád poriadok vo svojich drobných nástrojoch a veľmi ho poteší, keď po oprave dorazí prvý správny odkaz."
+      ],
+      "ability": "**Jeho superschopnosť:** opravovať a vytvárať bezpečné spojenia.",
+      "activity": "**Skús aj ty:** pozri sa s dospelým, ktoré zariadenia u vás doma spája kábel a na čo ho používate."
+    },
+    {
+      "id": "pingy",
+      "title": "PINGY — dátový posol",
+      "paragraphs": [
+        "Pingy je malý pomocník podobný obálke. Nosí čiapku a tašku na odkazy, v ktorej má pre každú správu vyhradené miesto. Miluje chvíle, keď sa kúsky informácií dostanú na správnu adresu a opäť dávajú zmysel. Je rýchly, vynaliezavý a nerád necháva niekoho čakať, no niekedy práve pre veľkú rýchlosť poprehadzuje, čo patrí k sebe.",
+        "Digitálne správy sa totiž môžu prenášať po malých častiach. Keď jednotlivé kúsky dorazia, treba ich správne poskladať. Pingy na to potrebuje dobré značky, spoľahlivé spojenie a občas aj Čipkov plán. V skutočnej domácnosti sa podobne prenášajú obrázky, zvuky aj texty, hoci ich ľudia vidia ako jednu hotovú vec. Pingy sa postupne učí, že správne doručená správa je cennejšia než tá, ktorá prišla síce rýchlo, ale na nesprávne miesto."
+      ],
+      "ability": "**Jeho superschopnosť:** prenášať a usporadúvať odkazy.",
+      "activity": "**Skús aj ty:** napíš krátku vetu, rozstrihaj ju na slová a nechaj niekoho iného poskladať ju späť."
+    },
+    {
+      "id": "cipko",
+      "title": "ČIPKO — premýšľavý mikročip",
+      "paragraphs": [
+        "Čipko je zelený Pixelko so zlatými kontaktmi a veľkými okuliarmi. Má rád mapy, pravidlá, poradie a drobné značky. Keď niekto nájde dve možné cesty, Čipko dokáže zistiť, ktorá naozaj vedie do cieľa. Nepotrebuje kričať ani sa ponáhľať. Najprv si všetko pozrie, porovná a až potom navrhne riešenie.",
+        "Jeho skutočnou predlohou je mikročip – maličká súčiastka s veľkým množstvom obvodov, v ktorej sa spracúvajú informácie. V príbehu Čipko pomáha ostatným rozmýšľať, ako jednotlivé údaje patria k sebe. Občas má tendenciu kontrolovať svoj plán toľkokrát, že skoro zabudne vyraziť. Piko mu preto pripomína, že aj dobrý plán potrebuje odvážneho Plugyho, pozorného Mikyho a ostatných priateľov. Čipko si najviac váži chvíľu, keď z neprehľadného zmätku vznikne jednoduchá a zrozumiteľná cesta."
+      ],
+      "ability": "**Jeho superschopnosť:** nájsť poriadok a riešenie v zložitom probléme.",
+      "activity": "**Skús aj ty:** opíš kamarátovi cestu cez byt iba presnými pokynmi. Dokáže ju nájsť bez ukazovania?"
+    },
+    {
+      "id": "guardy",
+      "title": "GUARDY — digitálny ochranca",
+      "paragraphs": [
+        "Guardy má podobu oranžového štítu. Pod tyrkysovou kravatou mu žiari malá kľúčová dierka. Stará sa o Ochranné pole, ktoré stráži dôležité digitálne priechody. Ak k bráne príde správa bez jasného pôvodu, Guardy ju najprv zastaví a preverí. Nerobí to preto, že by nemal rád návštevy. Jeho úlohou je zabezpečiť, aby sa do sveta Pixelkov dostali iba bezpečné spojenia.",
+        "Guardy je pokojný, spoľahlivý a veľmi pozorný. Občas sa zdá až príliš opatrný, ale vie, že otvorená brána nie je vždy dobrá brána. Keď sa potvrdí, že správa je v poriadku, rád pomôže otvoriť cestu. V skutočnom digitálnom svete nám jeho príbeh pripomína ochranné nastavenia, heslá a preverovanie podozrivých správ. Guardy chápe aj priateľstvo: na druhého sa dá spoľahnúť práve vtedy, keď dodrží dohodnuté pravidlá bezpečia."
+      ],
+      "ability": "**Jeho superschopnosť:** udržať kamarátov a spojenia v bezpečí.",
+      "activity": "**Skús aj ty:** porozmýšľaj s rodičom, čo je rozumné urobiť, keď na obrazovke uvidíš zvláštnu správu od neznámeho odosielateľa."
+    }
+  ]
+}

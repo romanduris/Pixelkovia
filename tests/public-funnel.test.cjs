@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=(process.env.BASE_URL||'http://127.0.0.1:8081').replace(/\/$/,'');
 const root='dist/funnel';
-const forbidden=['atlas-reading.js','atlas-reading.css','game.html','parent.html','storyboard.html','atlas.html','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
+const forbidden=['atlas-reading.js','atlas-reading.css','game.html','parent.html','storyboard.html','book-before.html','book-after.html','books-preview.html','legacy-atlas.html','books-content/before.json','books-content/after.json','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
 for(const file of forbidden)assert.ok(!fs.existsSync(path.join(root,file)),'public artifact excludes '+file);
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 assert.ok(index.includes('Dnes večer budeme'),'landing is rendered without JavaScript');

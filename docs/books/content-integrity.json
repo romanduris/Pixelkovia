@@ -1,0 +1,39 @@
+{
+  "source": "Final author texts supplied in MD; no literary rewriting.",
+  "books": {
+    "before": {
+      "originalFile": "01_AKO_VZNIKLI_PIXELKOVIA_KOMPLETNE_TEXTY.md",
+      "originalSha256": "bd3d2af09ad64b958a28e90246ec09f79f8b5a2dd6c3d0ed1b46de7b47121a7f",
+      "contentSha256": "c7ff7f44b89d35b06ee66948f57ac9e44d3eb35d1f217520426c1c091273e68d",
+      "paragraphs": [
+        17,
+        18,
+        20
+      ]
+    },
+    "after": {
+      "originalFile": "02_PO_VELKOM_ZABLESKU_KOMPLETNE_TEXTY.md",
+      "originalSha256": "de90d9a561fa00f3f4c566e73631b685cf5544a184efb49e77efb871f608a04b",
+      "contentSha256": "48cf2843eb2b2d65b02e292c48cd247a8fb36ffbe9a47ba51b42d3db36407bb1",
+      "paragraphs": [
+        17,
+        18,
+        18
+      ]
+    }
+  },
+  "atlas": {
+    "originalSha256": "e7f6088cfeb2f55a32d7fa72d4f42efb1cefe7569c16ddaf7ebe7cc0cf677563",
+    "contentSha256": "f2c1fc249478302e54b0d5fa95e53fea0e1b7a1930245096dfb0f42e2aa31af2"
+  },
+  "legacy": {
+    "atlas.html": {
+      "originalSha256": "c543e0aa1f6c817674ae99f459f9e35210917b365123f042a65b1cd1c8cc9b9f",
+      "archive": "legacy-atlas.html"
+    },
+    "atlas.css": {
+      "originalSha256": "897b3521c7289b449d8432e1b114e1e539fd669840772cdbac0a1883afe4b779",
+      "archive": "legacy-atlas.css"
+    }
+  }
+}

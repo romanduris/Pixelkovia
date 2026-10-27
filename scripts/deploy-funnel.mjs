@@ -32,7 +32,7 @@ const remote=execFileSync('git',['ls-remote','origin','refs/heads/main'],{encodi
 if(remote!==sha)throw Error('origin/main does not match the reviewed source.');
 const wrangler=process.env.WRANGLER_BIN;
 if(!wrangler||!existsSync(wrangler))throw Error('Set WRANGLER_BIN to the pinned Wrangler 4.151.1 CLI.');
-const forbidden=['game.html','parent.html','storyboard.html','atlas.html','printables.html','game-data.js','app.js','site-config.js','admin','assets/printables'];
+const forbidden=['game.html','parent.html','storyboard.html','book-before.html','book-after.html','books-preview.html','legacy-atlas.html','books-content','printables.html','game-data.js','app.js','site-config.js','admin','assets/printables'];
 for(const file of forbidden)if(existsSync(path.join(config.directory,file)))throw Error('Private content found in public artifact: '+file);
 if(!existsSync(path.join(config.directory,'404.html')))throw Error('Public artifact needs a real 404 page.');
 if(!project){

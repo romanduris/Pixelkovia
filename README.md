@@ -15,7 +15,7 @@ Ilustrácie neobsahujú mená ani menovky. Mená zostávajú upraviteľným HTML
 - `game-data.js`: príbeh, postavy, odpovede a hlasové podklady. `story-text.js` vykresľuje tie isté odseky v hre, storyboarde a tlačovinách.
 - `app.js`: oddelený funnel, príprava, hranie, uložený postup a izolované testy zo storyboardu. `cipko-game.js` obsahuje štyri dotykové hry úlohy 5.
 - `sales-page.js`, `sales.css`: predajný funnel so skutočnými PDF ukážkami. `checkout.html`, `checkout.js`, `checkout.css`: výber bonusových misií a súhrn; finálne Kúpiť je podľa zadania neaktívne. `site-config.js` je spoločný katalóg, ceny, 14-dňová garancia a výpočet balíka. `site-content.js` obsahuje materiály, prípravu a storyboard.
-- `atlas.html`: sedem literárnych kapitol, encyklopédia siedmich postáv a spoločné aktivity. Funguje aj bez JavaScriptu; hráč dostane odkaz až po finále.
+- `atlas.html`: nový verejný Atlas zdarma so siedmimi dodanými profilmi a aktivitami. `library.html` a dve stránky `book-*-sample.html` obsahujú iba anotácie a krátke ukážky. Plné autorské knihy sú v súkromných `book-before.html` / `book-after.html`; pôvodná sedemkapitolová rozprávka aj encyklopédia sú zachované v `legacy-atlas.html` s pôvodným štýlom `legacy-atlas.css`. Rozhodnutia o cenách, starých oprávneniach a serverovom doručovaní sú v [MASTER DESIGNER](docs/books/MASTER_DESIGNER.md).
 - `print-materials.js`, `printables.html`, `signal-print.css`: upraviteľný zdroj všetkých PDF aj zhodného storyboardu. Každý list má jednu A4. Balík má deväť strán: rodičovský návod prvý, úloh 1–7, diplom.
 
 ## Zachované hádanky
@@ -106,3 +106,11 @@ Guardyho dodaná nahrávka `assets/Guardy.mp3` je dostupná cez `GAME.guardyAudi
 Finálny QR `signal=navrat` vždy najprv otvorí zadanie hesla, aj pri uloženom dokončení úlohy 7. Správne heslo v aktuálnom otvorení zobrazí pôvodné finále s videom, Koniec hry a oneskoreným KONIEC. Po opätovnom načítaní QR sa heslo vyžaduje znovu; splnenia úloh zostávajú zachované. Na vstupnej obrazovke je priehľadná ilustrácia siedmich kamarátov držiacich sa za ruky.
 
 Predajný funnel, výskum, ceny a overenie: [docs/predajny-funnel.md](docs/predajny-funnel.md).
+
+## Dve samostatné knihy a Atlas zdarma
+
+Dodaný obsah: Kniha I *Ako vznikli Pixelkovia* (tri uzavreté rozprávky), Kniha II *Po veľkom záblesku* (tri nové rozprávky a samostatný úvod) a sedem bezplatných profilov Atlasu. Literárne dáta v `books-content/` zostávajú doslovné; kontrolné súčty pôvodných príloh sú v `docs/books/content-integrity.json`. Pôvodný Atlas sa nemaže, je archivovaný.
+
+Katalóg má nové ID `story-book-before` a `story-book-after`, každé s pracovnou cenou 4,99 €. Pôvodné ID a ceny vrátane `bedtime-book` sa nemenia. Samostatná pripravovaná ponuka knihy neobsahuje povinnú hru. Všetky platby ostávajú vypnuté; akcia oboch kníh za cenu jednej nie je aktivovaná. Plné knihy nesmú byť verejne publikované bez budúceho serverového overenia nákupných práv.
+
+Overenie: `node tests/books-content.test.cjs`, `PLAYWRIGHT_MODULE=/cesta/k/playwright BASE_URL=http://127.0.0.1:8083 PUBLIC_BASE_URL=http://127.0.0.1:8084 node tests/library.test.cjs`, existujúce testy funnelu, checkoutu a chránených herných súborov.

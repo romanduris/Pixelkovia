@@ -1,0 +1,71 @@
+[
+  {
+    "id": "before-cover",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nPortrait cover, ideally 1400 by 2000 pixels or larger, ratio 7:10. Golden-orange morning discovery. A recognizably ordinary household TV frame encloses a tiny welcoming digital space. The blue cloud-headed guide and the other six friends gather around a first golden luminous pixel and branching cyan pathways. Full cast exactly once in lower two thirds, cozy wonder and curiosity. Leave top third quiet dark amber for title, no lettering.",
+    "references": [
+      "assets/atlas/cover.webp",
+      "assets/atlas/piko.webp",
+      "assets/atlas/guardy.webp"
+    ]
+  },
+  {
+    "id": "after-cover",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nPortrait cover, ideally 1400 by 2000 pixels or larger, ratio 7:10. Companion to the first volume: same cover framing and scale, deep midnight blue and turquoise evening, inside a household TV. Exactly seven reference friends reunited in lower two thirds around a safe softly glowing circular data table, restored cyan connections. Mood relief, belonging and peaceful life after an adventure. Top third quiet dark blue for title, no lettering.",
+    "references": [
+      "assets/atlas/cover.webp",
+      "assets/atlas/piko.webp",
+      "assets/atlas/guardy.webp"
+    ]
+  },
+  {
+    "id": "before-1",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nLandscape 3:2 story opening: origin of the very first gold pixel. A single small warm golden square light, with the simplest friendly two-eye expression, awakens among dark-blue display pixels and delicate cyan signal traces inside a TV. A faint reflected household lamp in glass hints at the human apartment beyond. No full cast yet, no scenery or architecture; intimate first discovery and a memory cubby nearby.",
+    "references": [
+      "assets/atlas/pixi.webp"
+    ]
+  },
+  {
+    "id": "before-2",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nLandscape 3:2: the blue cloud-headed guide assembles all seven approved friends around a partially transmitted family drawing on a luminous digital display panel. The tiny drawing shows a normal apartment couch, table and a cat, not actual landscape. Microphone listens, yellow pixel illuminates missing portion, USB joins a short data bridge, envelope carries image tiles, green chip studies blank diagram and orange shield observes safe entry. Patient cooperation, gentle amber and cyan inside a TV.",
+    "references": [
+      "assets/atlas/cover.webp",
+      "assets/atlas/piko.webp",
+      "assets/atlas/plugy.webp"
+    ]
+  },
+  {
+    "id": "before-3",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nLandscape 3:2: orange shield protector and a closed SAFE cyan-orange data gate inside household electronics. Guide calmly observes, yellow pixel illuminates an unmarked pale-blue message tile missing its address. The gate protects a small memory cubby containing a drawing fragment: red blanket, yellow household lamp, blue pillow. Mood patient investigation and trust; shield is helpful and friendly, never villain. No text, no address letters.",
+    "references": [
+      "assets/atlas/guardy.webp",
+      "assets/atlas/piko.webp",
+      "assets/atlas/pixi.webp"
+    ]
+  },
+  {
+    "id": "after-1",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nLandscape 3:2: all seven reference friends in their tiny digital shared room after reunion, gathered around a low glowing table with exactly seven small cups and a NEW blank route map. Green chip draws abstract blue/orange/gold lines on a blank sheet, guide listens to friends, envelope brings blank message tiles, yellow pixel softly lights map, USB checks safe short connection, shield verifies blue gate glow. Memory shelves, simple household-inspired cushions, no plants. A calm relieved shared evening.",
+    "references": [
+      "assets/atlas/cover.webp",
+      "assets/atlas/piko.webp",
+      "assets/atlas/cipko.webp"
+    ]
+  },
+  {
+    "id": "after-2",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nLandscape 3:2: living microphone with cyan headphones carefully listens to THREE little abstract sound ripples from an older tablet resting on a shelf in a normal child's room. He and the blue cloud-headed guide study the device quietly from a tiny cyan signal path at its edge. A small nearly empty battery pictogram is allowed but NO digits or text. Saved drawing fragment with colored pencils and unfinished star in nearby memory cubby. Gentle morning, observation not panic.",
+    "references": [
+      "assets/atlas/miky.webp",
+      "assets/atlas/piko.webp"
+    ]
+  },
+  {
+    "id": "after-3",
+    "prompt": "Create finished book artwork in a matched series: soft retro pixel illustration, mostly 2D with gentle 2.5D depth, clean slightly chunky silhouettes and modest soft shading; no glossy CGI. Reference images define EXACT approved identities: blue cloud-headed screen-faced guide in dark suit and cyan tie (never antenna/red scarf/robot), living microphone with cyan headphones, yellow square pixel, cream USB with arms/legs and NO cable tail, cream envelope messenger with green cap, green microchip with eyeglasses, friendly orange ornate shield with cyan tie and keyhole. Depict a tiny storybook digital micro-world INSIDE real household TV/tablet/computer: luminous pixels, circuitry, memory cubbies and safe data gates. NO trees, plants, nature, mountains, castles, planets, floating fantasy islands. No character names or text, letters, numbers, watermark, labels or typography anywhere. Blank regions for title will be typeset in HTML.\nLandscape 3:2: small golden yellow square pixel places a treasured warm golden point of light into an OPEN tiny memory box of pale digital squares. Blue cloud-headed guide gently sits beside her; friendly orange shield closes a distant unused data gate, green microchip sets aside blank map, microphone rests nearby, envelope stores blank message tiles, USB checks last connection. Exactly seven approved friends preparing quiet evening in a simple tiny digital shared room with seven cups; soft blue/amber, no plants, no writing on box.",
+    "references": [
+      "assets/atlas/cover.webp",
+      "assets/atlas/pixi.webp",
+      "assets/atlas/piko.webp"
+    ]
+  }
+]

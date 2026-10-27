@@ -43,13 +43,15 @@ export async function prepareFunnel(output){
   // Reuse the same price functions and data without publishing access/admin code.
   const purchaseConfig=`/* Generated sales catalog: no game state or customer access. */\n(()=>{\nconst products=${JSON.stringify(config.products)};\nconst offer=${JSON.stringify(config.offer)};\nconst money=(${config.money.toString()});\nconst product=(${config.product.toString()});\nconst quote=(${config.quote.toString()});\nwindow.SITE_CONFIG={products,offer,money,product,quote};\n})();\n`;
   await writeFile(path.join(output,'purchase-config.js'),purchaseConfig);
-  const code=['styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js'];
+  const code=['styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js','library.css','library.js','library-catalog.js'];
   for(const file of code)await cp(path.join(root,file),path.join(output,file));
   const assets=[
     'favicon.ico','assets/brand/piko-32.png','assets/brand/piko-192.png','assets/brand/piko-180.png',
     'assets/pixelkovia-room-desktop.webp','assets/pixelkovia-room-mobile.webp',
     ...['opening','lock','code'].flatMap(scene=>['','-medium','-small'].map(size=>`assets/sales/family-${scene}-mobile${size}.webp`)),
-    'assets/sales/game-lock-partial.webp','assets/atlas/cover.webp','assets/fonts/Caveat.ttf',
+    'assets/sales/game-lock-partial.webp','assets/fonts/Caveat.ttf',
+    'assets/books/before-cover.webp','assets/books/after-cover.webp',
+    ...characters.map(c=>`assets/atlas/${c.id}.webp`),
     ...characters.map(c=>`assets/sales/characters/${c.id}.webp`),...Object.values(previews)
   ];
   for(const asset of assets){await mkdir(path.dirname(path.join(output,asset)),{recursive:true});await cp(path.join(root,asset),path.join(output,asset));}
@@ -60,6 +62,10 @@ export async function prepareFunnel(output){
   };
   await writeFile(path.join(output,'index.html'),await versioned(index));
   await writeFile(path.join(output,'checkout.html'),await versioned(checkout));
+  // The public library has only the free Atlas, metadata and two-paragraph samples.
+  for(const file of ['atlas.html','library.html','book-before-sample.html','book-after-sample.html']){
+    await writeFile(path.join(output,file),await versioned(await readFile(path.join(root,file),'utf8')));
+  }
   for(const file of ['404.html','_headers','robots.txt','sitemap.xml'])await cp(path.join(root,'funnel',file),path.join(output,file));
-  console.log(`Public sales-only funnel prepared (${assets.length} approved assets; no game, solutions or PDFs).`);
+  console.log(`Public sales-only funnel prepared (${assets.length} approved assets; free Atlas and book samples; no full books, game, solutions or PDFs).`);
 }

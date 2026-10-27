@@ -29,7 +29,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     assert.equal(await page.locator('#app>section').count(),9);
     assert.match(await page.locator('.hero-format').innerText(),/45–60 min[\s\S]*7–13 rokov[\s\S]*Jeden tím[\s\S]*2–5 hráčov/);
     assert.match(await page.locator('.hero-price').innerText(),/14,99 €/);
-    assert.match(await page.locator('.funnel-offer-card').innerText(),/Knižka \+ encyklopédia Pixelkov/);
+    assert.match(await page.locator('.funnel-offer-card').innerText(),/Atlas Pixelkov/);
     assert.equal(await page.locator('.faq-primary>.faq-item').count(),8);
     assert.equal(await page.locator('.faq-extra .faq-item').count(),11);
     assert.equal(await page.locator('.faq-more').getAttribute('aria-expanded'),'false');
