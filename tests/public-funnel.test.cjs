@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=(process.env.BASE_URL||'http://127.0.0.1:8081').replace(/\/$/,'');
 const root='dist/funnel';
-const forbidden=['game.html','parent.html','storyboard.html','atlas.html','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
+const forbidden=['atlas-reading.js','atlas-reading.css','game.html','parent.html','storyboard.html','atlas.html','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
 for(const file of forbidden)assert.ok(!fs.existsSync(path.join(root,file)),'public artifact excludes '+file);
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 assert.ok(index.includes('Dnes večer budeme'),'landing is rendered without JavaScript');
@@ -28,7 +28,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url())});
    await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"stage":3,"started":true}'));
    await page.goto(BASE+'/');await page.evaluate(()=>document.fonts.ready);
-   assert.equal(await page.locator('#app>section').count(),8);assert.equal(await page.locator('.faq-item').count(),19);
+   assert.equal(await page.locator('#app>section').count(),9);assert.equal(await page.locator('.faq-item').count(),19);
    assert.equal(await page.locator('.character-card').count(),7);
    assert.equal(await page.locator('.evidence-screen img[src="assets/sales/game-lock-partial.webp"]').count(),1);
    assert.equal(await page.locator('.bonus-book-art .book-cover-title').count(),1);
@@ -49,6 +49,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
     assert.ok(await page.locator('.mobile-buy').isVisible());
    }
    await require('./helpers/family-gallery.cjs')(page,{swipe:width===390});
+   await require('./helpers/sales-refresh.cjs')(page,{swipe:width===390});
    if(width===390)await page.locator('#ukazka').screenshot({path:'/tmp/pixelkovia-public-gallery-phone.png'});
    const preview=page.locator('[data-sales-open-preview]');await preview.click();
    assert.ok(await page.locator('#sales-preview').evaluate(el=>el.open));await page.keyboard.press('Escape');

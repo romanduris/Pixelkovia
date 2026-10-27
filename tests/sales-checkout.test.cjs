@@ -26,8 +26,8 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await page.goto(BASE);await page.locator('.funnel-hero').waitFor();await page.evaluate(()=>document.fonts.ready);
     assert.equal(await page.locator('h1').count(),1);assert.equal(await page.locator('.faq-list details').count(),19);assert.equal(await page.locator('.character-card').count(),7);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'sales overflow '+width);
-    assert.equal(await page.locator('#app>section').count(),8);
-    assert.match(await page.locator('.hero-format').innerText(),/7–13 rokov[\s\S]*45–60 min[\s\S]*2–5 hráčov[\s\S]*U vás doma/);
+    assert.equal(await page.locator('#app>section').count(),9);
+    assert.match(await page.locator('.hero-format').innerText(),/45–60 min[\s\S]*7–13 rokov[\s\S]*Jeden tím[\s\S]*2–5 hráčov/);
     assert.match(await page.locator('.hero-price').innerText(),/14,99 €/);
     assert.match(await page.locator('.funnel-offer-card').innerText(),/Knižka \+ encyklopédia Pixelkov/);
     assert.equal(await page.locator('.faq-primary>.faq-item').count(),8);
@@ -81,6 +81,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
      assert.ok(preview.clipped&&preview.overflow==='hidden','bottom reward/footer is outside public preview');
     }
     await require('./helpers/family-gallery.cjs')(page);
+    await require('./helpers/sales-refresh.cjs')(page);
     const previewButton=page.locator('[data-sales-open-preview]');
     await previewButton.focus();await page.keyboard.press('Enter');
     assert.ok(await page.locator('#sales-preview').evaluate(el=>el.open));
@@ -119,7 +120,7 @@ assert.equal(config.access.mode,'test','sales changes cannot simulate purchase e
     await page.goto(BASE+'/parent.html');await page.locator('.portal-header').waitFor();assert.equal(await page.locator('.material-card').count(),7);
     assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);await context.close();
    }
-   console.log('PASS '+engine.name()+': phone-first sales and checkout at 320/360/390/430/768/1366/1440px, 8 sections, 19 keyboard FAQs, conditional mobile bar, sharp protected worksheet previews, keyboard/touch game preview, pricing combinations, bundle discount, inactive payment, private form and preserved game progress.');
+   console.log('PASS '+engine.name()+': phone-first sales and checkout at 320/360/390/430/768/1366/1440px, 9 sections, 19 keyboard FAQs, conditional mobile bar, sharp protected worksheet previews, keyboard/touch game preview, pricing combinations, bundle discount, inactive payment, private form and preserved game progress.');
   }finally{await browser.close();}
  }
 })().catch(e=>{console.error(e);process.exit(1);});

@@ -20,7 +20,7 @@ html{scroll-padding-top:22px;scroll-padding-bottom:100px}
 .hero-subtitle{font-size:18px;line-height:1.6;color:#e1e4e7;margin:17px 0 0;max-width:470px}
 .funnel-hero-bottom{position:absolute;left:45px;bottom:30px;width:49%;max-width:540px}
 .funnel-hero-description{font-size:15px;line-height:1.75;color:#d1dce6;max-width:450px;margin:0 0 16px}
-.hero-format{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;list-style:none;margin:24px 0 0;padding:0;max-width:500px}
+.hero-format{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;list-style:none;margin:24px 0 0;padding:0;max-width:500px}
 .hero-format li{font-size:11px;line-height:1.5;color:#d9e8e4}.hero-format strong{display:block;font-size:13px;font-weight:750;white-space:nowrap}.hero-format span{display:block;font-size:10px;color:#adbed0;margin-top:5px}
 .hero-price{font-size:13px;line-height:1.6;color:#e4e5dc;margin:0 0 16px}.hero-price strong{font:650 31px/1.2 Manrope,sans-serif;color:#fff0d2;letter-spacing:-.04em;margin-right:6px}.hero-price>span{display:block;font-size:12px;color:#c5d0d4;margin-top:5px}
 .hero-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.hero-look{min-height:44px;display:inline-flex;align-items:center;font-size:12px;color:#c8d8e5;text-decoration:none}
@@ -107,3 +107,36 @@ body[data-environment="sales"]>.site-footer{max-width:1320px;padding:22px 56px;b
  body[data-environment="sales"] #app{padding-inline:12px}.funnel-nav{height:62px;gap:9px}.funnel-brand{font-size:11px;gap:6px}.funnel-brand small{font-size:6px}.funnel-brand img{width:29px;height:29px}.funnel-nav-cta{font-size:10px;padding-inline:10px}.funnel-hero{height:800px}.funnel-hero-top{left:17px;right:14px;top:22px}.funnel-hero h1{font-size:31px}.funnel-hero h1 em{font-size:1.18em}.hero-subtitle{font-size:14px}.funnel-hero-bottom{left:17px;right:17px;top:340px;bottom:17px}.funnel-hero-description{font-size:14px}.hero-format li{padding:0}.hero-actions{display:block}.hero-actions>.funnel-cta{width:100%}.hero-look{font-size:11px;min-height:44px;padding-top:4px}.funnel-hero-bottom>.sales-status{font-size:10px;margin-top:5px}.hero-price strong{font-size:29px}.hero-price>span{font-size:10px}.funnel-section h2{font-size:29px}.funnel-section .funnel-section-heading>p{font-size:14px}.evidence-screen{padding:17px 15px}.screen-preview-button{gap:15px}.screen-device{width:116px;flex-basis:116px}.preview-caption{font-size:14px}.compact-materials{padding-inline:5px}.compact-materials>figure{width:124.5px;flex-basis:124.5px}.compact-materials>figure+figure{margin-left:-45px}.compact-materials figcaption{font-size:9px}.funnel-offer-card{padding:25px 20px}.funnel-price strong{font-size:42px}.book-cover-title{inset:auto 6px 15px}.book-cover-title>span{font-size:7px}.book-cover-title>strong{font-size:31px}.book-cover-title>small{font-size:4.5px}.included-book h4{font-size:16px}.guarantee-section{display:block;padding:23px 21px}.refund-badge{margin-bottom:19px}.guarantee-section h2{font-size:28px}.mobile-buy:not([hidden]){padding-inline:13px;gap:10px}.mobile-buy>a{font-size:12px;padding-inline:16px}.mobile-buy>div>span{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.funnel-cta{transition:none}}
+
+/* Compact mobile introduction: leave the lower illustration visible on arrival. */
+.funnel-hero-top>.hero-price{margin-top:22px;margin-bottom:0}
+.review-gallery{max-width:720px;margin:auto;min-width:0}
+.review-gallery-track{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:12px}
+.review-gallery-track::-webkit-scrollbar{display:none}
+.review-card{flex:0 0 90%;min-width:0;scroll-snap-align:start;background:#172637;border:1px solid #425565;border-radius:12px;padding:30px;display:flex;flex-direction:column}
+.review-card:last-child{scroll-snap-align:end}
+.review-stars{font-size:22px;letter-spacing:4px;color:#edcf8c;line-height:1.4}
+.review-card blockquote{margin:19px 0 24px;flex:1}.funnel-section .review-card blockquote p{font-size:18px;line-height:1.8;color:#e4ebe7;margin:0}
+.funnel-section .review-example{font-size:11px;line-height:1.6;color:#a9bccb;margin:0}
+.review-counter{font:12px/1.5 Manrope,sans-serif;color:#bedccb;min-width:62px;text-align:center}
+.review-gallery-track:focus-visible{outline:2px solid #cab5f4;outline-offset:3px}
+@media(max-width:700px){
+ .funnel-hero{height:clamp(500px,calc(100svh - 78px),620px)}
+ .funnel-hero-top{top:18px;left:20px;right:20px}
+ .funnel-hero h1{font-size:32px;line-height:1.05;margin:10px 0 12px}.funnel-hero h1 em{font-size:1.16em;line-height:1.05}
+ .hero-subtitle{font-size:13px;line-height:1.6;max-width:285px}
+ .hero-format{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 0;max-width:none}
+ .hero-format strong{font-size:12px}.hero-format span{font-size:9px;line-height:1.5;margin-top:3px}
+ .funnel-hero-top>.hero-price{margin-top:16px;font-size:11px;line-height:1.5}.hero-price strong{font-size:25px}.hero-price>span{font-size:10px;margin-top:4px}
+ .funnel-hero-bottom{top:auto;left:20px;right:20px;bottom:17px;display:block}
+ .funnel-hero-description{display:none}.hero-actions{display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap;margin-top:0}
+ .hero-actions .funnel-cta{flex:1;min-height:48px;font-size:13px;padding:12px 16px;gap:14px}.hero-look{font-size:10px;min-height:44px;padding:0}
+ .funnel-hero-bottom>.sales-status{font-size:9px;line-height:1.6;margin-top:7px}
+ .review-card{padding:24px 22px}.funnel-section .review-card blockquote p{font-size:16px}.review-stars{font-size:20px}
+}
+@media(max-width:370px){
+ .funnel-hero-top{top:16px;left:16px;right:16px}.funnel-hero h1{font-size:28px}.hero-subtitle{font-size:12px;max-width:270px}
+ .hero-format{gap:7px}.hero-format strong{font-size:11px}.hero-format span{font-size:8px}
+ .funnel-hero-top>.hero-price{margin-top:13px}.hero-price strong{font-size:24px}.hero-price>span{font-size:9px}
+ .funnel-hero-bottom{left:16px;right:16px;top:auto;bottom:14px}.hero-actions>.funnel-cta{width:auto}.hero-actions .funnel-cta{font-size:12px;padding-inline:13px}.hero-look{font-size:9px}
+}

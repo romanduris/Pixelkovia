@@ -46,6 +46,7 @@ export async function prepareFunnel(output){
   const code=['styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js'];
   for(const file of code)await cp(path.join(root,file),path.join(output,file));
   const assets=[
+    'favicon.ico','assets/brand/piko-32.png','assets/brand/piko-192.png','assets/brand/piko-180.png',
     'assets/pixelkovia-room-desktop.webp','assets/pixelkovia-room-mobile.webp',
     ...['opening','lock','code'].flatMap(scene=>['','-medium','-small'].map(size=>`assets/sales/family-${scene}-mobile${size}.webp`)),
     'assets/sales/game-lock-partial.webp','assets/atlas/cover.webp','assets/fonts/Caveat.ttf',

@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const output = path.join(root, 'dist');
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
-const entries = ['atlas.html', 'atlas.css', 'index.html', 'checkout.html', 'checkout.js', 'checkout.css', 'sales-page.js', 'sales-interactions.js', 'sales.css', 'parent.html', 'storyboard.html', 'game.html', 'site-config.js', 'prep-store.js', 'printables.html', 'signal-print.css', 'styles.css', 'adventure.css', 'party.css', 'presentation.css', 'site-content.js', 'print-materials.js', 'app.js', 'cipko-game.js', 'game-data.js', 'story-text.js', 'assets'];
+const entries = ['favicon.ico', 'atlas.html', 'atlas.css', 'atlas-reading.css', 'atlas-reading.js', 'index.html', 'checkout.html', 'checkout.js', 'checkout.css', 'sales-page.js', 'sales-interactions.js', 'sales.css', 'parent.html', 'storyboard.html', 'game.html', 'site-config.js', 'prep-store.js', 'printables.html', 'signal-print.css', 'styles.css', 'adventure.css', 'party.css', 'presentation.css', 'site-content.js', 'print-materials.js', 'app.js', 'cipko-game.js', 'game-data.js', 'story-text.js', 'assets'];
 for (const entry of entries) {
   await cp(path.join(root, entry), path.join(output, entry), { recursive: true });
 }
