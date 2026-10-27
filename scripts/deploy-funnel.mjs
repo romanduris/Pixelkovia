@@ -43,7 +43,7 @@ if(project.production_branch!==config.production_branch)throw Error('Unexpected 
 if(project.canonical_deployment?.deployment_trigger?.metadata?.commit_hash===sha&&project.canonical_deployment?.latest_stage?.status==='success'){
  console.log('Reusing the successful Pages deployment for this exact source commit.');
 }else{
- const result=spawnSync(process.execPath,[wrangler,'pages','deploy',config.directory,'--config','funnel/wrangler.jsonc','--project-name',config.project_name,'--branch',config.production_branch,'--commit-hash',sha,'--commit-dirty=false'],{stdio:'inherit',env:{...process.env,CLOUDFLARE_API_TOKEN:token,CLOUDFLARE_ACCOUNT_ID:config.account_id,WRANGLER_SEND_METRICS:'false'}});
+ const result=spawnSync(process.execPath,[path.resolve(wrangler),'pages','deploy',path.resolve(config.directory),'--project-name',config.project_name,'--branch',config.production_branch,'--commit-hash',sha,'--commit-dirty=false'],{cwd:'funnel',stdio:'inherit',env:{...process.env,CLOUDFLARE_API_TOKEN:token,CLOUDFLARE_ACCOUNT_ID:config.account_id,WRANGLER_SEND_METRICS:'false'}});
  if(result.status!==0)throw Error('Pages upload failed; DNS was not changed.');
 }
 project=await api('GET',projectPath);

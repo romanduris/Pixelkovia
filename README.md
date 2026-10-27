@@ -23,7 +23,7 @@ WRANGLER_BIN=admin/node_modules/wrangler/bin/wrangler.js node scripts/deploy-fun
 
 Zdroje sú koreňové HTML/CSS/JS, `books-content/` a `assets/`. `dist/funnel/` je jediný nasadzovaný balík aplikácie. Pages Worker povoľuje presný zoznam verejných súborov a pred každým chráneným súborom overuje serverové oprávnenie. Priame URL pod `_protected/` sa nikdy neobsluhujú. Backend používa pôvodnú produkčnú D1; nevzniká druhý zákaznícky systém.
 
-Pôvodná owner-private ChatGPT Site obsahuje iba oznam o presune, zostavený do `dist/retired-site/`. Nie je druhým náhľadom aplikácie.
+Pôvodná owner-private ChatGPT Site obsahuje iba oznam o presune, zostavený do `dist/client/`. Nie je druhým náhľadom aplikácie.
 
 ## Platby a e-maily
 

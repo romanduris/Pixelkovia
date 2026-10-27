@@ -7,6 +7,6 @@ import './sync-catalog.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url)),output=path.join(root,'dist');
 await rm(output,{recursive:true,force:true});await mkdir(output,{recursive:true});
 await prepareFunnel(path.join(output,'funnel'));await prepareProtected(path.join(output,'funnel'));
-await mkdir(path.join(output,'retired-site'),{recursive:true});
+await mkdir(path.join(output,'client'),{recursive:true});
 await writeFile(path.join(output,'retired-site/index.html'),'<!doctype html><html lang="sk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pixelkovia sa presťahovali</title></head><body><h1>Pixelkovia sú na novej adrese.</h1><p><a href="https://pixelkovia.rodulab.com/">Otvoriť Pixelkov →</a></p></body></html>');
 console.log('One active application built in dist/funnel; the former private Site contains only a move notice.');
