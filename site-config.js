@@ -19,7 +19,7 @@
     return verifiedEntitlements[id]?.available ? 'available' : verifiedEntitlements[id]?.purchased ? 'purchased' : 'not-purchased';
   };
   const purchase = {action:'purchase', url:'checkout.html', label:`CHCEM SPOLOČNÉ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'available'};
-  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1999, additionalGameCents:999, campaign:'early-bird'};
+  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1998, additionalGameCents:999, campaign:'early-bird'};
   // All prices are calculated in integer cents.
   // Standalone books remain independent; the complete offer applies only to the game.
   const quote = (selected = [], baseId = 'episode-1', includeAtlas = true, voucherCode = '', includeGift = false) => {

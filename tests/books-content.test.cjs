@@ -13,10 +13,11 @@ assert.equal(hash(fs.readFileSync('books-content/atlas.json')),manifest.atlas.co
 const c={window:{}};vm.runInNewContext(fs.readFileSync('site-config.js','utf8'),c);const cfg=c.window.SITE_CONFIG;
 assert.equal(cfg.product('episode-1').priceCents,1499);
 for(const id of cfg.offer.bookIds){assert.equal(cfg.product(id).priceCents,499);assert.equal(cfg.product(id).pricing.status,'current');assert.equal(cfg.product(id).pricing.campaign,null);assert.equal(cfg.quote([],id).totalCents,499);assert.equal(cfg.quote(['episode-1',id],id).totalCents,499);}
-assert.equal(cfg.quote(cfg.offer.bookIds).totalCents,1999);assert.equal(cfg.quote(['story-book-after'],'story-book-before').totalCents,998);
+assert.equal(cfg.quote(cfg.offer.bookIds).totalCents,1998);assert.equal(cfg.quote(['story-book-after'],'story-book-before').totalCents,998);
+assert.equal((cfg.quote(cfg.offer.bookIds).totalCents-cfg.product('episode-1').priceCents)*2,cfg.offer.bookIds.reduce((sum,id)=>sum+cfg.product(id).priceCents,0),'the two-book add-on costs exactly half');
 for(let mask=0;mask<4;mask++){
  const ids=cfg.offer.bookIds.filter((_,i)=>mask&(1<<i)),q=cfg.quote(ids);
- assert.equal(q.totalCents,[1499,1998,1998,1999][mask]);assert.equal(q.bundleDiscountCents,mask===3?498:0);
+ assert.equal(q.totalCents,[1499,1998,1998,1998][mask]);assert.equal(q.bundleDiscountCents,mask===3?499:0);
  assert.equal(cfg.quote([...ids,...ids,'bad-id']).totalCents,q.totalCents,'duplicates and unknown IDs do not affect the quote');
  const withoutAtlas=cfg.quote(ids,'episode-1',false);
  assert.equal(withoutAtlas.atlasIncluded,false);assert.equal(q.atlasIncluded,true);

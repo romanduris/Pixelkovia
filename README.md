@@ -31,7 +31,7 @@ Kartu spracúva vložený Stripe Checkout. E-mail je povinný ešte pred vytvore
 
 V checkoute je pod tlačidlom kúpiť odkaz na voucher. Schválený kód `free` pokryje celú vybranú objednávku vrátane kníh. Server uloží použitý kód a nulovú sumu; prístup vytvorí až podpísaná udalosť pre dokončenú nulovú reláciu overenú cez Stripe API. Karta sa pri nulovej objednávke nevyžaduje. Samotný kód v prehliadači ani návratová URL prístup neudeľujú.
 
-Kompaktný checkout zbiera iba e-mail. Nasledujú tri stručné doplnky: Atlas zdarma, obe knihy za 5 € s existujúcou spoločnou ukážkou a druhá základná hra za 9,99 €. Druhá hra má samostatnú objednávku a vlastný účet bez kníh či Atlasu; kupujúcemu prídu dva oddelené e-maily s rôznymi heslami. Druhý e-mail môže preposlať ďalšej rodine. Jedna overená Stripe relácia vytvorí obe objednávky v jednej databázovej transakcii. Voucher pokrýva aj druhú hru.
+Kompaktný checkout zbiera iba e-mail. Nasledujú tri stručné doplnky: Atlas zdarma, obe knihy za 4,99 € (presne za polovicu) s existujúcou spoločnou ukážkou a druhá základná hra za 9,99 €. Druhá hra má samostatnú objednávku a vlastný účet bez kníh či Atlasu; kupujúcemu prídu dva oddelené e-maily s rôznymi heslami. Druhý e-mail môže preposlať ďalšej rodine. Jedna overená Stripe relácia vytvorí obe objednávky v jednej databázovej transakcii. Voucher pokrýva aj druhú hru.
 
 Prístupový e-mail z `Adam@pixelkovia.rodulab.com` posiela Resend. Heslo sa uchováva ako hash; šifrovaná správa v doručovacej fronte sa po odoslaní odstráni. Worker opakuje neúspešné odoslania každých desať minút.
 

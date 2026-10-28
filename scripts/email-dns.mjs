@@ -10,3 +10,12 @@ export function emailRecordName(recordName, host, zoneName) {
   }
   return name;
 }
+
+// A flattened Pages CNAME may coexist with this exact receiving MX. Never
+// replace unrelated mail records or accept another web origin during deploy.
+export function funnelDns(records,target,mx){
+  const cnames=records.filter(r=>r.type==='CNAME');
+  const receiving=records.filter(r=>r.type==='MX'&&r.content.replace(/\.$/,'')===mx&&r.priority===10);
+  if(cnames.length>1||receiving.length>1||records.length!==cnames.length+receiving.length||cnames.some(r=>r.content.replace(/\.$/,'')!==target.replace(/\.$/,''))||(receiving.length&&cnames.some(r=>!r.proxied)))throw Error('Conflicting funnel DNS records; existing website and mail records were preserved.');
+  return cnames[0];
+}

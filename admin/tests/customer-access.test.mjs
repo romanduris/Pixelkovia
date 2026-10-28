@@ -34,21 +34,29 @@ test('two purchases with the same email get isolated credentials, orders and boo
   const refundedOrder=await fulfill(env,refunded.sessionId);
   assert.equal((await first(db,'SELECT status FROM orders WHERE id=?',refundedOrder.id)).status,'refunded');
   assert.equal(await first(db,'SELECT order_id FROM access_deliveries WHERE order_id=?',refundedOrder.id),null,'a refund arriving before checkout completion cannot deliver access');
-  for(const [baseId,books,total]of [['episode-1',[],1499],['episode-1',['story-book-before'],1998],['episode-1',['story-book-before','story-book-after'],1999],['story-book-before',[],499],['story-book-after',[],499],['story-book-before',['story-book-after'],998]]){
+  for(const [baseId,books,total]of [['episode-1',[],1499],['episode-1',['story-book-before'],1998],['episode-1',['story-book-before','story-book-after'],1998],['story-book-before',[],499],['story-book-after',[],499],['story-book-before',['story-book-after'],998]]){
     const created=await createCheckout(env,{baseId,books,atlasIncluded:true,email});
     assert.equal(created.totalCents,total);assert.equal(sessions.get(created.sessionId).amount_total,total,'Stripe receives the unchanged server-calculated price');
     if(baseId==='episode-1'&&books.length===2){
-      assert.deepEqual(sessions.get(created.sessionId).line_items.map(l=>l.price_data.unit_amount),[1499,250,250,0],'bundle savings belong to the books, matching the checkout');
+      assert.deepEqual(sessions.get(created.sessionId).line_items.map(l=>l.price_data.unit_amount),[1499,249,250,0],'bundle savings belong to the books, matching the checkout');
       const order=await fulfill(env,created.sessionId);
       assert.equal((await first(db,"SELECT unit_price_cents n FROM order_items WHERE order_id=? AND product_id='episode-1'",order.id)).n,1499);
-      assert.equal((await first(db,"SELECT SUM(unit_price_cents) n FROM order_items WHERE order_id=? AND product_id LIKE 'story-book-%'",order.id)).n,500);
+      assert.equal((await first(db,"SELECT SUM(unit_price_cents) n FROM order_items WHERE order_id=? AND product_id LIKE 'story-book-%'",order.id)).n,499);
     }
   }
   const legacy=await createCheckout(env,{baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email});
-  await execute(db,'UPDATE checkout_attempts SET item_prices=NULL WHERE stripe_session_id=?',legacy.sessionId);
+  await execute(db,'UPDATE checkout_attempts SET item_prices=NULL,total_cents=1999 WHERE stripe_session_id=?',legacy.sessionId);
+  sessions.get(legacy.sessionId).amount_total=1999;
   sessions.get(legacy.sessionId).line_items.forEach((line,i)=>line.price_data.unit_amount=[1001,499,499,0][i]);
   const legacyOrder=await fulfill(env,legacy.sessionId);
   assert.equal((await first(db,"SELECT unit_price_cents n FROM order_items WHERE order_id=? AND product_id='episode-1'",legacyOrder.id)).n,1001,'an already-open older checkout keeps its original item prices');
+  const previousBundle=await createCheckout(env,{baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email});
+  const previousPrices={'episode-1':1499,'story-book-before':250,'story-book-after':250,'atlas-pixelkov':0};
+  await execute(db,'UPDATE checkout_attempts SET item_prices=?,total_cents=1999 WHERE stripe_session_id=?',JSON.stringify(previousPrices),previousBundle.sessionId);
+  sessions.get(previousBundle.sessionId).amount_total=1999;
+  const previousOrder=await fulfill(env,previousBundle.sessionId);
+  assert.equal((await first(db,'SELECT total_cents FROM orders WHERE id=?',previousOrder.id)).total_cents,1999,'an already-open 19.99 checkout keeps its saved price after the new half-price offer');
+  assert.equal((await first(db,"SELECT SUM(unit_price_cents) n FROM order_items WHERE order_id=? AND product_id LIKE 'story-book-%'",previousOrder.id)).n,500);
   const originalFetch=globalThis.fetch;
   try{globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');const mail=JSON.parse(options.body);assert.equal(mail.from,'Adam · Pixelkovia <Adam@pixelkovia.rodulab.com>');assert.ok(mail.text.includes('/Supervisor'));return Response.json({id:'provider-'+options.headers['Idempotency-Key']});};await sendPending(env);assert.equal((await first(db,'SELECT status FROM access_deliveries WHERE order_id=?',order1.id)).status,'sent');assert.equal((await first(db,'SELECT encrypted_message FROM access_deliveries WHERE order_id=?',order1.id)).encrypted_message,null);}finally{globalThis.fetch=originalFetch;db.close();}
 });
@@ -94,7 +102,7 @@ test('free voucher is server-owned and fulfills only a verified completed zero-c
   const second=await fulfill(env,b.sessionId),secondDelivery=await first(db,'SELECT * FROM access_deliveries WHERE order_id=?',second.id);
   assert.notEqual(firstDelivery.customer_id,secondDelivery.customer_id);
   assert.notEqual((await unseal(firstDelivery.encrypted_message,secret)).password,(await unseal(secondDelivery.encrypted_message,secret)).password);
-  const paid=await createCheckout(env,{...input,voucherCode:''});assert.equal(paid.totalCents,1999);
+  const paid=await createCheckout(env,{...input,voucherCode:''});assert.equal(paid.totalCents,1998);
   const forged=sessions.get(paid.sessionId);forged.status='complete';forged.amount_total=0;forged.metadata.voucher_code='free';
   await assert.rejects(()=>fulfill(env,paid.sessionId),e=>e.status===400,'a forged zero cannot replace a priced attempt');
   assert.equal((await first(db,'SELECT COUNT(*) n FROM orders')).n,2);

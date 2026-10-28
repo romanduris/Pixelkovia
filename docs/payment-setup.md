@@ -1,6 +1,6 @@
 # Platby a automatické doručenie
 
-Používa sa účet Stripe **Pixelkovia**, `acct_1UVB5BGle1VvIsLT`, jednorazové platby v EUR. Predajné ceny zostávajú v spoločnom `site-config.js`: hra 14,99 €, každá kniha 4,99 €, kompletný balík 19,99 €, voliteľný Atlas zdarma.
+Používa sa účet Stripe **Pixelkovia**, `acct_1UVB5BGle1VvIsLT`, jednorazové platby v EUR. Predajné ceny zostávajú v spoločnom `site-config.js`: hra 14,99 €, každá kniha 4,99 €, kompletný balík 19,98 €, voliteľný Atlas zdarma.
 
 ## Nastavenie kľúčov
 
@@ -43,11 +43,11 @@ Schválené [mobilné UX zadanie](stripe-checkout-mobile-ux.md) výslovne obmedz
 
 Pri otvorení platby výber produktov nahradí stručný prehľad objednávky a formulár. Návrat k úprave obnoví výber aj e-mail. Prehľad pre návrat od banky sa dočasne uchováva v `sessionStorage` bez hesiel či údajov karty; slúži výhradne na zobrazenie. Cenu aj zaplatenie vždy overuje server.
 
-Ponuka používa jeden výber oboch kníh: hra 14,99 € a knihy spolu 5 € (2 × 2,50 €), spolu 19,99 €. Server odosiela rovnaký rozpis do Stripe a uloží presné jednotkové ceny pri vytvorení relácie. Dokončenie ich prenesie do položiek objednávky. Už otvorené relácie spred tejto zmeny zachovajú pôvodné rozdelenie zľavy; celková suma sa nemení.
+Ponuka používa jeden výber oboch kníh: hra 14,99 € a knihy spolu 4,99 € namiesto 9,98 € (položky 2,49 € a 2,50 €), spolu 19,98 €. Server odosiela rovnaký rozpis do Stripe a uloží presné jednotkové ceny pri vytvorení relácie. Dokončenie ich prenesie do položiek objednávky. Zľava 4,99 € sa medzi knihy rozdelí na celé centy. Už otvorené relácie zachovajú uložené jednotkové ceny aj pôvodnú celkovú sumu.
 
 ## Druhá hra pre ďalšiu rodinu
 
-K základnej hre možno výslovne pridať druhú hru za **9,99 €**. Bez kníh je súčet 24,98 €; s balíkom kníh 29,98 €. Atlas je voliteľný a zdarma. Samostatná kniha nemá ponuku druhej hry. Používa sa iba e-mail kupujúceho, bez mena a ďalšieho formulára pre príjemcu.
+K základnej hre možno výslovne pridať druhú hru za **9,99 €**. Bez kníh je súčet 24,98 €; s balíkom kníh 29,97 €. Atlas je voliteľný a zdarma. Samostatná kniha nemá ponuku druhej hry. Používa sa iba e-mail kupujúceho, bez mena a ďalšieho formulára pre príjemcu.
 
 Migrácia `0007_additional_game.sql` ukladá výber a presnú cenu druhej hry do existujúceho `checkout_attempts`. Tabuľka `checkout_orders` prepája jednu Stripe reláciu s hlavnou a prípadnou druhou objednávkou a doplní väzby aj k starším objednávkam. Štruktúra pôvodných objednávok a prihlasovacie údaje sa nemenia.
 
@@ -77,4 +77,4 @@ Starý adaptér Payment Links a ručné doručovanie sa nepoužívajú. Voucher 
 
 `node --test tests/commerce-credentials.test.mjs` overuje skryté zadávanie, opakovanie výzvy, rozlíšenie chýb a obnovenie terminálu po zrušení bez vypísania zadanej hodnoty.
 
-`PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs` overuje stavový tok formulára v prehliadači s riadenou náhradou Stripe SDK: povinný e-mail, opakované kliknutie, chybu a opakovanie, zlyhanie načítania, potvrdenie serverom a návrat od banky. Kontroluje aj šírky 360, 390, 430 a 1360 px, sumy 14,99 €, 19,99 €, 24,98 € a 29,98 €, samostatné knihy za 4,99 €/9,98 € a voucher za 0 €, dotykové ovládanie na mobilných šírkach a zachovanie výberu aj e-mailu pri návrate z platby. S `QA_BROWSER=webkit` spustí rovnaké scenáre vo WebKite; predvolene používa Chromium. Dňa 28. 10. 2026 prešlo všetkých trinásť scenárov v každom prehliadači. Tieto scenáre neposielajú skutočné platby a neoverujú peňaženky na fyzickom zariadení.
+`PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs` overuje stavový tok formulára v prehliadači s riadenou náhradou Stripe SDK: povinný e-mail, opakované kliknutie, chybu a opakovanie, zlyhanie načítania, potvrdenie serverom a návrat od banky. Kontroluje aj šírky 360, 390, 430 a 1360 px, sumy 14,99 €, 19,98 €, 24,98 € a 29,97 €, samostatné knihy za 4,99 €/9,98 € a voucher za 0 €, dotykové ovládanie na mobilných šírkach a zachovanie výberu aj e-mailu pri návrate z platby. S `QA_BROWSER=webkit` spustí rovnaké scenáre vo WebKite; predvolene používa Chromium. Dňa 28. 10. 2026 prešlo všetkých trinásť scenárov v každom prehliadači. Tieto scenáre neposielajú skutočné platby a neoverujú peňaženky na fyzickom zariadení.

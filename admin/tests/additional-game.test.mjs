@@ -20,12 +20,12 @@ test('additional game has server-owned price, two isolated orders, exact entitle
   for(const giftGame of ['true',1,null])await assert.rejects(()=>createCheckout(env,{...input,giftGame}),e=>e.status===400);
   await assert.rejects(()=>createCheckout(env,{...input,baseId:'story-book-before'}),e=>e.status===400);
   const checkout=await createCheckout(env,{...input,totalCents:1,giftPriceCents:1});
-  assert.equal(checkout.totalCents,2998,'client prices cannot change 19.99 + 9.99');
-  assert.deepEqual(sessions.get(checkout.sessionId).line_items.map(l=>l.price_data.unit_amount),[1499,250,250,0,999]);
+  assert.equal(checkout.totalCents,2997,'client prices cannot change 19.98 + 9.99');
+  assert.deepEqual(sessions.get(checkout.sessionId).line_items.map(l=>l.price_data.unit_amount),[1499,249,250,0,999]);
   const order=await fulfill(env,checkout.sessionId);
   assert.equal((await fulfill(env,checkout.sessionId)).id,order.id);
   const orders=await query(db,'SELECT co.kind,o.* FROM checkout_orders co JOIN orders o ON o.id=co.order_id ORDER BY co.kind');
-  assert.equal(orders.length,2);assert.equal(orders.find(o=>o.kind==='primary').total_cents,1999);assert.equal(orders.find(o=>o.kind==='gift').total_cents,999);
+  assert.equal(orders.length,2);assert.equal(orders.find(o=>o.kind==='primary').total_cents,1998);assert.equal(orders.find(o=>o.kind==='gift').total_cents,999);
   assert.equal(orders.reduce((sum,o)=>sum+o.total_cents,0),checkout.totalCents);assert.notEqual(orders[0].customer_id,orders[1].customer_id);
   const deliveries=await query(db,'SELECT co.kind,d.* FROM checkout_orders co JOIN access_deliveries d ON d.order_id=co.order_id ORDER BY co.kind');
   const messages=await Promise.all(deliveries.map(d=>unseal(d.encrypted_message,secret)));

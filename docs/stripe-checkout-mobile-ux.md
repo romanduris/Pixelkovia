@@ -20,7 +20,7 @@ Súčasný Stripe Embedded Checkout je na mobiloch zbytočne dlhý: ponúka domi
 6. Zachovaj existujúce sumy a obchodnú logiku:
    - hlavná hra 14,99 €;
    - hra + jedna knižka 19,98 €;
-   - hra + obe knižky 19,99 €;
+   - hra + obe knižky 19,98 €;
    - Atlas Pixelkov zdarma podľa platnej konfigurácie;
    - samostatné knižky po 4,99 €.
 7. Zachovaj zabezpečenie serverového výpočtu ceny, Stripe webhooky, podpisové overovanie, ochranu proti duplicitným objednávkam a prideľovanie prístupu až po potvrdenej platbe.
@@ -44,7 +44,7 @@ Ak Stripe pri `payment_method_types: ['card']` napriek tomu zobrazuje Link alebo
 - Po pokračovaní sa skryje rozsiahly výber produktov a zobrazí sa stručný prehľad, suma a karta. Tlačidlo „Upraviť objednávku“ obnoví pôvodný výber a e-mail. Pri otvorení platby sa údaje uzamknú, aby sa počas vytvárania relácie nezmenili.
 - Cena zostáva v EUR; táto relácia neponúka konverziu meny. Stripe riadi vlastné tlačidlo „Zaplatiť“ a zobrazuje finálnu sumu tesne nad ním. Do textu ani DOM iframe nezasahujeme.
 - Chromium: šírky **360, 390, 430 a 1360 px**, bez vodorovného pretečenia; v každom prípade jeden formulár karty, žiadne tlačidlo Link ani uvedené zahraničné metódy, správna suma 14,99 €. Platobný krok mal pri základnej hre približne **981–987 px** výšky celej stránky.
-- Prešlo **24 serverových testov**, štyri scenáre prehliadača s riadeným SDK a kontroly súborov/cenníka. Serverové scenáre potvrdzujú sumy 14,99 €, 19,98 €, 19,99 €, samostatné knihy 4,99 € a obe knihy 9,98 €. Simulované scenáre pokrývajú chybu, opakovanie, dvojité kliknutie, zlyhanie načítania, serverové potvrdenie a návrat od banky.
+- Prešlo **24 serverových testov**, štyri scenáre prehliadača s riadeným SDK a kontroly súborov/cenníka. Serverové scenáre potvrdzujú sumy 14,99 €, 19,98 €, 19,98 €, samostatné knihy 4,99 € a obe knihy 9,98 €. Simulované scenáre pokrývajú chybu, opakovanie, dvojité kliknutie, zlyhanie načítania, serverové potvrdenie a návrat od banky.
 - Skutočný Stripe formulár bol vizuálne overený v nezaplatenej relácii. Neboli zadané údaje karty ani odoslaná skutočná platba. Skúšobné relácie sa po overení ukončia; simulované výsledky nie sú dôkazom reálneho bankového overenia alebo doručenia e-mailu.
 
 ### Pred / po
@@ -69,8 +69,8 @@ Zmenené súbory: `checkout.html`, `checkout.css`, `checkout.js`, `admin/src/com
 ## Aktuálna ponuka a voucher – 28. 10. 2026
 
 - Názov produktu je **Hra Pixelkovia – Stratený signál**. Hlavná karta uvádza „7 záhad v jednom spoločnom príbehu“.
-- Súhrn zobrazuje plánovanú štandardnú cenu **29,99 €**, zľavu **−15 € za prednostný prístup** a výsledok **14,99 €**. Označenie plánovanej ceny zostáva explicitné; nejde o predchádzajúcu predajnú cenu. Riadok „Doručenie online“ je odstránený.
-- Obe knihy sa pridávajú jedným spoločným políčkom. Zachované sú obe obálky, stručný obsah a samostatné ukážky. Používateľ potvrdil zachovanie kompletného balíka za **19,99 €**, preto knihy k hre stoja **5 € namiesto 9,98 €**, s textom „takmer za polovicu“. Atlas zostáva bezplatnou voliteľnou položkou. Samostatné knihy zostávajú za 4,99 €.
+- Súhrn zobrazuje štandardnú cenu **29,99 €**, zľavu **−15 € za Early Access** a výsledok **14,99 €**. Pri hre je štandardná cena prečiarknutá; ponuka má označenie Early Access. Riadok „Doručenie online“ je odstránený.
+- Obe knihy sa pridávajú jedným spoločným políčkom. Zachované sú obe obálky, stručný obsah a samostatné ukážky. Kompletný balík stojí **19,98 €**, knihy k hre teda stoja **4,99 € namiesto 9,98 €**, s textom „2 knižky · 6 rozprávok · za polovicu“. Atlas zostáva bezplatnou voliteľnou položkou. Samostatné knihy zostávajú za 4,99 €.
 - Pod tlačidlom kúpiť je iba odkaz „Mám zľavový kód“, ktorý otvorí dialóg. `free` vynuluje celú aktuálnu objednávku. Neznámy kód, zatvorenie bez uplatnenia, odstránenie kódu, návrat fokusu a zmeny výberu majú pokrytie v testoch.
 - Server overuje voucher a zapisuje ho do existujúcej D1 cez migráciu `0006_checkout_vouchers.sql`. Prístup vytvorí až po podpísanej udalosti a overení dokončenej nulovej relácie cez Stripe API. Otvorená, nezaplatená či podvrhnutá relácia prístup neudelí; opakovaná udalosť nevytvorí druhú objednávku. Podrobnosti: [platby a doručenie](payment-setup.md).
 - Prešlo **25 serverových testov**, **24 prehliadačových platobných scenárov** (12 Chromium + 12 WebKit), verejná ponuka na siedmich šírkach a celá cesta hrou v oboch prehliadačoch. Platby používajú riadené SDK a izolovanú databázu; automatizácia nevykonala živú úhradu ani nevytvorila produkčnú objednávku.
@@ -84,8 +84,8 @@ Aktuálne snímky ponuky, bez údajov karty:
 ## Kompaktný checkout a druhá hra – 28. 10. 2026
 
 - Potvrdené poradie je stručná karta hry → iba e-mail → tri kompaktné doplnky → **Vaša objednávka**. Meno sa nezbiera. E-mail má samostatný malý blok bez veľkého nadpisu.
-- Atlas uvádza preškrtnutú plánovanú cenu **2,99 €** a „Teraz zdarma“. Balík kníh má dve malé obálky, cenu +5 € a odkaz **Pozrieť ukážku oboch kníh**. Odkaz používa rovnaký dialóg `collection` ako funnel: dve knihy, štyri obrázkové ukážky, bez zmeny výberu či ceny.
-- Tretí voliteľný doplnok je druhá hra za **9,99 €**. Bez kníh sa platí 24,98 €, s knihami 29,98 €. Dve samostatné objednávky majú vlastné účty a heslá; kupujúci dostane dva oddelené e-maily a druhý môže preposlať. Druhá objednávka obsahuje iba základnú hru. [Spracovanie a testy](payment-setup.md).
+- Atlas uvádza preškrtnutú plánovanú cenu **2,99 €** a „Teraz zdarma“. Balík kníh má dve vyššie, mierne orezané obálky, cenu +4,99 € a odkaz **Pozrieť ukážku oboch kníh**. Odkaz používa rovnaký dialóg `collection` ako funnel: dve knihy, štyri obrázkové ukážky, bez zmeny výberu či ceny.
+- Tretí voliteľný doplnok je druhá hra za **9,99 €**, s prečiarknutou štandardnou cenou **29,99 €** a samostatnou zľavou **−20 €** v súhrne. Bez kníh sa platí 24,98 €, s knihami 29,97 €. Dve samostatné objednávky majú vlastné účty a heslá; kupujúci dostane dva oddelené e-maily a druhý môže preposlať. Druhá objednávka obsahuje iba základnú hru. [Spracovanie a testy](payment-setup.md).
 - Na mobile je pri prechádzaní ponuky dostupná spodná lišta s aktuálnou sumou a pokračovaním k platbe. Pri viditeľnom hlavnom tlačidle, otvorenej ukážke, voucheri alebo platobnom kroku sa schová. Obe tlačidlá vyžadujú platný e-mail a používajú rovnakú ochranu pred opakovaným kliknutím.
 - Vizuálna kontrola na 390 px: stránka má približne **1 500 px** oproti predchádzajúcim 2 090 px, napriek novej ponuke druhej hry. Kontroly na 360, 390, 430 a 1360 px pokrývajú aj chybové stavy, samostatné knihy, voucher, spoločnú ukážku a mobilné tlačidlo.
 - Prešlo **27 serverových testov**, **26 platobných scenárov** (13 Chromium + 13 WebKit), verejný funnel na siedmich šírkach a cesta cez sedem úloh v oboch prehliadačoch. Doručenie dvoch e-mailov, opakovanie, atómové vytvorenie, podpísané webhooky, refund aj voucher sú overené izolovane bez živej úhrady či produkčného nákupu.

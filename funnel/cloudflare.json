@@ -5,6 +5,7 @@
   "project_name": "pixelkovia-funnel",
   "project_id": "ea7dab2c-f7fe-42ef-954d-9f982607cdf4",
   "hostname": "pixelkovia.rodulab.com",
+  "receiving_mx": "receive-euw1.forge.rmta.net",
   "production_branch": "main",
   "directory": "dist/funnel"
 }

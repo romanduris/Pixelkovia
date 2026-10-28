@@ -21,7 +21,9 @@ export async function createCheckout(env,input){
   const q=quote(input.books,input.baseId,input.atlasIncluded,input.voucherCode,input.giftGame),id=uuid(),at=Date.now();
   if(input.voucherCode?.trim()&&!q.voucher)throw new HttpError(400,'Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.');
   const ids=[q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])];
-  const prices=Object.fromEntries(ids.map(productId=>[productId,q.voucher||productId===offer.atlasId?0:product(productId).priceCents-(q.books.includes(productId)?q.bundleDiscountCents/q.books.length:0)]));
+  // Split an odd-cent book discount deterministically; Stripe amounts are whole cents.
+  const bookDiscount=productId=>{const index=q.books.indexOf(productId);return index<0?0:Math.floor(q.bundleDiscountCents/q.books.length)+(index<q.bundleDiscountCents%q.books.length?1:0);};
+  const prices=Object.fromEntries(ids.map(productId=>[productId,q.voucher||productId===offer.atlasId?0:product(productId).priceCents-bookDiscount(productId)]));
   await execute(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices,gift_game,gift_price_cents) VALUES(?,?,?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher,JSON.stringify(prices),q.giftGame?1:0,q.giftTotalCents);
   const lines=ids.map(productId=>({price_data:{currency:'eur',product_data:{name:product(productId).name},unit_amount:prices[productId]},quantity:1}));
   if(q.giftGame)lines.push({price_data:{currency:'eur',product_data:{name:'Hra Pixelkovia – Stratený signál · pre ďalšiu rodinu'},unit_amount:q.giftTotalCents},quantity:1});

@@ -18,7 +18,7 @@ module.exports=async(page,{screenshotPrefix}={})=>{
  await input.fill(' FREE ');await input.press('Enter');assert.ok(await dialog.isHidden());
  assert.ok(await open.evaluate(el=>el===document.activeElement));assert.equal(await total.innerText(),'0,00 €');
  await page.locator('#select-bundle').check();assert.equal(await total.innerText(),'0,00 €');
- assert.equal(await discount.locator('strong').innerText(),'−19,99 €');
+ assert.equal(await discount.locator('strong').innerText(),'−19,98 €');
  await page.locator('[name="atlas"]').uncheck();assert.equal(await total.innerText(),'0,00 €');
  assert.ok(await page.locator('.gift-row').isHidden());
  await page.locator('[name="atlas"]').check();
@@ -27,7 +27,7 @@ module.exports=async(page,{screenshotPrefix}={})=>{
  await input.fill('not-free');await apply.click();assert.ok(await dialog.evaluate(el=>el.open));
  assert.equal(await total.innerText(),'0,00 €','invalid replacement preserves the voucher');
  await page.keyboard.press('Escape');assert.ok(await dialog.isHidden());
- await open.click();await remove.click();assert.equal(await total.innerText(),'19,99 €');assert.ok(await discount.isHidden());
+ await open.click();await remove.click();assert.equal(await total.innerText(),'19,98 €');assert.ok(await discount.isHidden());
  await page.locator('#select-bundle').uncheck();
  await open.click();await input.fill('free');await page.locator('#voucher-close').click();
  assert.equal(await total.innerText(),'14,99 €','closing without applying preserves the price');

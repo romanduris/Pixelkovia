@@ -91,8 +91,8 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await context.close();
   }
   const page=await browser.newPage();
-  for(const route of [...forbidden,'admin/api/customers','assets/printables/p2-preview.webp','missing-page']){
-   const response=await page.request.get(BASE+'/'+route);assert.equal(response.status(),404,'private/missing route returns 404: '+route);
+  for(const route of [...forbidden,'admin/api/customers','_protected/game.html','_protected/game-data.js','assets/printables/p2-preview.webp','missing-page']){
+   const response=await page.request.get(BASE+'/'+route,{maxRedirects:0});assert.equal(response.status(),route==='admin'?303:404,'private routes require authorization: '+route);
   }
   console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, three-scene swipe/keyboard gallery, preview, sticky CTA, all price combinations, inactive purchase, no submissions and unchanged game progress.');
  }finally{await browser.close()}
