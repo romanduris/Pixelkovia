@@ -6,7 +6,8 @@ Aktuálny stav k 28. 10. 2026. Zdroje sú `checkout.html`, `checkout.css`, `chec
 
 - Ponuka má tri rovnako vysoké, kratšie riadky. Názov, krátky opis a prípadná ukážka tvoria zvisle vycentrovaný blok. Atlas zastupuje Guardy. Platobná poznámka a garancia sú zarovnané na stred. Hlavička obsahuje „← Späť“.
 - Kniha **Po veľkom záblesku** používa v spoločnom katalógu údaj **20–25 minút spoločného čítania**.
-- Po povinnom e-maile a výbere doplnkov sa platba rozbalí **pod existujúcou objednávkou v rovnakej stránke** a stránka sa k nej plynulo posunie. Pôvodná ponuka, e-mail a súhrn zostanú viditeľné. Počas otvorenej relácie sú údaje uzamknuté; „Upraviť objednávku“ platbu zbalí a údaje znovu sprístupní. Zbaliteľná objednávka a suma sú nad kartou; karta neopakuje kontakt ani zoznam produktov.
+- Súhrn **Vaše dobrodružstvo** a sekcia **Bezpečná platba** sú v jednom zelenom paneli, bez druhej karty a opakovanej hlavičky s cenou. Panel má na desktope maximálnu šírku **660 px**; Stripe vypĺňa jeho vnútornú šírku. Na mobile panel využíva dostupnú šírku.
+- **Pokračovať k platbe** otvorí platbu priamo pod súčtom a skryje sa. Zostáva jediná kartová akcia **Zaplatiť [suma]** a dostupné tlačidlá peňaženiek. Pôvodná ponuka a e-mail zostávajú viditeľné, ale uzamknuté. **Upraviť objednávku** platbu zbalí a údaje znovu sprístupní. Garancia je až pod platbou.
 - Platba používa verejný Stripe Elements SDK nad Checkout Sessions (`ui_mode: elements`), samostatný Payment Element a Express Checkout Element. Form SDK s veľkým blokom Contact/Link už nový klient nepoužíva.
 - Oficiálny Appearance API používa `inputs: condensed`, slovenčinu a predvolené **Slovensko / SK**. Krajina zostáva zmeniteľná. Údaje karty sú vo vlastnom iframe Stripe; nezasahujeme do jeho DOM.
 - V tejto relácii sú ostatné aktuálne zapnuté miestne metódy a splátky vylúčené cez `excluded_payment_method_types`. Link vypína `wallet_options.link.display: never` a nastavenie prvkov; globálne nastavenia iných aplikácií sa nemenia.
@@ -17,15 +18,16 @@ Aktuálny stav k 28. 10. 2026. Zdroje sú `checkout.html`, `checkout.css`, `chec
 ## Overenie
 
 - Všetkých **33 serverových testov** a zostavenie Workeru prešlo. Overujú aj samostatné účty pri zhodnom e-maile, dve atómové objednávky, podpísané webhooky, refund, šifrované doručenie a preposielanie podpory.
-- Všetkých **38 platobných scenárov** s riadeným SDK prešlo (19 Chromium + 19 WebKit). Pokrývajú šírky **360, 390, 430 a 1360 px**, korektné ceny, návrat, chyby, dvojité potvrdenie, peňaženku, zmenenú sumu a nenačítané polia karty. Spustenie: `PLAYWRIGHT_MODULE=/cesta/k/playwright [QA_BROWSER=webkit] node tests/checkout-payment.test.cjs`.
-- Skutočný Stripe Payment Element bol vizuálne overený v Chromiu na 390 a 1360 px. Predvolená voľba v iframe bola **Slovensko**, karta bola po slovensky a bez Contact/Link bloku. Platobný panel mal **376 px** na mobile a **382 px** na desktope; pôvodný formulár zaberal približne celú mobilnú obrazovku.
-- Táto vizuálna kontrola iba otvorila nezaplatenú reláciu bez údajov karty či potvrdenia. Relácia bola po kontrole ukončená so stavom `expired` / `unpaid`. Bankové overenie ani fyzické peňaženky týmto overené nie sú.
+- Všetkých **40 platobných scenárov** s riadeným SDK prešlo (20 Chromium + 20 WebKit). Pokrývajú šírky **360, 390, 430 a 1360 px**, korektné ceny, návrat, chyby, dvojité potvrdenie, peňaženku, zmenenú sumu a nenačítané polia karty. Spustenie: `PLAYWRIGHT_MODULE=/cesta/k/playwright [QA_BROWSER=webkit] node tests/checkout-payment.test.cjs`.
+- Skutočný Stripe Payment Element bol vizuálne overený v Chromiu na **390 a 1360 px**. Predvolená krajina bola **Slovensko**, polia boli po slovensky a bez Contact/Link bloku. Spoločný panel mal približne **366 px** na mobile a **638 px** na desktope. Skutočné tlačidlá Apple Pay a Google Pay sa zobrazili nad kartou.
+- Vizuálna kontrola iba otvorila nezaplatenú reláciu bez údajov karty či potvrdenia. Relácia bola ukončená so stavom `expired` / `unpaid`. Bankové overenie a platba z fyzickej peňaženky týmto overené nie sú.
+- Návrat od banky má jeden súhrn s uloženou prezentačnou sumou. Bez uloženého prehľadu nezobrazuje nesúvisiaci predvolený košík. Zaplatenie vždy určuje server.
 
-## Apple Pay / Google Pay – aktivácia domény
+## Apple Pay / Google Pay
 
-Pri kontrole nebola v Stripe zaregistrovaná doména `pixelkovia.rodulab.com` pre platobné peňaženky. Pokus o jej registráciu cez pripojený Stripe plugin skončil požiadavkou na obnovenie prihlásenia/oprávnení (`UNAUTHORIZED`, reauthentication required). Existujúci runtime kľúč nemá právo na registráciu domény.
+Produkčná doména `pixelkovia.rodulab.com` je zaregistrovaná, povolená a v Stripe má Apple Pay aj Google Pay stav `active`. V predvolenej konfigurácii **Your account**, ktorú používa checkout, sú obe peňaženky dostupné a zapnuté. Registráciu a zapnutie Google Pay dokončil vlastník cez Dashboard; následná kontrola cez Stripe API potvrdila stav domény aj konfigurácie.
 
-Kód peňaženky podporuje; aktivácia vyžaduje obnovený prístup, registráciu presnej produkčnej domény a následné overenie stavu Apple Pay/Google Pay v Stripe. Nevytvárať ďalší účet ani meniť globálne nastavenia iných aplikácií. Dostupnosť sa napokon overuje na fyzickom podporovanom zariadení s peňaženkou.
+Dostupnosť na konkrétnom zariadení závisí od prehliadača a nastavenej peňaženky. Registrácia domény a zobrazenie tlačidla samy osebe neoverujú úspešnú bankovú platbu.
 
 ## Snímky
 

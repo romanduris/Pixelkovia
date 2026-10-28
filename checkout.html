@@ -43,14 +43,15 @@
         </section>
       </div>
       <aside class="checkout-summary" aria-labelledby="summary-heading"><div class="summary-inner">
-        <span class="checkout-step">SÚHRN</span><h2 id="summary-heading">Vaša objednávka</h2>
+        <div class="base-labels"><span class="checkout-step">SÚHRN OBJEDNÁVKY</span><span class="summary-access">Early Access</span></div><h2 id="summary-heading">Vaše dobrodružstvo</h2>
+        <p id="returned-order-items" class="returned-order-items" hidden></p>
         <div class="summary-items">
           <div class="summary-row summary-base"><span>Rodinná hra Pixelkovia</span><strong data-summary-base-price>14,99 €</strong></div><div id="summary-books"></div><div id="summary-additional-game" class="summary-row" hidden><span>Darčeková hra pre ďalšiu rodinu</span><strong></strong></div>
           <div class="summary-row gift-row"><span>Atlas Pixelkov</span><strong>ZDARMA</strong></div>
         </div>
         <div class="summary-total"><span>Celkom<small class="summary-price-note">Early Access · bez predplatného</small></span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div>
         <details id="price-calculation" class="price-calculation">
-          <summary><span>Zvýhodnenie oproti štandardným cenám:</span><span class="saving-amount"><strong id="summary-saving">15,00 €</strong><span class="calculation-arrow" aria-hidden="true"></span></span><span class="visually-hidden">Ako sa vypočítala cena?</span></summary>
+          <summary><span id="summary-saving-label">Zvýhodnenie pri Early Access:</span><span class="saving-amount"><strong id="summary-saving">15,00 €</strong><span class="calculation-arrow" aria-hidden="true"></span></span><span class="visually-hidden">Ako sa vypočítala cena?</span></summary>
           <div class="calculation-content">
             <div id="summary-early-discount" class="summary-discount"><span>Zľava Early Access</span><strong>−15,00 €</strong></div>
             <div id="summary-gift-discount" class="summary-discount" hidden><span>Zľava z druhej hry</span><strong></strong></div>
@@ -58,13 +59,13 @@
           </div>
         </details>
         <div id="summary-voucher" class="summary-discount" role="status" aria-live="polite" aria-atomic="true" hidden></div>
-        <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Kúpiť za <span id="button-total">14,99 €</span> <span aria-hidden="true">→</span></button>
+        <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Pokračovať k platbe <span aria-hidden="true">→</span></button>
         <button class="checkout-voucher-link" id="voucher-open" type="button" aria-haspopup="dialog" aria-controls="voucher-dialog">Mám zľavový kód</button>
         <p class="payment-note" id="payment-note"><strong>Platby zatiaľ nie sú spustené.</strong> Objednávka ani platba nevznikne a e-mail sa neodošle.</p>
-        <div class="checkout-guarantee"><span aria-hidden="true">14</span><p><strong>14-dňová garancia spokojnosti</strong><a href="index.html#garancia">Podmienky vrátenia peňazí →</a></p></div>
+        <section id="payment-panel" class="embedded-payment" hidden aria-labelledby="payment-heading"><h2 id="payment-heading">Bezpečná platba</h2><p class="payment-method-note">Platba kartou alebo Apple Pay / Google Pay</p><div id="express-checkout-slot"></div><p id="wallet-separator" class="wallet-separator" hidden>alebo zaplaťte kartou</p><div id="payment-slot"></div><button id="stripe-pay" class="stripe-pay" type="button" hidden disabled>Zaplatiť</button><p id="payment-status" role="status"></p><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
+        <div class="checkout-guarantee"><span aria-hidden="true">14</span><p><strong>Bezpečná platba · 14-dňová garancia spokojnosti</strong><a href="index.html#garancia">Podmienky vrátenia peňazí →</a></p></div>
       </div></aside>
     </form>
-    <section id="payment-panel" class="checkout-panel embedded-payment" hidden aria-labelledby="payment-heading"><div id="payment-summary" class="payment-order-summary" hidden><details><summary><span>Vaša objednávka</span><strong id="payment-order-total"></strong></summary><p id="payment-order-items"></p></details></div><h2 id="payment-heading">Bezpečná platba</h2><div id="express-checkout-slot"></div><p id="wallet-separator" class="wallet-separator" hidden>alebo zaplaťte kartou</p><div id="payment-slot"></div><button id="stripe-pay" class="stripe-pay" type="button" hidden disabled>Zaplatiť</button><p id="payment-status" role="status"></p><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
     <details class="checkout-privacy"><summary>Ako prebehne platba a doručenie?</summary><p>E-mail je povinný na doručenie prístupu. Kartu vyplníte v zabezpečenom formulári <a href="https://stripe.com/" target="_blank" rel="noopener noreferrer">Stripe</a> priamo na tejto stránke; údaje karty spracúva <a href="https://stripe.com/" target="_blank" rel="noopener noreferrer">Stripe</a>. Vaša banka môže vyžiadať potvrdenie platby. Po potvrdenej úhrade vám automaticky pošleme e-mail s odkazom na rodičovský portál a samostatným heslom pre tento nákup.</p></details>
     <details class="checkout-privacy checkout-help"><summary>Máte otázku? Napíšte na</summary><p>Radi vám pomôžeme. Napíšte na <a href="mailto:miky@pixelkovia.rodulab.com">miky@pixelkovia.rodulab.com</a>.</p></details>
   </main>

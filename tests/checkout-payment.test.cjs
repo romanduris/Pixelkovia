@@ -4,6 +4,7 @@ const engine={chromium,webkit}[process.env.QA_BROWSER||'chromium'];
 assert.ok(engine,'QA_BROWSER must be chromium or webkit');
 const origin='https://pixelkovia.rodulab.com';
 function installStripeStub(scenario){
+ if(scenario==='cached-return')sessionStorage.setItem('pixelkovia-checkout-summary',JSON.stringify({sessionId:'cs_test_fixture_returned',labels:['Rodinná hra Pixelkovia','Obe ilustrované knihy','Druhá hra pre ďalšiu rodinu'],totalCents:2997,at:Date.now()}));
  const state=window.checkoutFixture={calls:[],destroyed:0,walletDestroyed:0,finish:null,stale:null,totalCents:1499};
  window.Stripe=(key,options)=>{state.stripeOptions=options;return {initCheckoutElementsSdk(options){
   state.initOptions=options;
@@ -64,6 +65,7 @@ function installStripeStub(scenario){
   for(const width of [360,390,430,1360]){
    const t=await open('normal',false,false,width),{page,fixture}=t;
    const activate=locator=>width<600?locator.tap():locator.click();
+   assert.equal((await page.locator('.checkout-buy').innerText()).replace(/\s+/g,' '),'Pokračovať k platbe →');
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    assert.equal(await page.locator('#base-heading').innerText(),'Hra Pixelkovia – Stratený signál');
    assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad · 45–60 minút spoločnej zábavy');
@@ -100,7 +102,7 @@ function installStripeStub(scenario){
    assert.ok(!/prednostn|plánovaná štandardná/i.test(await page.locator('body').innerText()));
    assert.equal(await page.locator('.delivery-row').count(),0);
    assert.equal(await page.locator('[name="name"]').count(),0,'only email is collected');
-   assert.equal(await page.locator('#summary-heading').innerText(),'Vaša objednávka');
+   assert.equal(await page.locator('#summary-heading').innerText(),'Vaše dobrodružstvo');
    assert.ok((await page.locator('.details-panel').boundingBox()).height<145,'email stays compact');
    assert.deepEqual(await page.locator('.checkout-content>section').evaluateAll(es=>es.map(e=>e.classList.contains('base-product')?'game':e.classList.contains('details-panel')?'email':'addons')),['game','email','addons']);
    assert.equal(await page.locator('#addon-gift-game').isChecked(),false);
@@ -121,9 +123,13 @@ function installStripeStub(scenario){
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'order fits '+width+' px');
    await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');
    await activate(page.locator('#checkout-form .checkout-buy'));await page.locator('#stripe-pay').waitFor();
-   assert.equal(await page.locator('#payment-order-total').innerText(),'19,98 €');
+   assert.equal(await page.locator('#order-total').innerText(),'19,98 €');
    assert.equal(await page.locator('#checkout-form').isVisible(),true,'order remains visible above the inline payment');
-   assert.ok(await page.evaluate(()=>document.querySelector('#payment-panel').getBoundingClientRect().top>=document.querySelector('#checkout-form').getBoundingClientRect().bottom),'payment opens below the existing order');
+   assert.ok(await page.locator('.summary-inner #payment-panel').isVisible(),'payment belongs to the order panel');
+   assert.ok(await page.locator('.checkout-buy').isHidden(),'the intermediate button disappears during payment');
+   assert.equal(await page.locator('#payment-summary,#payment-order-total').count(),0,'there is no second order summary or total');
+   assert.ok(await page.evaluate(()=>{const panel=document.querySelector('#payment-panel'),summary=document.querySelector('.summary-inner'),r=panel.getBoundingClientRect(),style=getComputedStyle(summary);return Math.abs(r.width-(summary.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight)))<1&&getComputedStyle(panel).borderLeftWidth==='0px'&&r.top>=document.querySelector('.summary-total').getBoundingClientRect().bottom;}),'Stripe fills the unified panel below the total without a second frame');
+   if(width===1360)assert.ok((await page.locator('.summary-inner').boundingBox()).width<=680,'the desktop payment panel has a comfortable maximum width');
    assert.equal(page.context().pages().length,1,'payment uses the current tab');
    assert.equal(new URL(page.url()).pathname,'/checkout');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'payment fits '+width+' px');
@@ -149,7 +155,7 @@ function installStripeStub(scenario){
    await page.locator('#checkout-form .checkout-buy').click();await page.locator('#stripe-pay').waitFor();
    assert.equal(await page.locator('#checkout-form').isVisible(),true,'payment expands below the product picker and summary');
    assert.ok(await page.locator('#select-bundle').isDisabled(),'the visible order is locked to the active Stripe amount');
-   assert.equal(await page.locator('#payment-order-total').innerText(),'19,98 €');
+   assert.equal(await page.locator('#order-total').innerText(),'19,98 €');
    const methods=await page.evaluate(()=>checkoutFixture.expressOptions.paymentMethods);
    assert.equal(methods.link,'never');assert.notEqual(methods.applePay,'never');assert.notEqual(methods.googlePay,'never');
    assert.equal(await page.evaluate(()=>checkoutFixture.stripeOptions.locale),'sk');
@@ -157,7 +163,7 @@ function installStripeStub(scenario){
    assert.equal(await page.evaluate(()=>checkoutFixture.cardOptions.fields.billingDetails.email),'never','email is already collected before payment');
    assert.equal(fixture.posts[0].uiMode,'elements');
    assert.equal(await page.locator('#express-checkout-slot').isHidden(),true,'no empty wallet area on unsupported devices');
-   assert.equal(await page.locator('.payment-order-summary details').evaluate(el=>el.open),false,'product detail is collapsed');
+   assert.ok(await page.locator('.checkout-buy').isHidden(),'only the final payment action is visible');
    await page.locator('#stripe-pay').click();
    assert.equal(await page.locator('#change-order').isDisabled(),true,'order changes are blocked while confirmation is in flight');
    await page.locator('#stripe-pay').dispatchEvent('click');
@@ -199,8 +205,9 @@ function installStripeStub(scenario){
    await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill('free');await page.locator('#voucher-code').press('Enter');
    await page.locator('[name="email"]').fill('voucher-fixture@example.invalid');await page.locator('#checkout-form .checkout-buy').click();
    await page.locator('#stripe-pay').waitFor();
-   assert.equal(await page.locator('#payment-order-total').innerText(),'0,00 €');
+   assert.equal(await page.locator('#order-total').innerText(),'0,00 €');
    assert.equal(await page.locator('#payment-heading').innerText(),'Potvrdenie objednávky zdarma');
+   assert.ok(await page.locator('.payment-method-note').isHidden(),'a free confirmation does not advertise a card payment');
    assert.equal(fixture.posts[0].voucherCode,'free');assert.equal(fixture.posts[0].books.length,2);
    await page.locator('#stripe-pay').click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujem'));
@@ -217,7 +224,7 @@ function installStripeStub(scenario){
    assert.match(await page.locator('#summary-voucher').innerText(),/nákup za 1 €/);
    await page.locator('[name="email"]').fill('one-euro-fixture@example.invalid');await page.locator('#checkout-form .checkout-buy').click();
    await page.locator('#stripe-pay').waitFor();
-   assert.equal(fixture.posts[0].voucherCode,'1e');assert.equal(await page.locator('#payment-order-total').innerText(),'1,00 €');
+   assert.equal(fixture.posts[0].voucherCode,'1e');assert.equal(await page.locator('#order-total').innerText(),'1,00 €');
    assert.equal(await page.locator('#payment-heading').innerText(),'Bezpečná platba');
    await page.locator('#stripe-pay').click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujem'));
@@ -268,8 +275,8 @@ function installStripeStub(scenario){
    await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.locator('#mobile-buy').tap();
    await page.locator('#stripe-pay').waitFor();
    assert.equal(fixture.posts[0].giftGame,true);assert.equal(fixture.posts[0].name,undefined);
-   assert.equal(await page.locator('#payment-order-total').innerText(),'29,97 €');
-   assert.ok((await page.locator('#payment-order-items').textContent()).includes('Druhá hra pre ďalšiu rodinu'));
+   assert.equal(await page.locator('#order-total').innerText(),'29,97 €');
+   assert.ok(await page.locator('#summary-additional-game').isVisible());
    assert.equal(await page.locator('#mobile-checkout-bar').isHidden(),true);
    await page.locator('#stripe-pay').click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
    fixture.paid=true;await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('dva samostatné e-maily'));
@@ -287,9 +294,17 @@ function installStripeStub(scenario){
    const t=await open('normal',true,true);const {page,fixture}=t;
    await page.getByText('✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
    assert.equal(fixture.posts.length,0,'the bank return does not create a new payment');
-   assert.ok(await page.locator('#checkout-form').isHidden(),'a fresh bank-return page does not display an unrelated default cart');
+   assert.ok(await page.locator('.checkout-content').isHidden(),'a fresh bank-return page does not display an unrelated default cart');
    assert.equal(await page.locator('#checkout-form .checkout-buy').isDisabled(),true);assert.equal(await page.locator('[name="email"]').isDisabled(),true);
    await t.close();cases.push('bank return restores the server-confirmed result without creating another session');
+  }
+  {
+   const t=await open('cached-return',true,true),{page,fixture}=t;
+   await page.getByText('✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
+   assert.equal(await page.locator('#order-total').innerText(),'29,97 €','bank return keeps the saved presentation total after server verification');
+   assert.ok((await page.locator('#returned-order-items').innerText()).includes('Druhá hra pre ďalšiu rodinu'));
+   assert.ok(await page.locator('.summary-items').isHidden());assert.equal(fixture.posts.length,0);
+   await t.close();cases.push('bank return has one summary with the saved total and no default cart');
   }
   {
    const t=await open('wallets'),{page}=t;

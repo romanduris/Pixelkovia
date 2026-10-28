@@ -1,17 +1,17 @@
 .checkout-page{background:#0d1424;color:#f1ede5;color-scheme:dark;--checkout-line:#354654}
 .checkout-page [hidden]{display:none!important}
-.checkout-header{max-width:1080px;padding:12px 24px;margin:auto;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2c3a4e;gap:16px}
+.checkout-header{max-width:1240px;padding:12px 24px;margin:auto;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2c3a4e;gap:16px}
 .checkout-brand{display:flex;align-items:center;gap:9px;text-decoration:none;font:800 16px/1.3 Manrope,sans-serif;letter-spacing:.08em}
 .checkout-brand img{object-fit:contain;width:32px;height:32px}
 .checkout-brand small{display:block;font:8px/1.8 'DM Sans',sans-serif;letter-spacing:.1em;color:#a0b4cb}
 .checkout-header>a:last-child{font-size:12px;text-decoration:none;color:#b8c6d6;min-height:44px;display:flex;align-items:center;white-space:nowrap}
-.checkout-main{max-width:1080px;margin:auto;padding:20px 24px 28px}
-.checkout-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:start}
+.checkout-main{max-width:1240px;margin:auto;padding:20px 24px 28px}
+.checkout-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:22px;align-items:start}
 .checkout-step{font:650 9px/1.6 'DM Sans',sans-serif;letter-spacing:.09em;color:#a8dfc7}
 .checkout-panel{border:1px solid #3a4a59;background:#142032;border-radius:11px;padding:17px;margin-bottom:12px;min-width:0}
 .checkout-panel h2{font:650 18px/1.35 Manrope,sans-serif;color:#f2eddf;margin:4px 0 12px}
 .base-labels{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.launch-badge{display:inline-flex;padding:3px 6px;border:1px solid #86a58c;border-radius:5px;color:#cde8c5;background:#254035;font:650 7px/1.6 'DM Sans',sans-serif;letter-spacing:.04em}
+.launch-badge,.summary-access{display:inline-flex;padding:3px 6px;border:1px solid #86a58c;border-radius:5px;color:#cde8c5;background:#254035;font:650 7px/1.6 'DM Sans',sans-serif;letter-spacing:.04em}
 .base-product-heading{display:flex;gap:12px;align-items:center;margin:10px 0 7px}
 .base-product-heading>img{object-fit:contain;flex:0 0 48px;width:48px;height:48px}
 .base-product-heading h2{margin:0 0 3px;font-size:21px}
@@ -60,7 +60,7 @@
 .book-addon .offer-book-cover{justify-self:center;width:40px;height:57px}
 .book-addon .offer-book-cover strong{font-size:6px}
 .books-status:empty{display:none}
-.checkout-summary{position:sticky;top:18px;min-width:0}
+.checkout-summary{position:sticky;top:18px;min-width:0;width:100%;max-width:660px}
 .summary-inner{padding:19px;border:1px solid #758b78;border-radius:11px;background:linear-gradient(140deg,#23372f,#192437)}
 .summary-inner>h2{font:650 24px/1.3 Manrope,sans-serif;color:#f6eddb;margin:3px 0 15px}
 .summary-row{display:flex;justify-content:space-between;align-items:start;gap:12px;margin:9px 0;font-size:12px;color:#d9e1e2;line-height:1.5}
@@ -99,24 +99,24 @@
 .checkout-privacy{max-width:650px;margin-top:0}
 .checkout-privacy summary{font-size:11px;color:#adbed0;cursor:pointer;padding:10px 0;min-height:44px}
 .checkout-privacy p{font-size:12px;line-height:1.8;color:#a7b9cb}
-.checkout-footer{max-width:1080px;display:flex;justify-content:space-between;margin:auto;padding:16px 24px;border-top:1px solid #2c3a4e;color:#9bafc6;gap:12px;font-size:11px}
+.checkout-footer{max-width:1240px;display:flex;justify-content:space-between;margin:auto;padding:16px 24px;border-top:1px solid #2c3a4e;color:#9bafc6;gap:12px;font-size:11px}
 .checkout-footer>a{color:#b6c7d9;text-underline-offset:3px}
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .mobile-checkout-bar{display:none}
-.embedded-payment{max-width:520px;margin:0 auto 12px;padding:16px;scroll-margin-top:16px}
-.embedded-payment h2{font-size:20px;margin:0 0 12px}
-.payment-order-summary{padding-bottom:8px;margin-bottom:12px;border-bottom:1px solid var(--checkout-line)}
-.payment-order-summary summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;cursor:pointer;list-style:none;color:#b2c2d3;font-size:12px}
-.payment-order-summary summary::-webkit-details-marker{display:none}
-.payment-order-summary summary>span::after{content:'⌄';margin-left:6px}
-.payment-order-summary details[open] summary>span::after{content:'⌃'}
-.payment-order-summary p{font-size:12px;line-height:1.5;color:#b2c2d3;margin:8px 0 0;overflow-wrap:anywhere}
-.payment-order-summary strong{font:700 24px/1.3 Manrope,sans-serif;color:#fff1d3;white-space:nowrap}
+.embedded-payment{width:100%;margin:14px 0 16px;padding:18px 0 0;border-top:1px solid #61715c;scroll-margin-top:16px}
+.embedded-payment h2{font:650 20px/1.35 Manrope,sans-serif;margin:0 0 4px;color:#f6eddb}
+.payment-method-note{font-size:12px;line-height:1.5;color:#b4c5c9;margin:0 0 14px}
+.returned-order-items{font-size:12px;line-height:1.6;color:#d9e1e2;margin:12px 0}
+.payment-open .checkout-buy,.payment-open #voucher-open,.payment-open #payment-note{display:none}
+.payment-open .checkout-summary{position:static}
+.bank-return{display:block;max-width:660px;margin:auto}
+.bank-return .checkout-content,.bank-return .summary-items,.bank-return #price-calculation,.bank-return #summary-voucher{display:none!important}
+.bank-return .summary-total{margin-top:14px}
 #express-checkout-slot{min-height:0;margin-bottom:8px}
 .wallet-separator{text-align:center;font-size:11px;color:#b2c2d3;margin:6px 0 10px}
 .stripe-pay{margin-top:14px}
-#payment-slot{max-width:560px;margin:0 auto;overflow:hidden;border-radius:8px;background:#142032}
-.embedded-payment>#payment-status{max-width:560px;margin:16px auto 0;color:#b2c2d3;font-size:14px;line-height:1.65}
+#payment-slot{width:100%;margin:0;overflow:hidden;border-radius:8px}
+.embedded-payment>#payment-status{margin:16px auto 0;color:#b2c2d3;font-size:14px;line-height:1.65}
 .embedded-payment>#payment-status:empty{display:none}
 .embedded-payment>#change-order{display:flex;min-height:44px;margin:8px auto 0;padding:7px 14px;font-size:12px}
 .field-note{font-size:12px;line-height:1.6;margin:10px 0 0;color:#a9bacb}
