@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const BASE=(process.env.BASE_URL||'http://127.0.0.1:8081').replace(/\/$/,'');
 const root='dist/funnel';
-const forbidden=['game.html','parent.html','library-read.html','portal-library.js','portal-library.css','storyboard.html','book-before.html','book-after.html','books-preview.html','books-content/before.json','books-content/after.json','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
+const forbidden=['game.html','parent.html','library-read.html','storyboard.html','book-before.html','book-after.html','books-preview.html','books-content/before.json','books-content/after.json','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
 for(const file of forbidden)assert.ok(!fs.existsSync(path.join(root,file)),'public artifact excludes '+file);
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 assert.ok(index.includes('Dnes večer budeme'),'landing is rendered without JavaScript');
@@ -17,7 +17,7 @@ for(let mask=0;mask<4;mask++){
  assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids)),JSON.stringify(source.window.SITE_CONFIG.quote(ids)));
  for(const baseId of ['episode-1',...source.window.SITE_CONFIG.offer.bookIds]){
   for(const code of ['','free',' FREE ','not-free']){
-   for(const includeAtlas of [true,false])assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids,baseId,code,includeAtlas)),JSON.stringify(source.window.SITE_CONFIG.quote(ids,baseId,code,includeAtlas)),'public voucher and optional Atlas quote match the source');
+   for(const includeAtlas of [true,false])assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids,baseId,includeAtlas,code)),JSON.stringify(source.window.SITE_CONFIG.quote(ids,baseId,includeAtlas,code)),'public voucher and optional Atlas quote match the source');
   }
  }
 }
@@ -28,6 +28,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
   for(const [width,height]of [[320,568],[360,640],[390,844],[430,932],[768,1024],[1366,768],[1440,900]]){
    const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,isMobile:width<600,hasTouch:width<600});
    const page=await context.newPage(),errors=[],missing=[],outgoing=[];
+   await page.route('**/api/checkout/config',route=>route.fulfill({json:{enabled:false,publishableKey:null}}));
    page.on('pageerror',e=>errors.push(e.message));
    page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(BASE))missing.push(r.url())});
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url())});
@@ -75,7 +76,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await require('./helpers/book-offer.cjs').previews(page);
    await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL(url=>/\/checkout(?:\.html)?$/.test(url.pathname));
    await page.locator('#book-options input').first().waitFor();
-   assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('#payment-note').innerText(),/Platby zatiaľ nie sú spustené/);
+   assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('#payment-note').innerText(),/Platby ešte pripravujeme/);
    assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    await require('./helpers/book-offer.cjs').checkout(page);

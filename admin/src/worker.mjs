@@ -68,8 +68,8 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){
       const session=url.searchParams.get('session_id');if(!/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(session||''))throw new HttpError(400,'Neplatná platobná relácia.');
-      const order=await first(env.TQ_DB,'SELECT o.status,d.status delivery FROM orders o LEFT JOIN access_deliveries d ON d.order_id=o.id WHERE o.external_reference=?',session);
-      return json({paid:order?.status==='paid',delivered:order?.delivery==='sent'});
+      const order=await first(env.TQ_DB,'SELECT o.status,o.total_cents,d.status delivery FROM orders o LEFT JOIN access_deliveries d ON d.order_id=o.id WHERE o.external_reference=?',session);
+      return json({paid:order?.status==='paid',delivered:order?.delivery==='sent',noPaymentRequired:order?.total_cents===0});
     }
     if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);return json(await createCheckout(env,{...await body(request),__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
     if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env));

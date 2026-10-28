@@ -1,0 +1,36 @@
+const assert=require('node:assert/strict');
+module.exports=async(page,{screenshotPrefix}={})=>{
+ const open=page.locator('#voucher-open'),dialog=page.locator('#voucher-dialog'),input=page.locator('#voucher-code');
+ const total=page.locator('#order-total'),discount=page.locator('#summary-voucher');
+ const apply=page.locator('.voucher-apply'),remove=page.locator('#voucher-remove');
+ assert.equal(await open.innerText(),'Mám zľavový kód');
+ assert.ok(await open.evaluate(el=>el.previousElementSibling.matches('.checkout-buy')));
+ assert.ok((await open.boundingBox()).height>=44);
+ await open.click();assert.ok(await dialog.evaluate(el=>el.open));
+ assert.ok(await input.evaluate(el=>el===document.activeElement));
+ assert.ok(await dialog.evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight}));
+ assert.ok(await input.evaluate(el=>parseFloat(getComputedStyle(el).fontSize)>=16));
+ if(screenshotPrefix)await page.screenshot({path:screenshotPrefix+'-popup.png'});
+ await apply.click();assert.equal(await page.locator('#voucher-error').innerText(),'Zadajte kód voucheru.');
+ await input.fill('<img src=x onerror=alert(1)>');await input.press('Enter');
+ assert.match(await page.locator('#voucher-error').innerText(),/Tento voucher nepoznáme/);
+ assert.equal(await dialog.locator('img').count(),0);assert.equal(await total.innerText(),'14,99 €');
+ await input.fill(' FREE ');await input.press('Enter');assert.ok(await dialog.isHidden());
+ assert.ok(await open.evaluate(el=>el===document.activeElement));assert.equal(await total.innerText(),'0,00 €');
+ await page.locator('#select-bundle').check();assert.equal(await total.innerText(),'0,00 €');
+ assert.equal(await discount.locator('strong').innerText(),'−19,99 €');
+ await page.locator('[name="atlas"]').uncheck();assert.equal(await total.innerText(),'0,00 €');
+ assert.ok(await page.locator('.gift-row').isHidden());
+ await page.locator('[name="atlas"]').check();
+ if(screenshotPrefix){await page.locator('.checkout-summary').scrollIntoViewIfNeeded();await page.screenshot({path:screenshotPrefix+'-applied.png'});}
+ await open.click();assert.equal(await input.inputValue(),'free');assert.ok(await remove.isVisible());
+ await input.fill('not-free');await apply.click();assert.ok(await dialog.evaluate(el=>el.open));
+ assert.equal(await total.innerText(),'0,00 €','invalid replacement preserves the voucher');
+ await page.keyboard.press('Escape');assert.ok(await dialog.isHidden());
+ await open.click();await remove.click();assert.equal(await total.innerText(),'19,99 €');assert.ok(await discount.isHidden());
+ await page.locator('#select-bundle').uncheck();
+ await open.click();await input.fill('free');await page.locator('#voucher-close').click();
+ assert.equal(await total.innerText(),'14,99 €','closing without applying preserves the price');
+ await open.click();await page.mouse.click(2,2);assert.ok(await dialog.isHidden());
+ assert.ok(await open.evaluate(el=>el===document.activeElement));
+};

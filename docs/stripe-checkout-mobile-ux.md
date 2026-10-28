@@ -65,3 +65,18 @@ Zmenené súbory: `checkout.html`, `checkout.css`, `checkout.js`, `admin/src/com
 - Prešlo aj všetkých **24 serverových testov**, sedem testov prihlasovacích kľúčov a e-mailových DNS, kontrola statických súborov a digitálnych identít. Celá cesta cez izolované Workers/D1, portál, sedem úloh, druhý telefón, hodnotenie a administráciu prešla v **Chromiu aj WebKite**.
 - Na produkčnej doméne prešlo **17 HTTP kontrol** verejných stránok, povinného prihlásenia, nedostupných odpovedí, platených súborov a vyradených trás. Verejný checkout sa vo WebKite načítal so sumou 14,99 € bez vodorovného pretečenia.
 - Testy neodoslali skutočnú platbu, nevytvorili produkčného zákazníka a nemenili nastavenia Stripe. Skutočný formulár Stripe vo WebKite, bankové overenie, doručenie prístupového e-mailu a Apple Pay/Google Pay na fyzickom zariadení týmto overené nie sú. Pôvodné snímky pred/po zostávajú platné; vzhľad ani produkčná platobná logika sa v tomto doplnení nemenili.
+
+## Aktuálna ponuka a voucher – 28. 10. 2026
+
+- Názov produktu je **Hra Pixelkovia – Stratený signál**. Hlavná karta uvádza „7 záhad v jednom spoločnom príbehu“.
+- Súhrn zobrazuje plánovanú štandardnú cenu **29,99 €**, zľavu **−15 € za prednostný prístup** a výsledok **14,99 €**. Označenie plánovanej ceny zostáva explicitné; nejde o predchádzajúcu predajnú cenu. Riadok „Doručenie online“ je odstránený.
+- Obe knihy sa pridávajú jedným spoločným políčkom. Zachované sú obe obálky, stručný obsah a samostatné ukážky. Používateľ potvrdil zachovanie kompletného balíka za **19,99 €**, preto knihy k hre stoja **5 € namiesto 9,98 €**, s textom „takmer za polovicu“. Atlas zostáva bezplatnou voliteľnou položkou. Samostatné knihy zostávajú za 4,99 €.
+- Pod tlačidlom kúpiť je iba odkaz „Mám zľavový kód“, ktorý otvorí dialóg. `free` vynuluje celú aktuálnu objednávku. Neznámy kód, zatvorenie bez uplatnenia, odstránenie kódu, návrat fokusu a zmeny výberu majú pokrytie v testoch.
+- Server overuje voucher a zapisuje ho do existujúcej D1 cez migráciu `0006_checkout_vouchers.sql`. Prístup vytvorí až po podpísanej udalosti a overení dokončenej nulovej relácie cez Stripe API. Otvorená, nezaplatená či podvrhnutá relácia prístup neudelí; opakovaná udalosť nevytvorí druhú objednávku. Podrobnosti: [platby a doručenie](payment-setup.md).
+- Prešlo **25 serverových testov**, **24 prehliadačových platobných scenárov** (12 Chromium + 12 WebKit), verejná ponuka na siedmich šírkach a celá cesta hrou v oboch prehliadačoch. Platby používajú riadené SDK a izolovanú databázu; automatizácia nevykonala živú úhradu ani nevytvorila produkčnú objednávku.
+
+Aktuálne snímky ponuky, bez údajov karty:
+
+| Mobilná ponuka | Dialóg voucheru | Desktop |
+| --- | --- | --- |
+| [390 px](screenshots/checkout-offer-390.png) | [Voucher](screenshots/checkout-voucher-390.png) | [1360 px](screenshots/checkout-offer-1360.png) |

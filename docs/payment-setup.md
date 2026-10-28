@@ -43,13 +43,19 @@ Schválené [mobilné UX zadanie](stripe-checkout-mobile-ux.md) výslovne obmedz
 
 Pri otvorení platby výber produktov nahradí stručný prehľad objednávky a formulár. Návrat k úprave obnoví výber aj e-mail. Prehľad pre návrat od banky sa dočasne uchováva v `sessionStorage` bez hesiel či údajov karty; slúži výhradne na zobrazenie. Cenu aj zaplatenie vždy overuje server.
 
+Ponuka používa jeden výber oboch kníh: hra 14,99 € a knihy spolu 5 € (2 × 2,50 €), spolu 19,99 €. Server odosiela rovnaký rozpis do Stripe a uloží presné jednotkové ceny pri vytvorení relácie. Dokončenie ich prenesie do položiek objednávky. Už otvorené relácie spred tejto zmeny zachovajú pôvodné rozdelenie zľavy; celková suma sa nemení.
+
 Udalosť `confirm` odovzdáva `formConfirmEvent` do `actions.confirm` s `redirect: 'if_required'`. Počas potvrdenia je zmena objednávky blokovaná a druhé kliknutie sa ignoruje. Chyba ponechá formulár pripravený na opravu. Úspech SDK spustí overenie objednávky na serveri; sám neudelí prístup ani neoznačí nákup za zaplatený. Návrat od banky používa rovnaké serverové overenie a nevytvorí ďalšiu platobnú reláciu.
 
 Podpísané udalosti `checkout.session.completed` a `checkout.session.async_payment_succeeded` spúšťajú vytvorenie prístupu len po overení `payment_status=paid`, režimu, sumy, meny a väzby na serverovú objednávku. Opakovaná udalosť nevytvorí ďalší účet. Úplný refund zneplatní zaplatený stav objednávky. Návratová URL sama prístup neudelí.
 
 Každý nákup má vlastné zákaznícke ID, zakúpené produkty a náhodné heslo, aj pri rovnakom e-maile. E-mail z **Adam@pixelkovia.rodulab.com** obsahuje iba krátke poďakovanie, odkaz na `/Supervisor`, prihlasovací e-mail a heslo pre daný nákup. Fronta je šifrovaná, úspešné odoslanie vymaže šifrovaný obsah a neúspešné odoslanie sa opakuje.
 
-Vývojový voucher `free`, starý adaptér Payment Links a ručné doručovanie sa nepoužívajú.
+Pod tlačidlom kúpiť je odkaz „Mám zľavový kód“, ktorý otvorí dialóg. Schválený voucher `free` (bez ohľadu na veľkosť písmen a okolité medzery) zníži celú vybranú objednávku na 0 €. Platí pre hru, balík aj samostatné knihy. Neznámy kód server odmietne. Voucher sa neukladá do URL ani lokálneho úložiska.
+
+Server zapíše `voucher_code=free` a nulovú cenu do `checkout_attempts` a vytvorí nulové Stripe položky. Podľa [dokumentácie Stripe pre nulové objednávky](https://docs.stripe.com/payments/checkout/no-cost-orders?ui=checkout-form) formulár pri celkovej sume 0 nevyžaduje kartu. Prístup sa vytvorí až z podpísanej udalosti `checkout.session.completed` po načítaní relácie cez Stripe API: `status=complete`, `payment_status=no_payment_required`, suma 0, správna mena, režim účtu, väzba na serverový pokus a potvrdený voucher v metadata. Nulová relácia nemá PaymentIntent. Opakovaná udalosť nevytvorí ďalšiu objednávku; opakovaný samostatný nákup má vlastné heslo a šifrovaný doručovací záznam.
+
+Starý adaptér Payment Links a ručné doručovanie sa nepoužívajú. Voucher neobchádza kontrolu pripravenosti Stripe ani e-mailového odosielateľa.
 
 ## Overenie
 
@@ -59,4 +65,4 @@ Vývojový voucher `free`, starý adaptér Payment Links a ručné doručovanie 
 
 `node --test tests/commerce-credentials.test.mjs` overuje skryté zadávanie, opakovanie výzvy, rozlíšenie chýb a obnovenie terminálu po zrušení bez vypísania zadanej hodnoty.
 
-`PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs` overuje stavový tok formulára v prehliadači s riadenou náhradou Stripe SDK: povinný e-mail, opakované kliknutie, chybu a opakovanie, zlyhanie načítania, potvrdenie serverom a návrat od banky. Kontroluje aj šírky 360, 390, 430 a 1360 px, sumy 14,99 €, 19,98 € a 19,99 €, dotykové ovládanie na mobilných šírkach a zachovanie výberu aj e-mailu pri návrate z platby. S `QA_BROWSER=webkit` spustí rovnaké scenáre vo WebKite; predvolene používa Chromium. Dňa 28. 10. 2026 prešlo všetkých osem scenárov v každom prehliadači. Tieto scenáre neposielajú skutočné platby a neoverujú peňaženky na fyzickom zariadení.
+`PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs` overuje stavový tok formulára v prehliadači s riadenou náhradou Stripe SDK: povinný e-mail, opakované kliknutie, chybu a opakovanie, zlyhanie načítania, potvrdenie serverom a návrat od banky. Kontroluje aj šírky 360, 390, 430 a 1360 px, sumy 14,99 € a 19,99 €, samostatné knihy za 4,99 €/9,98 € a voucher za 0 €, dotykové ovládanie na mobilných šírkach a zachovanie výberu aj e-mailu pri návrate z platby. S `QA_BROWSER=webkit` spustí rovnaké scenáre vo WebKite; predvolene používa Chromium. Dňa 28. 10. 2026 prešlo všetkých dvanásť scenárov v každom prehliadači. Tieto scenáre neposielajú skutočné platby a neoverujú peňaženky na fyzickom zariadení.

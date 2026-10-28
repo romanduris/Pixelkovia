@@ -26,19 +26,13 @@
     <form id="checkout-form" class="checkout-layout" autocomplete="on">
       <div class="checkout-content">
         <section class="checkout-panel base-product" aria-labelledby="base-heading">
-          <div class="base-labels"><span class="checkout-step">01 / VAŠA HRA</span><span class="launch-badge">UVÁDZACIA PONUKA</span></div>
-          <div class="base-product-heading"><img src="assets/sales/characters/piko.webp" width="64" height="64" alt="Piko, modrý sprievodca hrou"><div><h2 id="base-heading">Stratený signál</h2><p>Rodinné dobrodružstvo na doma</p><strong data-base-price>14,99 €</strong><small class="planned-price">Po úvodnej ponuke: <span data-planned-price>29,99 €</span></small></div></div>
-          <ul><li>7 úloh</li><li>Príbeh v mobile, videá a hlasové správy</li><li>Rodičovský návod, checklist, nápovedy a diplom</li></ul>
+          <div class="base-labels"><span class="checkout-step">01 / VAŠA HRA</span><span class="launch-badge">PREDNOSTNÝ PRÍSTUP</span></div>
+          <div class="base-product-heading"><img src="assets/sales/characters/piko.webp" width="64" height="64" alt="Piko, modrý sprievodca hrou"><div><h2 id="base-heading">Hra Pixelkovia – Stratený signál</h2><p>Rodinné dobrodružstvo na doma</p><strong data-base-price>14,99 €</strong><small class="planned-price">Plánovaná štandardná cena: <span data-planned-price>29,99 €</span></small></div></div>
+          <ul><li>7 záhad v jednom spoločnom príbehu</li><li>Príbeh v mobile, videá a hlasové správy</li><li>Rodičovský návod, checklist, nápovedy a diplom</li></ul>
         </section>
         <section class="checkout-panel addons-panel" aria-labelledby="books-heading">
-          <span class="checkout-step">02 / VOLITEĽNÉ DOPLNKY</span><h2 id="books-heading">Pridajte si príbehy</h2>
-          <p class="panel-description">Dve voliteľné knihy na spoločné čítanie.</p>
-          <button class="checkout-bundle" id="select-bundle" type="button" aria-describedby="books-status">
-            <span class="bundle-top"><strong>Celý balík</strong><b data-complete-price>19,99 €</b></span>
-            <span class="bundle-contents">Hra + obe knihy + Atlas zdarma</span>
-            <span class="bundle-comparison"><span>Samostatne <s data-bundle-subtotal>24,97 €</s></span><strong>Ušetríte <span data-bundle-saving>4,98 €</span></strong></span>
-            <span class="bundle-action">Vybrať celý balík jedným klikom <span aria-hidden="true">→</span></span>
-          </button>
+          <span class="checkout-step">02 / VOLITEĽNÉ ČÍTANIE</span><h2 id="books-heading">Ešte viac spoločných príbehov</h2>
+          <p class="panel-description">Dve ilustrované knihy, šesť rozprávok. Na čítanie pred dobrodružstvom aj po ňom.</p>
           <div id="book-options" class="checkout-addons"></div>
           <p id="books-status" class="books-status" role="status" aria-live="polite" aria-atomic="true"></p>
         </section>
@@ -50,12 +44,14 @@
       </div>
       <aside class="checkout-summary" aria-labelledby="summary-heading"><div class="summary-inner">
         <span class="checkout-step">VAŠA PONUKA</span><h2 id="summary-heading">Vaša spoločná výprava</h2>
-        <div class="summary-row summary-base"><span>Stratený signál</span><strong data-base-price>14,99 €</strong></div><div id="summary-books"></div>
+        <div class="summary-row summary-base"><span>Hra Pixelkovia – Stratený signál<small>Plánovaná štandardná cena</small></span><strong data-summary-base-price>29,99 €</strong></div><div id="summary-books"></div>
         <div class="summary-row gift-row"><span>Atlas Pixelkov</span><strong>ZDARMA</strong></div>
+        <div id="summary-early-discount" class="summary-discount"><span>Zľava za prednostný prístup</span><strong>−15,00 €</strong></div>
         <div id="summary-discount" class="summary-discount" hidden></div>
-        <div class="summary-row delivery-row"><span>Doručenie online</span><strong>0 €</strong></div>
-        <div class="summary-total"><span>Celkom</span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div><p class="summary-price-note">Uvádzacia ponuka · bez predplatného</p>
+        <div id="summary-voucher" class="summary-discount" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+        <div class="summary-total"><span>Celkom</span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div><p class="summary-price-note">Prednostný prístup · bez predplatného</p>
         <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Kúpiť za <span id="button-total">14,99 €</span> <span aria-hidden="true">→</span></button>
+        <button class="checkout-voucher-link" id="voucher-open" type="button" aria-haspopup="dialog" aria-controls="voucher-dialog">Mám zľavový kód</button>
         <p class="payment-note" id="payment-note"><strong>Platby zatiaľ nie sú spustené.</strong> Objednávka ani platba nevznikne a e-mail sa neodošle.</p>
         <div class="checkout-guarantee"><span aria-hidden="true">14</span><p><strong>14-dňová garancia spokojnosti</strong><a href="index.html#garancia">Podmienky vrátenia peňazí →</a></p></div>
         <a class="checkout-help" href="mailto:roman.duris@gmail.com">Máte otázku? Napíšte nám ↗</a>
@@ -64,6 +60,17 @@
     <section id="payment-panel" class="checkout-panel embedded-payment" hidden aria-labelledby="payment-heading"><div id="payment-summary" class="payment-order-summary" hidden><p id="payment-order-items"></p><div><span>Celkom</span><strong id="payment-order-total"></strong></div></div><h2 id="payment-heading">Bezpečná platba</h2><div id="payment-slot"></div><p id="payment-status" role="status"></p><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
     <details class="checkout-privacy"><summary>Ako prebehne platba a doručenie?</summary><p>E-mail je povinný na doručenie prístupu. Kartu vyplníte v zabezpečenom formulári Stripe priamo na tejto stránke; údaje karty spracúva Stripe. Vaša banka môže vyžiadať potvrdenie platby. Po potvrdenej úhrade vám automaticky pošleme e-mail s odkazom na rodičovský portál a samostatným heslom pre tento nákup.</p></details>
   </main>
+  <dialog class="voucher-dialog" id="voucher-dialog" aria-labelledby="voucher-heading" aria-describedby="voucher-description">
+    <div class="voucher-heading"><h2 id="voucher-heading">Máte zľavový kód?</h2><button id="voucher-close" type="button" aria-label="Zavrieť voucher">×</button></div>
+    <p id="voucher-description">Zadajte svoj kód. Zľavu hneď uvidíte v súhrne objednávky.</p>
+    <form id="voucher-form" novalidate>
+      <label class="field-label" for="voucher-code">Zľavový kód</label>
+      <input class="checkout-input" id="voucher-code" name="voucher" type="text" maxlength="64" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Váš kód" aria-describedby="voucher-error" required autofocus>
+      <p class="voucher-error" id="voucher-error" role="alert" hidden></p>
+      <button class="voucher-apply" type="submit">Uplatniť kód <span aria-hidden="true">→</span></button>
+      <button class="voucher-remove" id="voucher-remove" type="button" hidden>Odstrániť kód</button>
+    </form>
+  </dialog>
   <footer class="checkout-footer"><span>Malé postavičky. Veľké dobrodružstvo.</span><a href="index.html#otazky">Otázky a odpovede</a></footer>
 </body>
 </html>

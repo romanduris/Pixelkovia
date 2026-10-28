@@ -16,12 +16,15 @@ export async function createCheckout(env,input){
   const throttle=await first(env.TQ_DB,`INSERT INTO customer_login_attempts VALUES(?,1,?) ON CONFLICT(scope_key) DO UPDATE SET attempts=CASE WHEN window_start<=? THEN 1 ELSE attempts+1 END,window_start=CASE WHEN window_start<=? THEN excluded.window_start ELSE window_start END RETURNING attempts`,scope,Date.now(),Date.now()-900000,Date.now()-900000);
   if(throttle.attempts>60)throw new HttpError(429,'Príliš veľa platobných pokusov. Skúste to neskôr.');
   if(!['episode-1',...offer.bookIds].includes(input.baseId)||!Array.isArray(input.books)||input.books.length>2||input.books.some(id=>!offer.bookIds.includes(id))||typeof input.atlasIncluded!=='boolean')throw new HttpError(400,'Neplatný výber produktov.');
-  const q=quote(input.books,input.baseId,input.atlasIncluded),id=uuid(),at=Date.now();
+  if(input.voucherCode!==undefined&&(typeof input.voucherCode!=='string'||input.voucherCode.length>64))throw new HttpError(400,'Neplatný zľavový kód.');
+  const q=quote(input.books,input.baseId,input.atlasIncluded,input.voucherCode),id=uuid(),at=Date.now();
+  if(input.voucherCode?.trim()&&!q.voucher)throw new HttpError(400,'Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.');
   const ids=[q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])];
-  await execute(env.TQ_DB,'INSERT INTO checkout_attempts VALUES(?,?,?,?,?,?,NULL,NULL)',id,email,name,JSON.stringify(ids),q.totalCents,at);
-  const lines=ids.map(productId=>({price_data:{currency:'eur',product_data:{name:product(productId).name},unit_amount:productId===offer.atlasId?0:productId===q.baseId?product(productId).priceCents-q.bundleDiscountCents:product(productId).priceCents},quantity:1}));
+  const prices=Object.fromEntries(ids.map(productId=>[productId,q.voucher||productId===offer.atlasId?0:product(productId).priceCents-(q.books.includes(productId)?q.bundleDiscountCents/q.books.length:0)]));
+  await execute(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices) VALUES(?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher,JSON.stringify(prices));
+  const lines=ids.map(productId=>({price_data:{currency:'eur',product_data:{name:product(productId).name},unit_amount:prices[productId]},quantity:1}));
   // The approved mobile brief explicitly selects card payments, including device wallets.
-  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:'form',payment_method_types:['card'],adaptive_pricing:{enabled:false},customer_email:email,client_reference_id:id,line_items:lines,return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>String.fromCharCode(97+b%26)).join(''),metadata:{checkout_attempt:id},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
+  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:'form',payment_method_types:['card'],adaptive_pricing:{enabled:false},customer_email:email,client_reference_id:id,line_items:lines,return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>String.fromCharCode(97+b%26)).join(''),metadata:{checkout_attempt:id,...(q.voucher?{voucher_code:q.voucher}:{})},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
   await execute(env.TQ_DB,'UPDATE checkout_attempts SET stripe_session_id=? WHERE id=?',session.id,id);
   return {clientSecret:session.client_secret,sessionId:session.id,totalCents:q.totalCents};
 }
@@ -32,18 +35,23 @@ export async function fulfill(env,sessionId){
   const db=env.TQ_DB,previous=await first(db,'SELECT id FROM orders WHERE external_reference=?',sessionId);
   if(previous)return previous;
   const session=await stripe(env).checkout.sessions.retrieve(sessionId,{expand:['payment_intent.latest_charge']});
-  if(session.payment_status!=='paid'||session.mode!=='payment')return null;
+  const completedFree=session.payment_status==='no_payment_required'&&session.status==='complete'&&session.amount_total===0;
+  if((session.payment_status!=='paid'&&!completedFree)||session.mode!=='payment')return null;
   const attempt=await first(db,'SELECT * FROM checkout_attempts WHERE id=? AND stripe_session_id=?',session.client_reference_id,session.id);
   if(!attempt||session.amount_total!==attempt.total_cents||session.currency!=='eur'||session.livemode!==env.STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_'))throw new HttpError(400,'Platbu sa nepodarilo priradiť k objednávke.');
+  if(attempt.total_cents===0&&(attempt.voucher_code!=='free'||session.metadata?.voucher_code!=='free'||!completedFree))throw new HttpError(400,'Objednávku zdarma sa nepodarilo overiť.');
   const intentId=typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null;
   await execute(db,'UPDATE checkout_attempts SET payment_intent=? WHERE id=?',intentId,attempt.id);
   if(session.payment_intent?.latest_charge?.refunded===true)await execute(db,'INSERT OR IGNORE INTO payment_refunds VALUES(?,?)',intentId,Date.now());
   const ids=JSON.parse(attempt.selection),id=uuid(),customerId=uuid(),at=Date.now(),password=randomToken().slice(0,24);
+  // Older attempts retain their original allocation; new ones use the exact Stripe prices.
+  const legacyDiscount=ids.includes('episode-1')&&offer.bookIds.every(id=>ids.includes(id))?498:0;
+  const prices=attempt.item_prices?JSON.parse(attempt.item_prices):Object.fromEntries(ids.map(productId=>[productId,productId===offer.atlasId?0:product(productId).priceCents-(productId==='episode-1'?legacyDiscount:0)]));
+  if(ids.some(id=>!Number.isInteger(prices[id])||prices[id]<0)||ids.reduce((sum,id)=>sum+prices[id],0)!==attempt.total_cents)throw new HttpError(400,'Ceny objednávky sa nepodarilo overiť.');
   const c=await credentials(attempt.email,password,env.CUSTOMER_AUTH_SECRET,at);
   const message=await seal({email:attempt.email,password,name:attempt.name,products:ids.map(id=>product(id).name)},env.CUSTOMER_AUTH_SECRET);
-  const bundleDiscount=ids.includes('episode-1')&&offer.bookIds.every(id=>ids.includes(id))?498:0;
   const batch=[statement(db,'INSERT INTO customers VALUES(?,?,?,?)',customerId,attempt.email,attempt.name||attempt.email,at),statement(db,'INSERT INTO customer_credentials VALUES(?,?,?,?,?)',customerId,c.lookup,c.salt,c.hash,at),statement(db,"INSERT INTO orders SELECT ?,?,?,CASE WHEN EXISTS(SELECT 1 FROM payment_refunds WHERE payment_intent=?) THEN 'refunded' ELSE 'paid' END,?,?,?,?",id,customerId,session.id,intentId,attempt.total_cents,'EUR',at,at)];
-  for(const productId of ids){const item=uuid();batch.push(statement(db,'INSERT INTO order_items VALUES(?,?,?,?,?)',item,id,productId,1,productId===offer.atlasId?0:product(productId).priceCents-(productId==='episode-1'?bundleDiscount:0)),statement(db,"INSERT INTO entitlements(id,customer_id,order_item_id,product_id,granted_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",uuid(),customerId,item,productId,at,id));}
+  for(const productId of ids){const item=uuid();batch.push(statement(db,'INSERT INTO order_items VALUES(?,?,?,?,?)',item,id,productId,1,prices[productId]),statement(db,"INSERT INTO entitlements(id,customer_id,order_item_id,product_id,granted_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",uuid(),customerId,item,productId,at,id));}
   batch.push(statement(db,"INSERT INTO access_deliveries(order_id,customer_id,encrypted_message,status) SELECT ?,?,?,'queued' WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",id,customerId,message,id),statement(db,"INSERT INTO email_events(id,customer_id,template_key,category,status,created_at) SELECT ?,?,'portal-access','transactional','queued',? WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",'access-'+id,customerId,at,id));
   try{await db.batch(batch);}catch(error){const duplicate=await first(db,'SELECT id FROM orders WHERE external_reference=?',session.id);if(duplicate)return duplicate;throw error;}
   return {id};
@@ -74,7 +82,7 @@ export async function paymentWebhook(request,env){
   bytes+=decoder.decode();
   let event;try{event=await stripe(env).webhooks.constructEventAsync(bytes,request.headers.get('stripe-signature'),env.STRIPE_WEBHOOK_SECRET,undefined,Stripe.createSubtleCryptoProvider());}catch{throw new HttpError(400,'Neplatný podpis platobnej udalosti.');}
   if(await first(env.TQ_DB,'SELECT id FROM payment_events WHERE id=?',event.id))return {received:true};
-  if(['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)&&event.data.object.payment_status==='paid')await fulfill(env,event.data.object.id);
+  if(['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)&&(event.data.object.payment_status==='paid'||(event.type==='checkout.session.completed'&&event.data.object.payment_status==='no_payment_required')))await fulfill(env,event.data.object.id);
   if(event.type==='charge.refunded'&&event.data.object.refunded===true){await env.TQ_DB.batch([statement(env.TQ_DB,'INSERT OR IGNORE INTO payment_refunds VALUES(?,?)',event.data.object.payment_intent,Date.now()),statement(env.TQ_DB,"UPDATE orders SET status='refunded' WHERE external_reference IN(SELECT stripe_session_id FROM checkout_attempts WHERE payment_intent=?)",event.data.object.payment_intent)]);}
   await execute(env.TQ_DB,'INSERT OR IGNORE INTO payment_events VALUES(?,?,?)',event.id,event.data.object.id,Date.now());
   await sendPending(env);
