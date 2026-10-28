@@ -120,46 +120,75 @@
     document.querySelector('#change-order').disabled=false;
   }
   async function mountPayment(session){
-    const checkout=Stripe(configuration.publishableKey).initCheckoutFormSdk({
+    const checkout=Stripe(configuration.publishableKey,{locale:'sk'}).initCheckoutElementsSdk({
       clientSecret:session.clientSecret,
-      appearance:{
-        theme:'night',inputs:'spaced',labels:'above',
-        variables:{colorPrimary:'#ace9cf',colorBackground:'#101b2d',colorText:'#f1ede5',colorTextSecondary:'#b2c2d3',colorTextPlaceholder:'#9aaac0',colorDanger:'#ffb89b',accessibleColorOnColorPrimary:'#123228',fontFamily:'Inter, system-ui, sans-serif',fontSizeBase:'16px',borderRadius:'7px',spacingUnit:'4px'}
-      }
+      adaptivePricing:{allowed:false},
+      defaultValues:{billingAddress:{address:{country:'SK'}}},
+      elementsOptions:{appearance:{
+        theme:'night',inputs:'condensed',labels:'above',
+        variables:{colorPrimary:'#ace9cf',colorBackground:'#101b2d',colorText:'#f1ede5',colorTextSecondary:'#b2c2d3',colorTextPlaceholder:'#9aaac0',colorDanger:'#ffb89b',accessibleColorOnColorPrimary:'#123228',fontFamily:'Inter, system-ui, sans-serif',fontSizeBase:'16px',borderRadius:'7px',spacingUnit:'3px'}
+      }}
     });
     const loaded=await checkout.loadActions();
     if(loaded.type!=='success')throw Error('Platobný formulár sa nepodarilo načítať. Skúste to znova.');
-    const paymentForm=checkout.createForm({layout:'expanded',expressCheckout:{paymentMethods:{link:'never'}}});
-    const change=document.querySelector('#change-order'),status=document.querySelector('#payment-status');
-    let alive=true,confirming=false;
-    paymentForm.on('confirm',async event=>{
+    const change=document.querySelector('#change-order'),status=document.querySelector('#payment-status'),pay=document.querySelector('#stripe-pay');
+    const walletSlot=document.querySelector('#express-checkout-slot'),separator=document.querySelector('#wallet-separator');
+    let alive=true,confirming=false,cardReady=session.totalCents===0,priceValid=true,payment,wallet;
+    const syncPayButton=()=>{pay.disabled=confirming||!cardReady||!priceValid;};
+    function displayTotal(current){
+      const amount=current.total.total.minorUnitsAmount;
+      if(current.currency!=='eur'||current.minorUnitsAmountDivisor!==100||amount!==session.totalCents)throw Error('Cena platby sa zmenila. Vráťte sa k objednávke a skúste to znova.');
+      document.querySelector('#payment-order-total').textContent=money(amount);
+      pay.textContent=amount===0?'Potvrdiť objednávku zdarma':'Zaplatiť '+money(amount);
+    }
+    displayTotal(loaded.actions.getSession());
+    checkout.on('change',current=>{
+      if(!alive)return;
+      try{displayTotal(current);priceValid=true;syncPayButton();}catch(error){priceValid=false;syncPayButton();status.textContent=error.message;}
+    });
+    async function confirm(event){
       if(!alive||confirming)return;
-      confirming=true;change.disabled=true;status.textContent=session.totalCents===0?'Potvrdzujem objednávku…':'Spracúvam platbu…';
+      confirming=true;pay.disabled=true;change.disabled=true;status.textContent=session.totalCents===0?'Potvrdzujem objednávku…':'Spracúvam platbu…';
       try{
-        const result=await loaded.actions.confirm({formConfirmEvent:event,redirect:'if_required'});
+        displayTotal(loaded.actions.getSession());
+        const result=await loaded.actions.confirm({redirect:'if_required',...(event?{expressCheckoutConfirmEvent:event}:{})});
         if(!alive)return;
         if(result.type==='success'){
           embedded?.destroy();embedded=null;
           await paymentStatus(session.sessionId);
         }else{
           status.textContent=result.error?.message||'Platbu sa nepodarilo dokončiť. Skúste to znova.';
+          event?.paymentFailed?.({reason:'fail',message:status.textContent});
         }
       }catch{
-        if(alive)status.textContent='Platbu sa nepodarilo dokončiť. Skúste to znova.';
+        if(alive){status.textContent='Platbu sa nepodarilo dokončiť. Skúste to znova.';event?.paymentFailed?.({reason:'fail',message:status.textContent});}
       }finally{
         confirming=false;
-        if(alive)change.disabled=false;
+        if(alive){syncPayButton();change.disabled=false;}
       }
-    });
+    }
+    const submit=()=>confirm();
+    const destroy=()=>{alive=false;pay.removeEventListener('click',submit);payment?.destroy();wallet?.destroy();pay.hidden=true;pay.disabled=true;walletSlot.hidden=true;separator.hidden=true;};
     document.querySelector('#payment-heading').textContent=session.totalCents===0?'Potvrdenie objednávky zdarma':'Bezpečná platba';
-    form.hidden=true;panel.hidden=false;
-    paymentForm.mount('#payment-slot');
-    return {destroy(){alive=false;paymentForm.destroy();}};
+    form.hidden=true;panel.hidden=false;walletSlot.hidden=false;separator.hidden=true;pay.hidden=false;pay.disabled=true;
+    try{
+      if(session.totalCents>0){
+        payment=checkout.createPaymentElement({layout:'tabs',fields:{billingDetails:{email:'never',phone:'never'}},wallets:{applePay:'never',googlePay:'never',link:'never'}});
+        payment.on('ready',()=>{if(alive){cardReady=true;syncPayButton();}});
+        payment.on('loaderror',()=>{if(alive){cardReady=false;syncPayButton();status.textContent='Údaje karty sa nepodarilo načítať. Upravte objednávku a skúste to znova.';}});
+        wallet=checkout.createExpressCheckoutElement({buttonHeight:44,layout:{maxColumns:2,maxRows:1},paymentMethods:{applePay:'always',googlePay:'always',link:'never',paypal:'never',amazonPay:'never',klarna:'never'}});
+        wallet.on('ready',event=>{if(!alive)return;const available=Boolean(event.availablePaymentMethods?.applePay||event.availablePaymentMethods?.googlePay);walletSlot.hidden=!available;separator.hidden=!available;});
+        wallet.on('confirm',confirm);
+        payment.mount('#payment-slot');wallet.mount('#express-checkout-slot');
+      }else{walletSlot.hidden=true;pay.disabled=false;}
+      pay.addEventListener('click',submit);
+      return {destroy};
+    }catch(error){destroy();throw error;}
   }
   buy.addEventListener('click',async()=>{
     if(!configuration?.enabled||creating||!form.reportValidity())return;
     creating=true;lockOrder(true);update();document.querySelector('#payment-note').textContent='Pripravujem zabezpečený formulár…';
-    try{const response=await fetch('/api/checkout/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseId,books:[...selected],atlasIncluded:atlasSelected,voucherCode,giftGame:giftSelected,email:form.elements.email.value.trim()})});const session=await response.json();if(!response.ok)throw Error(session.error||'Platbu sa nepodarilo pripraviť.');await loadStripe();rememberSummary(session);document.querySelector('#payment-status').textContent='';embedded=await mountPayment(session);panel.scrollIntoView({behavior:'smooth',block:'start'});document.querySelector('#payment-note').textContent='Objednávku dokončite v zabezpečenom formulári nižšie.';}
+    try{const response=await fetch('/api/checkout/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseId,books:[...selected],atlasIncluded:atlasSelected,voucherCode,giftGame:giftSelected,uiMode:'elements',email:form.elements.email.value.trim()})});const session=await response.json();if(!response.ok)throw Error(session.error||'Platbu sa nepodarilo pripraviť.');await loadStripe();rememberSummary(session);document.querySelector('#payment-status').textContent='';embedded=await mountPayment(session);panel.scrollIntoView({behavior:'smooth',block:'start'});document.querySelector('#payment-note').textContent='Objednávku dokončite v zabezpečenom formulári nižšie.';}
     catch(error){embedded?.destroy();embedded=null;panel.hidden=true;form.hidden=false;lockOrder(false);document.querySelector('#payment-slot').replaceChildren();document.querySelector('#payment-note').textContent=error.message;creating=false;update();}
   });
   function clearVoucherError(){voucherError.hidden=true;voucherError.textContent='';voucherInput.removeAttribute('aria-invalid');}

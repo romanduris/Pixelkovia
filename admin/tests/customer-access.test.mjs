@@ -12,10 +12,15 @@ test('two purchases with the same email get isolated credentials, orders and boo
   const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_live_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_test_fixture',RESEND_API_KEY:'re_test_fixture',STRIPE_CLIENT:{checkout:{sessions:{async create(input){const id='cs_live_fixture'+(++counter);sessions.set(id,{id,...input,amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:true,payment_status:'paid',payment_intent:'pi_'+counter});return {id,client_secret:'not-a-real-secret'};},async retrieve(id){return sessions.get(id);}}}}};
   assert.equal(commerceReady(env),true);
   await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email:''}),e=>e.status===400);
-  const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,email});
+  await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email,uiMode:'hosted'}),e=>e.status===400);
+  const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,uiMode:'elements',email});
   const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email});
-  assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'form','the form SDK requires a form session to apply the dark Appearance theme');
-  assert.deepEqual(sessions.get(firstPurchase.sessionId).payment_method_types,['card'],'approved mobile checkout offers cards and their device wallets');
+  assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'elements','the compact checkout uses individual Stripe Elements');
+  assert.equal(sessions.get(secondPurchase.sessionId).ui_mode,'form','already-open checkout tabs retain a compatible session during deployment');
+  assert.equal(sessions.get(firstPurchase.sessionId).payment_method_types,undefined);
+  assert.ok(sessions.get(firstPurchase.sessionId).excluded_payment_method_types.includes('bancontact'));
+  assert.equal(sessions.get(firstPurchase.sessionId).wallet_options.link.display,'never');
+  assert.equal(sessions.get(firstPurchase.sessionId).locale,'sk');
   assert.equal(sessions.get(firstPurchase.sessionId).adaptive_pricing.enabled,false,'the advertised EUR amount has no extra currency decision');
   const order1=await fulfill(env,firstPurchase.sessionId),order2=await fulfill(env,secondPurchase.sessionId);
   assert.equal((await fulfill(env,firstPurchase.sessionId)).id,order1.id);

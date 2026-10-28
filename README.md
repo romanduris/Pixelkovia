@@ -27,7 +27,7 @@ Pôvodná owner-private ChatGPT Site obsahuje iba oznam o presune, zostavený do
 
 ## Platby a e-maily
 
-Kartu spracúva vložený Stripe Checkout. E-mail je povinný ešte pred vytvorením platby. Server vypočíta cenu podľa spoločného katalógu; podpis webhooku a skutočná zaplatená relácia rozhodujú o vytvorení objednávky. Každá vytvorená objednávka má vlastný prístup. Dva nákupy s rovnakým e-mailom vytvoria dva oddelené účty s rôznymi heslami.
+Kartu spracúva kompaktný Stripe Payment Element s predvolenou krajinou Slovensko a slovenčinou. Podporované peňaženky Apple Pay/Google Pay majú samostatný Express Checkout Element; dostupnosť závisí aj od Stripe a zariadenia. E-mail je povinný ešte pred vytvorením platby. Server vypočíta cenu podľa spoločného katalógu; podpis webhooku a skutočná zaplatená relácia rozhodujú o vytvorení objednávky. Každá vytvorená objednávka má vlastný prístup. Dva nákupy s rovnakým e-mailom vytvoria dva oddelené účty s rôznymi heslami.
 
 V checkoute je pod tlačidlom kúpiť odkaz na voucher. Schválený kód `free` pokryje celú vybranú objednávku vrátane kníh. Server uloží použitý kód a nulovú sumu; prístup vytvorí až podpísaná udalosť pre dokončenú nulovú reláciu overenú cez Stripe API. Karta sa pri nulovej objednávke nevyžaduje. Samotný kód v prehliadači ani návratová URL prístup neudeľujú.
 

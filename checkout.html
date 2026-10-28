@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/piko-180.png">
 </head>
 <body class="checkout-page">
-  <header class="checkout-header"><a href="index.html" class="checkout-brand"><img src="assets/sales/characters/piko.webp" width="42" height="42" alt=""><span>PIXELKOVIA<small>VAŠE SPOLOČNÉ DOBRODRUŽSTVO</small></span></a><a href="https://pixelkovia.rodulab.com/index.html#balik">Späť</a></header>
+  <header class="checkout-header"><a href="index.html" class="checkout-brand"><img src="assets/sales/characters/piko.webp" width="42" height="42" alt=""><span>PIXELKOVIA<small>VAŠE SPOLOČNÉ DOBRODRUŽSTVO</small></span></a><a href="https://pixelkovia.rodulab.com/index.html#balik">← Späť</a></header>
   <main class="checkout-main">
     <h1 class="visually-hidden">Vaša objednávka Pixelkovia</h1>
     <noscript><p>Na výber doplnkov a pokračovanie z checkoutu zapnite JavaScript.</p></noscript>
@@ -64,7 +64,7 @@
         <div class="checkout-guarantee"><span aria-hidden="true">14</span><p><strong>14-dňová garancia spokojnosti</strong><a href="index.html#garancia">Podmienky vrátenia peňazí →</a></p></div>
       </div></aside>
     </form>
-    <section id="payment-panel" class="checkout-panel embedded-payment" hidden aria-labelledby="payment-heading"><div id="payment-summary" class="payment-order-summary" hidden><p id="payment-order-items"></p><div><span>Celkom</span><strong id="payment-order-total"></strong></div></div><h2 id="payment-heading">Bezpečná platba</h2><div id="payment-slot"></div><p id="payment-status" role="status"></p><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
+    <section id="payment-panel" class="checkout-panel embedded-payment" hidden aria-labelledby="payment-heading"><div id="payment-summary" class="payment-order-summary" hidden><details><summary><span>Vaša objednávka</span><strong id="payment-order-total"></strong></summary><p id="payment-order-items"></p></details></div><h2 id="payment-heading">Bezpečná platba</h2><div id="express-checkout-slot"></div><p id="wallet-separator" class="wallet-separator" hidden>alebo zaplaťte kartou</p><div id="payment-slot"></div><button id="stripe-pay" class="stripe-pay" type="button" hidden disabled>Zaplatiť</button><p id="payment-status" role="status"></p><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
     <details class="checkout-privacy"><summary>Ako prebehne platba a doručenie?</summary><p>E-mail je povinný na doručenie prístupu. Kartu vyplníte v zabezpečenom formulári <a href="https://stripe.com/" target="_blank" rel="noopener noreferrer">Stripe</a> priamo na tejto stránke; údaje karty spracúva <a href="https://stripe.com/" target="_blank" rel="noopener noreferrer">Stripe</a>. Vaša banka môže vyžiadať potvrdenie platby. Po potvrdenej úhrade vám automaticky pošleme e-mail s odkazom na rodičovský portál a samostatným heslom pre tento nákup.</p></details>
     <details class="checkout-privacy checkout-help"><summary>Máte otázku? Napíšte na</summary><p>Radi vám pomôžeme. Napíšte na <a href="mailto:miky@pixelkovia.rodulab.com">miky@pixelkovia.rodulab.com</a>.</p></details>
   </main>
