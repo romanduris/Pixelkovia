@@ -47,6 +47,9 @@
     document.querySelectorAll('[name="book"]:not(:disabled)').forEach(input=>input.checked=selected.has(input.value));
     document.querySelector('[name="atlas"]').checked=q.atlasIncluded;
     document.querySelector('.gift-row').hidden=!q.atlasIncluded;
+    const atlasDiscount=document.querySelector('#summary-atlas-discount');
+    const atlasSaving=q.atlasIncluded?product(offer.atlasId).priceCents:0;
+    atlasDiscount.hidden=!q.atlasIncluded;atlasDiscount.querySelector('strong').textContent='−'+money(atlasSaving);
     if(isGame)document.querySelector('#select-bundle').checked=q.books.length===2;
     document.querySelector('#summary-books').innerHTML=isGame&&q.books.length===2?`<div class="summary-row"><span>Obe ilustrované knihy</span><strong>${money(q.booksCents-q.bundleDiscountCents)}</strong></div>`:q.books.map(id=>`<div class="summary-row"><span>${product(id).name}</span><strong>${money(product(id).priceCents)}</strong></div>`).join('');
     const giftRow=document.querySelector('#summary-additional-game');giftRow.hidden=!q.giftGame;giftRow.querySelector('strong').textContent=money(q.giftCents);
@@ -56,7 +59,7 @@
     const discount=document.querySelector('#summary-discount');
     discount.hidden=q.bundleDiscountCents===0;
     discount.innerHTML=q.bundleDiscountCents?`<span>Zľava na balík kníh</span><strong>−${money(q.bundleDiscountCents)}</strong>`:'';
-    const standardTotal=(isGame?standardGameCents:product(baseId).priceCents)+q.booksCents+(q.giftGame?standardGameCents:0);
+    const standardTotal=(isGame?standardGameCents:product(baseId).priceCents)+q.booksCents+(q.giftGame?standardGameCents:0)+atlasSaving;
     const saving=standardTotal-(q.totalCents+q.voucherDiscountCents);
     document.querySelector('#price-calculation').hidden=saving===0;
     document.querySelector('#summary-saving').textContent=money(saving);
@@ -65,7 +68,7 @@
     voucher.innerHTML=q.voucher?`<span>Voucher ${q.voucher} · ${q.voucher==='1e'?'nákup za 1 €':'zľava 100 %'}</span><strong>−${money(q.voucherDiscountCents)}</strong>`:'';
     voucherOpen.textContent=q.voucher?'Zľavový kód je uplatnený':'Mám zľavový kód';
     document.querySelector('#order-total').textContent=money(q.totalCents);
-    document.querySelector('#summary-saving-label').textContent=isGame&&!q.books.length&&!q.giftGame?'Zvýhodnenie pri Early Access:':'Zvýhodnenie oproti štandardným cenám:';
+    document.querySelector('#summary-saving-label').textContent=isGame&&!q.books.length&&!q.giftGame&&!q.atlasIncluded?'Zvýhodnenie pri Early Access:':'Zvýhodnenie oproti štandardným cenám:';
     if(returnedSummary)document.querySelector('#order-total').textContent=money(returnedSummary.totalCents);
     document.querySelector('.checkout-buy').disabled=!configuration?.enabled||creating||completed;
     document.querySelector('#mobile-order-total').textContent=money(q.totalCents);
