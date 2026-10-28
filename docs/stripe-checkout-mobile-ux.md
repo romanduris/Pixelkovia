@@ -6,7 +6,7 @@ Aktuálny stav k 28. 10. 2026. Zdroje sú `checkout.html`, `checkout.css`, `chec
 
 - Ponuka má tri rovnako vysoké, kratšie riadky. Názov, krátky opis a prípadná ukážka tvoria zvisle vycentrovaný blok. Atlas zastupuje Guardy. Platobná poznámka a garancia sú zarovnané na stred. Hlavička obsahuje „← Späť“.
 - Kniha **Po veľkom záblesku** používa v spoločnom katalógu údaj **20–25 minút spoločného čítania**.
-- Po povinnom e-maile a výbere doplnkov sa otvorí stručný platobný krok. Zbaliteľná objednávka a suma sú nad kartou; karta neopakuje kontakt ani zoznam produktov.
+- Po povinnom e-maile a výbere doplnkov sa platba rozbalí **pod existujúcou objednávkou v rovnakej stránke** a stránka sa k nej plynulo posunie. Pôvodná ponuka, e-mail a súhrn zostanú viditeľné. Počas otvorenej relácie sú údaje uzamknuté; „Upraviť objednávku“ platbu zbalí a údaje znovu sprístupní. Zbaliteľná objednávka a suma sú nad kartou; karta neopakuje kontakt ani zoznam produktov.
 - Platba používa verejný Stripe Elements SDK nad Checkout Sessions (`ui_mode: elements`), samostatný Payment Element a Express Checkout Element. Form SDK s veľkým blokom Contact/Link už nový klient nepoužíva.
 - Oficiálny Appearance API používa `inputs: condensed`, slovenčinu a predvolené **Slovensko / SK**. Krajina zostáva zmeniteľná. Údaje karty sú vo vlastnom iframe Stripe; nezasahujeme do jeho DOM.
 - V tejto relácii sú ostatné aktuálne zapnuté miestne metódy a splátky vylúčené cez `excluded_payment_method_types`. Link vypína `wallet_options.link.display: never` a nastavenie prvkov; globálne nastavenia iných aplikácií sa nemenia.

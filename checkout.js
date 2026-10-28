@@ -100,7 +100,7 @@
     try{sessionStorage.setItem('pixelkovia-checkout-summary',JSON.stringify(summary));}catch{}
   }
   async function paymentStatus(sessionId){
-    form.hidden=true;panel.hidden=false;lockOrder(true);refreshMobileBar();document.querySelector('#change-order').disabled=true;
+    panel.hidden=false;lockOrder(true);refreshMobileBar();document.querySelector('#change-order').disabled=true;
     const target=document.querySelector('#payment-status');target.textContent='Overujem potvrdenie objednávky…';
     for(let i=0;i<8;i++){
       try{
@@ -170,7 +170,7 @@
     const submit=()=>confirm();
     const destroy=()=>{alive=false;pay.removeEventListener('click',submit);payment?.destroy();wallet?.destroy();pay.hidden=true;pay.disabled=true;walletSlot.hidden=true;separator.hidden=true;};
     document.querySelector('#payment-heading').textContent=session.totalCents===0?'Potvrdenie objednávky zdarma':'Bezpečná platba';
-    form.hidden=true;panel.hidden=false;walletSlot.hidden=false;separator.hidden=true;pay.hidden=false;pay.disabled=true;
+    panel.hidden=false;walletSlot.hidden=false;separator.hidden=true;pay.hidden=false;pay.disabled=true;
     try{
       if(session.totalCents>0){
         payment=checkout.createPaymentElement({layout:'tabs',fields:{billingDetails:{email:'never',phone:'never'}},wallets:{applePay:'never',googlePay:'never',link:'never'}});
@@ -214,6 +214,6 @@
   document.querySelector('#voucher-remove').addEventListener('click',()=>{voucherCode='';update();voucherDialog.close();});
   document.querySelector('#change-order').addEventListener('click',()=>{embedded?.destroy();embedded=null;panel.hidden=true;form.hidden=false;creating=false;document.querySelector('#payment-status').textContent='';document.querySelector('#payment-note').textContent='Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.';lockOrder(false);update();form.scrollIntoView({behavior:'smooth',block:'start'});});
   fetch('/api/checkout/config',{cache:'no-store'}).then(r=>r.json()).then(value=>{configuration=value;document.querySelector('#payment-note').textContent=value.enabled?'Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.':'Platby ešte pripravujeme. Objednávka ani platba sa teraz nespustí.';update();}).catch(()=>{document.querySelector('#payment-note').textContent='Platobnú službu sa nepodarilo načítať. Skúste stránku obnoviť.';});
-  const returned=new URLSearchParams(location.search).get('session_id');if(returned){try{const summary=JSON.parse(sessionStorage.getItem('pixelkovia-checkout-summary'));if(summary?.sessionId===returned&&Date.now()-summary.at<86400000)showSummary(summary);}catch{}paymentStatus(returned);}
+  const returned=new URLSearchParams(location.search).get('session_id');if(returned){form.hidden=true;try{const summary=JSON.parse(sessionStorage.getItem('pixelkovia-checkout-summary'));if(summary?.sessionId===returned&&Date.now()-summary.at<86400000)showSummary(summary);}catch{}paymentStatus(returned);}
   update();
 })();

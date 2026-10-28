@@ -103,7 +103,7 @@
 .checkout-footer>a{color:#b6c7d9;text-underline-offset:3px}
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .mobile-checkout-bar{display:none}
-.embedded-payment{max-width:520px;margin:0 auto 12px;padding:16px}
+.embedded-payment{max-width:520px;margin:0 auto 12px;padding:16px;scroll-margin-top:16px}
 .embedded-payment h2{font-size:20px;margin:0 0 12px}
 .payment-order-summary{padding-bottom:8px;margin-bottom:12px;border-bottom:1px solid var(--checkout-line)}
 .payment-order-summary summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;cursor:pointer;list-style:none;color:#b2c2d3;font-size:12px}

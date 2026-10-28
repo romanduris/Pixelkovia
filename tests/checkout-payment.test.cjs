@@ -122,9 +122,14 @@ function installStripeStub(scenario){
    await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');
    await activate(page.locator('#checkout-form .checkout-buy'));await page.locator('#stripe-pay').waitFor();
    assert.equal(await page.locator('#payment-order-total').innerText(),'19,98 €');
-   assert.equal(await page.locator('#checkout-form').isHidden(),true);
+   assert.equal(await page.locator('#checkout-form').isVisible(),true,'order remains visible above the inline payment');
+   assert.ok(await page.evaluate(()=>document.querySelector('#payment-panel').getBoundingClientRect().top>=document.querySelector('#checkout-form').getBoundingClientRect().bottom),'payment opens below the existing order');
+   assert.equal(page.context().pages().length,1,'payment uses the current tab');
+   assert.equal(new URL(page.url()).pathname,'/checkout');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'payment fits '+width+' px');
    assert.equal(fixture.posts.length,1);
+   await page.waitForFunction(()=>{const r=document.querySelector('#payment-panel').getBoundingClientRect();return r.top<innerHeight&&r.bottom>0&&scrollY>0;});
+   if(width===390||width===1360)await page.screenshot({path:'/tmp/pixelkovia-inline-payment-'+engine.name()+'-'+width+'.png',fullPage:true});
    await activate(page.locator('#change-order'));
    assert.equal(await page.locator('#checkout-form').isVisible(),true);
    assert.equal(await page.locator('[name="email"]').inputValue(),'checkout-fixture@example.invalid');
@@ -142,7 +147,8 @@ function installStripeStub(scenario){
    await page.locator('#checkout-form .checkout-buy').click();assert.equal(fixture.posts.length,0,'email is required before a session exists');
    await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');await page.locator('#select-bundle').click();
    await page.locator('#checkout-form .checkout-buy').click();await page.locator('#stripe-pay').waitFor();
-   assert.equal(await page.locator('#checkout-form').isHidden(),true,'payment is a compact step without the product picker');
+   assert.equal(await page.locator('#checkout-form').isVisible(),true,'payment expands below the product picker and summary');
+   assert.ok(await page.locator('#select-bundle').isDisabled(),'the visible order is locked to the active Stripe amount');
    assert.equal(await page.locator('#payment-order-total').innerText(),'19,98 €');
    const methods=await page.evaluate(()=>checkoutFixture.expressOptions.paymentMethods);
    assert.equal(methods.link,'never');assert.notEqual(methods.applePay,'never');assert.notEqual(methods.googlePay,'never');
@@ -183,6 +189,7 @@ function installStripeStub(scenario){
    assert.ok(!(await page.locator('#payment-status').innerText()).includes('Platba je potvrdená'),'the SDK result alone never declares an order paid');
    fixture.paid=true;await page.getByText('✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
    assert.equal(await page.locator('#checkout-form .checkout-buy').isDisabled(),true);assert.equal(await page.locator('#change-order').isHidden(),true);
+   assert.ok(await page.locator('#checkout-form').isVisible(),'server confirmation keeps the current order visible');
    assert.equal(await page.evaluate(()=>checkoutFixture.destroyed),1);assert.ok(fixture.reads>=2);
    await t.close();cases.push('confirmation waits for the server and cannot start a second order');
   }
@@ -280,6 +287,7 @@ function installStripeStub(scenario){
    const t=await open('normal',true,true);const {page,fixture}=t;
    await page.getByText('✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
    assert.equal(fixture.posts.length,0,'the bank return does not create a new payment');
+   assert.ok(await page.locator('#checkout-form').isHidden(),'a fresh bank-return page does not display an unrelated default cart');
    assert.equal(await page.locator('#checkout-form .checkout-buy').isDisabled(),true);assert.equal(await page.locator('[name="email"]').isDisabled(),true);
    await t.close();cases.push('bank return restores the server-confirmed result without creating another session');
   }
