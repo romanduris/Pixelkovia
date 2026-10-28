@@ -27,16 +27,16 @@
 .checkout-input::placeholder{color:#9aaac0;font-size:14px}
 .checkout-input:-webkit-autofill,.checkout-input:-webkit-autofill:hover,.checkout-input:-webkit-autofill:focus{-webkit-text-fill-color:#e7eef6;caret-color:#e7eef6;-webkit-box-shadow:0 0 0 1000px #101b2d inset;box-shadow:0 0 0 1000px #101b2d inset}
 .details-panel .field-note{font-size:11px;line-height:1.5;margin:6px 0 0;color:#a9bacb}
-.checkout-addons{display:grid;gap:0}
-.checkout-addon{border:1px solid #405869;border-bottom:0;background:#172638;padding:8px 10px;min-width:0}
+.checkout-addons{display:grid;grid-auto-rows:1fr;gap:0}
+.checkout-addon{display:flex;border:1px solid #405869;border-bottom:0;background:#172638;padding:8px 10px;min-width:0}
 .checkout-addon:first-child{border-radius:7px 7px 0 0}
 .checkout-addon:last-child{border-bottom:1px solid #405869;border-radius:0 0 7px 7px}
 .checkout-addon:has(input:checked){background:#1c302d;border-color:#658a76}
-.addon-main{display:grid;grid-template-columns:22px 60px minmax(0,1fr) auto;gap:10px;align-items:center}
+.addon-main{display:grid;flex:1;min-width:0;grid-template-columns:22px 60px minmax(0,1fr) auto;gap:10px;align-items:center}
 .addon-check{display:grid;place-items:center;width:44px;height:44px;margin-left:-11px;cursor:pointer}
 .addon-main input{width:21px;height:21px;margin:0;accent-color:#ace3c4;cursor:pointer}
 .addon-main>img{width:48px;height:54px;object-fit:contain;justify-self:center}
-.addon-copy{min-width:0}
+.addon-copy{min-width:0;align-self:start}
 .addon-copy>label{display:block;cursor:pointer;font:650 15px/1.35 Manrope,sans-serif;color:#f2ebdc}
 .addon-copy>small{display:block;font-size:11px;line-height:1.45;color:#adc2d2;margin-top:3px}
 .addon-copy .book-preview-button,.addon-copy .book-sample-link{display:inline-flex;align-items:center;min-height:44px;padding:5px 0;margin:0;border:0;background:transparent;color:#c8dfdd;font:11px/1.4 'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;gap:4px}
