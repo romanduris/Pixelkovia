@@ -19,19 +19,22 @@
     return verifiedEntitlements[id]?.available ? 'available' : verifiedEntitlements[id]?.purchased ? 'purchased' : 'not-purchased';
   };
   const purchase = {action:'purchase', url:'checkout.html', label:`CHCEM SPOLOČNÉ DOBRODRUŽSTVO – ${money(product('episode-1').priceCents)}`, status:'available'};
-  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1999, campaign:'early-bird'};
+  const offer = {refundDays:14, contactEmail:'roman.duris@gmail.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1999, additionalGameCents:999, campaign:'early-bird'};
   // All prices are calculated in integer cents.
   // Standalone books remain independent; the complete offer applies only to the game.
-  const quote = (selected = [], baseId = 'episode-1', includeAtlas = true, voucherCode = '') => {
+  const quote = (selected = [], baseId = 'episode-1', includeAtlas = true, voucherCode = '', includeGift = false) => {
     if(!offer.bookIds.includes(baseId))baseId='episode-1';
     const books=offer.bookIds.filter(id=>id!==baseId&&selected.includes(id));
     const booksCents=books.reduce((sum,id)=>sum+product(id).priceCents,0);
-    const subtotalCents=product(baseId).priceCents+booksCents;
-    const bundleDiscountCents=baseId==='episode-1'&&books.length===2?subtotalCents-offer.completeBundleCents:0;
+    const primarySubtotalCents=product(baseId).priceCents+booksCents;
+    const giftGame=baseId==='episode-1'&&includeGift===true;
+    const giftCents=giftGame?offer.additionalGameCents:0;
+    const subtotalCents=primarySubtotalCents+giftCents;
+    const bundleDiscountCents=baseId==='episode-1'&&books.length===2?primarySubtotalCents-offer.completeBundleCents:0;
     const beforeVoucherCents=subtotalCents-bundleDiscountCents;
     const voucher=typeof voucherCode==='string'&&voucherCode.trim().toLowerCase()==='free'?'free':null;
     const voucherDiscountCents=voucher?beforeVoucherCents:0;
-    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, voucher, voucherDiscountCents, totalCents:beforeVoucherCents-voucherDiscountCents};
+    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, giftGame, giftCents, giftTotalCents:voucher?0:giftCents, primaryTotalCents:voucher?0:primarySubtotalCents-bundleDiscountCents, voucher, voucherDiscountCents, totalCents:beforeVoucherCents-voucherDiscountCents};
   };
   const localPreview=typeof location!=='undefined'&&['localhost','127.0.0.1'].includes(location.hostname);
   const access = {mode:(window.PIXELKOVIA_ADMIN||localPreview)?'test':'authenticated', canLaunch:ready=>Boolean(window.PIXELKOVIA_RUN)||Boolean(window.PIXELKOVIA_ADMIN&&ready)};

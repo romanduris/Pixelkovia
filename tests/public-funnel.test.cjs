@@ -81,7 +81,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    await require('./helpers/book-offer.cjs').checkout(page);
    await require('./helpers/checkout-voucher.cjs')(page,{standalone:width===390,screenshotPrefix:width===390?'/tmp/pixelkovia-voucher-public':undefined});
-   await page.locator('#customer-name').fill('Rodinný tím');await page.locator('#customer-email').fill('test@example.com');
+   assert.equal(await page.locator('[name="name"]').count(),0);await page.locator('#customer-email').fill('test@example.com');
    await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
    assert.deepEqual(outgoing,[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);
    assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"progressVersion":2,"stage":3,"started":true}');

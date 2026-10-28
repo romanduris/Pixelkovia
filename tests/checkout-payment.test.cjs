@@ -32,10 +32,10 @@ function installStripeStub(scenario){
    if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:scenario!=='disabled',publishableKey:'pk_test_fixture'}});
    if(url.pathname==='/api/checkout/session'){
     fixture.posts.push(route.request().postDataJSON());
-    const input=fixture.posts.at(-1),totalCents=input.voucherCode==='free'?0:input.baseId==='episode-1'?(input.books.length===2?1999:input.books.length===1?1998:1499):499*(1+input.books.length);
+    const input=fixture.posts.at(-1),totalCents=input.voucherCode==='free'?0:input.baseId==='episode-1'?((input.books.length===2?1999:input.books.length===1?1998:1499)+(input.giftGame?999:0)):499*(1+input.books.length);
     return route.fulfill({json:{sessionId:'cs_test_fixture_session'+fixture.posts.length,clientSecret:'fixture-client-secret',totalCents}});
    }
-   if(url.pathname==='/api/checkout/status'){fixture.reads++;return route.fulfill({json:{paid:fixture.paid,delivered:fixture.delivered,noPaymentRequired:fixture.posts.at(-1)?.voucherCode==='free'}});}
+   if(url.pathname==='/api/checkout/status'){fixture.reads++;return route.fulfill({json:{paid:fixture.paid,delivered:fixture.delivered,noPaymentRequired:fixture.posts.at(-1)?.voucherCode==='free',orderCount:fixture.posts.at(-1)?.giftGame?2:1}});}
    let file=url.pathname==='/'?'index.html':url.pathname.slice(1);if(!path.extname(file))file+='.html';
    const target=path.join(process.cwd(),'dist/funnel',file);
    if(!fs.existsSync(target)||!fs.statSync(target).isFile())return route.fulfill({status:404,body:''});
@@ -43,6 +43,7 @@ function installStripeStub(scenario){
    return route.fulfill({contentType:type,body:fs.readFileSync(target)});
   });
   await page.goto(origin+'/checkout'+(returned?'?session_id=cs_test_fixture_returned':baseId==='episode-1'?'':'?product='+baseId));
+  await page.evaluate(()=>document.fonts.ready);
   if(!returned&&scenario!=='disabled')await page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled);
   else if(scenario==='disabled')await page.waitForFunction(()=>document.querySelector('#payment-note').textContent.includes('Platby ešte pripravujeme'));
   return {page,fixture,close:()=>context.close()};
@@ -57,10 +58,18 @@ function installStripeStub(scenario){
    assert.equal(await page.locator('[data-summary-base-price]').innerText(),'29,99 €');
    assert.equal(await page.locator('#summary-early-discount strong').innerText(),'−15,00 €');
    assert.equal(await page.locator('.delivery-row').count(),0);
+   assert.equal(await page.locator('[name="name"]').count(),0,'only email is collected');
+   assert.equal(await page.locator('#summary-heading').innerText(),'Vaša objednávka');
+   assert.ok((await page.locator('.details-panel').boundingBox()).height<145,'email stays compact');
+   assert.deepEqual(await page.locator('.checkout-content>section').evaluateAll(es=>es.map(e=>e.classList.contains('base-product')?'game':e.classList.contains('details-panel')?'email':'addons')),['game','email','addons']);
+   assert.equal(await page.locator('#addon-gift-game').isChecked(),false);
+   assert.match(await page.locator('.atlas-addon .addon-price').innerText(),/2,99 €[\s\S]*Teraz zdarma/);
+   if(width<600){const height=await page.evaluate(()=>document.documentElement.scrollHeight);assert.ok(height<1600,'compact phone checkout at '+width+' px: '+height+' px total');await page.locator('#mobile-buy').tap();assert.equal(fixture.posts.length,0);assert.ok(await page.locator('[name="email"]').evaluate(el=>el===document.activeElement));}
    assert.equal(await page.locator('[name="book-bundle"]').count(),1);
    assert.equal(await page.locator('[name="book"]').count(),0,'the game has one opt-in for both books');
-   assert.equal(await page.locator('.bundle-book .offer-book-cover').count(),2,'both illustrated covers remain');
-   await page.locator('[data-book-preview="story-book-before"]').click();
+   assert.equal(await page.locator('.book-pair .offer-book-cover').count(),2,'both illustrated covers remain');
+   await page.locator('[data-book-preview="collection"]').click();
+   assert.equal(await page.locator('.book-preview-content').count(),2);assert.equal(await page.locator('.book-preview-pages img').count(),4);
    await page.locator('[data-close-book-preview]').click();
    assert.equal(await page.locator('#select-bundle').isChecked(),false,'a sample does not opt in to the books');
    await activate(page.locator('#select-bundle'));assert.equal(await page.locator('#order-total').innerText(),'19,99 €');
@@ -79,7 +88,7 @@ function installStripeStub(scenario){
    assert.equal(await page.locator('#order-total').innerText(),'19,99 €');
    assert.equal(fixture.posts.length,1,'editing does not create another session');
    await page.locator('#select-bundle').uncheck();assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
-   if(width===390||width===1360){await page.locator('[name="email"]').fill('');await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.screenshot({path:'/tmp/pixelkovia-checkout-offer-'+engine.name()+'-'+width+'.png',fullPage:true});}
+   if(width===390||width===1360){await page.locator('[name="email"]').fill('');await page.evaluate(()=>{scrollTo({top:0,behavior:'instant'});document.querySelector('#mobile-checkout-bar').style.visibility='hidden';});await page.screenshot({path:'/tmp/pixelkovia-checkout-offer-'+engine.name()+'-'+width+'.png',fullPage:true});await page.locator('#mobile-checkout-bar').evaluate(el=>el.style.visibility='');}
    await require('./helpers/checkout-voucher.cjs')(page,{screenshotPrefix:width===390?'/tmp/pixelkovia-voucher-'+engine.name():undefined});
    await t.close();cases.push(width+' px: reference price, discounts, book bundle, voucher popup and preserved order on return');
   }
@@ -153,6 +162,26 @@ function installStripeStub(scenario){
    await page.getByRole('button',{name:'Fixture pay',exact:true}).waitFor();
    assert.equal(fixture.posts[0].baseId,baseId);assert.equal(fixture.posts[0].voucherCode,'free');assert.equal(fixture.posts[0].books.length,1);
    await t.close();cases.push(baseId+': independent book selection, full price and free voucher');
+  }
+  {
+   const t=await open(),{page,fixture}=t;
+   await page.locator('#addon-gift-game').check();assert.equal(await page.locator('#order-total').innerText(),'24,98 €');
+   await page.locator('#select-bundle').check();assert.equal(await page.locator('#order-total').innerText(),'29,98 €');
+   await page.locator('#addon-gift-game').uncheck();assert.equal(await page.locator('#order-total').innerText(),'19,99 €');
+   await page.locator('#addon-gift-game').check();
+   await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill('free');await page.locator('#voucher-code').press('Enter');
+   assert.equal(await page.locator('#order-total').innerText(),'0,00 €');
+   await page.locator('#voucher-open').click();await page.locator('#voucher-remove').click();assert.equal(await page.locator('#order-total').innerText(),'29,98 €');
+   await page.locator('[name="email"]').fill('two-families@example.invalid');
+   await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.locator('#mobile-buy').tap();
+   await page.getByRole('button',{name:'Fixture pay',exact:true}).waitFor();
+   assert.equal(fixture.posts[0].giftGame,true);assert.equal(fixture.posts[0].name,undefined);
+   assert.equal(await page.locator('#payment-order-total').innerText(),'29,98 €');
+   assert.ok((await page.locator('#payment-order-items').innerText()).includes('Druhá hra pre ďalšiu rodinu'));
+   assert.equal(await page.locator('#mobile-checkout-bar').isHidden(),true);
+   await page.getByRole('button',{name:'Fixture pay',exact:true}).click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
+   fixture.paid=true;await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('dva samostatné e-maily'));
+   await t.close();cases.push('additional game, voucher, mobile CTA and two independent access emails');
   }
   {
    const t=await open('disabled'),{page,fixture}=t;

@@ -80,3 +80,14 @@ Aktuálne snímky ponuky, bez údajov karty:
 | Mobilná ponuka | Dialóg voucheru | Desktop |
 | --- | --- | --- |
 | [390 px](screenshots/checkout-offer-390.png) | [Voucher](screenshots/checkout-voucher-390.png) | [1360 px](screenshots/checkout-offer-1360.png) |
+
+## Kompaktný checkout a druhá hra – 28. 10. 2026
+
+- Potvrdené poradie je stručná karta hry → iba e-mail → tri kompaktné doplnky → **Vaša objednávka**. Meno sa nezbiera. E-mail má samostatný malý blok bez veľkého nadpisu.
+- Atlas uvádza preškrtnutú plánovanú cenu **2,99 €** a „Teraz zdarma“. Balík kníh má dve malé obálky, cenu +5 € a odkaz **Pozrieť ukážku oboch kníh**. Odkaz používa rovnaký dialóg `collection` ako funnel: dve knihy, štyri obrázkové ukážky, bez zmeny výberu či ceny.
+- Tretí voliteľný doplnok je druhá hra za **9,99 €**. Bez kníh sa platí 24,98 €, s knihami 29,98 €. Dve samostatné objednávky majú vlastné účty a heslá; kupujúci dostane dva oddelené e-maily a druhý môže preposlať. Druhá objednávka obsahuje iba základnú hru. [Spracovanie a testy](payment-setup.md).
+- Na mobile je pri prechádzaní ponuky dostupná spodná lišta s aktuálnou sumou a pokračovaním k platbe. Pri viditeľnom hlavnom tlačidle, otvorenej ukážke, voucheri alebo platobnom kroku sa schová. Obe tlačidlá vyžadujú platný e-mail a používajú rovnakú ochranu pred opakovaným kliknutím.
+- Vizuálna kontrola na 390 px: stránka má približne **1 500 px** oproti predchádzajúcim 2 090 px, napriek novej ponuke druhej hry. Kontroly na 360, 390, 430 a 1360 px pokrývajú aj chybové stavy, samostatné knihy, voucher, spoločnú ukážku a mobilné tlačidlo.
+- Prešlo **27 serverových testov**, **26 platobných scenárov** (13 Chromium + 13 WebKit), verejný funnel na siedmich šírkach a cesta cez sedem úloh v oboch prehliadačoch. Doručenie dvoch e-mailov, opakovanie, atómové vytvorenie, podpísané webhooky, refund aj voucher sú overené izolovane bez živej úhrady či produkčného nákupu.
+
+Snímky vyššie sú aktualizované; [prvá mobilná obrazovka so spodnou lištou](screenshots/checkout-mobile-bar-390.png) ukazuje dostupné pokračovanie bez posúvania k súhrnu.

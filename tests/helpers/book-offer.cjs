@@ -16,7 +16,7 @@ exports.checkout=async page=>{
  const books=page.locator('#select-bundle'),atlas=page.locator('[name="atlas"]');
  assert.equal(await page.locator('[name="book-bundle"]').count(),1);
  assert.equal(await page.locator('[name="book"]').count(),0);
- assert.equal(await page.locator('.bundle-book .offer-book-cover').count(),2);
+ assert.equal(await page.locator('.book-pair .offer-book-cover').count(),2);
  assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad v jednom spoločnom príbehu');
  assert.equal(await page.locator('[data-summary-base-price]').innerText(),'29,99 €');
  assert.equal(await page.locator('#summary-early-discount strong').innerText(),'−15,00 €');
@@ -28,7 +28,7 @@ exports.checkout=async page=>{
  assert.ok(!(await atlas.isChecked()),'selecting books does not change the Atlas preference');
  await atlas.check();assert.ok(await page.locator('.gift-row').isVisible());
  await books.uncheck();assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
- for(const id of ['story-book-before','story-book-after']){
+ for(const id of ['collection']){
   const trigger=page.locator(`[data-book-preview="${id}"]`);
   await trigger.click();assert.ok(await page.locator('#book-preview-dialog').evaluate(el=>el.open));
   assert.equal(await books.isChecked(),false,'a preview never adds paid books');
