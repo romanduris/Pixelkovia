@@ -3,6 +3,7 @@
 - Communicate with the user in Slovak. Use `.agents/skills/mystery-at-home-workflow/SKILL.md` for repository changes.
 - Work only on `main`. After a completed change, commit, push to `origin/main`, verify the push and deploy the affected application. Never force-push or rewrite Git history. Read-only tasks need no empty commit.
 - The only active website is https://pixelkovia.rodulab.com. Its routes are `/`, `/checkout`, `/Supervisor`, `/hra` and `/admin`. Storyboard is available at `/admin/storyboard` behind the administrator's session. Keep the existing seven puzzles, story, recordings and game mechanics unchanged unless specifically requested.
+- Use Guardy, the approved orange shield with a teal tie and cyan keyhole, as the visual representative of Atlas Pixelkov in offers, covers and library cards.
 - Return the permanent application URL as a clickable Markdown link after every completed change. Use deployed URLs, never Codespace or localhost previews.
 - Build with `node scripts/prepare-static.mjs`. Root HTML/CSS/JS, `books-content/` and `assets/` are the sources of truth. Never edit generated `dist/` files.
 - Publish only `dist/funnel/` using `scripts/deploy-funnel.mjs`, the existing Cloudflare Pages project in `funnel/cloudflare.json` and the pinned Wrangler CLI. Never upload the entire repository or `dist/`.
