@@ -10,7 +10,7 @@ const origin='https://pixelkovia.rodulab.com',secret='a'.repeat(64);
 function fixture(){
  const db=fresh(),sessions=new Map(),sdk=new Stripe('sk_test_fixture');let sequence=0;
  const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',RESEND_API_KEY:'re_fixture',STRIPE_CLIENT:{webhooks:sdk.webhooks,checkout:{sessions:{async create(input){const id='cs_test_twogamesfixture'+(++sequence),amount_total=input.line_items.reduce((sum,l)=>sum+l.price_data.unit_amount*l.quantity,0);sessions.set(id,{id,...input,status:'complete',currency:'eur',livemode:false,amount_total,payment_status:amount_total===0?'no_payment_required':'paid',payment_intent:amount_total===0?null:'pi_fixture'+sequence});return {id,client_secret:'fixture'};},async retrieve(id){return sessions.get(id);}}}}};
- const input={baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,giftGame:true,email:'two-families@example.invalid'};
+ const input={baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,giftGame:true,newPurchase:true,email:'two-families@example.invalid'};
  const event=(id,type,object)=>{const payload=JSON.stringify({id,type,data:{object}});return new Request(origin+'/api/stripe/webhook',{method:'POST',body:payload,headers:{'stripe-signature':sdk.webhooks.generateTestHeaderString({payload,secret:env.STRIPE_WEBHOOK_SECRET})}});};
  return {db,env,input,sessions,event};
 }

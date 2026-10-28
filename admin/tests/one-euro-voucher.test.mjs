@@ -24,7 +24,7 @@ test('1e sets every selectable cart to exactly one euro with exact Stripe item a
   try{
     for(const baseId of ['episode-1','story-book-before','story-book-after'])for(let mask=0;mask<4;mask++)for(const atlasIncluded of [true,false])for(const giftGame of baseId==='episode-1'?[true,false]:[false]){
       const books=['story-book-before','story-book-after'].filter((_,i)=>mask&(1<<i));
-      const checkout=await createCheckout(env,{...input,baseId,books,atlasIncluded,giftGame,totalCents:1,giftPriceCents:1});
+      const checkout=await createCheckout(env,{...input,email:[baseId,mask,atlasIncluded,giftGame].join('-')+'@example.invalid',baseId,books,atlasIncluded,giftGame,totalCents:1,giftPriceCents:1});
       const session=sessions.get(checkout.sessionId),attempt=await first(db,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',checkout.sessionId);
       assert.equal(checkout.totalCents,100);assert.equal(session.amount_total,100);
       assert.equal(session.metadata.voucher_code,'1e');assert.equal(attempt.fixed_total_voucher,'1e');assert.equal(attempt.voucher_code,null);

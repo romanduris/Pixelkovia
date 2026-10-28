@@ -9,12 +9,12 @@ const secret='a'.repeat(64),origin='https://pixelkovia.rodulab.com';
 test('two purchases with the same email get isolated credentials, orders and books; fulfillment retries never duplicate access',async()=>{
   const db=fresh(),email='family@example.invalid';
   const sessions=new Map();let counter=0;
-  const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_live_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_test_fixture',RESEND_API_KEY:'re_test_fixture',STRIPE_CLIENT:{checkout:{sessions:{async create(input){const id='cs_live_fixture'+(++counter);sessions.set(id,{id,...input,amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:true,payment_status:'paid',payment_intent:'pi_'+counter});return {id,client_secret:'not-a-real-secret'};},async retrieve(id){return sessions.get(id);}}}}};
+  const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_live_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_test_fixture',RESEND_API_KEY:'re_test_fixture',STRIPE_CLIENT:{checkout:{sessions:{async create(input){const id='cs_live_fixture'+(++counter);sessions.set(id,{id,...input,amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:true,status:'complete',payment_status:'paid',payment_intent:'pi_'+counter});return {id,client_secret:'not-a-real-secret'};},async retrieve(id){return sessions.get(id);}}}}};
   assert.equal(commerceReady(env),true);
   await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email:''}),e=>e.status===400);
-  await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email,uiMode:'hosted'}),e=>e.status===400);
+  await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email,newPurchase:true,uiMode:'hosted'}),e=>e.status===400);
   const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,uiMode:'elements',email});
-  const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email});
+  const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email,newPurchase:true});
   assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'elements','the compact checkout uses individual Stripe Elements');
   assert.equal(sessions.get(secondPurchase.sessionId).ui_mode,'form','already-open checkout tabs retain a compatible session during deployment');
   assert.equal(sessions.get(firstPurchase.sessionId).payment_method_types,undefined);
@@ -34,13 +34,13 @@ test('two purchases with the same email get isolated credentials, orders and boo
   assert.equal(identity.customerId,d1.customer_id);assert.notEqual(identity.customerId,d2.customer_id);
   assert.deepEqual((await customerLibrary(db,identity.customerId)).books.map(b=>b.owned),[true,false]);
   const bad=await customerLogin(new Request(origin),env,{email,password:'wrong-password-value'});assert.equal(bad.status,401);
-  const refunded=await createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:false,email});
+  const refunded=await createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:false,email,newPurchase:true});
   await execute(db,'INSERT INTO payment_refunds VALUES(?,?)','pi_3',Date.now());
   const refundedOrder=await fulfill(env,refunded.sessionId);
   assert.equal((await first(db,'SELECT status FROM orders WHERE id=?',refundedOrder.id)).status,'refunded');
   assert.equal(await first(db,'SELECT order_id FROM access_deliveries WHERE order_id=?',refundedOrder.id),null,'a refund arriving before checkout completion cannot deliver access');
   for(const [baseId,books,total]of [['episode-1',[],1499],['episode-1',['story-book-before'],1998],['episode-1',['story-book-before','story-book-after'],1998],['story-book-before',[],499],['story-book-after',[],499],['story-book-before',['story-book-after'],998]]){
-    const created=await createCheckout(env,{baseId,books,atlasIncluded:true,email});
+    const created=await createCheckout(env,{baseId,books,atlasIncluded:true,email,newPurchase:true});
     assert.equal(created.totalCents,total);assert.equal(sessions.get(created.sessionId).amount_total,total,'Stripe receives the unchanged server-calculated price');
     if(baseId==='episode-1'&&books.length===2){
       assert.deepEqual(sessions.get(created.sessionId).line_items.map(l=>l.price_data.unit_amount),[1499,249,250,0],'bundle savings belong to the books, matching the checkout');
@@ -49,13 +49,13 @@ test('two purchases with the same email get isolated credentials, orders and boo
       assert.equal((await first(db,"SELECT SUM(unit_price_cents) n FROM order_items WHERE order_id=? AND product_id LIKE 'story-book-%'",order.id)).n,499);
     }
   }
-  const legacy=await createCheckout(env,{baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email});
+  const legacy=await createCheckout(env,{baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email,newPurchase:true});
   await execute(db,'UPDATE checkout_attempts SET item_prices=NULL,total_cents=1999 WHERE stripe_session_id=?',legacy.sessionId);
   sessions.get(legacy.sessionId).amount_total=1999;
   sessions.get(legacy.sessionId).line_items.forEach((line,i)=>line.price_data.unit_amount=[1001,499,499,0][i]);
   const legacyOrder=await fulfill(env,legacy.sessionId);
   assert.equal((await first(db,"SELECT unit_price_cents n FROM order_items WHERE order_id=? AND product_id='episode-1'",legacyOrder.id)).n,1001,'an already-open older checkout keeps its original item prices');
-  const previousBundle=await createCheckout(env,{baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email});
+  const previousBundle=await createCheckout(env,{baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email,newPurchase:true});
   const previousPrices={'episode-1':1499,'story-book-before':250,'story-book-after':250,'atlas-pixelkov':0};
   await execute(db,'UPDATE checkout_attempts SET item_prices=?,total_cents=1999 WHERE stripe_session_id=?',JSON.stringify(previousPrices),previousBundle.sessionId);
   sessions.get(previousBundle.sessionId).amount_total=1999;
@@ -74,7 +74,7 @@ test('free voucher is server-owned and fulfills only a verified completed zero-c
  const db=fresh(),sessions=new Map();let counter=0;
  const sdk=new Stripe('sk_test_fixture');
  const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',RESEND_API_KEY:'re_fixture',STRIPE_CLIENT:{webhooks:sdk.webhooks,checkout:{sessions:{async create(input){const id='cs_test_voucherfixture'+(++counter);sessions.set(id,{id,...input,status:'open',amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:false,payment_status:'no_payment_required',payment_intent:null});return {id,client_secret:'fixture'};},async retrieve(id){return sessions.get(id);}}}}};
- const input={baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email:'voucher@example.invalid',voucherCode:' FREE '};
+ const input={baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,email:'voucher@example.invalid',newPurchase:true,voucherCode:' FREE '};
  try{
   for(const voucherCode of ['unknown',{},'x'.repeat(65)])await assert.rejects(()=>createCheckout(env,{...input,voucherCode}),e=>e.status===400);
   assert.equal((await first(db,'SELECT COUNT(*) n FROM checkout_attempts')).n,0);
@@ -112,7 +112,7 @@ test('free voucher is server-owned and fulfills only a verified completed zero-c
   await assert.rejects(()=>fulfill(env,paid.sessionId),e=>e.status===400,'a forged zero cannot replace a priced attempt');
   assert.equal((await first(db,'SELECT COUNT(*) n FROM orders')).n,2);
   for(const baseId of ['story-book-before','story-book-after']){
-   const book=await createCheckout(env,{...input,baseId,books:[],voucherCode:'free'});
+   const book=await createCheckout(env,{...input,baseId,email:baseId+'@example.invalid',books:[],voucherCode:'free'});
    assert.equal(book.totalCents,0);assert.equal(sessions.get(book.sessionId).line_items.length,2);
   }
  }finally{db.close();}

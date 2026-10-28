@@ -8,7 +8,7 @@ import {passwordLogin,passwordLogout,sessionCookie,clearCookie} from './password
 import {fakeCustomerCount} from './fake-customers.mjs';
 import {customerLogin,customerLogout,customerCookie} from './customer-auth.mjs';
 import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './customer-portal.mjs';
-import {checkoutConfig,createCheckout,checkoutStatus,paymentWebhook,sendPending} from './commerce.mjs';
+import {checkoutConfig,createCheckout,verifiedCheckoutStatus,releaseCheckout,paymentWebhook,sendPending} from './commerce.mjs';
 import {supportWebhook} from './support-mail.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
@@ -62,17 +62,18 @@ async function customerApi(request,env,path){
   if(path==='/api/customer/complete'&&request.method==='POST')return json(await gameEvent(db,run,{...input,type:'complete'}));
   throw new HttpError(404,'Endpoint neexistuje.');
 }
-export default {async scheduled(event,env){await sendPending(env);},async fetch(request,env){
+export default {async scheduled(event,env){await sendPending(env);},async fetch(request,env,context){
   try{
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){
       const session=url.searchParams.get('session_id');if(!/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(session||''))throw new HttpError(400,'Neplatná platobná relácia.');
-      return json(await checkoutStatus(env.TQ_DB,session));
+      return json(await verifiedCheckoutStatus(env,session));
     }
     if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);return json(await createCheckout(env,{...await body(request),__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
-    if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env));
+    if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);return json(await releaseCheckout(env,await body(request)));}
+    if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env,context));
     if(path==='/api/support/webhook'&&request.method==='POST')return json(await supportWebhook(request,env));
     if(path==='/api/customer/login'&&request.method==='POST'){
       sameOrigin(request);const login=await customerLogin(request,env,await body(request));
@@ -122,7 +123,7 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
     // Never return the demo UI on a remote host, even if a local configuration is accidentally deployed.
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
     return secureAsset(await env.ASSETS.fetch(request));
-  }catch(error){return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.'},error instanceof HttpError?error.status:500);}
+  }catch(error){return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.',...(error instanceof HttpError&&error.code==='previous_payment_paid'?{code:error.code}:{})},error instanceof HttpError?error.status:500);}
 }};
 
 function secureAsset(response){

@@ -42,14 +42,15 @@ function installStripeStub(scenario){
   await page.route('**/*',async route=>{
    const url=new URL(route.request().url());
    if(url.origin!==origin)return route.abort();
-   if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:scenario!=='disabled',publishableKey:'pk_test_fixture'}});
+   if(url.pathname==='/api/checkout/release')return route.fulfill({json:{released:true}});
+   if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:scenario!=='disabled',publishableKey:'pk_test_fixture',wallets:{applePay:true,googlePay:true}}});
    if(url.pathname==='/api/checkout/session'){
     fixture.posts.push(route.request().postDataJSON());
     const input=fixture.posts.at(-1),totalCents=input.voucherCode==='free'?0:input.voucherCode==='1e'?100:input.baseId==='episode-1'?((input.books.length===2?1998:input.books.length===1?1998:1499)+(input.giftGame?999:0)):499*(1+input.books.length);
     await page.evaluate(total=>checkoutFixture.totalCents=total,totalCents);
     return route.fulfill({json:{sessionId:'cs_test_fixture_session'+fixture.posts.length,clientSecret:'fixture-client-secret',totalCents}});
    }
-   if(url.pathname==='/api/checkout/status'){fixture.reads++;return route.fulfill({json:{paid:fixture.paid,delivered:fixture.delivered,noPaymentRequired:fixture.posts.at(-1)?.voucherCode==='free',orderCount:fixture.posts.at(-1)?.giftGame?2:1}});}
+   if(url.pathname==='/api/checkout/status'){fixture.reads++;return route.fulfill({json:{state:'pending',paid:fixture.paid,delivered:fixture.delivered,noPaymentRequired:fixture.posts.at(-1)?.voucherCode==='free',orderCount:fixture.posts.at(-1)?.giftGame?2:1}});}
    let file=url.pathname==='/'?'index.html':url.pathname.slice(1);if(!path.extname(file))file+='.html';
    const target=path.join(process.cwd(),'dist/funnel',file);
    if(!fs.existsSync(target)||!fs.statSync(target).isFile())return route.fulfill({status:404,body:''});
@@ -176,22 +177,21 @@ function installStripeStub(scenario){
    assert.equal(await page.locator('#change-order').isDisabled(),true,'order changes are blocked while confirmation is in flight');
    await page.locator('#stripe-pay').dispatchEvent('click');
    assert.equal(await page.evaluate(()=>checkoutFixture.calls.length),1,'a second tap cannot confirm again');
-   await page.evaluate(()=>checkoutFixture.finish({type:'error',error:{message:'Karta bola zamietnutá.'}}));
+   await page.evaluate(()=>checkoutFixture.finish({type:'error',error:{type:'card_error',message:'Karta bola zamietnutá.'}}));
    await page.getByText('Karta bola zamietnutá.',{exact:true}).waitFor();assert.equal(await page.locator('#change-order').isEnabled(),true);
-   await page.locator('#stripe-pay').click();
-   await page.evaluate(()=>checkoutFixture.finish({throw:true}));await page.getByText('Platbu sa nepodarilo dokončiť. Skúste to znova.',{exact:true}).waitFor();
-   await page.locator('#change-order').click();assert.equal(await page.locator('[name="email"]').inputValue(),'checkout-fixture@example.invalid');
+   await page.locator('#change-order').click();await page.waitForFunction(()=>!document.querySelector('[name="email"]').disabled);assert.equal(await page.locator('[name="email"]').inputValue(),'checkout-fixture@example.invalid');
    assert.equal(await page.locator('[name="email"]').isEnabled(),true);assert.equal(await page.locator('#select-bundle').isChecked(),true,'editing preserves the selected bundle');
    assert.equal(await page.locator('#checkout-form').isVisible(),true);
    const before=await page.evaluate(()=>checkoutFixture.calls.length);await page.evaluate(()=>checkoutFixture.stale({fixture:true}));
    assert.equal(await page.evaluate(()=>checkoutFixture.calls.length),before,'destroyed forms cannot confirm a stale event');
    assert.deepEqual(await page.evaluate(()=>checkoutFixture.calls[0]),{redirect:'if_required',expressEvent:false});
-   await t.close();cases.push('required email, duplicate taps, declined/network errors, editable retry and stale callback isolation');
+   await t.close();cases.push('required email, duplicate taps, confirmed decline, safe editing and stale callback isolation');
   }
   {
    const t=await open('load-error');const {page}=t;
    await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');await page.locator('#checkout-form .checkout-buy').click();
-   await page.getByText('Platobný formulár sa nepodarilo načítať. Skúste to znova.',{exact:true}).waitFor();
+   await page.locator('#retry-payment').waitFor();
+   await page.locator('#change-order').click();await page.waitForFunction(()=>!document.querySelector('[name="email"]').disabled);
    assert.equal(await page.locator('#checkout-form .checkout-buy').isEnabled(),true);assert.equal(await page.locator('[name="email"]').isEnabled(),true);
    await t.close();cases.push('provider initialization failure keeps the order editable');
   }
@@ -199,12 +199,12 @@ function installStripeStub(scenario){
    const t=await open();const {page,fixture}=t;
    await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');await page.locator('#checkout-form .checkout-buy').click();
    await page.locator('#stripe-pay').click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
-   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujem'));
+   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujeme'));
    assert.ok(!(await page.locator('#payment-status').innerText()).includes('Platba je potvrdená'),'the SDK result alone never declares an order paid');
    fixture.paid=true;await page.getByText('✓ Platba je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
    assert.equal(await page.locator('#checkout-form .checkout-buy').isDisabled(),true);assert.equal(await page.locator('#change-order').isHidden(),true);
    assert.ok(await page.locator('#checkout-form').isVisible(),'server confirmation keeps the current order visible');
-   assert.equal(await page.evaluate(()=>checkoutFixture.destroyed),1);assert.ok(fixture.reads>=2);
+   assert.equal(await page.evaluate(()=>checkoutFixture.destroyed),0,'Stripe retains its element until native completion');assert.ok(fixture.reads>=2);
    await t.close();cases.push('confirmation waits for the server and cannot start a second order');
   }
   {
@@ -218,7 +218,7 @@ function installStripeStub(scenario){
    assert.ok(await page.locator('.payment-method-note').isHidden(),'a free confirmation does not advertise a card payment');
    assert.equal(fixture.posts[0].voucherCode,'free');assert.equal(fixture.posts[0].books.length,2);
    await page.locator('#stripe-pay').click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
-   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujem'));
+   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujeme'));
    assert.ok(!(await page.locator('#payment-status').innerText()).includes('je potvrdená'),'free voucher also waits for server fulfillment');
    fixture.paid=true;await page.getByText('✓ Objednávka s voucherom je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
    await t.close();cases.push('free voucher reaches Stripe with zero total and waits for server-confirmed access');
@@ -235,7 +235,7 @@ function installStripeStub(scenario){
    assert.equal(fixture.posts[0].voucherCode,'1e');assert.equal(await page.locator('#order-total').innerText(),'1,00 €');
    assert.equal(await page.locator('#payment-heading').innerText(),'Bezpečná platba');
    await page.locator('#stripe-pay').click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
-   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujem'));
+   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujeme'));
    assert.ok(!(await page.locator('#payment-status').innerText()).includes('Platba je potvrdená'));
    fixture.paid=true;await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
    await t.close();cases.push(baseId+': one-euro voucher keeps a paid one-euro total and waits for server confirmation');
@@ -334,7 +334,7 @@ function installStripeStub(scenario){
    assert.ok(await page.locator('#wallet-separator').isHidden());
    assert.ok(await page.locator('#stripe-pay').isEnabled(),'card payment remains available throughout wallet checks');
    await page.evaluate(()=>checkoutFixture.walletAvailability({googlePay:{available:true}}));
-   await page.locator('#change-order').click();
+   await page.locator('#change-order').click();await page.waitForFunction(()=>!document.querySelector('[name="email"]').disabled);
    await page.evaluate(()=>checkoutFixture.walletAvailability({applePay:{available:true},googlePay:{available:true}}));
    assert.ok(await page.locator('#express-checkout-slot').isHidden(),'late events from a destroyed checkout cannot restore wallets');
    assert.ok(await page.locator('#wallet-separator').isHidden());
@@ -347,21 +347,21 @@ function installStripeStub(scenario){
    await page.getByRole('button',{name:'Fixture Apple Pay'}).click();
    assert.equal(await page.locator('#stripe-pay').isDisabled(),true);
    await page.locator('#stripe-pay').dispatchEvent('click');assert.equal(await page.evaluate(()=>checkoutFixture.calls.length),1,'wallet and card cannot confirm twice');
-   await page.evaluate(()=>checkoutFixture.finish({type:'error',error:{message:'Platbu skúste znova.'}}));
+   await page.evaluate(()=>checkoutFixture.finish({type:'error',error:{type:'card_error',message:'Platbu skúste znova.'}}));
    await page.waitForFunction(()=>checkoutFixture.walletFailed===true);
    assert.deepEqual(await page.evaluate(()=>checkoutFixture.calls[0]),{redirect:'if_required',expressEvent:true});
-   await page.locator('#change-order').click();assert.equal(await page.evaluate(()=>checkoutFixture.walletDestroyed),1);
+   await page.locator('#change-order').click();await page.waitForFunction(()=>!document.querySelector('[name="email"]').disabled);assert.equal(await page.evaluate(()=>checkoutFixture.walletDestroyed),1);
    await t.close();cases.push('eligible wallet confirms once, reports errors and is destroyed on editing');
   }
   for(const scenario of ['wrong-total','card-load-error']){
    const t=await open(scenario),{page}=t;
    await page.locator('[name="email"]').fill('failure@example.invalid');await page.locator('#checkout-form .checkout-buy').click();
    if(scenario==='wrong-total'){
-    await page.getByText('Cena platby sa zmenila. Vráťte sa k objednávke a skúste to znova.',{exact:true}).waitFor();
+    await page.locator('#retry-payment').waitFor();
     assert.ok(await page.locator('#checkout-form').isVisible());
    }else{
     await page.getByText('Údaje karty sa nepodarilo načítať. Upravte objednávku a skúste to znova.',{exact:true}).waitFor();
-    assert.ok(await page.locator('#stripe-pay').isDisabled());await page.locator('#change-order').click();
+    assert.ok(await page.locator('#stripe-pay').isDisabled());await page.locator('#change-order').click();await page.waitForFunction(()=>!document.querySelector('[name="email"]').disabled);
    }
    assert.equal(await page.evaluate(()=>checkoutFixture.calls.length),0,'no confirmation with changed total or unavailable card fields');
    await t.close();cases.push(scenario+': payment cannot proceed and order can be corrected');

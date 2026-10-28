@@ -1,81 +1,56 @@
-# P0 – Google Pay callback timeout; prevent double payment and audit Apple Pay
+# P0 – timeout Google Pay a ochrana pred opakovanou platbou
 
-**Project:** Pixelkovia · WEB & BUSINESS  
-**Priority:** P0 / release blocker for wallet payments  
-**Status:** Approved investigation and fix request; not yet implemented  
-**Scope:** Payment confirmation, wallet callbacks, checkout recovery, webhook/order status. **Do not modify login passwords or password generation.**
+Stav k 28. 10. 2026: oprava implementovaná; natívne platby Google Pay aj Apple Pay zostávajú na tomto checkoute vypnuté do overenia na zariadeniach. Platba kartou zostáva dostupná. Globálne nastavenia účtu Stripe sa nemenia.
 
-## Observed production behavior (user confirmed)
+## Zistenia a hranice dôkazov
 
-- One live card payment for **€14.99** completed and displayed correctly.
-- Two separate live **Google Pay** payments for **€1.00** each were successfully charged, yet both showed **callback timeout** in the browser.
-- The user nearly attempted another payment because the checkout appeared to have failed.
-- Many other created, abandoned, or expired Checkout Sessions came from manually opening and previewing the checkout. Do **not** count them as actual failed payment attempts.
-- A purchased-access email arrived, indicating that the successful-payment fulfillment path worked at least in that instance.
-- **Apple Pay has not been tested by the user** (no Apple device). The same class of problem must be proactively examined for Apple Pay; do not claim Apple Pay is broken without evidence.
+- Čítanie produkčného Stripe API potvrdilo dve úspešné platby Google Pay po 1 € a jednu úspešnú kartovú platbu 14,99 €. Obe peňaženky mali `PaymentIntent.status=succeeded` a `latest_charge.payment_method_details.card.wallet.type=google_pay`. Otvorené alebo expirované náhľadové relácie sa nepočítajú ako neúspešné platby.
+- Existujúca D1 databáza potvrdila objednávky a odoslané prístupové správy pri všetkých troch nákupoch. Pri Google Pay sa objednávky uložili približne 3,2 a 4,0 sekundy po vytvorení úspešnej platby; doručenie do odosielacej služby nasledovalo približne o 0,6 sekundy neskôr.
+- Pôvodný klient po úspechu SDK okamžite zničil Payment/Express Checkout Element a v rovnakom `confirm` handleri čakal na serverový polling. Pri každej výnimke bez rozlíšenia volal `paymentFailed()`. Po vyčerpaní pollingu znovu povolil úpravu objednávky. Server pre každý POST vytváral nový pokus s novým Stripe idempotency key.
+- Nesprávne označenie neznámeho výsledku za zlyhanie a možnosť novej relácie sú potvrdené chyby kódu. Predčasné zničenie elementu a čakanie handlera sú podozrivé príčiny natívneho timeoutu. Historický záznam z prehliadača chýba; presná príčina pôvodného hlásenia `callback timeout` nie je preukázaná. Približne 12-sekundové čakanie aplikácie neoznačujeme za preukázaný limit Google Pay.
+- Apple Pay používa ten istý `confirm` handler. Nie je dôkaz, že by pôvodne na zariadení zlyhalo.
 
-**Critical requirement:** No ambiguous client-side error or timeout may encourage a customer to pay a second time when the first payment could have succeeded.
+## Výsledné správanie
 
-## 1. Investigate the root cause
+`checkout.js` odovzdáva pôvodný `expressCheckoutConfirmEvent` do `actions.confirm`, uvádza návratovú URL a necháva Stripe riadiť natívny platobný hárok. Po výsledku nečaká na webhook, objednávku ani e-mail a neničí element. Samostatný 20-sekundový watchdog iba prepne stav aplikácie; nevyvoláva `paymentFailed()` ani neukončuje natívnu platbu. Jeho čas nie je tvrdením o limite peňaženiek.
 
-Review the latest actual implementation, in particular:
+Jednoznačný `card_error` alebo `validation_error` umožní vedomú opravu a opakovanie v rovnakej relácii. Výnimka spojenia, neznámy výsledok alebo oneskorenie ukáže:
 
-- `checkout.js`: Express Checkout Element wallet `confirm` event, `checkout.actions.confirm()`, handling of `result.type`, `event.paymentFailed()`, callback completion timing, retry paths, `paymentStatus()`, session persistence, page reload and navigation;
-- `admin/src/commerce.mjs`: `createCheckout()`, Checkout Session idempotency, `checkoutStatus()`, `fulfill()`, `paymentWebhook()`, `sendPending()`;
-- routes for `/api/checkout/session`, `/api/checkout/status` and `/api/stripe/webhook`, related D1 tables and deployment logs;
-- relevant official **current Stripe documentation** for Checkout Elements SDK, Express Checkout Element, Google Pay **and** Apple Pay.
+> Overujeme vašu platbu. Prosíme, neplaťte znova. Potvrdenie a prístup vám po úspešnej úhrade prídu e-mailom.
 
-Determine whether the wallet callback waits too long for server-side fulfillment, whether callback lifecycle is correctly settled per Stripe API, and what happens when the confirmation is successful but the client times out. Do not assume that the approximately 12-second status poll is necessarily the actual Google Pay callback timeout: verify with traces or reproducible tests.
+Stav blokuje novú platbu a ponúkne overenie pôvodnej. Identifikátor relácie zostáva v návratovej URL; lokálne sa uchová náhodný identifikátor pokusu a výber objednávky, bez údajov karty či hesiel. Obnovenie stránky, návrat späť a druhá záložka obnovujú pôvodný pokus. Browser storage slúži iba obnove; prístup ani zaplatenie neurčuje.
 
-**Avoid live charges during investigation.** Use test mode, mocked Stripe API and/or isolated worker/D1 fixtures.
+`admin/migrations/0010_checkout_requests.sql` pridáva jedinečný serverový pokus a jedinečný aktívny nákup pre e-mail. Atómový D1 batch zabraňuje dvom súbežným pokusom; opakovanie po stratenej odpovedi používa pôvodný Stripe idempotency key a rovnaké parametre. Iný identifikátor z prehliadača neobíde nevyriešenú platbu. Kontrolujú sa aj staršie relácie pred migráciou. Úprava objednávky najskôr na serveri overí a bezpečne expiruje pôvodnú Stripe Session; neznámy výsledok, `processing` či `requires_action` zámok neuvoľnia. Ďalší nákup po potvrdenej platbe vyžaduje výslovnú akciu a vytvorí vlastnú objednávku a prístup.
 
-## 2. Fix Google Pay without losing payment correctness
+`/api/checkout/status` overuje reláciu priamo v Stripe vrátane serverovej sumy, EUR, režimu účtu, väzby na pokus a voucherov. Rozlišuje `pending`, `failed`, `expired`, `paid` a `refunded`. Úspech sa zobrazí aj pri oneskorenom webhooku; doručenie e-mailu má vlastný stav. Stavové API nevytvára účty ani oprávnenia. Tie stále vznikajú z podpísaných webhookov a overenej Stripe relácie.
 
-- Properly settle the wallet `confirm` event following the documented Checkout Elements SDK contract, without blocking the wallet callback on webhook delivery or email dispatch.
-- Distinguish **confirmed payment**, **pending/unknown status**, and **confirmed declined/canceled payment**.
-- Never invoke wallet `paymentFailed()` solely because an application callback/status fetch times out while the charge outcome is unknown.
-- On ambiguous outcome show a clear state such as:
-  **„Overujeme vašu platbu. Prosíme, neplaťte znova. Potvrdenie a prístup vám po úspešnej úhrade prídu e-mailom.“**
-- Keep the existing Checkout Session identifier and show a safe status/recovery UI after reload, redirect or temporary network failure.
-- Prevent double-click, concurrent Checkout Session creation, and unintentional repeat charges while the previous attempt remains unresolved. A browser-only disabled button is insufficient: verify robust server-side checks, purchase-attempt state and idempotency.
-- A successful payment should lead to a clear success state even if sending the access email is delayed.
-- For a truly failed/declined payment, permit a deliberate and safe retry.
-- Preserve server-verified amount/currency, webhook signature verification, order/entitlement idempotency, refund handling and existing prices.
+Webhook ukladá objednávky pred potvrdením prijatia. Posielanie správ odovzdáva do `context.waitUntil`, takže oneskorený Resend neblokuje odpoveď webhooku. Existujúce opakovanie doručenia, šifrovanie, odstránenie odoslaných správ, atómové dve objednávky a refund zostávajú zachované. Generovanie hesiel a prihlasovanie sa nemenili.
 
-## 3. Apple Pay preventive audit (mandatory)
+## Overenie
 
-The user cannot test Apple Pay on their phone. **Audit and harden it anyway.**
+Prešlo **42 serverových testov** a **66 prehliadačových scenárov**: 21 regresných + 12 obnovovacích v každom z prehliadačov Chromium a WebKit. Prešli aj statické zostavenie a dry-run zostavenia Workeru.
 
-- Check whether Google Pay and Apple Pay use exactly the same `ExpressCheckoutElement.on('confirm')` and `actions.confirm()` flow.
-- If they share the callback logic, apply the same protections to both wallets.
-- Verify supported Apple Pay browser/device behavior and wallet availability handling.
-- Check cancellation, network loss, delayed server confirmation and browser-return cases.
-- Add automated tests with a **mocked Apple Pay confirm event** covering callback success, rejection, timeout/unknown, delayed webhook, page refresh and retry safety.
-- If real Apple Pay end-to-end testing requires an Apple device or Safari, **state this as an explicit remaining validation requirement**. Never claim full E2E verification based solely on mocked tests; obtain a device/browser test before enabling Apple Pay for public sales or leave it disabled until validated.
-- Do not alter SCA/3D Secure requirements or try to mimic native wallet behavior with custom DOM/CSS.
+```sh
+node scripts/prepare-static.mjs
+npm run build:check --prefix admin
+npm test --prefix admin
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/checkout-payment.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-recovery.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/checkout-recovery.test.cjs
+```
 
-## 4. Acceptance tests
+- Serverové testy používajú izolovanú SQLite/D1 databázu a nahradené Stripe/Resend. Overujú súbeh dvoch kľúčov, stratenú odpoveď pri vytváraní, blokovanie neznámej platby, expiráciu pred novým pokusom, staršie relácie, potvrdenie bez webhooku/e-mailu, nulový voucher, úmyselný nový nákup a duplicitné či prehodené webhooky. Existujúce testy kontrolujú ceny 14,99 €, 19,98 €, staršie otvorené relácie za 19,99 €, darovanú hru, samostatné prístupy a refund.
+- Prehliadačové testy spúšťajú skutočný klient v Chromiu a WebKite s nahradeným SDK. Pre Google Pay aj Apple Pay overujú návrat callbacku pri zablokovanom stavovom API, zachovaný element, úspešnú platbu pri výnimke SDK, neznámy výsledok aj výpadok stavového API, refresh/back/druhú záložku, zamietnutie, zrušenie, oneskorený úspech a stratenú odpoveď vytvárania.
+- Mobilné snímky stavov potvrdenia a overovania sa vizuálne kontrolujú pri šírke 390 px. Existujúca regresná sada pokrýva aj 360, 430 a 1360 px, kartu, vouchery a ceny.
+- Testy nevytvárajú živé platby a neposielajú skutočné e-maily. Produkčné vyšetrovanie bolo iba na čítanie.
 
-1. Successful Google Pay + delayed webhook: no timeout-as-failure, no double charge.
-2. Successful Google Pay + delayed email: success shown, email status described separately.
-3. Google Pay callback network timeout with unknown outcome: clear warning to avoid repaying, recover original session.
-4. Google Pay real decline/cancel: appropriate failure state and controlled retry.
-5. Double-click, repeat confirmation, reload, back navigation and reopening checkout: no duplicate charge.
-6. Duplicate/out-of-order Stripe webhook: single order, one set of entitlements, no duplicate access emails.
-7. Apple Pay mocked success, delay, cancel, unknown outcome and retry behavior: same protections.
-8. Ordinary card checkout remains functional and unchanged.
-9. Existing totals €14.99, €19.98, €19.99 and gift-game calculations remain correct.
-10. No real paid tests without explicit user authorization.
+## Apple Pay a Google Pay – zostávajúca podmienka aktivácie
 
-## 5. Delivery
+Obe vetvy sú skontrolované a majú spoločné automatizované testy. Verejný `checkoutConfig()` vracia pre obe peňaženky `false`; Payment Element ich tiež nezobrazuje. Obnoviť ich možno až po samostatne overenej zmene.
 
-Before release report:
-- confirmed vs. suspected timeout root cause, with code/log evidence;
-- changed files and code-level explanation;
-- test commands/results and any unresolved risks;
-- proof that ambiguous outcomes cannot trigger an easy second charge;
-- Apple Pay status: **code reviewed / automated mock tests passed / real Apple-device test pending** as applicable.
+Podľa aktuálnej matice Stripe funguje Apple Pay v Safari a podporovaných prehliadačoch iOS 16+; na ostatných desktopových prehliadačoch vyžaduje `paymentMethods.applePay: always`. Google Pay v niektorých prehliadačoch vrátane Safari tiež vyžaduje `always`. Pri budúcom povolení zachováva klient tieto nastavenia, no rozhodujú udalosti dostupnosti zo Stripe; na Chrome/Android sa Apple Pay neponúka.
 
-**Do not change password generation, customer login design, or email password length.** These are explicitly out of scope.
+Skutočný test Google Pay na podporovanom zariadení a Apple Pay v podporovanom prehliadači s pripravenou Apple peňaženkou zostáva povinný. WebKit s mockom neoveruje natívny Apple Pay hárok, bankovú autorizáciu ani príčinu pôvodného timeoutu. Apple Pay dostupnosť závisí od prehliadača, zariadenia, pripravenej peňaženky a registrovanej domény; samotné tlačidlo ani registrácia nie sú E2E platbou. Bez tohto overenia zostávajú peňaženky vypnuté. Živý platený test vyžaduje výslovné povolenie vlastníka.
 
-**Operational safeguard:** If ambiguity or repeat-payment risk remains, keep Google Pay and/or Apple Pay disabled in public checkout until verified. Do not silently activate live wallet payments.
+Oficiálne podklady overené pomocou Stripe CLI 1.55.3: [Checkout confirm](https://docs.stripe.com/js/custom_checkout/confirm), [Express confirm event](https://docs.stripe.com/js/elements_object/express_checkout_element_confirm_event), [prechod na Checkout Sessions](https://docs.stripe.com/elements/express-checkout-element/migration?payment-ui=embedded-components), [Express Checkout a podporované prehliadače](https://docs.stripe.com/elements/express-checkout-element), [testovanie peňaženiek](https://docs.stripe.com/elements/express-checkout-element/accept-a-payment?payment-ui=embedded-components).
