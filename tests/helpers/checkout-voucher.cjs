@@ -33,4 +33,16 @@ module.exports=async(page,{screenshotPrefix}={})=>{
  assert.equal(await total.innerText(),'14,99 €','closing without applying preserves the price');
  await open.click();await page.mouse.click(2,2);assert.ok(await dialog.isHidden());
  assert.ok(await open.evaluate(el=>el===document.activeElement));
+ await open.click();await input.fill(' 1E ');await apply.click();
+ assert.equal(await total.innerText(),'1,00 €');assert.equal(await discount.locator('strong').innerText(),'−13,99 €');
+ assert.match(await discount.innerText(),/Voucher 1e · nákup za 1 €/);assert.ok(!(await discount.innerText()).includes('100 %'));
+ await page.locator('#select-bundle').check();assert.equal(await total.innerText(),'1,00 €');assert.equal(await discount.locator('strong').innerText(),'−18,98 €');
+ await page.locator('#addon-gift-game').check();assert.equal(await total.innerText(),'1,00 €');assert.equal(await discount.locator('strong').innerText(),'−28,97 €');
+ await page.locator('[name="atlas"]').uncheck();assert.equal(await total.innerText(),'1,00 €');await page.locator('[name="atlas"]').check();
+ if(screenshotPrefix)await page.screenshot({path:screenshotPrefix+'-one-euro.png'});
+ await open.click();await input.fill('unknown');await apply.click();assert.equal(await total.innerText(),'1,00 €');
+ await input.fill('free');await apply.click();assert.equal(await total.innerText(),'0,00 €');
+ await open.click();await input.fill('1e');await apply.click();assert.equal(await total.innerText(),'1,00 €');
+ await open.click();await remove.click();assert.equal(await total.innerText(),'29,97 €');assert.ok(await discount.isHidden());
+ await page.locator('#addon-gift-game').uncheck();await page.locator('#select-bundle').uncheck();assert.equal(await total.innerText(),'14,99 €');
 };

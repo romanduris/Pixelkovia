@@ -27,9 +27,11 @@ Pôvodná owner-private ChatGPT Site obsahuje iba oznam o presune, zostavený do
 
 ## Platby a e-maily
 
-Kartu spracúva vložený Stripe Checkout. E-mail je povinný ešte pred vytvorením platby. Server vypočíta cenu podľa spoločného katalógu; podpis webhooku a skutočná zaplatená relácia rozhodujú o vytvorení objednávky. Jedna platba vytvorí iba jeden prístup. Dva nákupy s rovnakým e-mailom vytvoria dva oddelené účty s rôznymi heslami.
+Kartu spracúva vložený Stripe Checkout. E-mail je povinný ešte pred vytvorením platby. Server vypočíta cenu podľa spoločného katalógu; podpis webhooku a skutočná zaplatená relácia rozhodujú o vytvorení objednávky. Každá vytvorená objednávka má vlastný prístup. Dva nákupy s rovnakým e-mailom vytvoria dva oddelené účty s rôznymi heslami.
 
 V checkoute je pod tlačidlom kúpiť odkaz na voucher. Schválený kód `free` pokryje celú vybranú objednávku vrátane kníh. Server uloží použitý kód a nulovú sumu; prístup vytvorí až podpísaná udalosť pre dokončenú nulovú reláciu overenú cez Stripe API. Karta sa pri nulovej objednávke nevyžaduje. Samotný kód v prehliadači ani návratová URL prístup neudeľujú.
+
+Kupón `1e` upraví celú vybranú objednávku na 1 € aj pri druhej hre. Stále vyžaduje skutočné zaplatenie a overenie Stripe na serveri; existujúci `free` zostáva za 0 €.
 
 Kompaktný checkout zbiera iba e-mail. Nasledujú tri stručné doplnky: Atlas zdarma, obe knihy za 4,99 € (presne za polovicu) s existujúcou spoločnou ukážkou a druhá základná hra za 9,99 €. Druhá hra má samostatnú objednávku a vlastný účet bez kníh či Atlasu; kupujúcemu prídu dva oddelené e-maily s rôznymi heslami. Druhý e-mail môže preposlať ďalšej rodine. Jedna overená Stripe relácia vytvorí obe objednávky v jednej databázovej transakcii. Voucher pokrýva aj druhú hru.
 

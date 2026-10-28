@@ -32,7 +32,7 @@ function installStripeStub(scenario){
    if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:scenario!=='disabled',publishableKey:'pk_test_fixture'}});
    if(url.pathname==='/api/checkout/session'){
     fixture.posts.push(route.request().postDataJSON());
-    const input=fixture.posts.at(-1),totalCents=input.voucherCode==='free'?0:input.baseId==='episode-1'?((input.books.length===2?1998:input.books.length===1?1998:1499)+(input.giftGame?999:0)):499*(1+input.books.length);
+    const input=fixture.posts.at(-1),totalCents=input.voucherCode==='free'?0:input.voucherCode==='1e'?100:input.baseId==='episode-1'?((input.books.length===2?1998:input.books.length===1?1998:1499)+(input.giftGame?999:0)):499*(1+input.books.length);
     return route.fulfill({json:{sessionId:'cs_test_fixture_session'+fixture.posts.length,clientSecret:'fixture-client-secret',totalCents}});
    }
    if(url.pathname==='/api/checkout/status'){fixture.reads++;return route.fulfill({json:{paid:fixture.paid,delivered:fixture.delivered,noPaymentRequired:fixture.posts.at(-1)?.voucherCode==='free',orderCount:fixture.posts.at(-1)?.giftGame?2:1}});}
@@ -160,6 +160,23 @@ function installStripeStub(scenario){
    fixture.paid=true;await page.getByText('✓ Objednávka s voucherom je potvrdená. Prístupový e-mail pre vás pripravujeme.',{exact:true}).waitFor();
    await t.close();cases.push('free voucher reaches Stripe with zero total and waits for server-confirmed access');
   }
+  for(const baseId of ['episode-1','story-book-before','story-book-after']){
+   const t=await open('normal',false,false,390,baseId),{page,fixture}=t;
+   if(baseId==='episode-1'){await page.locator('#select-bundle').check();await page.locator('#addon-gift-game').check();}
+   else await page.locator('[name="book"]').check();
+   await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill(' 1E ');await page.locator('#voucher-code').press('Enter');
+   assert.equal(await page.locator('#order-total').innerText(),'1,00 €');
+   assert.match(await page.locator('#summary-voucher').innerText(),/nákup za 1 €/);
+   await page.locator('[name="email"]').fill('one-euro-fixture@example.invalid');await page.locator('.checkout-buy').click();
+   await page.getByRole('button',{name:'Fixture pay',exact:true}).waitFor();
+   assert.equal(fixture.posts[0].voucherCode,'1e');assert.equal(await page.locator('#payment-order-total').innerText(),'1,00 €');
+   assert.equal(await page.locator('#payment-heading').innerText(),'Bezpečná platba');
+   await page.getByRole('button',{name:'Fixture pay',exact:true}).click();await page.evaluate(()=>checkoutFixture.finish({type:'success'}));
+   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Overujem'));
+   assert.ok(!(await page.locator('#payment-status').innerText()).includes('Platba je potvrdená'));
+   fixture.paid=true;await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
+   await t.close();cases.push(baseId+': one-euro voucher keeps a paid one-euro total and waits for server confirmation');
+  }
   for(const baseId of ['story-book-before','story-book-after']){
    const t=await open('normal',false,false,390,baseId),{page,fixture}=t;
    assert.equal(await page.locator('#order-total').innerText(),'4,99 €');
@@ -202,6 +219,8 @@ function installStripeStub(scenario){
   }
   {
    const t=await open('disabled'),{page,fixture}=t;
+   await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill('1e');await page.locator('#voucher-code').press('Enter');
+   assert.equal(await page.locator('#order-total').innerText(),'1,00 €');assert.equal(await page.locator('.checkout-buy').isDisabled(),true);
    await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill('free');await page.locator('#voucher-code').press('Enter');
    assert.equal(await page.locator('#order-total').innerText(),'0,00 €');assert.equal(await page.locator('.checkout-buy').isDisabled(),true);
    assert.equal(fixture.posts.length,0);await t.close();cases.push('voucher never bypasses server payment readiness');

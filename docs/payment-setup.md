@@ -69,6 +69,14 @@ Server zapíše `voucher_code=free` a nulovú cenu do `checkout_attempts` a vytv
 
 Starý adaptér Payment Links a ručné doručovanie sa nepoužívajú. Voucher neobchádza kontrolu pripravenosti Stripe ani e-mailového odosielateľa.
 
+## Kupón na nákup za 1 €
+
+Kód `1e` nerozlišuje veľké písmená ani okolité medzery a nastavuje celý nákup na presne **1 €**, vrátane kníh a prípadnej druhej hry. V súhrne sa zobrazuje aktuálna zľava a „nákup za 1 €“. Pole pre kód je spoločné s existujúcim `free`; uplatnenie jedného nahradí druhý.
+
+Server rozdelí 100 centov pomerne medzi hlavnú a druhú objednávku a následne medzi platené položky. Zaokrúhlenie metódou najväčších zvyškov zachová celé centy a presný súčet; Atlas zostáva za 0 €. Pri hre s knihami a druhou hrou ide o 67 centov hlavnej objednávky a 33 centov druhej. Každá objednávka má vlastný prístup, heslo a e-mail. Úplný refund zneplatní obe.
+
+Migrácia `0009_one_euro_voucher.sql` pridá `fixed_total_voucher` bez prepisovania existujúcich objednávok či obmedzenia pôvodného `free`. Kód `1e` je uložený v serverovom pokuse aj v metadata Stripe. Prístup vyžaduje podpísanú udalosť a znovu načítanú reláciu Stripe so stavom `complete`, `payment_status=paid`, sumou 100 centov a správnym kódom. `no_payment_required` kupón `1e` nesplní. Existujúce otvorené relácie zachovajú uložené ceny.
+
 ## Overenie
 
 `admin/tests/customer-access.test.mjs` kontroluje dva nezávislé nákupy rovnakého e-mailu, idempotenciu, prihlásenie, rozdielne knihy, podpis platobnej udalosti a odstránenie obsahu doručovacej fronty. `tests/customer-journey.test.cjs` overuje skutočný portál, všetkých sedem úloh a hodnotenie v izolovanom Workers/D1 prostredí. Tieto testy nenahrádzajú platbu kartou a doručenie cez živého poskytovateľa.

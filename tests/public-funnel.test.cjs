@@ -16,7 +16,7 @@ for(let mask=0;mask<4;mask++){
  const ids=source.window.SITE_CONFIG.offer.bookIds.filter((_,i)=>mask&(1<<i));
  assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids)),JSON.stringify(source.window.SITE_CONFIG.quote(ids)));
  for(const baseId of ['episode-1',...source.window.SITE_CONFIG.offer.bookIds]){
-  for(const code of ['','free',' FREE ','not-free']){
+  for(const code of ['','free',' FREE ','1e',' 1E ','not-free']){
    for(const includeAtlas of [true,false])assert.equal(JSON.stringify(compiled.window.SITE_CONFIG.quote(ids,baseId,includeAtlas,code)),JSON.stringify(source.window.SITE_CONFIG.quote(ids,baseId,includeAtlas,code)),'public voucher and optional Atlas quote match the source');
   }
  }

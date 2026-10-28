@@ -15,3 +15,5 @@ Obe knihy pri hre automaticky uplatnia zľavu 4,99 €. Atlas je voliteľný, pr
 Platené doplnky sa nepredvyberajú. Jedným kliknutím možno vybrať celý balík a potom ho upraviť. Ukážky nemenia výber ani cenu. Každá kniha funguje samostatne, bez potreby vlastniť alebo dohrať hru.
 
 Cenu kontroluje server pred vytvorením vloženého Stripe Checkout. Voucher `free` vyžaduje dokončenú, serverom overenú nulovú Stripe reláciu. Staré platobné odkazy sa nepoužívajú. Dostupnosť živého checkoutu určuje overená serverová konfigurácia.
+
+Kupón `1e` nastaví konečnú cenu celej vybranej objednávky na 1 €, aj s oboma knihami a druhou hrou. Zľava sa prepočíta pri každej zmene výberu. Platbu 1 € musí potvrdiť Stripe a overiť server; kupón nevytvára prístup bez úhrady. `free` zostáva samostatným kupónom na nulovú objednávku.

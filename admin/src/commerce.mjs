@@ -23,8 +23,16 @@ export async function createCheckout(env,input){
   const ids=[q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])];
   // Split an odd-cent book discount deterministically; Stripe amounts are whole cents.
   const bookDiscount=productId=>{const index=q.books.indexOf(productId);return index<0?0:Math.floor(q.bundleDiscountCents/q.books.length)+(index<q.bundleDiscountCents%q.books.length?1:0);};
-  const prices=Object.fromEntries(ids.map(productId=>[productId,q.voucher||productId===offer.atlasId?0:product(productId).priceCents-bookDiscount(productId)]));
-  await execute(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices,gift_game,gift_price_cents) VALUES(?,?,?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher,JSON.stringify(prices),q.giftGame?1:0,q.giftTotalCents);
+  const prices=Object.fromEntries(ids.map(productId=>[productId,productId===offer.atlasId?0:product(productId).priceCents-bookDiscount(productId)]));
+  if(q.voucher){
+    // Largest remainders preserve the exact total with whole-cent Stripe items.
+    const weight=ids.reduce((sum,id)=>sum+prices[id],0);
+    const allocation=ids.map((id,index)=>({id,index,cents:Math.floor(prices[id]*q.primaryTotalCents/weight),remainder:prices[id]*q.primaryTotalCents%weight}));
+    const remaining=q.primaryTotalCents-allocation.reduce((sum,item)=>sum+item.cents,0);
+    allocation.sort((a,b)=>b.remainder-a.remainder||a.index-b.index);
+    allocation.forEach((item,index)=>{prices[item.id]=item.cents+(index<remaining?1:0);});
+  }
+  await execute(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices,gift_game,gift_price_cents,fixed_total_voucher) VALUES(?,?,?,?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher==='free'?'free':null,JSON.stringify(prices),q.giftGame?1:0,q.giftTotalCents,q.voucher==='1e'?'1e':null);
   const lines=ids.map(productId=>({price_data:{currency:'eur',product_data:{name:product(productId).name},unit_amount:prices[productId]},quantity:1}));
   if(q.giftGame)lines.push({price_data:{currency:'eur',product_data:{name:'Hra Pixelkovia – Stratený signál · pre ďalšiu rodinu'},unit_amount:q.giftTotalCents},quantity:1});
   // The approved mobile brief explicitly selects card payments, including device wallets.
@@ -44,6 +52,7 @@ export async function fulfill(env,sessionId){
   const attempt=await first(db,'SELECT * FROM checkout_attempts WHERE id=? AND stripe_session_id=?',session.client_reference_id,session.id);
   if(!attempt||session.amount_total!==attempt.total_cents||session.currency!=='eur'||session.livemode!==env.STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_'))throw new HttpError(400,'Platbu sa nepodarilo priradiť k objednávke.');
   if(attempt.total_cents===0&&(attempt.voucher_code!=='free'||session.metadata?.voucher_code!=='free'||!completedFree))throw new HttpError(400,'Objednávku zdarma sa nepodarilo overiť.');
+  if(attempt.fixed_total_voucher==='1e'&&(attempt.total_cents!==100||session.metadata?.voucher_code!=='1e'||session.payment_status!=='paid'||session.status!=='complete'))throw new HttpError(400,'Platbu s kupónom sa nepodarilo overiť.');
   const intentId=typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null;
   await execute(db,'UPDATE checkout_attempts SET payment_intent=? WHERE id=?',intentId,attempt.id);
   if(session.payment_intent?.latest_charge?.refunded===true)await execute(db,'INSERT OR IGNORE INTO payment_refunds VALUES(?,?)',intentId,Date.now());

@@ -55,7 +55,7 @@
     discount.innerHTML=q.bundleDiscountCents?`<span>Zľava na balík kníh</span><strong>−${money(q.bundleDiscountCents)}</strong>`:'';
     const voucher=document.querySelector('#summary-voucher');
     voucher.hidden=!q.voucher;
-    voucher.innerHTML=q.voucher?`<span>Voucher ${q.voucher} · zľava 100 %</span><strong>−${money(q.voucherDiscountCents)}</strong>`:'';
+    voucher.innerHTML=q.voucher?`<span>Voucher ${q.voucher} · ${q.voucher==='1e'?'nákup za 1 €':'zľava 100 %'}</span><strong>−${money(q.voucherDiscountCents)}</strong>`:'';
     voucherOpen.textContent=q.voucher?'Zľavový kód je uplatnený':'Mám zľavový kód';
     document.querySelector('#order-total').textContent=money(q.totalCents);
     document.querySelector('#button-total').textContent=money(q.totalCents);

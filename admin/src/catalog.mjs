@@ -12,7 +12,10 @@ export const quote=(selected = [], baseId = 'episode-1', includeAtlas = true, vo
     const subtotalCents=primarySubtotalCents+giftCents;
     const bundleDiscountCents=baseId==='episode-1'&&books.length===2?primarySubtotalCents-offer.completeBundleCents:0;
     const beforeVoucherCents=subtotalCents-bundleDiscountCents;
-    const voucher=typeof voucherCode==='string'&&voucherCode.trim().toLowerCase()==='free'?'free':null;
-    const voucherDiscountCents=voucher?beforeVoucherCents:0;
-    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, giftGame, giftCents, giftTotalCents:voucher?0:giftCents, primaryTotalCents:voucher?0:primarySubtotalCents-bundleDiscountCents, voucher, voucherDiscountCents, totalCents:beforeVoucherCents-voucherDiscountCents};
+    const code=typeof voucherCode==='string'?voucherCode.trim().toLowerCase():'';
+    const voucher=['free','1e'].includes(code)?code:null;
+    const totalCents=voucher==='free'?0:voucher==='1e'?100:beforeVoucherCents;
+    const voucherDiscountCents=beforeVoucherCents-totalCents;
+    const giftTotalCents=voucher?Math.round(totalCents*giftCents/beforeVoucherCents):giftCents;
+    return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, giftGame, giftCents, giftTotalCents, primaryTotalCents:totalCents-giftTotalCents, voucher, voucherDiscountCents, totalCents};
   };

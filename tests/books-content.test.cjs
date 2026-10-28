@@ -24,5 +24,10 @@ for(let mask=0;mask<4;mask++){
  assert.equal(withoutAtlas.totalCents,q.totalCents,'Atlas is optional and free');
 }
 assert.equal(cfg.product(cfg.offer.atlasId).priceCents,299);assert.equal(cfg.product('episode-1').pricing.plannedStandardPriceCents,2999);
+for(const baseId of ['episode-1',...cfg.offer.bookIds])for(const gift of [false,true]){
+ const q=cfg.quote(cfg.offer.bookIds,baseId,true,' 1E ',gift);
+ assert.equal(q.voucher,'1e');assert.equal(q.totalCents,100);
+ assert.equal(q.primaryTotalCents+q.giftTotalCents,100);assert.ok(Number.isInteger(q.primaryTotalCents)&&Number.isInteger(q.giftTotalCents));
+}
 for(const file of ['books-content','books-preview.html','library-read.html','game-data.js','app.js','assets/printables/vsetky-materialy.pdf'])assert(!fs.existsSync('dist/funnel/'+file));
 console.log('PASS: complete 3+3 author texts, 7 Atlas profiles, current independent SKUs, all four Early Bird combinations and public artifact boundary.');
