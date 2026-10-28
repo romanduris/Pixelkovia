@@ -9,6 +9,7 @@ import {fakeCustomerCount} from './fake-customers.mjs';
 import {customerLogin,customerLogout,customerCookie} from './customer-auth.mjs';
 import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './customer-portal.mjs';
 import {checkoutConfig,createCheckout,checkoutStatus,paymentWebhook,sendPending} from './commerce.mjs';
+import {supportWebhook} from './support-mail.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
 async function body(request){
@@ -72,6 +73,7 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
     }
     if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);return json(await createCheckout(env,{...await body(request),__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
     if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env));
+    if(path==='/api/support/webhook'&&request.method==='POST')return json(await supportWebhook(request,env));
     if(path==='/api/customer/login'&&request.method==='POST'){
       sameOrigin(request);const login=await customerLogin(request,env,await body(request));
       const response=json(login.status===200?{authenticated:true}:{error:login.error},login.status);

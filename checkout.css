@@ -80,7 +80,8 @@
 .checkout-guarantee>p{font-size:10px;line-height:1.5;color:#b7c8c2;margin:0}
 .checkout-guarantee strong{font-size:11px;display:block;color:#dfd7bd}
 .checkout-guarantee a{display:inline-flex;align-items:center;min-height:32px;text-underline-offset:3px;color:#c7d2cb}
-.checkout-help{font-size:11px;display:flex;align-items:center;justify-content:center;margin:3px 0 0;color:#c4d1cc;min-height:44px;text-underline-offset:4px}
+.checkout-help{font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:12px 0 0;color:#c4d1cc;text-align:center}
+.checkout-help a{display:flex;align-items:center;min-height:44px;color:inherit;text-underline-offset:4px;user-select:text}
 .checkout-privacy{max-width:650px;margin-top:0}
 .checkout-privacy summary{font-size:11px;color:#adbed0;cursor:pointer;padding:10px 0;min-height:44px}
 .checkout-privacy p{font-size:12px;line-height:1.8;color:#a7b9cb}

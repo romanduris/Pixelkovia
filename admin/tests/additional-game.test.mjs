@@ -45,7 +45,7 @@ test('additional game has server-owned price, two isolated orders, exact entitle
   const mails=[];let failGift=true;
   globalThis.fetch=async(url,options)=>{
    assert.equal(url,'https://api.resend.com/emails');const mail=JSON.parse(options.body);mails.push(mail);
-   assert.deepEqual(mail.to,[input.email]);assert.equal(mail.from,'Adam · Pixelkovia <Adam@pixelkovia.rodulab.com>');
+   assert.deepEqual(mail.to,[input.email]);assert.equal(mail.from,'Piko · Pixelkovia <Piko@pixelkovia.rodulab.com>');
    if(mail.subject.includes('druhá hra')&&failGift)return new Response('',{status:503});
    return Response.json({id:'provider-'+options.headers['Idempotency-Key']});
   };

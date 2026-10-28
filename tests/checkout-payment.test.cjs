@@ -59,6 +59,8 @@ function installStripeStub(scenario){
    assert.equal(await page.locator('#summary-early-discount strong').innerText(),'−15,00 €');
    assert.equal(await page.locator('.launch-badge').innerText(),'Early Access');
    assert.equal(await page.locator('.summary-base small').innerText(),'Štandardná cena');
+   assert.equal(await page.locator('.checkout-help a').innerText(),'miky@pixelkovia.rodulab.com');
+   assert.equal(await page.locator('.checkout-help a').getAttribute('href'),'mailto:miky@pixelkovia.rodulab.com');
    assert.equal(await page.locator('.planned-price s').innerText(),'29,99 €');
    assert.equal(await page.locator('.planned-price s').evaluate(el=>getComputedStyle(el).textDecorationLine),'line-through');
    assert.equal(await page.locator('.book-bundle-option .addon-copy>label').innerText(),'2 knižky');

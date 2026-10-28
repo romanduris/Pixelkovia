@@ -16,7 +16,7 @@ Existujúci Worker `treasurequest-admin` spravuje pôvodnú produkčnú D1 `trea
 
 Heslá majú PBKDF2-SHA256 so soľou a serverovým pepperom. Relácie obsahujú náhodné tokeny a D1 ukladá ich hashe. Zákaznícke cookies sú `HttpOnly; Secure; SameSite=Lax`, aby fungovali vstupy z vytlačených QR; meniace požiadavky kontrolujú presný Origin. Administrátorská cookie zostáva `SameSite=Strict`. Prihlasovanie má limity pokusov. Odhlásenie zákazníka zruší identitu; token telefónu sám prístup k údajom neposkytuje a umožní obnovenie po opätovnom prihlásení na tom istom telefóne.
 
-Krátky prístupový e-mail posiela Resend z `Adam@pixelkovia.rodulab.com`. Kým čaká na odoslanie, údaje sú šifrované AES-GCM; po odoslaní sa zašifrovaná správa odstráni. Neúspešné doručenia opakuje desaťminútový cron. Knihy nezávisia od časového okna opakovania hry. Pôvodná hranica opakovania zostáva prvé dokončenie + 24 hodín; nedokončená hra nemá nový automatický limit.
+Krátky prístupový e-mail posiela Resend z `Piko@pixelkovia.rodulab.com`. Kým čaká na odoslanie, údaje sú šifrované AES-GCM; po odoslaní sa zašifrovaná správa odstráni. Neúspešné doručenia opakuje desaťminútový cron. Knihy nezávisia od časového okna opakovania hry. Pôvodná hranica opakovania zostáva prvé dokončenie + 24 hodín; nedokončená hra nemá nový automatický limit.
 
 ## Vývoj a overenie
 

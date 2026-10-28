@@ -53,7 +53,7 @@ Migrácia `0007_additional_game.sql` ukladá výber a presnú cenu druhej hry do
 
 Po overení Stripe relácie vzniknú obe objednávky, účty, heslá, oprávnenia a šifrované doručovacie záznamy v jednom atómovom D1 batchi. Hlavná objednávka obsahuje vlastný výber; druhá iba `episode-1` za 9,99 €. Celkové sumy oboch sa musia rovnať overenej platbe. Opakované udalosti nevytvoria ďalšiu dvojicu; zlyhanie batchu neuloží polovicu nákupu. Existujúca otvorená relácia bez druhej hry sa spracuje rovnako ako pred zmenou.
 
-Oba e-maily idú kupujúcemu z `Adam@pixelkovia.rodulab.com`. Druhý má vlastný predmet „Vaša druhá hra Pixelkovia – na preposlanie“ a obsahuje iba heslo druhého účtu. Každý sa doručuje a opakuje nezávisle; checkout hlási doručenie až po odoslaní oboch. Úplný refund pôvodnej platby zneplatní obe objednávky. `free` vynuluje aj druhú hru a po dokončení overenej nulovej relácie vytvorí dva oddelené prístupy.
+Oba e-maily idú kupujúcemu z `Piko@pixelkovia.rodulab.com`. Druhý má vlastný predmet „Vaša druhá hra Pixelkovia – na preposlanie“ a obsahuje iba heslo druhého účtu. Každý sa doručuje a opakuje nezávisle; checkout hlási doručenie až po odoslaní oboch. Úplný refund pôvodnej platby zneplatní obe objednávky. `free` vynuluje aj druhú hru a po dokončení overenej nulovej relácie vytvorí dva oddelené prístupy.
 
 `admin/tests/additional-game.test.mjs` overuje ceny, oddelenie účtov a kníh, dva odlišné e-maily, opakovanie iba neúspešného doručenia, odstránenie šifrovaných správ po úspechu, atómový rollback, podpísané webhooky, idempotenciu, refund pred aj po dokončení a nulovú dvojicu s voucherom. Používa izolovanú databázu a nahradených poskytovateľov; neposiela živé e-maily ani platby.
 
@@ -61,7 +61,13 @@ Udalosť `confirm` odovzdáva `formConfirmEvent` do `actions.confirm` s `redirec
 
 Podpísané udalosti `checkout.session.completed` a `checkout.session.async_payment_succeeded` spúšťajú vytvorenie prístupu len po overení `payment_status=paid`, režimu, sumy, meny a väzby na serverovú objednávku. Opakovaná udalosť nevytvorí ďalší účet. Úplný refund zneplatní zaplatený stav objednávky. Návratová URL sama prístup neudelí.
 
-Každý nákup má vlastné zákaznícke ID, zakúpené produkty a náhodné heslo, aj pri rovnakom e-maile. E-mail z **Adam@pixelkovia.rodulab.com** obsahuje iba krátke poďakovanie, odkaz na `/Supervisor`, prihlasovací e-mail a heslo pre daný nákup. Fronta je šifrovaná, úspešné odoslanie vymaže šifrovaný obsah a neúspešné odoslanie sa opakuje.
+Každý nákup má vlastné zákaznícke ID, zakúpené produkty a náhodné heslo, aj pri rovnakom e-maile. E-mail z **Piko@pixelkovia.rodulab.com** obsahuje iba krátke poďakovanie, odkaz na `/Supervisor`, prihlasovací e-mail a heslo pre daný nákup. Fronta je šifrovaná, úspešné odoslanie vymaže šifrovaný obsah a neúspešné odoslanie sa opakuje.
+
+Prístupové správy majú meno a podpis „Piko · Pixelkovia“. Odpovede smerujú na `miky@pixelkovia.rodulab.com`; vrátenie peňazí na `guardy@pixelkovia.rodulab.com`. Existujúca doména Resend prijíma poštu cez MX v `funnel/cloudflare.json`, vedľa proxovaného (flattened) Pages CNAME. Koreňová pošta domény a iné aplikácie sa nemenia.
+
+`node scripts/configure-support.mjs` používa existujúce `RESEND_API_KEY`, Cloudflare token a súkromnú cieľovú adresu `SUPPORT_FORWARD_TO`. Cieľ aj `RESEND_WEBHOOK_SECRET` uloží do Cloudflare a Codespaces secrets. Verejný katalóg cieľovú adresu neobsahuje. Webhook `/api/support/webhook` overuje pôvodné bajty a Svix HMAC podpis s toleranciou päť minút. Správu načíta z Resend a prepošle iba pre obe určené adresy; `Reply-To` obsahuje pôvodného zákazníka. Predmety sú `CHARGEBACK - Pixelkovia - <časť odosielateľa pred @>` a `QUESTION - Pixelkovia - <časť odosielateľa pred @>`. Pôvodný predmet je v tele správy. D1 uchováva iba doručovacie ID a čas, nie obsah ani súkromný cieľ. Opakovanie používa rovnaký idempotency key a úspešné ID bráni opätovnému odoslaniu. Chyby vracajú neúspešný stav pre opakovanie cez Resend.
+
+Prílohy do 15 MiB spolu sa prenesú vrátane vložených obrázkov. Pri väčších prílohách alebo neúplnom zozname príloh príde telo správy a upozornenie s odkazom na pôvodnú správu v súkromnej schránke Resend. Obsah zostáva v pôvodnej správe aj pri zlyhaní preposlania.
 
 Pod tlačidlom kúpiť je odkaz „Mám zľavový kód“, ktorý otvorí dialóg. Schválený voucher `free` (bez ohľadu na veľkosť písmen a okolité medzery) zníži celú vybranú objednávku na 0 €. Platí pre hru, balík aj samostatné knihy. Neznámy kód server odmietne. Voucher sa neukladá do URL ani lokálneho úložiska.
 

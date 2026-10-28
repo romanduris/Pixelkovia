@@ -36,7 +36,7 @@ const existingHook=hooks.data.find(h=>h.url==='https://'+host+'/api/stripe/webho
 if(existingHook&&!signingSecret)throw Error('The payment webhook already exists. Restore STRIPE_WEBHOOK_SECRET from Codespaces secrets; do not create another endpoint.');
 if(!existingHook){const hook=await stripe.webhookEndpoints.create({url:'https://'+host+'/api/stripe/webhook',enabled_events:['checkout.session.completed','checkout.session.async_payment_succeeded','charge.refunded'],api_version:'2026-08-26.dahlia',description:'Pixelkovia paid orders and automatic customer access'},{idempotencyKey:'pixelkovia-order-access-webhook-v1'});signingSecret=hook.secret;persist('STRIPE_WEBHOOK_SECRET',signingSecret);}
 for(const [name,value]of Object.entries({STRIPE_SECRET_KEY:key,STRIPE_PUBLISHABLE_KEY:publicKey,RESEND_API_KEY:mailKey,STRIPE_WEBHOOK_SECRET:signingSecret,MAIL_DOMAIN_VERIFIED:String(verified),PAYMENTS_ENABLED:String(verified)}))await runtimeSecret(name,value);
-console.log(verified?'Live checkout configured; sender Adam@pixelkovia.rodulab.com verified.':'Keys are persisted; email DNS verification is pending. Payments remain disabled. Rerun after DNS propagates.');
+console.log(verified?'Live checkout configured; sender Piko@pixelkovia.rodulab.com verified.':'Keys are persisted; email DNS verification is pending. Payments remain disabled. Rerun after DNS propagates.');
 
 }
 main().catch(error=>{console.error(error.type?.startsWith('Stripe')?'Stripe configuration failed (HTTP '+(error.statusCode||'unknown')+'). No credentials were logged.':error.message);process.exitCode=1;});
