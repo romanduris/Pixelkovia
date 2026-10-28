@@ -18,7 +18,7 @@
   // Both books are opt-in through one checkbox. Standalone books remain independent.
   document.querySelectorAll('[data-base-price]').forEach(el=>el.textContent=money(product(baseId).priceCents));
   document.querySelector('[data-planned-price]').textContent=money(product('episode-1').pricing.plannedStandardPriceCents);
-  document.querySelector('[data-summary-base-price]').textContent=money(product('episode-1').pricing.plannedStandardPriceCents);
+  document.querySelector('[data-summary-base-price]').textContent=money(product(baseId).priceCents);
   document.querySelector('#summary-early-discount strong').textContent='−'+money(product('episode-1').pricing.plannedStandardPriceCents-product('episode-1').priceCents);
   if(!isGame){
     const book=bookInfo(baseId);
@@ -29,11 +29,11 @@
     document.querySelector('#books-heading').textContent='Pridajte aj druhú knihu';
   }
   const atlasMarkup=`<article class="checkout-addon atlas-addon"><div class="addon-main"><label class="addon-check"><input type="checkbox" id="addon-atlas" name="atlas" checked aria-label="Pridať Atlas Pixelkov zdarma"></label><img src="assets/atlas/piko.webp" width="48" height="60" alt=""><div class="addon-copy"><label for="addon-atlas">Atlas Pixelkov</label><small>Sedem Pixelkov a ich schopnosti</small><a href="atlas.html" class="book-sample-link">Pozrieť Atlas ↗</a></div><div class="addon-price"><s aria-label="Plánovaná samostatná cena">${money(product(offer.atlasId).priceCents)}</s><strong>Teraz zdarma</strong></div></div></article>`;
-  const booksMarkup=isGame?`<article class="checkout-addon book-bundle-option"><div class="addon-main"><label class="addon-check"><input id="select-bundle" type="checkbox" name="book-bundle" aria-label="Pridať dve knižky za ${money(complete.totalCents-product(baseId).priceCents)}"></label><div class="book-pair">${offer.bookIds.map(id=>cover(bookInfo(id))).join('')}</div><div class="addon-copy"><label for="select-bundle">2 knižky</label><small>6 rozprávok · za polovicu</small>${button('collection','Pozrieť ukážku oboch kníh')}</div><div class="addon-price"><s>${money(complete.booksCents)}</s><strong>+${money(complete.totalCents-product(baseId).priceCents)}</strong></div></div></article>`:offer.bookIds.filter(id=>id!==baseId).map(id=>{
+  const booksMarkup=isGame?`<article class="checkout-addon book-bundle-option"><div class="addon-main"><label class="addon-check"><input id="select-bundle" type="checkbox" name="book-bundle" aria-label="Pridať obe ilustrované knihy za ${money(complete.totalCents-product(baseId).priceCents)}"></label><div class="book-pair">${offer.bookIds.map(id=>cover(bookInfo(id))).join('')}</div><div class="addon-copy"><label for="select-bundle">Obe ilustrované knihy</label><small>6 rozprávok · približne 40 minút čítania</small>${button('collection','Pozrieť ukážku oboch kníh')}</div><div class="addon-price"><s>${money(complete.booksCents)}</s><strong>+${money(complete.totalCents-product(baseId).priceCents)}</strong></div></div></article>`:offer.bookIds.filter(id=>id!==baseId).map(id=>{
     const book=bookInfo(id);
     return `<article class="checkout-addon book-addon"><div class="addon-main"><label class="addon-check"><input type="checkbox" id="addon-${id}" name="book" value="${id}" aria-label="Pridať knihu ${book.title}"></label>${cover(book)}<div class="addon-copy"><label for="addon-${id}">${book.title}</label><small>3 samostatné rozprávky</small>${button(id,'Pozrieť ukážku')}</div><div class="addon-price"><strong>+${money(product(id).priceCents)}</strong></div></div></article>`;
   }).join('');
-  const giftMarkup=isGame?`<article class="checkout-addon additional-game-addon"><div class="addon-main"><label class="addon-check"><input id="addon-gift-game" type="checkbox" name="gift-game" aria-describedby="gift-game-info" aria-label="Pridať druhú hru pre ďalšiu rodinu"></label><img src="assets/sales/characters/piko.webp" width="48" height="60" alt=""><div class="addon-copy"><label for="addon-gift-game">Druhá hra</label><small id="gift-game-info">Pre ďalšiu rodinu. Vlastné heslo v e-maile na preposlanie.</small></div><div class="addon-price"><s>${money(standardGameCents)}</s><strong>+${money(offer.additionalGameCents)}</strong></div></div></article>`:'';
+  const giftMarkup=isGame?`<article class="checkout-addon additional-game-addon"><div class="addon-main"><label class="addon-check"><input id="addon-gift-game" type="checkbox" name="gift-game" aria-describedby="gift-game-info" aria-label="Darovať dobrodružstvo ďalšej rodine"></label><img src="assets/sales/characters/piko.webp" width="48" height="60" alt=""><div class="addon-copy"><label for="addon-gift-game">Darujte dobrodružstvo</label><small id="gift-game-info">Poznáte rodinu, ktorej by sa Pixelkovia tiež páčili? Darujte im ich za špeciálnu cenu.</small></div><div class="addon-price"><s>${money(standardGameCents)}</s><strong>+${money(offer.additionalGameCents)}</strong></div></div></article>`:'';
   document.querySelector('#book-options').innerHTML=atlasMarkup+booksMarkup+giftMarkup;
   function refreshMobileBar(){
     const keyboard=window.visualViewport&&innerHeight-window.visualViewport.height>180;
@@ -45,14 +45,22 @@
     document.querySelector('[name="atlas"]').checked=q.atlasIncluded;
     document.querySelector('.gift-row').hidden=!q.atlasIncluded;
     if(isGame)document.querySelector('#select-bundle').checked=q.books.length===2;
-    document.querySelector('#summary-books').innerHTML=isGame&&q.books.length===2?`<div class="summary-row"><span>2 knižky · 6 rozprávok</span><strong>${money(q.booksCents)}</strong></div>`:q.books.map(id=>`<div class="summary-row"><span>${product(id).name}</span><strong>${money(product(id).priceCents)}</strong></div>`).join('');
-    const giftRow=document.querySelector('#summary-additional-game');giftRow.hidden=!q.giftGame;giftRow.querySelector('strong').textContent=money(standardGameCents);
+    document.querySelector('#summary-books').innerHTML=isGame&&q.books.length===2?`<div class="summary-row"><span>Obe ilustrované knihy</span><strong>${money(q.booksCents-q.bundleDiscountCents)}</strong></div>`:q.books.map(id=>`<div class="summary-row"><span>${product(id).name}</span><strong>${money(product(id).priceCents)}</strong></div>`).join('');
+    const giftRow=document.querySelector('#summary-additional-game');giftRow.hidden=!q.giftGame;giftRow.querySelector('strong').textContent=money(q.giftCents);
     const giftDiscount=document.querySelector('#summary-gift-discount');giftDiscount.hidden=!q.giftGame;giftDiscount.querySelector('strong').textContent='−'+money(standardGameCents-offer.additionalGameCents);
     if(isGame)document.querySelector('#addon-gift-game').checked=q.giftGame;
-    document.querySelector('#email-note').textContent=q.giftGame?'Pošleme dva e-maily s rôznymi heslami. Druhý môžete preposlať.':'Prístup a heslo vám pošleme e-mailom.';
+    document.querySelector('#email-note').textContent=isGame?'Po zaplatení vám e-mailom príde prístup k hre a zakúpeným doplnkom.'+(q.giftGame?' Dostanete aj samostatný prístup na darovanie.':''):'Po zaplatení vám e-mailom príde prístup k zakúpeným knihám.';
     const discount=document.querySelector('#summary-discount');
     discount.hidden=q.bundleDiscountCents===0;
     discount.innerHTML=q.bundleDiscountCents?`<span>Zľava na balík kníh</span><strong>−${money(q.bundleDiscountCents)}</strong>`:'';
+    const standardTotal=(isGame?standardGameCents:product(baseId).priceCents)+q.booksCents+(q.giftGame?standardGameCents:0);
+    const saving=standardTotal-(q.totalCents+q.voucherDiscountCents);
+    document.querySelector('#price-calculation').hidden=saving===0;
+    document.querySelector('#summary-saving').textContent=money(saving);
+    document.querySelector('#calculation-base-label').textContent=isGame?'Hra · štandardná cena':product(baseId).name;
+    document.querySelector('#calculation-base-price').textContent=money(isGame?standardGameCents:product(baseId).priceCents);
+    const calculationBooks=document.querySelector('#calculation-books');calculationBooks.hidden=!q.books.length;calculationBooks.querySelector('strong').textContent=money(q.booksCents);
+    const calculationGift=document.querySelector('#calculation-gift');calculationGift.hidden=!q.giftGame;calculationGift.querySelector('strong').textContent=money(standardGameCents);
     const voucher=document.querySelector('#summary-voucher');
     voucher.hidden=!q.voucher;
     voucher.innerHTML=q.voucher?`<span>Voucher ${q.voucher} · ${q.voucher==='1e'?'nákup za 1 €':'zľava 100 %'}</span><strong>−${money(q.voucherDiscountCents)}</strong>`:'';

@@ -54,20 +54,32 @@ function installStripeStub(scenario){
    const activate=locator=>width<600?locator.tap():locator.click();
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    assert.equal(await page.locator('#base-heading').innerText(),'Hra Pixelkovia – Stratený signál');
-   assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad v jednom spoločnom príbehu');
-   assert.equal(await page.locator('[data-summary-base-price]').innerText(),'29,99 €');
-   assert.equal(await page.locator('#summary-early-discount strong').innerText(),'−15,00 €');
+   assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad · 45–60 minút spoločnej zábavy');
+   assert.equal(await page.locator('[data-summary-base-price]').innerText(),'14,99 €');
+   assert.equal(await page.locator('#summary-early-discount strong').textContent(),'−15,00 €');
    assert.equal(await page.locator('.launch-badge').innerText(),'Early Access');
-   assert.equal(await page.locator('.summary-base small').innerText(),'Štandardná cena');
+   assert.equal(await page.locator('.summary-base>span').innerText(),'Rodinná hra Pixelkovia');
+   assert.equal(await page.locator('.early-access-note').innerText(),'Prvá vlna Pixelkov je otvorená. Získajte kompletné dobrodružstvo za zvýhodnenú cenu.');
+   assert.equal(await page.locator('#details-heading').innerText(),'Kam vám pošleme dobrodružstvo?');
+   assert.equal(await page.locator('#email-note').innerText(),'Po zaplatení vám e-mailom príde prístup k hre a zakúpeným doplnkom.');
+   assert.equal(await page.locator('#price-calculation').evaluate(el=>el.open),false,'calculation is collapsed before payment');
+   assert.equal(await page.locator('#summary-saving').innerText(),'15,00 €');
+   assert.ok(await page.locator('#summary-early-discount').isHidden());
+   await page.locator('#price-calculation summary').focus();await page.keyboard.press('Enter');
+   assert.ok(await page.locator('#summary-early-discount').isVisible());
+   await page.keyboard.press('Enter');assert.ok(await page.locator('#summary-early-discount').isHidden());
+   assert.ok(await page.evaluate(()=>document.querySelector('.checkout-buy').getBoundingClientRect().top-document.querySelector('.summary-total').getBoundingClientRect().bottom<65),'collapsed savings keep the payable total close to the CTA');
    assert.equal(await page.locator('.checkout-help a').innerText(),'miky@pixelkovia.rodulab.com');
    assert.equal(await page.locator('.checkout-help a').getAttribute('href'),'mailto:miky@pixelkovia.rodulab.com');
    assert.equal(await page.locator('.planned-price s').innerText(),'29,99 €');
    assert.equal(await page.locator('.planned-price s').evaluate(el=>getComputedStyle(el).textDecorationLine),'line-through');
-   assert.equal(await page.locator('.book-bundle-option .addon-copy>label').innerText(),'2 knižky');
-   assert.equal(await page.locator('.book-bundle-option .addon-copy>small').innerText(),'6 rozprávok · za polovicu');
+   assert.equal(await page.locator('.book-bundle-option .addon-copy>label').innerText(),'Obe ilustrované knihy');
+   assert.equal(await page.locator('.book-bundle-option .addon-copy>small').innerText(),'6 rozprávok · približne 40 minút čítania');
    assert.equal(await page.locator('.book-bundle-option .addon-price strong').innerText(),'+4,99 €');
    assert.ok((await page.locator('.book-pair .offer-book-cover').first().boundingBox()).height>=58,'covers are taller while the offer remains compact');
    assert.equal(await page.locator('.additional-game-addon .addon-price s').innerText(),'29,99 €');
+   assert.equal(await page.locator('.additional-game-addon .addon-copy>label').innerText(),'Darujte dobrodružstvo');
+   assert.equal(await page.locator('#gift-game-info').innerText(),'Poznáte rodinu, ktorej by sa Pixelkovia tiež páčili? Darujte im ich za špeciálnu cenu.');
    assert.ok(!/prednostn|plánovaná štandardná/i.test(await page.locator('body').innerText()));
    assert.equal(await page.locator('.delivery-row').count(),0);
    assert.equal(await page.locator('[name="name"]').count(),0,'only email is collected');
@@ -76,7 +88,11 @@ function installStripeStub(scenario){
    assert.deepEqual(await page.locator('.checkout-content>section').evaluateAll(es=>es.map(e=>e.classList.contains('base-product')?'game':e.classList.contains('details-panel')?'email':'addons')),['game','email','addons']);
    assert.equal(await page.locator('#addon-gift-game').isChecked(),false);
    assert.match(await page.locator('.atlas-addon .addon-price').innerText(),/2,99 €[\s\S]*Teraz zdarma/);
-   if(width<600){const height=await page.evaluate(()=>document.documentElement.scrollHeight);assert.ok(height<1600,'compact phone checkout at '+width+' px: '+height+' px total');await page.locator('#mobile-buy').tap();assert.equal(fixture.posts.length,0);assert.ok(await page.locator('[name="email"]').evaluate(el=>el===document.activeElement));}
+   if(width<600){
+    const height=await page.evaluate(()=>document.documentElement.scrollHeight);assert.ok(height<1700,'compact phone checkout at '+width+' px: '+height+' px total');
+    await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.locator('#mobile-buy').tap();
+    assert.equal(fixture.posts.length,0);assert.ok(await page.locator('[name="email"]').evaluate(el=>el===document.activeElement));
+   }
    assert.equal(await page.locator('[name="book-bundle"]').count(),1);
    assert.equal(await page.locator('[name="book"]').count(),0,'the game has one opt-in for both books');
    assert.equal(await page.locator('.book-pair .offer-book-cover').count(),2,'both illustrated covers remain');
@@ -194,19 +210,29 @@ function installStripeStub(scenario){
   }
   {
    const t=await open(),{page,fixture}=t;
-   const summarySum=async()=>page.locator('.summary-inner').evaluate(root=>[...root.querySelectorAll('.summary-row>strong,.summary-discount>strong')].filter(el=>el.getClientRects().length&&el.textContent.trim().endsWith('€')).reduce((sum,el)=>sum+Math.round(Number(el.textContent.replace(/[\s€]/g,'').replace('−','-').replace(',','.'))*100),0));
+   const summarySum=async()=>page.locator('.summary-inner').evaluate(root=>[...root.querySelectorAll('.summary-items .summary-row>strong,#summary-voucher>strong')].filter(el=>el.getClientRects().length&&el.textContent.trim().endsWith('€')).reduce((sum,el)=>sum+Math.round(Number(el.textContent.replace(/[\s€]/g,'').replace('−','-').replace(',','.'))*100),0));
    await page.locator('#addon-gift-game').check();assert.equal(await page.locator('#order-total').innerText(),'24,98 €');
-   assert.equal(await page.locator('#summary-additional-game strong').innerText(),'29,99 €');
-   assert.equal(await page.locator('#summary-gift-discount strong').innerText(),'−20,00 €');
-   assert.equal(await summarySum(),2498,'standard prices less the two separate game discounts match the payable amount');
+   assert.equal(await page.locator('#summary-additional-game strong').innerText(),'9,99 €');
+   assert.equal(await page.locator('#summary-gift-discount strong').textContent(),'−20,00 €');
+   assert.equal(await summarySum(),2498,'the final prices of the selected items match the payable amount');
    await page.locator('#select-bundle').check();assert.equal(await page.locator('#order-total').innerText(),'29,97 €');
    assert.equal(await summarySum(),2997,'books are discounted by exactly half and the second game only once');
+   assert.equal(await page.locator('#summary-books strong').innerText(),'4,99 €');
+   assert.equal(await page.locator('#summary-saving').innerText(),'39,99 €');
+   assert.ok((await page.locator('#email-note').innerText()).includes('samostatný prístup na darovanie'));
+   assert.ok(await page.locator('#summary-gift-discount').isHidden());
+   await page.locator('#price-calculation summary').click();
+   for(const discount of ['#summary-early-discount','#summary-gift-discount','#summary-discount'])assert.ok(await page.locator(discount).isVisible(),'all three selected discounts are available in the calculation');
+   const calculationSum=()=>page.locator('.summary-inner').evaluate(root=>[...root.querySelectorAll('.calculation-row>strong,.calculation-content .summary-discount>strong,#summary-voucher>strong')].filter(el=>el.getClientRects().length).reduce((sum,el)=>sum+Math.round(Number(el.textContent.replace(/[\s€]/g,'').replace('−','-').replace(',','.'))*100),0));
+   assert.equal(await calculationSum(),2997,'reference prices minus the three disclosed discounts reconcile to the exact final price');
    await page.locator('#addon-gift-game').uncheck();assert.equal(await page.locator('#order-total').innerText(),'19,98 €');
    assert.ok(await page.locator('#summary-gift-discount').isHidden());
    await page.locator('#addon-gift-game').check();
    await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill('free');await page.locator('#voucher-code').press('Enter');
    assert.equal(await page.locator('#order-total').innerText(),'0,00 €');
    assert.equal(await summarySum(),0,'the voucher also reconciles with all displayed discounts');
+   assert.equal(await calculationSum(),0,'the expanded calculation also reconciles with the voucher');
+   await page.locator('#price-calculation summary').click();
    await page.locator('#voucher-open').click();await page.locator('#voucher-remove').click();assert.equal(await page.locator('#order-total').innerText(),'29,97 €');
    await page.locator('[name="email"]').fill('two-families@example.invalid');
    await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.locator('#mobile-buy').tap();

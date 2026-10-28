@@ -28,12 +28,13 @@
         <section class="checkout-panel base-product" aria-labelledby="base-heading">
           <div class="base-labels"><span class="checkout-step">01 / VAŠA HRA</span><span class="launch-badge">Early Access</span></div>
           <div class="base-product-heading"><img src="assets/sales/characters/piko.webp" width="64" height="64" alt="Piko, modrý sprievodca hrou"><div><h2 id="base-heading">Hra Pixelkovia – Stratený signál</h2><p>Rodinné dobrodružstvo na doma</p><strong data-base-price>14,99 €</strong><small class="planned-price">Štandardná cena: <s data-planned-price>29,99 €</s></small></div></div>
-          <ul><li>7 záhad v jednom spoločnom príbehu</li><li>Videá, hlasové správy a materiály na vytlačenie</li></ul>
+          <ul><li>7 záhad · 45–60 minút spoločnej zábavy</li><li>Videá, hlasové správy a materiály na vytlačenie</li></ul>
+          <p class="early-access-note"><strong>Prvá vlna Pixelkov je otvorená.</strong> Získajte kompletné dobrodružstvo za zvýhodnenú cenu.</p>
         </section>
         <section class="checkout-panel details-panel" aria-labelledby="details-heading">
-          <label id="details-heading" class="field-label" for="customer-email">Kam pošleme prístup?</label>
+          <label id="details-heading" class="field-label" for="customer-email">Kam vám pošleme dobrodružstvo?</label>
           <input class="checkout-input" id="customer-email" name="email" autocomplete="email" type="email" inputmode="email" spellcheck="false" maxlength="254" required placeholder="vas@email.sk" aria-describedby="email-note">
-          <p id="email-note" class="field-note">Prístup a heslo vám pošleme e-mailom.</p>
+          <p id="email-note" class="field-note">Po zaplatení vám e-mailom príde prístup k hre a zakúpeným doplnkom.</p>
         </section>
         <section class="checkout-panel addons-panel" aria-labelledby="books-heading">
           <span class="checkout-step">02 / VOLITEĽNE K HRE</span><h2 id="books-heading">Pridajte, čo sa vám hodí</h2>
@@ -43,13 +44,24 @@
       </div>
       <aside class="checkout-summary" aria-labelledby="summary-heading"><div class="summary-inner">
         <span class="checkout-step">SÚHRN</span><h2 id="summary-heading">Vaša objednávka</h2>
-        <div class="summary-row summary-base"><span>Hra Pixelkovia – Stratený signál<small>Štandardná cena</small></span><strong data-summary-base-price>29,99 €</strong></div><div id="summary-books"></div><div id="summary-additional-game" class="summary-row" hidden><span>Druhá hra pre ďalšiu rodinu<small>Štandardná cena</small></span><strong></strong></div>
-        <div class="summary-row gift-row"><span>Atlas Pixelkov</span><strong>ZDARMA</strong></div>
-        <div id="summary-early-discount" class="summary-discount"><span>Zľava Early Access</span><strong>−15,00 €</strong></div>
-        <div id="summary-gift-discount" class="summary-discount" hidden><span>Zľava z druhej hry</span><strong></strong></div>
-        <div id="summary-discount" class="summary-discount" hidden></div>
+        <div class="summary-items">
+          <div class="summary-row summary-base"><span>Rodinná hra Pixelkovia</span><strong data-summary-base-price>14,99 €</strong></div><div id="summary-books"></div><div id="summary-additional-game" class="summary-row" hidden><span>Darčeková hra pre ďalšiu rodinu</span><strong></strong></div>
+          <div class="summary-row gift-row"><span>Atlas Pixelkov</span><strong>ZDARMA</strong></div>
+        </div>
+        <div class="summary-total"><span>Celkom<small class="summary-price-note">Early Access · bez predplatného</small></span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div>
+        <details id="price-calculation" class="price-calculation">
+          <summary><span>Zvýhodnenie oproti štandardným cenám: <strong id="summary-saving">15,00 €</strong><span class="calculation-arrow" aria-hidden="true">⌄</span></span><span class="calculation-label">Ako sa vypočítala cena?</span></summary>
+          <div class="calculation-content">
+            <p>Porovnanie so štandardnými samostatnými cenami.</p>
+            <div class="calculation-row"><span id="calculation-base-label">Hra · štandardná cena</span><strong id="calculation-base-price">29,99 €</strong></div>
+            <div id="calculation-books" class="calculation-row" hidden><span>Obe knihy · samostatne</span><strong></strong></div>
+            <div id="calculation-gift" class="calculation-row" hidden><span>Darčeková hra · štandardná cena</span><strong></strong></div>
+            <div id="summary-early-discount" class="summary-discount"><span>Zľava Early Access</span><strong>−15,00 €</strong></div>
+            <div id="summary-gift-discount" class="summary-discount" hidden><span>Zľava z druhej hry</span><strong></strong></div>
+            <div id="summary-discount" class="summary-discount" hidden></div>
+          </div>
+        </details>
         <div id="summary-voucher" class="summary-discount" role="status" aria-live="polite" aria-atomic="true" hidden></div>
-        <div class="summary-total"><span>Celkom</span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div><p class="summary-price-note">Early Access · bez predplatného</p>
         <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Kúpiť za <span id="button-total">14,99 €</span> <span aria-hidden="true">→</span></button>
         <button class="checkout-voucher-link" id="voucher-open" type="button" aria-haspopup="dialog" aria-controls="voucher-dialog">Mám zľavový kód</button>
         <p class="payment-note" id="payment-note"><strong>Platby zatiaľ nie sú spustené.</strong> Objednávka ani platba nevznikne a e-mail sa neodošle.</p>

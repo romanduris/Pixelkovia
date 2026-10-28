@@ -17,14 +17,14 @@ exports.checkout=async page=>{
  assert.equal(await page.locator('[name="book-bundle"]').count(),1);
  assert.equal(await page.locator('[name="book"]').count(),0);
  assert.equal(await page.locator('.book-pair .offer-book-cover').count(),2);
- assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad v jednom spoločnom príbehu');
- assert.equal(await page.locator('[data-summary-base-price]').innerText(),'29,99 €');
- assert.equal(await page.locator('#summary-early-discount strong').innerText(),'−15,00 €');
+ assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad · 45–60 minút spoločnej zábavy');
+ assert.equal(await page.locator('[data-summary-base-price]').innerText(),'14,99 €');
+ assert.equal(await page.locator('#summary-early-discount strong').textContent(),'−15,00 €');
  assert.equal(await page.locator('.delivery-row').count(),0);
  assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
  assert.ok(await atlas.isChecked());await atlas.uncheck();assert.ok(await page.locator('.gift-row').isHidden());
  await books.check();assert.equal(await page.locator('#order-total').innerText(),'19,98 €');
- assert.match(await page.locator('#summary-discount').innerText(),/Zľava na balík kníh[\s\S]*−4,99 €/);
+ assert.match(await page.locator('#summary-discount').textContent(),/Zľava na balík kníh[\s\S]*−4,99 €/);
  assert.ok(!(await atlas.isChecked()),'selecting books does not change the Atlas preference');
  await atlas.check();assert.ok(await page.locator('.gift-row').isVisible());
  await books.uncheck();assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
