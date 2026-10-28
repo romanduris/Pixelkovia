@@ -1,5 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const engine={chromium,webkit}[process.env.QA_BROWSER||'chromium'];
+assert.ok(engine,'QA_BROWSER must be chromium or webkit');
 const origin='https://pixelkovia.rodulab.com';
 function installStripeStub(scenario){
  const state=window.checkoutFixture={calls:[],destroyed:0,finish:null,stale:null};
@@ -18,10 +20,10 @@ function installStripeStub(scenario){
  function assertEvent(event){if(event!=='confirm')throw Error('Unexpected Stripe form event.');}
 }
 (async()=>{
- const browser=await chromium.launch({headless:true});
+ const browser=await engine.launch({headless:true,...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',JSC_useJIT:'0'}}:{})});
  const cases=[];
- async function open(scenario='normal',paid=false,returned=false){
-  const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage();
+ async function open(scenario='normal',paid=false,returned=false,width=390){
+  const context=await browser.newContext({viewport:{width,height:844},isMobile:width<600,hasTouch:width<600}),page=await context.newPage();
   const fixture={posts:[],reads:0,paid,delivered:false};
   await page.addInitScript(installStripeStub,scenario);
   await page.route('**/*',async route=>{
@@ -45,6 +47,27 @@ function installStripeStub(scenario){
   return {page,fixture,close:()=>context.close()};
  }
  try{
+  for(const width of [360,390,430,1360]){
+   const t=await open('normal',false,false,width),{page,fixture}=t;
+   const activate=locator=>width<600?locator.tap():locator.click();
+   assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
+   await page.locator('[name="book"]').first().check();assert.equal(await page.locator('#order-total').innerText(),'19,98 €');
+   await activate(page.locator('#select-bundle'));assert.equal(await page.locator('#order-total').innerText(),'19,99 €');
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'order fits '+width+' px');
+   await page.locator('[name="email"]').fill('checkout-fixture@example.invalid');
+   await activate(page.locator('.checkout-buy'));await page.getByRole('button',{name:'Fixture pay',exact:true}).waitFor();
+   assert.equal(await page.locator('#payment-order-total').innerText(),'19,99 €');
+   assert.equal(await page.locator('#checkout-form').isHidden(),true);
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'payment fits '+width+' px');
+   assert.equal(fixture.posts.length,1);
+   await activate(page.locator('#change-order'));
+   assert.equal(await page.locator('#checkout-form').isVisible(),true);
+   assert.equal(await page.locator('[name="email"]').inputValue(),'checkout-fixture@example.invalid');
+   assert.equal(await page.locator('[name="book"]:checked').count(),2);
+   assert.equal(await page.locator('#order-total').innerText(),'19,99 €');
+   assert.equal(fixture.posts.length,1,'editing does not create another session');
+   await t.close();cases.push(width+' px: correct prices, compact payment, touch/mouse controls and preserved order on return');
+  }
   {
    const t=await open();const {page,fixture}=t;
    await page.locator('.checkout-buy').click();assert.equal(fixture.posts.length,0,'email is required before a session exists');
@@ -95,6 +118,6 @@ function installStripeStub(scenario){
    assert.equal(await page.locator('.checkout-buy').isDisabled(),true);assert.equal(await page.locator('[name="email"]').isDisabled(),true);
    await t.close();cases.push('bank return restores the server-confirmed result without creating another session');
   }
-  cases.forEach(c=>console.log('PASS: '+c));
+  cases.forEach(c=>console.log('PASS '+engine.name()+': '+c));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

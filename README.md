@@ -37,13 +37,16 @@ Nastavenie: [docs/payment-setup.md](docs/payment-setup.md). Bez overených kľú
 
 ```sh
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/customer-journey.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/checkout-payment.test.cjs
 node tests/books-content.test.cjs
 node tests/static-assets.test.cjs
 node tests/digital-identity.test.cjs
 node tests/paper-puzzles.test.cjs
 ```
 
-Predvolený test používa Chromium; `QA_BROWSER=webkit` volí WebKit. Aktuálny WebKit v tomto Codespace pri lokálnych a zachytených URL padá, preto jeho úplné overenie zostáva otvorené. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Nevytvára produkčných zákazníkov ani platby. Prístupové údaje fixture zostávajú v testovacom procese.
+Predvolené testy používajú Chromium; `QA_BROWSER=webkit` volí WebKit. Dňa 28. 10. 2026 prešla celá cesta aj platobné scenáre v oboch prehliadačoch. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Checkout kontroluje šírky 360, 390, 430 a 1360 px, ceny, návrat k objednávke a chybové stavy s riadenou náhradou Stripe SDK. Testy nevytvárajú produkčných zákazníkov ani platby; neoverujú fyzické zariadenie, banku ani doručenie skutočného e-mailu. Prístupové údaje fixture zostávajú v testovacom procese.
 
 ## QR a tlač
 

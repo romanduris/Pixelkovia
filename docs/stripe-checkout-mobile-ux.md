@@ -56,3 +56,12 @@ Snímky používajú iba skúšobné údaje, bez údajov platobnej karty:
 | [Snímka pred – 390 px](screenshots/checkout-before-390.png) | [Snímka po – 390 px](screenshots/checkout-after-390.png) |
 
 Zmenené súbory: `checkout.html`, `checkout.css`, `checkout.js`, `admin/src/commerce.mjs`, `admin/tests/customer-access.test.mjs`, `tests/checkout-payment.test.cjs`, dokumentácia nastavenia platieb a toto zadanie so snímkami. Herný obsah a ceny sa nemenili.
+
+## Doplňujúce overenie – 28. 10. 2026
+
+- Pôvodné zjednodušenie je pushnuté a bolo úspešne nasadené z commitu `69bad78`. Produkčný `checkout.js` sa pri kontrole zhodoval so zdrojom.
+- Predtým otvorené automatizované overenie vo WebKite sa podarilo dokončiť. `tests/checkout-payment.test.cjs` teraz podporuje `QA_BROWSER=webkit` a trvalo pokrýva šírky **360, 390, 430 a 1360 px**. V každej kontroluje správne sumy, otvorenie kompaktného kroku, absenciu vodorovného pretečenia a zachovanie výberu aj e-mailu po návrate. Mobilné scenáre používajú dotykové ovládanie.
+- Prešlo **16 platobných scenárov**: osem v Chromiu a osem vo WebKite, s riadenou náhradou Stripe SDK a zachytenými požiadavkami bez prístupu k platobnému poskytovateľovi. Zahŕňajú chyby, opakovanie, dvojité kliknutie, serverové potvrdenie a návrat od banky.
+- Prešlo aj všetkých **24 serverových testov**, sedem testov prihlasovacích kľúčov a e-mailových DNS, kontrola statických súborov a digitálnych identít. Celá cesta cez izolované Workers/D1, portál, sedem úloh, druhý telefón, hodnotenie a administráciu prešla v **Chromiu aj WebKite**.
+- Na produkčnej doméne prešlo **17 HTTP kontrol** verejných stránok, povinného prihlásenia, nedostupných odpovedí, platených súborov a vyradených trás. Verejný checkout sa vo WebKite načítal so sumou 14,99 € bez vodorovného pretečenia.
+- Testy neodoslali skutočnú platbu, nevytvorili produkčného zákazníka a nemenili nastavenia Stripe. Skutočný formulár Stripe vo WebKite, bankové overenie, doručenie prístupového e-mailu a Apple Pay/Google Pay na fyzickom zariadení týmto overené nie sú. Pôvodné snímky pred/po zostávajú platné; vzhľad ani produkčná platobná logika sa v tomto doplnení nemenili.
