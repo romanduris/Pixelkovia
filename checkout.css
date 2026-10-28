@@ -52,11 +52,14 @@
 .checkout-addons .offer-book-cover{width:29px;height:42px;flex:0 0 29px;border-radius:3px;box-shadow:0 4px 8px #0004}
 .checkout-addons .offer-book-cover strong{font-size:4.5px;line-height:1.2;letter-spacing:0}
 .checkout-addons .offer-book-cover small{font-size:2px}
-.book-bundle-option .book-pair{gap:0;min-height:66px}
-.book-bundle-option .book-pair .offer-book-cover{width:34px;height:62px;flex-basis:34px;border-radius:3px;box-shadow:0 5px 10px #0005}
-.book-bundle-option .book-pair .offer-book-cover+ .offer-book-cover{margin-left:-8px;transform:translateY(4px)}
-.book-bundle-option .book-pair .offer-book-cover>img{object-fit:cover;object-position:center 55%}
-.book-bundle-option .book-pair .offer-book-cover strong{font-size:5px}
+.book-bundle-option .addon-main{grid-template-columns:22px 90px minmax(0,1fr) auto}
+.book-bundle-option .book-pair{--bundle-cover-width:38px;position:relative;display:block;width:90px;height:calc(var(--bundle-cover-width)*10/7 + 16px);min-height:0}
+.book-bundle-option .book-pair .offer-book-cover{position:absolute;width:var(--bundle-cover-width);height:auto;aspect-ratio:7/10;border-radius:3px;box-shadow:0 4px 8px #0005}
+.book-bundle-option .book-pair .offer-book-cover:first-child{left:0;top:0}
+.book-bundle-option .book-pair .offer-book-cover:last-child{right:0;bottom:0}
+.book-bundle-option .book-pair .offer-book-cover>img{object-fit:contain;object-position:center}
+.book-bundle-option .book-pair .offer-book-cover strong{font-size:5px;line-height:1.15;margin-top:3px}
+.book-pair-plus{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#bde7be;font:700 17px/1 sans-serif}
 .book-addon .offer-book-cover{justify-self:center;width:40px;height:57px}
 .book-addon .offer-book-cover strong{font-size:6px}
 .books-status:empty{display:none}
@@ -141,9 +144,9 @@
 .voucher-apply:hover{background:#c2f2df}
 .voucher-error{font-size:13px;line-height:1.7;color:#ffd1bc;margin:12px 0 0}
 .voucher-dialog [aria-invalid="true"]{border-color:#ffb89b}
-@media(max-width:900px){.checkout-layout{gap:16px}.checkout-panel,.summary-inner{padding:14px}.addon-main{grid-template-columns:22px 52px minmax(0,1fr) auto;gap:8px}.addon-copy>label{font-size:14px}.book-pair{gap:2px}.checkout-addons .offer-book-cover{width:25px;height:36px;flex-basis:25px}.book-bundle-option .book-pair .offer-book-cover{width:30px;height:60px;flex-basis:30px}}
+@media(max-width:900px){.checkout-layout{gap:16px}.checkout-panel,.summary-inner{padding:14px}.addon-main{grid-template-columns:22px 52px minmax(0,1fr) auto;gap:8px}.addon-copy>label{font-size:14px}.book-pair{gap:2px}.checkout-addons .offer-book-cover{width:25px;height:36px;flex-basis:25px}.book-bundle-option .addon-main{grid-template-columns:22px 72px minmax(0,1fr) auto}.book-bundle-option .book-pair{--bundle-cover-width:30px;width:72px}}
 @media(max-width:700px){.checkout-header{padding:8px 14px;gap:10px}.checkout-brand{font-size:14px;gap:7px}.checkout-brand small{font-size:6px}.checkout-header>a:last-child{font-size:11px}.checkout-main{padding:12px 12px 20px}.checkout-layout{display:flex;flex-direction:column;gap:0}.checkout-content,.checkout-summary{width:100%;min-width:0}.checkout-panel{padding:13px;margin-bottom:10px}.base-product-heading h2{font-size:20px}.base-product-heading{margin:7px 0}.base-product li{font-size:11px}.base-product-heading p{display:none}.details-panel{padding-block:10px}.details-panel>.checkout-step{display:none}.details-panel .field-label{font-size:14px;margin:0 0 6px}.checkout-summary{position:static;margin-bottom:8px}.summary-inner{padding:16px}.summary-inner>h2{font-size:22px;margin-bottom:12px}.checkout-footer{padding:14px 12px 100px;font-size:10px;line-height:1.5}.addons-panel>h2{font-size:16px;margin:3px 0 10px}.addon-price>strong{font-size:15px}.addon-main{grid-template-columns:21px 56px minmax(0,1fr) auto;gap:8px}.checkout-addon{padding:6px 8px}.addon-copy>small{font-size:10px}.addon-copy .book-preview-button,.addon-copy .book-sample-link{font-size:10px}.addon-price{max-width:62px}.book-pair{gap:3px}.checkout-addons .offer-book-cover{width:26px;height:38px;flex-basis:26px}.mobile-checkout-bar{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#142332f5;border-top:1px solid #5f8270;box-shadow:0 -8px 24px #050b1633;backdrop-filter:blur(12px)}.mobile-checkout-bar small{display:block;font-size:10px;color:#b9cbcc}.mobile-checkout-bar strong{display:block;font:700 22px/1.3 Manrope,sans-serif;color:#fff1d3;white-space:nowrap}.mobile-checkout-bar button{display:flex;align-items:center;justify-content:center;gap:14px;min-height:48px;padding:10px 16px;border:1px solid #b3e9ce;border-radius:7px;background:#ace9cf;color:#123228;font-size:13px;font-weight:750}.voucher-dialog{padding:22px 20px}.voucher-heading h2{font-size:24px}}
 @media(max-width:360px){.checkout-main{padding-inline:10px}.checkout-panel{padding:12px}.base-product-heading h2{font-size:19px}.base-product-heading>img{width:42px;height:42px;flex-basis:42px}.base-product-heading{gap:9px}.planned-price{font-size:9px}.addon-main{grid-template-columns:21px 48px minmax(0,1fr) auto;gap:6px}.checkout-addon{padding:6px 7px}.addon-copy>label{font-size:13px}.addon-price>strong{font-size:14px}.addon-main>img{width:40px}.book-pair{gap:2px}.checkout-addons .offer-book-cover{width:23px;height:33px;flex-basis:23px}.addon-price{max-width:58px}.mobile-checkout-bar{padding-inline:12px;gap:10px}.mobile-checkout-bar button{padding-inline:12px;gap:8px;font-size:12px}}
 
-@media(min-width:361px) and (max-width:700px){.book-bundle-option .book-pair .offer-book-cover{width:32px;height:62px;flex-basis:32px}}
-@media(max-width:360px){.book-bundle-option .book-pair .offer-book-cover{width:28px;height:58px;flex-basis:28px}}
+@media(min-width:361px) and (max-width:700px){.book-bundle-option .addon-main{grid-template-columns:21px 80px minmax(0,1fr) auto}.book-bundle-option .book-pair{--bundle-cover-width:34px;width:80px}}
+@media(max-width:360px){.book-bundle-option .addon-main{grid-template-columns:21px 66px minmax(0,1fr) auto}.book-bundle-option .book-pair{--bundle-cover-width:28px;width:66px}.book-pair-plus{font-size:13px}}

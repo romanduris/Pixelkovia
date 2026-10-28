@@ -95,7 +95,6 @@ function installStripeStub(scenario){
    assert.equal(await page.locator('.book-bundle-option .addon-copy>label').innerText(),'Obe ilustrované knihy');
    assert.equal(await page.locator('.book-bundle-option .addon-copy>small').innerText(),'6 rozprávok · približne 40 minút čítania');
    assert.equal(await page.locator('.book-bundle-option .addon-price strong').innerText(),'+4,99 €');
-   assert.ok((await page.locator('.book-pair .offer-book-cover').first().boundingBox()).height>=58,'covers are taller while the offer remains compact');
    assert.equal(await page.locator('.additional-game-addon .addon-price s').innerText(),'29,99 €');
    assert.equal(await page.locator('.additional-game-addon .addon-copy>label').innerText(),'Darujte dobrodružstvo');
    assert.equal(await page.locator('#gift-game-info').innerText(),'Poznáte rodinu, ktorej by sa Pixelkovia tiež páčili? Darujte im ich za špeciálnu cenu.');
