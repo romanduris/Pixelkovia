@@ -1,6 +1,7 @@
 # Project workflow
 
 - Communicate with the user in Slovak. Use `.agents/skills/mystery-at-home-workflow/SKILL.md` for repository changes.
+- Before requesting additional service permissions, new credentials or an app reconnection, first check the API keys already available in the environment and secrets and verify their permissions for the authorized action. Use suitable existing credentials; if access is insufficient, explain the provider's specific error. Never print or commit secret values.
 - Work only on `main`. After a completed change, commit, push to `origin/main`, verify the push and deploy the affected application. Never force-push or rewrite Git history. Read-only tasks need no empty commit.
 - The only active website is https://pixelkovia.rodulab.com. Its routes are `/`, `/checkout`, `/Supervisor`, `/hra` and `/admin`. Storyboard is available at `/admin/storyboard` behind the administrator's session. Keep the existing seven puzzles, story, recordings and game mechanics unchanged unless specifically requested.
 - Use Guardy, the approved orange shield with a teal tie and cyan keyhole, as the visual representative of Atlas Pixelkov in offers, covers and library cards.
