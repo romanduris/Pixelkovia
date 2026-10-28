@@ -228,15 +228,15 @@ function installStripeStub(scenario){
    assert.ok(await page.locator('#summary-gift-discount').isHidden());
    await page.locator('#price-calculation summary').click();
    for(const discount of ['#summary-early-discount','#summary-gift-discount','#summary-discount'])assert.ok(await page.locator(discount).isVisible(),'all three selected discounts are available in the calculation');
-   const calculationSum=()=>page.locator('.summary-inner').evaluate(root=>[...root.querySelectorAll('.calculation-row>strong,.calculation-content .summary-discount>strong,#summary-voucher>strong')].filter(el=>el.getClientRects().length).reduce((sum,el)=>sum+Math.round(Number(el.textContent.replace(/[\s€]/g,'').replace('−','-').replace(',','.'))*100),0));
-   assert.equal(await calculationSum(),2997,'reference prices minus the three disclosed discounts reconcile to the exact final price');
+   const discountSum=()=>page.locator('.calculation-content .summary-discount>strong').evaluateAll(es=>es.filter(el=>el.getClientRects().length).reduce((sum,el)=>sum+Math.round(Number(el.textContent.replace(/[\s€−]/g,'').replace(',','.'))*100),0));
+   assert.equal(await discountSum(),3999,'the three disclosed discounts add up to the displayed saving');
    await page.locator('#addon-gift-game').uncheck();assert.equal(await page.locator('#order-total').innerText(),'19,98 €');
    assert.ok(await page.locator('#summary-gift-discount').isHidden());
    await page.locator('#addon-gift-game').check();
    await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill('free');await page.locator('#voucher-code').press('Enter');
    assert.equal(await page.locator('#order-total').innerText(),'0,00 €');
    assert.equal(await summarySum(),0,'the voucher also reconciles with all displayed discounts');
-   assert.equal(await calculationSum(),0,'the expanded calculation also reconciles with the voucher');
+   assert.equal(await discountSum(),3999,'the voucher preserves the three separate offer discounts');
    await page.locator('#price-calculation summary').click();
    await page.locator('#voucher-open').click();await page.locator('#voucher-remove').click();assert.equal(await page.locator('#order-total').innerText(),'29,97 €');
    await page.locator('[name="email"]').fill('two-families@example.invalid');

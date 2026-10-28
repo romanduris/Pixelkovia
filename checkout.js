@@ -57,10 +57,6 @@
     const saving=standardTotal-(q.totalCents+q.voucherDiscountCents);
     document.querySelector('#price-calculation').hidden=saving===0;
     document.querySelector('#summary-saving').textContent=money(saving);
-    document.querySelector('#calculation-base-label').textContent=isGame?'Hra · štandardná cena':product(baseId).name;
-    document.querySelector('#calculation-base-price').textContent=money(isGame?standardGameCents:product(baseId).priceCents);
-    const calculationBooks=document.querySelector('#calculation-books');calculationBooks.hidden=!q.books.length;calculationBooks.querySelector('strong').textContent=money(q.booksCents);
-    const calculationGift=document.querySelector('#calculation-gift');calculationGift.hidden=!q.giftGame;calculationGift.querySelector('strong').textContent=money(standardGameCents);
     const voucher=document.querySelector('#summary-voucher');
     voucher.hidden=!q.voucher;
     voucher.innerHTML=q.voucher?`<span>Voucher ${q.voucher} · ${q.voucher==='1e'?'nákup za 1 €':'zľava 100 %'}</span><strong>−${money(q.voucherDiscountCents)}</strong>`:'';
