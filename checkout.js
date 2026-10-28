@@ -184,7 +184,10 @@
         payment.on('ready',()=>{if(alive){cardReady=true;syncPayButton();}});
         payment.on('loaderror',()=>{if(alive){cardReady=false;syncPayButton();status.textContent='Údaje karty sa nepodarilo načítať. Upravte objednávku a skúste to znova.';}});
         wallet=checkout.createExpressCheckoutElement({buttonHeight:44,layout:{maxColumns:2,maxRows:1},paymentMethods:{applePay:'always',googlePay:'always',link:'never',paypal:'never',amazonPay:'never',klarna:'never'}});
-        wallet.on('ready',event=>{if(!alive)return;const available=Boolean(event.availablePaymentMethods?.applePay||event.availablePaymentMethods?.googlePay);walletSlot.hidden=!available;separator.hidden=!available;});
+        const showWallets=available=>{if(alive){walletSlot.hidden=!available;separator.hidden=!available;}};
+        wallet.on('ready',event=>showWallets(Boolean(event.availablePaymentMethods?.applePay||event.availablePaymentMethods?.googlePay)));
+        // Availability can change after ready while Stripe checks the browser's wallets.
+        wallet.on('availablepaymentmethodschange',event=>showWallets(Boolean(event.paymentMethods?.applePay?.available||event.paymentMethods?.googlePay?.available)));
         wallet.on('confirm',confirm);
         payment.mount('#payment-slot');wallet.mount('#express-checkout-slot');
       }else{walletSlot.hidden=true;pay.disabled=false;}

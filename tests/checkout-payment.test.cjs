@@ -25,6 +25,7 @@ function installStripeStub(scenario){
    createExpressCheckoutElement(options){
     state.expressOptions=options;
     const handlers={},wallet=document.createElement('button');wallet.type='button';wallet.textContent='Fixture Apple Pay';
+    state.walletAvailability=paymentMethods=>handlers.availablepaymentmethodschange?.({elementType:'expressCheckout',paymentMethods});
     wallet.addEventListener('click',()=>handlers.confirm({fixture:true,paymentFailed(){state.walletFailed=true;}}));
     return {on(event,fn){handlers[event]=fn;if(event==='confirm')state.stale=fn;},mount(selector){document.querySelector(selector).append(wallet);handlers.ready?.({availablePaymentMethods:scenario==='wallets'?{applePay:true,googlePay:true}:null});},destroy(){state.walletDestroyed++;wallet.remove();}};
    }
@@ -304,6 +305,29 @@ function installStripeStub(scenario){
    assert.ok((await page.locator('#returned-order-items').innerText()).includes('Druhá hra pre ďalšiu rodinu'));
    assert.ok(await page.locator('.summary-items').isHidden());assert.equal(fixture.posts.length,0);
    await t.close();cases.push('bank return has one summary with the saved total and no default cart');
+  }
+  {
+   const t=await open(),{page}=t;
+   await page.locator('[name="email"]').fill('delayed-wallet@example.invalid');await page.locator('#checkout-form .checkout-buy').click();
+   await page.locator('#stripe-pay').waitFor();
+   assert.ok(await page.locator('#express-checkout-slot').isHidden(),'no wallet reported on initial ready');
+   assert.ok(await page.locator('#wallet-separator').isHidden());
+   await page.evaluate(()=>checkoutFixture.walletAvailability({googlePay:{available:true}}));
+   assert.ok(await page.locator('#express-checkout-slot').isVisible(),'Google Pay appearing after ready is shown without reloading');
+   assert.ok(await page.locator('#wallet-separator').isVisible());
+   await page.evaluate(()=>checkoutFixture.walletAvailability({googlePay:{available:false},applePay:{available:true}}));
+   assert.ok(await page.locator('#express-checkout-slot').isVisible(),'Apple Pay alone keeps the wallet block visible');
+   await page.evaluate(()=>checkoutFixture.walletAvailability({googlePay:{available:false},applePay:{available:false}}));
+   assert.ok(await page.locator('#express-checkout-slot').isHidden(),'unavailable methods do not leave an empty wallet block');
+   assert.ok(await page.locator('#wallet-separator').isHidden());
+   assert.ok(await page.locator('#stripe-pay').isEnabled(),'card payment remains available throughout wallet checks');
+   await page.evaluate(()=>checkoutFixture.walletAvailability({googlePay:{available:true}}));
+   await page.locator('#change-order').click();
+   await page.evaluate(()=>checkoutFixture.walletAvailability({applePay:{available:true},googlePay:{available:true}}));
+   assert.ok(await page.locator('#express-checkout-slot').isHidden(),'late events from a destroyed checkout cannot restore wallets');
+   assert.ok(await page.locator('#wallet-separator').isHidden());
+   assert.equal(await page.evaluate(()=>checkoutFixture.calls.length),0,'availability checks never confirm a payment');
+   await t.close();cases.push('delayed wallet availability updates visibility and ignores events after editing');
   }
   {
    const t=await open('wallets'),{page}=t;
