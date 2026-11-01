@@ -2,7 +2,7 @@
 // PUBLIC_FILES and PRIVATE_FILES are generated from the exact build inventories.
 const notFound=()=>new Response('Stránka sa nenašla.',{status:404,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});
 const redirect=path=>new Response(null,{status:303,headers:{Location:path,'Cache-Control':'no-store'}});
-const csp=nonce=>`default-src 'self'; script-src 'self' 'nonce-${nonce}' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.stripe.com; connect-src 'self' https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; media-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' https://*.stripe.com`;
+const csp=nonce=>`default-src 'self'; script-src 'self'${nonce?` 'nonce-${nonce}'`:''} https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.stripe.com; connect-src 'self' https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; media-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' https://*.stripe.com`;
 function secured(response,privateContent=false,nonce=''){
   const r=new Response(response.body,response);
   r.headers.set('X-Content-Type-Options','nosniff');r.headers.set('Referrer-Policy','strict-origin-when-cross-origin');r.headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()');

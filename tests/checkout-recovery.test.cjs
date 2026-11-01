@@ -1,133 +1,87 @@
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const engine={chromium,webkit}[process.env.QA_BROWSER||'chromium'],origin='https://pixelkovia.rodulab.com';
-function install(method){
- const s=window.walletFixture={calls:0,failed:0,destroyed:0,returned:false,nativeComplete:false,wallets:0};
- window.Stripe=()=>({initCheckoutElementsSdk(){return {
-  on(){},
-  async loadActions(){return {type:'success',actions:{getSession(){return {currency:'eur',minorUnitsAmountDivisor:100,total:{total:{minorUnitsAmount:1499}}};},confirm(options){s.calls++;s.forwarded=options.expressCheckoutConfirmEvent?.expressPaymentType;s.returnUrl=options.returnUrl;return new Promise((resolve,reject)=>{s.finish=value=>value.throw?reject(Error('Network lost after confirmation')):resolve(value);});}}};},
-  createPaymentElement(){return {on(event,fn){if(event==='ready')s.cardReady=fn;},mount(selector){document.querySelector(selector).textContent='Card fields';s.cardReady?.();},destroy(){}};},
-  createExpressCheckoutElement(options){
-   s.wallets++;s.options=options;const handlers={};
-   const button=document.createElement('button');button.type='button';button.textContent='Fixture '+method;
-   s.event={expressPaymentType:method,paymentFailed(){s.failed++;}};
-   button.addEventListener('click',async()=>{s.returned=false;await handlers.confirm(s.event);s.returned=true;queueMicrotask(()=>s.nativeComplete=s.destroyed===0);});
-   s.cancel=()=>handlers.cancel?.({});s.again=()=>handlers.confirm(s.event);
-   return {on(event,fn){handlers[event]=fn;},mount(selector){document.querySelector(selector).append(button);handlers.ready?.({availablePaymentMethods:{applePay:method==='apple_pay',googlePay:method==='google_pay'}});},destroy(){s.destroyed++;button.remove();}};
-  }
- };}});
-}
-(async()=>{
- const browser=await engine.launch({headless:true,...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',JSC_useJIT:'0'}}:{})});
- const cases=[];cases.push=(value)=>{console.log('PASS '+engine.name()+': '+value);return Array.prototype.push.call(cases,value);};
- async function open(method='google_pay',wallets=true){
-  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-  const f={posts:[],releases:0,reads:0,paid:false,state:'pending',delivered:false,hang:false,waiting:[],createLost:false,offline:false};
-  await context.addInitScript(install,method);
-  await context.route('**/*',async route=>{
-   const url=new URL(route.request().url());if(url.origin!==origin)return route.abort();
-   if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:true,publishableKey:'pk_test_fixture',wallets:{applePay:wallets,googlePay:wallets}}});
-   if(url.pathname==='/api/checkout/session'){
-    f.posts.push(route.request().postDataJSON());if(f.createLost){f.createLost=false;return route.abort();}
-    return route.fulfill({json:{sessionId:'cs_test_recovery_browser_fixture',clientSecret:'fixture',totalCents:1499}});
-   }
-   if(url.pathname==='/api/checkout/release'){f.releases++;return route.fulfill({json:{released:true}});}
-   if(url.pathname==='/api/checkout/status'){
-    f.reads++;if(f.offline)return route.abort();if(f.hang)await new Promise(resolve=>f.waiting.push(resolve));
-    try{return await route.fulfill({json:{state:f.paid?'paid':f.state,paid:f.paid,delivered:f.delivered,noPaymentRequired:false,orderCount:f.paid?1:0}});}catch{return;}
-   }
-   let file=url.pathname==='/'?'index.html':url.pathname.slice(1);if(!path.extname(file))file+='.html';
-   const target=path.join(process.cwd(),'dist/funnel',file);if(!fs.existsSync(target)||!fs.statSync(target).isFile())return route.fulfill({status:404,body:''});
-   const contentType={'.html':'text/html','.js':'application/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png','.svg':'image/svg+xml'}[path.extname(file)]||'application/octet-stream';
-   return route.fulfill({contentType,body:fs.readFileSync(target)});
-  });
-  const page=await context.newPage();await page.goto(origin+'/checkout');await page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled);
-  const start=async()=>{await page.locator('[name="email"]').fill('fixture@example.invalid');await page.locator('#checkout-form .checkout-buy').tap();await page.locator('#stripe-pay').waitFor();};
-  return {page,context,f,start,async close(){f.hang=false;f.waiting.splice(0).forEach(resolve=>resolve());await context.close();}};
+const assert=require('node:assert/strict');
+const {launch,open,cachedPurchase,sessionId,checkoutUrl,origin}=require('./helpers/hosted-checkout.cjs');
+(async()=>{const browser=await launch(),cases=[];try{
+ {
+  const t=await open(browser,{createLost:true});await t.start();await t.page.locator('#retry-payment').waitFor();
+  await t.page.reload();await t.page.locator('#retry-payment').click();await t.page.waitForURL(checkoutUrl);
+  assert.equal(t.f.posts.length,2);assert.deepEqual(t.f.posts[0],t.f.posts[1]);await t.close();cases.push('lost create response and refresh reuse exact request and key');
  }
- try{
-  for(const method of ['google_pay','apple_pay']){
-   {
-    const t=await open(method),{page,f}=t;await t.start();f.hang=true;
-    await page.getByRole('button',{name:'Fixture '+method}).tap();await page.evaluate(()=>walletFixture.finish({type:'success'}));
-    await page.waitForFunction(()=>walletFixture.returned&&walletFixture.nativeComplete,{},{timeout:2000});
-    assert.equal(await page.evaluate(()=>walletFixture.destroyed),0,'native wallet element stays mounted');
-    assert.equal(await page.evaluate(()=>walletFixture.failed),0);assert.equal(await page.evaluate(()=>walletFixture.forwarded),method);
-    assert.match(await page.evaluate(()=>walletFixture.returnUrl),/session_id=cs_test_recovery_browser_fixture/);
-    assert.match(await page.locator('#payment-status').textContent(),/neplaťte znova/);
-    assert.ok(await page.locator('#change-order').isDisabled());
-    f.paid=true;f.hang=false;f.waiting.splice(0).forEach(resolve=>resolve());
-    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
-    assert.match(await page.locator('#payment-status').textContent(),/e-mail pre vás pripravujeme/);
-    assert.equal(f.posts.length,1);assert.equal(await page.evaluate(()=>walletFixture.calls),1);
-    await page.screenshot({path:'/tmp/pixelkovia-'+engine.name()+'-'+method+'-success.png',fullPage:true});
-    await page.locator('#new-order').tap();await page.waitForFunction(()=>!document.querySelector('[name="email"]').disabled);
-    assert.equal(f.releases,1);assert.equal(f.posts.length,1,'a next purchase needs a separate deliberate continuation');
-    await page.locator('#checkout-form .checkout-buy').tap();await page.locator('#stripe-pay').waitFor();
-    assert.equal(f.posts.length,2);assert.notEqual(f.posts[0].attemptKey,f.posts[1].attemptKey);assert.equal(f.posts[1].newPurchase,true);
-    await t.close();cases.push(method+': callback returns before status/webhook/mail and retains native element');
+ for(const state of ['ready','failed','expired','pending','refunded','unknown']){
+  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId,state});
+  if(state==='pending'){
+   assert.match(await t.page.locator('#payment-status').innerText(),/Overujeme|neplaťte znova/);assert.ok(await t.page.locator('#change-order').isHidden());assert.ok(await t.page.locator('#continue-payment').isHidden());
+  }else{
+   await t.page.waitForFunction(()=>!document.querySelector('#payment-status').textContent.includes('Overujeme výsledok'));
+   if(['ready','failed'].includes(state)){
+    assert.ok(await t.page.locator('#continue-payment').isVisible());assert.equal(await t.page.locator('#continue-payment').getAttribute('href'),checkoutUrl);
+    if(state==='failed')assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');
+    await t.page.locator('#continue-payment').click();await t.page.waitForURL(checkoutUrl);assert.equal(t.f.posts.length,0);
    }
-   {
-    const t=await open(method),{page,f}=t;await t.start();await page.getByRole('button',{name:'Fixture '+method}).tap();
-    f.paid=true;await page.evaluate(()=>walletFixture.finish({throw:true}));
-    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
-    assert.equal(await page.evaluate(()=>walletFixture.failed),0,'transport errors never report wallet failure');
-    assert.equal(f.posts.length,1);await t.close();cases.push(method+': charged payment with SDK network error recovers as paid');
-   }
-   {
-    const t=await open(method),{page,f}=t;await t.start();await page.getByRole('button',{name:'Fixture '+method}).tap();
-    f.offline=true;await page.evaluate(()=>walletFixture.finish({type:'error',error:{type:'api_error',message:'callback timeout'}}));await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('neplaťte znova'));
-    assert.ok(await page.locator('#change-order').isDisabled());assert.ok(await page.locator('#new-order').isHidden());assert.ok(await page.locator('#retry-payment').isHidden());
-    await page.locator('#stripe-pay').dispatchEvent('click');await page.evaluate(()=>walletFixture.again());
-    assert.equal(await page.evaluate(()=>walletFixture.calls),1);assert.equal(await page.evaluate(()=>walletFixture.failed),0);
-    await page.screenshot({path:'/tmp/pixelkovia-'+engine.name()+'-'+method+'-pending.png',fullPage:true});
-    await page.reload();await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('neplaťte znova'));
-    assert.equal(f.posts.length,1,'refresh recovers status without creating a Session');
-    assert.equal(await page.evaluate(()=>walletFixture.calls),0,'refresh never reconfirms payment');
-    const sibling=await t.context.newPage();await sibling.goto(origin+'/checkout');await sibling.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('neplaťte znova'));
-    assert.equal(f.posts.length,1,'reopening checkout in another tab recovers the original Session');
-    await page.goto(origin+'/');await page.goBack();await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('neplaťte znova'));assert.equal(f.posts.length,1);
-    f.offline=false;f.paid=true;
-    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
-    assert.ok(await page.locator('#stripe-pay').isHidden());assert.equal(f.releases,0);
-    await t.close();cases.push(method+': unknown outcome survives refresh, back and another tab without another charge');
-   }
-   {
-    const t=await open(method),{page,f}=t;await t.start();
-    await page.evaluate(()=>walletFixture.cancel());assert.equal(await page.evaluate(()=>walletFixture.calls),0);
-    await page.getByRole('button',{name:'Fixture '+method}).tap();
-    await page.evaluate(()=>walletFixture.finish({type:'error',error:{type:'card_error',message:'Banka platbu zamietla.'}}));
-    await page.waitForFunction(()=>walletFixture.failed===1);assert.ok(await page.locator('#stripe-pay').isEnabled());
-    await page.getByRole('button',{name:'Fixture '+method}).tap();f.paid=true;await page.evaluate(()=>walletFixture.finish({type:'success'}));
-    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
-    assert.equal(f.posts.length,1,'deliberate retry retains one Stripe Session');assert.equal(await page.evaluate(()=>walletFixture.calls),2);
-    await t.close();cases.push(method+': native cancellation and confirmed decline allow deliberate same-Session retry');
-   }
-   {
-    const t=await open(method),{page,f}=t;await t.start();await page.clock.install();
-    await page.getByRole('button',{name:'Fixture '+method}).tap();await page.clock.fastForward(21000);
-    assert.match(await page.locator('#payment-status').textContent(),/neplaťte znova/);
-    assert.equal(await page.evaluate(()=>walletFixture.failed),0);assert.equal(await page.evaluate(()=>walletFixture.destroyed),0);
-    assert.ok(await page.locator('#change-order').isDisabled());
-    f.paid=true;await page.evaluate(()=>walletFixture.finish({type:'success'}));await page.clock.runFor(1600);
-    await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('✓ Platba je potvrdená.'));
-    assert.equal(f.posts.length,1);await t.close();cases.push(method+': hung SDK watchdog never fails/destroys wallet and late success recovers');
-   }
+   if(state==='expired'){await t.page.locator('#change-order').click();await t.page.waitForFunction(()=>!document.querySelector('#customer-email').disabled);assert.equal(t.f.releases.length,1);}
+   if(state==='refunded')assert.ok(await t.page.locator('#new-order').isVisible());
+   if(state==='unknown')assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');
   }
-  {
-   const t=await open('apple_pay',false),{page}=t;await t.start();assert.equal(await page.evaluate(()=>walletFixture.wallets),0);assert.ok(await page.locator('#stripe-pay').isEnabled());await t.close();cases.push('unvalidated live wallets stay off while card checkout works');
-  }
-  {
-   const t=await open(),{page,f}=t;f.createLost=true;
-   await page.locator('[name="email"]').fill('fixture@example.invalid');await page.locator('#checkout-form .checkout-buy').tap();
-   await page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('ten istý nákup'));
-   await page.reload();await page.locator('#retry-payment').waitFor();
-   await page.locator('#retry-payment').tap();await page.locator('#stripe-pay').waitFor();
-   assert.equal(f.posts.length,2);assert.deepEqual(f.posts[0],f.posts[1],'lost-create recovery sends the exact original request/key');
-   await page.reload();await page.locator('#retry-payment').waitFor();await page.locator('#retry-payment').tap();await page.locator('#stripe-pay').waitFor();
-   assert.equal(f.posts.length,3);assert.deepEqual(f.posts[0],f.posts[2],'unsubmitted reload resumes the same session');
-   await t.close();cases.push('lost session creation and unsubmitted refresh retain original idempotency key and selection');
-  }
-
- }finally{await browser.close();}
-})().catch(error=>{console.error(error);process.exitCode=1;});
+  await t.close();cases.push('return state '+state);
+ }
+ {
+  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:false,orderCount:2});
+  await t.page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Platba je potvrdená'));
+  assert.match(await t.page.locator('#payment-status').innerText(),/dva samostatné e-maily/i);assert.ok(await t.page.locator('#open-portal').isHidden());
+  t.f.delivered=true;await t.page.locator('#check-payment').click();await t.page.locator('#open-portal').waitFor();assert.ok(await t.page.locator('#check-payment').isHidden());assert.equal(t.f.posts.length,0);await t.close();cases.push('paid before mail, then two messages ready');
+ }
+ {
+  const t=await open(browser,{query:'?checkout_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&canceled=1',denyStorage:true});
+  await t.page.locator('#continue-payment').waitFor();await t.page.locator('#continue-payment').click();await t.page.waitForURL(checkoutUrl);assert.equal(t.f.posts.length,0);await t.close();cases.push('cancel URL recovers same Session with browser storage denied');
+ }
+ {
+  const t=await open(browser,{purchase:cachedPurchase({input:{...cachedPurchase().input,uiMode:'elements'},phase:'unknown'})});
+  await t.page.locator('#change-order').waitFor();await t.page.locator('#change-order').click();assert.equal(t.f.releases.length,1);
+  await t.page.waitForFunction(()=>!document.querySelector('#customer-email').disabled);await t.start();await t.page.waitForURL(checkoutUrl);assert.equal(t.f.posts[0].uiMode,'hosted');await t.close();cases.push('stuck legacy checkout closes original before a hosted order');
+ }
+ {
+  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId,statusError:true});
+  await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='error');
+  assert.ok(await t.page.locator('#change-order').isHidden());assert.match(await t.page.locator('#payment-status').innerText(),/neplaťte znova/);
+  await t.page.screenshot({path:'/tmp/pixelkovia-payment-network-390.png',fullPage:true});
+  t.f.statusError=false;await t.page.locator('#check-payment').click();await t.page.locator('#continue-payment').waitFor();assert.equal(t.f.posts.length,0);await t.close();cases.push('network error is visible and retry checks original payment');
+ }
+ {
+  const t=await open(browser,{purchase:cachedPurchase(),releaseError:true});await t.page.locator('#change-order').waitFor();await t.page.locator('#change-order').click();
+  await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='error');assert.equal(t.f.posts.length,0);assert.ok(await t.page.locator('#customer-email').isDisabled());await t.close();cases.push('release failure keeps purchase locked');
+ }
+ {
+  const t=await open(browser,{purchase:cachedPurchase(),paid:true,delivered:true});await t.page.locator('#new-order').waitFor();await t.page.locator('#new-order').click();await t.start();await t.page.waitForURL(checkoutUrl);
+  assert.equal(t.f.posts[0].newPurchase,true);assert.notEqual(t.f.posts[0].attemptKey,cachedPurchase().attemptKey);await t.close();cases.push('explicit repeat purchase gets a new key');
+ }
+ {
+  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId});await t.page.locator('#continue-payment').waitFor();
+  await t.page.evaluate(()=>{const v=JSON.parse(localStorage.getItem('pixelkovia-checkout-attempt'));v.sessionId='cs_test_unrelatedorder12345';window.dispatchEvent(new StorageEvent('storage',{key:'pixelkovia-checkout-attempt',newValue:JSON.stringify(v)}));});
+  assert.equal(t.f.posts.length,0);assert.ok(t.page.url().includes(sessionId));await t.close();cases.push('another tab never replaces return-linked order');
+ }
+ {
+  const t=await open(browser,{configError:true});await t.page.locator('#reload-payments').waitFor();assert.equal(t.f.posts.length,0);
+  t.f.configError=false;await t.page.locator('#reload-payments').click();await t.page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled);await t.close();cases.push('configuration outage retries without refresh');
+ }
+ for(const createError of [400,403,409,429,500]){
+  const t=await open(browser,{createError});await t.start();await t.page.locator('#retry-payment').waitFor();assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');
+  const original=t.f.posts[0];t.f.createError=0;await t.page.locator('#retry-payment').evaluate(el=>{el.click();el.click();});await t.page.waitForURL(checkoutUrl);assert.deepEqual(t.f.posts[1],original);assert.equal(t.f.posts.length,2);await t.close();cases.push('HTTP '+createError+' recovers one original request');
+ }
+ {
+  const t=await open(browser);await t.start();await t.page.waitForURL(checkoutUrl);await t.page.goBack();await t.page.locator('#continue-payment').waitFor();assert.equal(t.f.posts.length,1);await t.close();cases.push('browser back restores original unpaid Session');
+ }
+ {
+  const t=await open(browser,{purchase:cachedPurchase(),state:'pending'});await t.page.clock.install();await t.page.clock.runFor(8500);
+  await t.page.waitForFunction(()=>!document.querySelector('#check-payment').disabled);assert.ok(await t.page.locator('#change-order').isHidden());assert.ok(await t.page.locator('#continue-payment').isHidden());
+  t.f.paid=true;await t.page.locator('#check-payment').click();await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.equal(t.f.posts.length,0);await t.close();cases.push('polling stops safely and a late confirmed payment recovers');
+ }
+ {
+  const t=await open(browser,{query:'?session_id='+sessionId,denyStorage:true,state:'expired'});await t.page.locator('#change-order').waitFor();await t.page.locator('#change-order').click();await t.page.waitForFunction(()=>!document.querySelector('#customer-email').disabled);assert.equal(t.f.posts.length,0);await t.close();cases.push('verified expiry releases UI with storage denied');
+ }
+ {
+  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:true,totalCents:0});await t.page.locator('#open-portal').waitFor();assert.match(await t.page.locator('#payment-status').innerText(),/Objednávka zdarma je potvrdená/);await t.close();cases.push('verified free order has correct success copy');
+ }
+ {
+  const t=await open(browser,{query:'?session_id='+sessionId,labels:['<img src=x onerror=alert(1)>']});await t.page.locator('#continue-payment').waitFor();assert.equal(await t.page.locator('#returned-order-items img').count(),0);assert.match(await t.page.locator('#returned-order-items').innerText(),/<img/);await t.close();cases.push('server summary is rendered as plain text');
+ }
+ console.log(JSON.stringify({browser:process.env.QA_BROWSER||'chromium',passed:cases.length,cases},null,2));
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

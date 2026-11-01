@@ -14,14 +14,15 @@ function fixture(){
   async create(input,{idempotencyKey}){
    if(!requests.has(idempotencyKey)){
     const id='cs_test_recoveryfixture'+(++sequence);
-    requests.set(idempotencyKey,{id,client_secret:'fixture_secret',parameters:input});
-    sessions.set(id,{...input,id,client_secret:'fixture_secret',amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:false,status:'open',payment_status:'unpaid',payment_intent:null});
+    requests.set(idempotencyKey,{id,ui_mode:input.ui_mode,url:input.ui_mode==='hosted_page'?'https://checkout.stripe.com/c/pay/'+id:null,client_secret:'fixture_secret',parameters:input});
+    sessions.set(id,{...input,id,url:input.ui_mode==='hosted_page'?'https://checkout.stripe.com/c/pay/'+id:null,client_secret:'fixture_secret',amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:false,status:'open',payment_status:'unpaid',payment_intent:null});
    }
    assert.deepEqual(input,requests.get(idempotencyKey).parameters,'every replay uses identical Stripe parameters');
    if(lost){lost=false;throw Error('Lost response after Stripe created the Session');}
    return requests.get(idempotencyKey);
   },
   async retrieve(id){if(failRead)throw Error('Stripe read timeout');return sessions.get(id);},
+  async list(){if(failRead)throw Error('Stripe list timeout');return {data:[...sessions.values()],has_more:false};},
   async expire(id){const s=sessions.get(id);assert.equal(s.status,'open');s.status='expired';if(s.payment_intent)s.payment_intent.status='canceled';return s;}
  }}}};
  const input={baseId:'episode-1',books:[],atlasIncluded:true,email:'recovery@example.invalid',attemptKey:crypto.randomUUID(),uiMode:'elements'};
@@ -50,7 +51,7 @@ test('racing tabs with different keys cannot create two unresolved Stripe Sessio
 test('status separates verified payment from delayed webhook and email, and validates totals and refunds',async()=>{
  const f=fixture();try{
   const a=await createCheckout(f.env,f.input),s=f.sessions.get(a.sessionId);
-  assert.equal((await verifiedCheckoutStatus(f.env,s.id)).state,'pending');
+  assert.equal((await verifiedCheckoutStatus(f.env,s.id)).state,'ready');
   s.payment_intent={id:'pi_fixture',status:'processing'};
   assert.equal((await verifiedCheckoutStatus(f.env,s.id)).retryAllowed,false);
   s.status='complete';s.payment_status='paid';s.payment_intent.status='succeeded';
@@ -107,11 +108,11 @@ test('webhook acknowledges before delayed mail; duplicates/out-of-order success 
   assert.equal((await first(f.db,'SELECT attempts FROM access_deliveries')).attempts,1);
  }finally{globalThis.fetch=original;f.db.close();}
 });
-test('production config keeps wallets disabled; recovery routes enforce origin and verify Stripe state',async()=>{
+test('production uses hosted Checkout; recovery routes enforce origin and verify Stripe state',async()=>{
  const f=fixture();try{
-  assert.deepEqual(checkoutConfig(f.env).wallets,{applePay:false,googlePay:false});
+  assert.deepEqual(checkoutConfig(f.env),{enabled:true,checkout:'hosted'});
   const a=await createCheckout(f.env,f.input);
-  const status=await worker.fetch(new Request(origin+'/api/checkout/status?session_id='+a.sessionId),f.env);assert.equal(status.status,200);assert.equal((await status.json()).state,'pending');
+  const status=await worker.fetch(new Request(origin+'/api/checkout/status?session_id='+a.sessionId),f.env);assert.equal(status.status,200);assert.equal((await status.json()).state,'ready');
   const foreign=await worker.fetch(new Request(origin+'/api/checkout/release',{method:'POST',headers:{origin:'https://foreign.invalid','content-type':'application/json'},body:JSON.stringify(f.input)}),f.env);assert.equal(foreign.status,403);
   await assert.rejects(()=>releaseCheckout(f.env,{attemptKey:'forged'}),e=>e.status===400);
  }finally{f.db.close();}
@@ -137,4 +138,52 @@ test('free Session can be safely edited, while only completed verified zero-cost
   assert.equal((await verifiedCheckoutStatus(f.env,next.id)).paid,true);
   next.metadata.voucher_code='forged';await assert.rejects(()=>verifiedCheckoutStatus(f.env,next.id),e=>e.status===400);
  }finally{f.db.close();}
+});
+
+test('hosted Checkout has one owner for confirmation and return URLs, preserves cart and resumes one Session',async()=>{
+ const f=fixture();try{
+  const input={...f.input,uiMode:'hosted',books:['story-book-before','story-book-after'],giftGame:true};
+  const a=await createCheckout(f.env,input),s=f.sessions.get(a.sessionId);
+  assert.equal(a.clientSecret,undefined,'the browser needs no Stripe client secret');
+  assert.equal(a.checkoutUrl,'https://checkout.stripe.com/c/pay/'+s.id);
+  assert.equal(s.ui_mode,'hosted_page');assert.equal(s.return_url,undefined);
+  assert.equal(s.success_url,origin+'/checkout?session_id={CHECKOUT_SESSION_ID}&product=episode-1');
+  assert.equal(s.cancel_url,origin+'/checkout?checkout_id='+s.client_reference_id+'&canceled=1&product=episode-1');
+  assert.equal(s.customer_email,input.email);assert.equal(a.totalCents,2997);
+  assert.equal(s.branding_settings.display_name,'Pixelkovia');assert.equal(s.branding_settings.background_color,'#0d1424');
+  assert.equal(s.payment_method_types,undefined);assert.ok(!s.excluded_payment_method_types.includes('card'));
+  assert.equal((await createCheckout(f.env,input)).sessionId,a.sessionId);assert.equal(f.sessions.size,1);
+  const ready=await verifiedCheckoutStatus(f.env,s.id);assert.equal(ready.state,'ready');assert.equal(ready.checkoutUrl,a.checkoutUrl);assert.equal(ready.canEdit,true);
+  const canceled=await verifiedCheckoutStatus(f.env,null,s.client_reference_id);assert.equal(canceled.sessionId,s.id);assert.equal(canceled.checkoutUrl,a.checkoutUrl);
+  const response=await worker.fetch(new Request(origin+'/api/checkout/status?checkout_id='+s.client_reference_id),f.env);assert.equal(response.status,200);assert.equal((await response.json()).sessionId,s.id);
+  for(const status of ['processing','requires_action','succeeded']){s.payment_intent={id:'pi_fixture',status};const result=await verifiedCheckoutStatus(f.env,s.id);assert.equal(result.checkoutUrl,null);assert.equal(result.canEdit,false);assert.equal(result.retryAllowed,false);}
+  s.payment_intent={id:'pi_fixture',status:'requires_payment_method',last_payment_error:{code:'card_declined'}};
+  assert.equal((await verifiedCheckoutStatus(f.env,s.id)).state,'failed');assert.equal((await verifiedCheckoutStatus(f.env,s.id)).checkoutUrl,a.checkoutUrl);
+ }finally{f.db.close();}
+});
+test('hosted status rejects forged return references and untrusted redirect targets; zero-cost completion is verified',async()=>{
+ const f=fixture();try{
+  const a=await createCheckout(f.env,{...f.input,uiMode:'hosted',voucherCode:'free'}),s=f.sessions.get(a.sessionId);
+  for(const url of ['https://checkout.stripe.com.evil.example/c/pay/fake','javascript:alert(1)','http://checkout.stripe.com/c/pay/fake']){s.url=url;assert.equal((await verifiedCheckoutStatus(f.env,s.id)).checkoutUrl,null);}
+  assert.equal((await worker.fetch(new Request(origin+'/api/checkout/status?checkout_id=forged'),f.env)).status,400);
+  assert.equal((await verifiedCheckoutStatus(f.env,null,crypto.randomUUID())).state,'unknown');
+  s.status='complete';s.payment_status='no_payment_required';assert.equal((await verifiedCheckoutStatus(f.env,s.id)).paid,true);
+  assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0,'return/status never grants access');
+ }finally{f.db.close();}
+});
+
+test('a lost create response cannot lock the buyer forever or allow an unverified replacement',async()=>{
+ for(const providerCreated of [true,false]){
+  const f=fixture();try{
+   f.lose();await assert.rejects(()=>createCheckout(f.env,{...f.input,uiMode:'hosted'}));
+   await assert.rejects(()=>releaseCheckout(f.env,f.input),e=>e.status===409,'fresh unknown create remains guarded');
+   await execute(f.db,'UPDATE checkout_attempts SET created_at=?',Date.now()-1900000);
+   if(!providerCreated)f.sessions.clear();
+   f.failRead(true);await assert.rejects(()=>releaseCheckout(f.env,f.input),/timeout/);
+   assert.equal((await first(f.db,'SELECT active FROM checkout_requests')).active,1,'provider outage cannot release the lock');f.failRead(false);
+   assert.equal((await releaseCheckout(f.env,f.input)).released,true);
+   assert.equal((await first(f.db,'SELECT active FROM checkout_requests')).active,0);
+   if(providerCreated)assert.equal([...f.sessions.values()][0].status,'expired','a found Session is closed before replacing it');
+  }finally{f.db.close();}
+ }
 });

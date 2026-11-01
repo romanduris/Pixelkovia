@@ -7,8 +7,8 @@ const ORIGIN='https://pixelkovia.rodulab.com',enc=new TextEncoder();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stripe=env=>env.STRIPE_CLIENT||new Stripe(env.STRIPE_SECRET_KEY,{apiVersion:'2026-08-26.dahlia',maxNetworkRetries:2,httpClient:Stripe.createFetchHttpClient()});
 export const commerceReady=env=>env.PAYMENTS_ENABLED==='true'&&!!(env.STRIPE_SECRET_KEY&&env.STRIPE_PUBLISHABLE_KEY&&env.STRIPE_WEBHOOK_SECRET&&env.CUSTOMER_AUTH_SECRET&&env.RESEND_API_KEY&&env.MAIL_DOMAIN_VERIFIED==='true');
-// Wallets stay off until native-device validation is completed. Account settings are untouched.
-export function checkoutConfig(env){return {enabled:commerceReady(env),publishableKey:commerceReady(env)?env.STRIPE_PUBLISHABLE_KEY:null,wallets:{applePay:false,googlePay:false}};}
+// Hosted Checkout owns card validation, bank authentication and eligible wallets.
+export function checkoutConfig(env){return {enabled:commerceReady(env),checkout:'hosted'};}
 const pendingMessage='Overujeme vašu platbu. Prosíme, neplaťte znova. Potvrdenie a prístup vám po úspešnej úhrade prídu e-mailom.';
 const requestHash=async key=>{
   if(typeof key!=='string'||!/^[-a-zA-Z0-9_]{32,100}$/.test(key))throw new HttpError(400,'Neplatný identifikátor nákupu.');
@@ -22,10 +22,25 @@ function verifySession(env,session,attempt){
 const settledPaid=(session,attempt)=>session.status==='complete'&&(session.payment_status==='paid'||(attempt.voucher_code==='free'&&attempt.total_cents===0&&session.payment_status==='no_payment_required'));
 const safelyExpired=session=>session.status==='expired'&&['unpaid','no_payment_required'].includes(session.payment_status)&&(!session.payment_intent||['canceled','requires_payment_method'].includes(session.payment_intent.status));
 async function readSession(env,attempt){const session=await stripe(env).checkout.sessions.retrieve(attempt.stripe_session_id,{expand:['payment_intent.latest_charge']});verifySession(env,session,attempt);return session;}
+// Reconcile a lost create response even after its original 30-minute window.
+// No replacement may open while a Stripe request can still create that Session.
+async function recoverLostSession(env,attempt){
+  let starting_after;
+  do{
+    const page=await stripe(env).checkout.sessions.list({created:{gte:Math.floor(attempt.created_at/1000)-60,lte:Math.floor(attempt.created_at/1000)+1800},limit:100,...(starting_after?{starting_after}:{})});
+    const found=page.data.find(s=>s.client_reference_id===attempt.id);
+    if(found){verifySession(env,found,{...attempt,stripe_session_id:found.id});await execute(env.TQ_DB,'UPDATE checkout_attempts SET stripe_session_id=? WHERE id=?',found.id,attempt.id);attempt.stripe_session_id=found.id;return true;}
+    starting_after=page.has_more?page.data.at(-1)?.id:null;
+  }while(starting_after);
+  return false;
+}
 export async function releaseCheckout(env,input){
   const row=await first(env.TQ_DB,'SELECT a.* FROM checkout_requests r JOIN checkout_attempts a ON a.id=r.attempt_id WHERE r.request_key=? AND r.active=1',await requestHash(input.attemptKey));
   if(!row)return {released:true};
-  if(!row.stripe_session_id)throw new HttpError(409,pendingMessage);
+  if(!row.stripe_session_id){
+    if(Date.now()-row.created_at<=1800000)throw new HttpError(409,pendingMessage);
+    if(!await recoverLostSession(env,row)){await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);return {released:true};}
+  }
   let session=await readSession(env,row);
   if(!settledPaid(session,row)&&!safelyExpired(session)){
     const intent=session.payment_intent;
@@ -38,16 +53,22 @@ export async function releaseCheckout(env,input){
   await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);
   return {released:true};
 }
-export async function verifiedCheckoutStatus(env,sessionId){
+export async function verifiedCheckoutStatus(env,sessionId,checkoutId){
+  if(checkoutId){const row=await first(env.TQ_DB,'SELECT stripe_session_id FROM checkout_attempts WHERE id=?',checkoutId);sessionId=row?.stripe_session_id;}
+  if(!sessionId)return {paid:false,delivered:false,state:'unknown',retryAllowed:false};
   const order=await checkoutStatus(env.TQ_DB,sessionId);
   const attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',sessionId);
   if(!attempt)return {...order,state:'unknown',retryAllowed:false};
   const session=await readSession(env,attempt),intent=session.payment_intent;
   if(intent?.latest_charge?.refunded===true||(order.orderCount&&!order.paid))return {...order,paid:false,state:'refunded',retryAllowed:false};
   const paid=settledPaid(session,attempt);
-  const failed=session.status==='open'&&intent?.status==='requires_payment_method'&&!!intent.last_payment_error;
-  return {...order,paid:paid||order.paid,noPaymentRequired:paid?attempt.total_cents===0:order.noPaymentRequired,state:paid||order.paid?'paid':safelyExpired(session)?'expired':failed?'failed':'pending',retryAllowed:failed||safelyExpired(session),orderCount:order.orderCount||(paid?(attempt.gift_game?2:1):0)};
+  const ready=session.status==='open'&&(!intent||['requires_payment_method','canceled'].includes(intent.status));
+  const failed=ready&&!!intent?.last_payment_error;
+  const url=ready&&session.ui_mode==='hosted_page'?hostedUrl(session.url):null;
+  return {...order,sessionId,paid:paid||order.paid,noPaymentRequired:paid?attempt.total_cents===0:order.noPaymentRequired,state:paid||order.paid?'paid':safelyExpired(session)?'expired':failed?'failed':ready?'ready':'pending',retryAllowed:ready||safelyExpired(session),canEdit:ready||safelyExpired(session),checkoutUrl:url,totalCents:attempt.total_cents,labels:JSON.parse(attempt.selection).map(id=>product(id).name).concat(attempt.gift_game?['Druhá hra pre ďalšiu rodinu']:[]),orderCount:order.orderCount||(paid?(attempt.gift_game?2:1):0)};
 }
+function hostedUrl(value){try{const url=new URL(value);if(url.protocol==='https:'&&url.hostname==='checkout.stripe.com'&&!url.username&&!url.password&&!url.port&&url.pathname.startsWith('/c/pay/'))return url.href;}catch{}return null;}
+function checkoutReply(session,attempt){return {sessionId:session.id,totalCents:attempt.total_cents,state:settledPaid(session,attempt)?'paid':safelyExpired(session)?'expired':'open',...(session.ui_mode==='hosted_page'?{checkoutUrl:hostedUrl(session.url)}:{clientSecret:session.client_secret})};}
 export async function createCheckout(env,input){
   if(!commerceReady(env))throw new HttpError(503,'Predaj práve pripravujeme. Platba sa nespustila.');
   const email=emailAddress(typeof input.email==='string'?input.email.trim():null),name=typeof input.name==='string'?input.name.trim().slice(0,120):'';
@@ -58,7 +79,7 @@ export async function createCheckout(env,input){
   if(!['episode-1',...offer.bookIds].includes(input.baseId)||!Array.isArray(input.books)||input.books.length>2||input.books.some(id=>!offer.bookIds.includes(id))||typeof input.atlasIncluded!=='boolean')throw new HttpError(400,'Neplatný výber produktov.');
   if(input.voucherCode!==undefined&&(typeof input.voucherCode!=='string'||input.voucherCode.length>64))throw new HttpError(400,'Neplatný zľavový kód.');
   if(input.giftGame!==undefined&&(typeof input.giftGame!=='boolean'||(input.giftGame&&input.baseId!=='episode-1')))throw new HttpError(400,'Druhú hru možno pridať iba k základnej hre.');
-  if(input.uiMode!==undefined&&!['elements','form'].includes(input.uiMode))throw new HttpError(400,'Neplatný platobný formulár.');
+  if(input.uiMode!==undefined&&!['hosted','elements','form'].includes(input.uiMode))throw new HttpError(400,'Neplatný platobný formulár.');
   const q=quote([...input.books].sort(),input.baseId,input.atlasIncluded,input.voucherCode,input.giftGame);
   let id=uuid(),at=Date.now();
   if(input.voucherCode?.trim()&&!q.voucher)throw new HttpError(400,'Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.');
@@ -97,7 +118,7 @@ export async function createCheckout(env,input){
     if(!existing.active||existing.payload_hash!==payloadHash)throw new HttpError(409,'Tento nákup už existuje. Overte pôvodnú platbu alebo bezpečne ukončite pôvodnú objednávku.');
     const saved=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE id=?',existing.attempt_id);
     id=saved.id;at=saved.created_at;
-    if(saved.stripe_session_id){const session=await readSession(env,saved);return {clientSecret:session.client_secret,sessionId:session.id,totalCents:saved.total_cents,state:settledPaid(session,saved)?'paid':safelyExpired(session)?'expired':'open'};}
+    if(saved.stripe_session_id){const session=await readSession(env,saved);return checkoutReply(session,saved);}
     // A lost Stripe create response is retried with the original exact request/key.
     if(saved.total_cents!==q.totalCents||saved.item_prices!==JSON.stringify(prices)||Date.now()-at>1800000)throw new HttpError(409,pendingMessage);
   }
@@ -106,9 +127,10 @@ export async function createCheckout(env,input){
   // Scope method exclusions to this checkout; account-wide settings stay shared.
   // Older open checkout tabs still request the original form during deployment.
   const excludedMethods=['bancontact','blik','eps','ideal','klarna','swish','kakao_pay','mb_way','naver_pay','payco','pix','samsung_pay','satispay'];
-  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:input.uiMode==='elements'?'elements':'form',locale:'sk',excluded_payment_method_types:excludedMethods,wallet_options:{link:{display:'never'}},adaptive_pricing:{enabled:false},customer_email:email,client_reference_id:id,line_items:lines,return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}',integration_identifier:'pixelkovia_'+id.replaceAll('-','').slice(0,8).split('').map(c=>String.fromCharCode(97+parseInt(c,16))).join(''),metadata:{checkout_attempt:id,...(q.voucher?{voucher_code:q.voucher}:{})},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
+  const hosted=input.uiMode==='hosted';
+  const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:hosted?'hosted_page':input.uiMode==='elements'?'elements':'form',locale:'sk',excluded_payment_method_types:excludedMethods,wallet_options:{link:{display:'never'}},adaptive_pricing:{enabled:false},customer_email:email,client_reference_id:id,line_items:lines,...(hosted?{success_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}&product='+q.baseId,cancel_url:ORIGIN+'/checkout?checkout_id='+id+'&canceled=1&product='+q.baseId,branding_settings:{display_name:'Pixelkovia',background_color:'#0d1424',button_color:'#ace9cf',font_family:'inter',border_style:'rounded'},custom_text:{submit:{message:'Po potvrdenej platbe vám pošleme e-mail s prístupom k dobrodružstvu. Každý nákup má vlastné heslo.'}}}:{return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}'}),integration_identifier:'pixelkovia_'+id.replaceAll('-','').slice(0,8).split('').map(c=>String.fromCharCode(97+parseInt(c,16))).join(''),metadata:{checkout_attempt:id,...(q.voucher?{voucher_code:q.voucher}:{})},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
   await execute(env.TQ_DB,'UPDATE checkout_attempts SET stripe_session_id=? WHERE id=?',session.id,id);
-  return {clientSecret:session.client_secret,sessionId:session.id,totalCents:q.totalCents};
+  return checkoutReply(session,{total_cents:q.totalCents,voucher_code:q.voucher});
 }
 async function encryptionKey(secret){return crypto.subtle.importKey('raw',Uint8Array.from(secret.match(/../g),x=>parseInt(x,16)),'AES-GCM',false,['encrypt','decrypt']);}
 export async function seal(value,secret){const iv=crypto.getRandomValues(new Uint8Array(12));const bytes=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await encryptionKey(secret),enc.encode(JSON.stringify(value))));return btoa(String.fromCharCode(...iv,...bytes));}

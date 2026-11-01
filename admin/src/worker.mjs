@@ -68,8 +68,9 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){
-      const session=url.searchParams.get('session_id');if(!/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(session||''))throw new HttpError(400,'Neplatná platobná relácia.');
-      return json(await verifiedCheckoutStatus(env,session));
+      const session=url.searchParams.get('session_id'),checkoutId=url.searchParams.get('checkout_id');
+      if(checkoutId?!/^[a-f0-9-]{36}$/.test(checkoutId):!/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(session||''))throw new HttpError(400,'Neplatná platobná relácia.');
+      return json(await verifiedCheckoutStatus(env,session,checkoutId));
     }
     if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);return json(await createCheckout(env,{...await body(request),__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
     if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);return json(await releaseCheckout(env,await body(request)));}

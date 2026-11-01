@@ -1,56 +1,32 @@
-# P0 – timeout Google Pay a ochrana pred opakovanou platbou
+# P0 – oprava karty a prechod na Stripe Checkout
 
-Stav k 28. 10. 2026: oprava implementovaná; natívne platby Google Pay aj Apple Pay zostávajú na tomto checkoute vypnuté do overenia na zariadeniach. Platba kartou zostáva dostupná. Globálne nastavenia účtu Stripe sa nemenia.
+Stav 1. 11. 2026: po súhlase vlastníka vlastné potvrdenie karty a callbacky peňaženiek nahrádza predpripravená Stripe stránka. Ponuka, ceny, vouchery, izolované prístupy, podpísané webhooky a doručovanie ostávajú zachované.
 
-## Zistenia a hranice dôkazov
+## Preukázaná príčina incidentu
 
-- Čítanie produkčného Stripe API potvrdilo dve úspešné platby Google Pay po 1 € a jednu úspešnú kartovú platbu 14,99 €. Obe peňaženky mali `PaymentIntent.status=succeeded` a `latest_charge.payment_method_details.card.wallet.type=google_pay`. Otvorené alebo expirované náhľadové relácie sa nepočítajú ako neúspešné platby.
-- Existujúca D1 databáza potvrdila objednávky a odoslané prístupové správy pri všetkých troch nákupoch. Pri Google Pay sa objednávky uložili približne 3,2 a 4,0 sekundy po vytvorení úspešnej platby; doručenie do odosielacej služby nasledovalo približne o 0,6 sekundy neskôr.
-- Pôvodný klient po úspechu SDK okamžite zničil Payment/Express Checkout Element a v rovnakom `confirm` handleri čakal na serverový polling. Pri každej výnimke bez rozlíšenia volal `paymentFailed()`. Po vyčerpaní pollingu znovu povolil úpravu objednávky. Server pre každý POST vytváral nový pokus s novým Stripe idempotency key.
-- Nesprávne označenie neznámeho výsledku za zlyhanie a možnosť novej relácie sú potvrdené chyby kódu. Predčasné zničenie elementu a čakanie handlera sú podozrivé príčiny natívneho timeoutu. Historický záznam z prehliadača chýba; presná príčina pôvodného hlásenia `callback timeout` nie je preukázaná. Približne 12-sekundové čakanie aplikácie neoznačujeme za preukázaný limit Google Pay.
-- Apple Pay používa ten istý `confirm` handler. Nie je dôkaz, že by pôvodne na zariadení zlyhalo.
+- Produkčný JavaScript bol totožný s commitom `886fa85`. Konfigurácia výslovne vracala obe peňaženky vypnuté. Doména bola v Stripe povolená a Apple Pay/Google Pay mali aktívnu registráciu.
+- So skutočným Stripe SDK a prázdnymi údajmi sa reprodukoval `IntegrationError`: `returnUrl` pri `confirm()` bol poslaný súčasne s už nastaveným serverovým `return_url`. Výnimka sa potlačila, formulár sa skryl a zákazník zostal v neistom overovaní. Žiadna karta ani platba sa neposlala.
+- Po odstránení tejto duplicity iba v diagnostickom prehliadači Stripe vrátil `{type: error, error: {code: null, message: Číslo vašej karty je neúplné.}}`. Klient očakával iné `error.type`, preto aj túto validáciu nesprávne označil za neistú platbu.
+- Dnešné dve pôvodné relácie za 1 € nemali PaymentIntent. Staršie úspešné platby ostali zachované. Historický natívny timeout Google Pay nie je týmto vyšetrovaním spätne vysvetlený.
 
-## Výsledné správanie
+## Výsledná zmena
 
-`checkout.js` odovzdáva pôvodný `expressCheckoutConfirmEvent` do `actions.confirm`, uvádza návratovú URL a necháva Stripe riadiť natívny platobný hárok. Po výsledku nečaká na webhook, objednávku ani e-mail a neničí element. Samostatný 20-sekundový watchdog iba prepne stav aplikácie; nevyvoláva `paymentFailed()` ani neukončuje natívnu platbu. Jeho čas nie je tvrdením o limite peňaženiek.
+Klient neposiela údaje karty, nenačítava Stripe.js a nevolá `confirm`. Server vytvorí `ui_mode: hosted_page`, nastaví iba príslušné `success_url`/`cancel_url`, názov, farby a písmo. Zákazník vie pred prechodom, že platbu dokončí na Stripe. Samotná URL ani lokálne úložisko neudeľujú prístup.
 
-Jednoznačný `card_error` alebo `validation_error` umožní vedomú opravu a opakovanie v rovnakej relácii. Výnimka spojenia, neznámy výsledok alebo oneskorenie ukáže:
+Server vracia overené stavy `ready`, `failed`, `pending`, `expired`, `paid`, `refunded`, `unknown`. Pripravená alebo zamietnutá platba sa obnoví v tej istej relácii. Bankové overenie, spracovanie a výpadok blokujú neoverenú novú platbu. Zmena výberu najskôr bezpečne expiruje pôvodnú reláciu. Obnova zo starého checkoutu neobíde tento krok. Po strate odpovede sa používa ten istý idempotency key; dlhodobo chýbajúce Stripe ID sa pred uvoľnením dohľadá u poskytovateľa.
 
-> Overujeme vašu platbu. Prosíme, neplaťte znova. Potvrdenie a prístup vám po úspešnej úhrade prídu e-mailom.
+Návrat zo Stripe funguje aj bez browser storage cez náhodné serverové checkout ID. Samostatná kniha zostáva samostatnou knihou. Návratová URL udrží vlastnú objednávku aj pri ďalšom nákupe v druhej záložke. Chyby sa zobrazujú výrazne červené s ikonou a konkrétnou ďalšou akciou; úspech zelený. Text sa vykresľuje bezpečne ako text.
 
-Stav blokuje novú platbu a ponúkne overenie pôvodnej. Identifikátor relácie zostáva v návratovej URL; lokálne sa uchová náhodný identifikátor pokusu a výber objednávky, bez údajov karty či hesiel. Obnovenie stránky, návrat späť a druhá záložka obnovujú pôvodný pokus. Browser storage slúži iba obnove; prístup ani zaplatenie neurčuje.
+## Dôkazy a hranice overenia
 
-`admin/migrations/0010_checkout_requests.sql` pridáva jedinečný serverový pokus a jedinečný aktívny nákup pre e-mail. Atómový D1 batch zabraňuje dvom súbežným pokusom; opakovanie po stratenej odpovedi používa pôvodný Stripe idempotency key a rovnaké parametre. Iný identifikátor z prehliadača neobíde nevyriešenú platbu. Kontrolujú sa aj staršie relácie pred migráciou. Úprava objednávky najskôr na serveri overí a bezpečne expiruje pôvodnú Stripe Session; neznámy výsledok, `processing` či `requires_action` zámok neuvoľnia. Ďalší nákup po potvrdenej platbe vyžaduje výslovnú akciu a vytvorí vlastnú objednávku a prístup.
+- Serverové testy pokrývajú súbeh, idempotenciu, stratenú odpoveď, bezpečné uzavretie, cenu, účet, vouchery, podpisy, izoláciu nákupov, dve atómové objednávky, heslá, e-maily a refund.
+- Browser testy pokrývajú Chromium aj WebKit, mobilné šírky 360/390/430 a desktop, ceny a výber, chybový e-mail, návrat/späť, HTTP chyby, dvojklik, zastavenie pollingu, neskoré potvrdenie, zakázaný storage, starý formulár a podvrhnuté URL/texty. Snímky mobilnej chyby a skutočného Stripe formulára boli vizuálne skontrolované.
+- Produkčné Stripe API prijalo presné nové relácie 14,99 €/1 €/0 €. Relácie používali vlastnú konfiguráciu účtu, v ktorej sú karta, Apple Pay aj Google Pay zapnuté a dostupné. Globálne konfigurácie ani iné integrácie sa nemenili.
+- Opt-in test `tests/stripe-hosted-live.test.mjs` načítava skutočný Stripe Checkout a overuje validáciu polí. Vytvorené relácie sa expirujú, platobné POST požiadavky sú blokované a API musí potvrdiť, že nevznikol PaymentIntent. Test nepoužíva produkčnú D1 a neposiela prístupové e-maily.
+- Tieto kontroly nepredstavujú uskutočnenú úhradu, overenie 3-D Secure cez banku ani natívnu platbu na fyzickom iPhone/Androide. Zobrazenie peňaženky závisí aj od podporovaného zariadenia a pripravenej peňaženky.
 
-`/api/checkout/status` overuje reláciu priamo v Stripe vrátane serverovej sumy, EUR, režimu účtu, väzby na pokus a voucherov. Rozlišuje `pending`, `failed`, `expired`, `paid` a `refunded`. Úspech sa zobrazí aj pri oneskorenom webhooku; doručenie e-mailu má vlastný stav. Stavové API nevytvára účty ani oprávnenia. Tie stále vznikajú z podpísaných webhookov a overenej Stripe relácie.
+Detaily a spustenie kontrol: [platby a doručenie](../docs/payment-setup.md).
 
-Webhook ukladá objednávky pred potvrdením prijatia. Posielanie správ odovzdáva do `context.waitUntil`, takže oneskorený Resend neblokuje odpoveď webhooku. Existujúce opakovanie doručenia, šifrovanie, odstránenie odoslaných správ, atómové dve objednávky a refund zostávajú zachované. Generovanie hesiel a prihlasovanie sa nemenili.
+### Obmedzenie externého WebKitu v tomto Codespace
 
-## Overenie
-
-Prešlo **42 serverových testov** a **66 prehliadačových scenárov**: 21 regresných + 12 obnovovacích v každom z prehliadačov Chromium a WebKit. Prešli aj statické zostavenie a dry-run zostavenia Workeru.
-
-```sh
-node scripts/prepare-static.mjs
-npm run build:check --prefix admin
-npm test --prefix admin
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/checkout-payment.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-recovery.test.cjs
-PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/checkout-recovery.test.cjs
-```
-
-- Serverové testy používajú izolovanú SQLite/D1 databázu a nahradené Stripe/Resend. Overujú súbeh dvoch kľúčov, stratenú odpoveď pri vytváraní, blokovanie neznámej platby, expiráciu pred novým pokusom, staršie relácie, potvrdenie bez webhooku/e-mailu, nulový voucher, úmyselný nový nákup a duplicitné či prehodené webhooky. Existujúce testy kontrolujú ceny 14,99 €, 19,98 €, staršie otvorené relácie za 19,99 €, darovanú hru, samostatné prístupy a refund.
-- Prehliadačové testy spúšťajú skutočný klient v Chromiu a WebKite s nahradeným SDK. Pre Google Pay aj Apple Pay overujú návrat callbacku pri zablokovanom stavovom API, zachovaný element, úspešnú platbu pri výnimke SDK, neznámy výsledok aj výpadok stavového API, refresh/back/druhú záložku, zamietnutie, zrušenie, oneskorený úspech a stratenú odpoveď vytvárania.
-- Mobilné snímky stavov potvrdenia a overovania sa vizuálne kontrolujú pri šírke 390 px. Existujúca regresná sada pokrýva aj 360, 430 a 1360 px, kartu, vouchery a ceny.
-- Testy nevytvárajú živé platby a neposielajú skutočné e-maily. Produkčné vyšetrovanie bolo iba na čítanie.
-
-## Apple Pay a Google Pay – zostávajúca podmienka aktivácie
-
-Obe vetvy sú skontrolované a majú spoločné automatizované testy. Verejný `checkoutConfig()` vracia pre obe peňaženky `false`; Payment Element ich tiež nezobrazuje. Obnoviť ich možno až po samostatne overenej zmene.
-
-Podľa aktuálnej matice Stripe funguje Apple Pay v Safari a podporovaných prehliadačoch iOS 16+; na ostatných desktopových prehliadačoch vyžaduje `paymentMethods.applePay: always`. Google Pay v niektorých prehliadačoch vrátane Safari tiež vyžaduje `always`. Pri budúcom povolení zachováva klient tieto nastavenia, no rozhodujú udalosti dostupnosti zo Stripe; na Chrome/Android sa Apple Pay neponúka.
-
-Skutočný test Google Pay na podporovanom zariadení a Apple Pay v podporovanom prehliadači s pripravenou Apple peňaženkou zostáva povinný. WebKit s mockom neoveruje natívny Apple Pay hárok, bankovú autorizáciu ani príčinu pôvodného timeoutu. Apple Pay dostupnosť závisí od prehliadača, zariadenia, pripravenej peňaženky a registrovanej domény; samotné tlačidlo ani registrácia nie sú E2E platbou. Bez tohto overenia zostávajú peňaženky vypnuté. Živý platený test vyžaduje výslovné povolenie vlastníka.
-
-Oficiálne podklady overené pomocou Stripe CLI 1.55.3: [Checkout confirm](https://docs.stripe.com/js/custom_checkout/confirm), [Express confirm event](https://docs.stripe.com/js/elements_object/express_checkout_element_confirm_event), [prechod na Checkout Sessions](https://docs.stripe.com/elements/express-checkout-element/migration?payment-ui=embedded-components), [Express Checkout a podporované prehliadače](https://docs.stripe.com/elements/express-checkout-element), [testovanie peňaženiek](https://docs.stripe.com/elements/express-checkout-element/accept-a-payment?payment-ui=embedded-components).
+Vlastné obrazovky prešli v Chromium aj WebKite. Skutočný Stripe formulár a validácia prešli v Chromium. Pri samostatnom externom WebKite požiadavka na `api.stripe.com` zlyhala s `Unacceptable TLS certificate` a Stripe zobrazil svoju sieťovú chybu. Test neoznačujeme za úspešný a bezpečnosť produkcie sa kvôli nemu nemení. Overenie reálneho Safari/iPhonu zostáva otvorené.

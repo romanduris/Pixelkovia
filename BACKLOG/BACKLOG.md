@@ -6,13 +6,13 @@
 
 ## P0 – Kritické pred ostrým spustením
 
-- [ ] **Google Pay – odstrániť callback timeout po úspešnej platbe.** Dve reálne platby po 1 € boli úspešné, ale používateľ videl timeout a hrozilo opakované zaplatenie. Musí fungovať bezpečné potvrdenie, obnovenie stavu a ochrana proti dvojitej úhrade. [Detailné zadanie](../MD/P0-google-pay-timeout-apple-pay-audit.md).
-- [ ] **Apple Pay – preventívny audit platobného toku.** Preveriť spoločný callback s Google Pay, doplniť simulované testy a pred verejným zapnutím naplánovať reálny test na Apple zariadení. [Detailné zadanie](../MD/P0-google-pay-timeout-apple-pay-audit.md).
+- [ ] **Google Pay – overiť reálnu platbu po prechode na Stripe Checkout.** Vlastný callback bol odstránený; ochrana pred dvojitou úhradou a obnova prešli automatizovanými testami. Zostáva potvrdiť natívnu platbu na podporovanom zariadení. [Detailné zadanie](../MD/P0-google-pay-timeout-apple-pay-audit.md).
+- [ ] **Apple Pay – reálny test na Apple zariadení.** Vlastný callback nahradil Stripe Checkout, metóda je dostupná v používanej konfigurácii Stripe. Overiť natívny platobný hárok a výsledok na skutočnom iPhone/Safari; automatizované testy obnovy sú hotové. [Detailné zadanie](../MD/P0-google-pay-timeout-apple-pay-audit.md).
 - [ ] **Kompletný E2E test nákupu.** Preveriť checkout, doplnky, súčet, Stripe webhook, pridelenie prístupov, odoslanie e-mailu, rodičovskú stránku a zabránenie duplicitnému nákupu. Ostré platby nerobiť bez schválenia.
 
 ## P1 – Dokončiť / preveriť pred spustením
 
-- [ ] **Checkout – zjednotiť súhrn a platobný formulár.** Jeden vizuálny panel, jediná hlavná platobná akcia, primerané opakovanie ceny a plná dostupná šírka na mobile. Zachovať bezpečné Stripe komponenty.
+- [x] **Checkout – zjednodušiť a vyladiť platobný tok.** Po schválení vlastníkom výber a súhrn zostávajú v jednom paneli, platbu riadi predpripravená stránka Stripe. Výrazné chyby, obnova a návrat prešli kontrolami na mobilných šírkach aj desktope; fyzické peňaženky zostávajú vyššie na overenie.
 - [ ] **Skutočné recenzie namiesto ukážkových.** Upraviť prezentáciu hodnotení tak, aby zobrazovala iba autentické recenzie od reálnych hráčov. Nevytvárať fiktívne hodnotenia ani nezavádzať pri zatiaľ nízkom počte recenzií.
 - [ ] **Rodičovská stránka – hodnotenie po dohraní hry.** Po ukončení posledného videa a kliknutí na tlačidlo typu „Koniec hry“ presmerovať hráča na rodičovskú stránku, kde sa zobrazí žiadosť o hodnotenie hviezdičkami a krátky komentár: čo sa najviac páčilo a čo sa nepáčilo / čo zlepšiť. Premyslieť jednoduchý UX, dobrovoľnosť hodnotenia a spracovanie recenzií pred publikovaním. Prepojenie s hviezdičkovým hodnotením zobrazeným vyššie na stránke; verejne zobrazovať iba skutočné, prípadne moderované hodnotenia.
 - [ ] **Po hodnotení – zvýrazniť knižnicu v rodičovskom portáli.** Po odoslaní alebo preskočení hodnotenia prehľadne zobraziť dostupné zakúpené knižky na čítanie a ponuku dokúpenia nezakúpených. Nezablokovať prístup ku knižnici, ak rodič hodnotenie nechce vyplniť.

@@ -12,7 +12,7 @@ test('two purchases with the same email get isolated credentials, orders and boo
   const env={TQ_DB:db,PAYMENTS_ENABLED:'true',MAIL_DOMAIN_VERIFIED:'true',CUSTOMER_AUTH_SECRET:secret,STRIPE_SECRET_KEY:'rk_live_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_test_fixture',RESEND_API_KEY:'re_test_fixture',STRIPE_CLIENT:{checkout:{sessions:{async create(input){const id='cs_live_fixture'+(++counter);sessions.set(id,{id,...input,amount_total:input.line_items.reduce((s,l)=>s+l.price_data.unit_amount,0),currency:'eur',livemode:true,status:'complete',payment_status:'paid',payment_intent:'pi_'+counter});return {id,client_secret:'not-a-real-secret'};},async retrieve(id){return sessions.get(id);}}}}};
   assert.equal(commerceReady(env),true);
   await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email:''}),e=>e.status===400);
-  await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email,newPurchase:true,uiMode:'hosted'}),e=>e.status===400);
+  await assert.rejects(()=>createCheckout(env,{baseId:'episode-1',books:[],atlasIncluded:true,email,newPurchase:true,uiMode:'invalid'}),e=>e.status===400);
   const firstPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-before'],atlasIncluded:true,uiMode:'elements',email});
   const secondPurchase=await createCheckout(env,{baseId:'episode-1',books:['story-book-after'],atlasIncluded:false,email,newPurchase:true});
   assert.equal(sessions.get(firstPurchase.sessionId).ui_mode,'elements','the compact checkout uses individual Stripe Elements');
