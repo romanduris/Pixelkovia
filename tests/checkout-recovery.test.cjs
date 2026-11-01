@@ -66,8 +66,10 @@ const {launch,open,cachedPurchase,sessionId}=require('./helpers/inline-checkout.
  {
   const old=cachedPurchase();old.input.uiMode='hosted';const t=await open(browser,{purchase:old});await t.page.locator('#stripe-pay').waitFor();assert.equal(t.f.posts.length,2);assert.equal(t.f.releases.length,1);assert.equal(t.f.posts[0].uiMode,'hosted');assert.equal(t.f.posts[1].uiMode,'elements');assert.notEqual(t.f.posts[0].attemptKey,t.f.posts[1].attemptKey);assert.ok(t.page.url().startsWith('https://pixelkovia.rodulab.com'));await t.close();cases.push('old unpaid hosted attempt is safely closed before inline migration');
  }
- {
-  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:false,orderCount:2});await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.match(await t.page.locator('#payment-status').innerText(),/dva samostatné e-maily/);assert.ok(await t.page.locator('#check-payment').isVisible());t.f.delivered=true;await t.page.locator('#check-payment').click();await t.page.waitForFunction(()=>document.querySelector('#check-payment').hidden);await t.close();cases.push('two access emails have their own delivery status after payment');
+ for(const delivered of [false,true]){
+  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered,orderCount:2});await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.match(await t.page.locator('#payment-status').innerText(),delivered?/Dva e-maily/:/dva samostatné e-maily/);assert.ok(await t.page.locator('#check-payment').isHidden());assert.ok(await t.page.locator('#new-order').isVisible());
+  for(const width of [390,1360]){await t.page.setViewportSize({width,height:844});const panel=await t.page.locator('#payment-panel').boundingBox(),button=await t.page.locator('#new-order').boundingBox();assert.ok(Math.abs(button.x+button.width/2-panel.x-panel.width/2)<1,'new order action is centered');}
+  await t.close();cases.push('confirmed payment hides status check and centers new order with email delivery '+delivered);
  }
  for(const state of ['expired','refunded','unknown']){
   const t=await open(browser,{query:'?session_id='+sessionId,denyStorage:true,state});await t.page.waitForFunction(()=>!document.querySelector('#payment-status').textContent.startsWith('Overujeme'));

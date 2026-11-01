@@ -181,7 +181,7 @@
           paymentMessage(confirmed+(value.orderCount===2?(value.delivered?' Dva e-maily s rôznymi heslami sme odovzdali na odoslanie. Druhý je pre ďalšiu rodinu.':' Pripravujeme dva samostatné e-maily s rôznymi heslami. Druhý môžete preposlať ďalšej rodine.'):(value.delivered?' E-mail s prístupom sme odovzdali na odoslanie. Skontrolujte aj priečinok Spam.':' Prístupový e-mail pre vás pripravujeme. Platbu už neopakujte.')),'success');
           if(purchase){forgetSavedPurchase();purchase.phase='paid';}
           if(!embedded?.inFlight)hidePayment();
-          change.hidden=true;check.hidden=value.delivered;next.hidden=!!embedded?.inFlight;return;
+          change.hidden=true;check.hidden=true;next.hidden=!!embedded?.inFlight;return;
         }
         if((value.state==='ready'||value.state==='failed')&&embedded?.inFlight&&embedded.recoverable){
           paymentMessage('Potvrdenie platby sa zatiaľ nedokončilo. Prosíme, neplaťte znova. Ak ste platobné okno zatvorili, môžete obnoviť formulár. Najprv bezpečne overíme a uzavrieme pôvodný pokus.');
