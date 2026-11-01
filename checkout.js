@@ -184,7 +184,6 @@
           change.hidden=true;check.hidden=value.delivered;next.hidden=!!embedded?.inFlight;return;
         }
         if((value.state==='ready'||value.state==='failed')&&embedded?.inFlight&&embedded.recoverable){
-          if(embedded.autoRecover){checking=false;await recoverInterruptedPayment();return;}
           paymentMessage('Potvrdenie platby sa zatiaľ nedokončilo. Prosíme, neplaťte znova. Ak ste platobné okno zatvorili, môžete obnoviť formulár. Najprv bezpečne overíme a uzavrieme pôvodný pokus.');
           retry.hidden=false;retry.textContent='Obnoviť platobný formulár';return;
         }
@@ -249,9 +248,9 @@
     if(loaded.type!=='success')throw Error('Platobný formulár sa nepodarilo načítať. Skúste to znova.');
     const change=document.querySelector('#change-order'),status=document.querySelector('#payment-status'),pay=document.querySelector('#stripe-pay');
     const walletSlot=document.querySelector('#express-checkout-slot'),separator=document.querySelector('#wallet-separator');
-    let alive=true,confirming=false,inFlight=false,walletOpen=false,walletDismissed=false,confirmationSlow=false,recoveryAttempted=false,walletTimer,walletAvailable=false,cardReady=session.totalCents===0,priceValid=true,payment,wallet;
-    const syncPayButton=()=>{pay.disabled=completed||recoveringPayment||walletOpen||confirming||!cardReady||!priceValid;};
-    const slowConfirmation=(method,type)=>{if(!alive||(!inFlight&&!walletOpen))return;confirmationSlow=true;diagnostic(type,method);if(purchase){purchase.phase='unknown';persistPurchase();}paymentMessage(pendingMessage);document.querySelector('#check-payment').hidden=false;void paymentStatus(session.sessionId);};
+    let alive=true,confirming=false,inFlight=false,walletDismissed=false,confirmationSlow=false,recoveryAttempted=false,walletAvailable=false,cardReady=session.totalCents===0,priceValid=true,payment,wallet;
+    const syncPayButton=()=>{pay.disabled=completed||recoveringPayment||confirming||!cardReady||!priceValid;};
+    const slowConfirmation=method=>{if(!alive||!inFlight)return;confirmationSlow=true;diagnostic('confirmation_timeout',method);if(purchase){purchase.phase='unknown';persistPurchase();}paymentMessage(pendingMessage);document.querySelector('#check-payment').hidden=false;void paymentStatus(session.sessionId);};
     function displayTotal(current){
       const amount=current.total.total.minorUnitsAmount;
       if(current.currency!=='eur'||current.minorUnitsAmountDivisor!==100||amount!==session.totalCents)throw Error('Cena platby sa zmenila. Vráťte sa k objednávke a skúste to znova.');
@@ -272,10 +271,11 @@
     }
     async function confirm(event){
       if(!alive||recoveringPayment||completed)return;
-      if(event&&!walletOpen){event.paymentFailed?.({reason:'fail',message:'Peňaženka bola zatvorená. Otvorte ju znova alebo pokračujte kartou.'});return;}
-      if(confirming||(!event&&(checking||walletOpen||purchase?.phase==='unknown'))||purchase?.phase==='paid')return;
-      clearTimeout(walletTimer);
-      try{displayTotal(loaded.actions.getSession());}catch(error){walletOpen=false;priceValid=false;syncPayButton();change.disabled=false;document.querySelector('#retry-payment').hidden=false;paymentMessage(error.message,'error');event?.paymentFailed?.({reason:'fail',message:error.message});return;}
+      // Checkout's Express Element emits confirm after authorization. Its API
+      // has no click event: never reject this based on a locally inferred open flag.
+      if(confirming||(!event&&checking)||purchase?.phase==='unknown'||purchase?.phase==='paid')return;
+      walletDismissed=false;
+      try{displayTotal(loaded.actions.getSession());}catch(error){priceValid=false;syncPayButton();change.disabled=false;document.querySelector('#retry-payment').hidden=false;paymentMessage(error.message,'error');event?.paymentFailed?.({reason:'fail',message:error.message});return;}
       confirming=true;pay.disabled=true;change.disabled=true;
       // Stripe's Checkout API reports validation separately from confirmation errors.
       // Do this before recording any attempt to charge; invalid fields stay visible.
@@ -292,7 +292,7 @@
       inFlight=true;if(purchase){purchase.phase='confirming';persistPurchase();}
       paymentMessage(session.totalCents===0?'Potvrdzujem objednávku…':'Spracúvam platbu…');
       // A slow bank dialog must keep its original Stripe elements and confirmation alive.
-      const watchdog=setTimeout(()=>slowConfirmation(method,'confirmation_timeout'),20000);
+      const watchdog=setTimeout(()=>slowConfirmation(method),20000);
       let outcome,confirmationIssue=false;
       try{
         // return_url is owned by the server. Supplying returnUrl here throws before charging.
@@ -305,7 +305,7 @@
         // network/bank outcomes must still be verified before any retry.
         if(event&&['billing_phone_missing','billing_email_missing','return_url_conflict'].includes(code))event.paymentFailed?.({reason:'fail',message:'Platbu sa nepodarilo odoslať. Obnovte pôvodný formulár a skúste znova.'});
       }
-      finally{clearTimeout(watchdog);inFlight=false;walletOpen=false;}
+      finally{clearTimeout(watchdog);inFlight=false;}
       if(!alive||recoveringPayment)return;
       if(outcome?.type==='error'&&outcome.error?.code==='paymentFailed'&&!completed){
         diagnostic('payment_failed_client',method);
@@ -321,7 +321,7 @@
       setTimeout(()=>{if(alive)void paymentStatus(session.sessionId,{confirmationIssue});},0);
     }
     const submit=()=>confirm();
-    const destroy=()=>{alive=false;clearTimeout(walletTimer);pay.removeEventListener('click',submit);payment?.destroy();wallet?.destroy();pay.hidden=true;pay.disabled=true;walletSlot.hidden=true;separator.hidden=true;};
+    const destroy=()=>{alive=false;pay.removeEventListener('click',submit);payment?.destroy();wallet?.destroy();pay.hidden=true;pay.disabled=true;walletSlot.hidden=true;separator.hidden=true;};
     document.querySelector('#payment-heading').textContent=session.totalCents===0?'Potvrdenie objednávky zdarma':'Bezpečná platba';
     document.querySelector('.payment-method-note').hidden=session.totalCents===0;
     form.classList.add('payment-open');panel.hidden=false;document.querySelector('#payment-slot').hidden=false;walletSlot.hidden=false;separator.hidden=true;pay.hidden=false;pay.disabled=true;document.querySelector('#check-payment').hidden=true;document.querySelector('#retry-payment').hidden=true;document.querySelector('#new-order').hidden=true;
@@ -334,28 +334,17 @@
         payment.on('loaderror',()=>{if(alive){diagnostic('element_error','card');cardReady=false;syncPayButton();paymentMessage('Údaje karty sa nepodarilo načítať. Skontrolujte pripojenie a obnovte pôvodný formulár.','error');document.querySelector('#retry-payment').hidden=false;}});
         if(configuration.wallets?.applePay||configuration.wallets?.googlePay){
           wallet=checkout.createExpressCheckoutElement({buttonHeight:44,layout:{maxColumns:2,maxRows:1},paymentMethods:{applePay:configuration.wallets?.applePay?'always':'never',googlePay:configuration.wallets?.googlePay?'always':'never',link:'never',paypal:'never',amazonPay:'never',klarna:'never'}});
-          const showWallets=available=>{if(!alive)return;if(available&&!walletAvailable)diagnostic('wallet_available','wallet');walletAvailable=available;if(!walletOpen&&!confirming&&!checking&&!completed){walletSlot.hidden=!available;separator.hidden=!available;}};
+          const showWallets=available=>{if(!alive)return;if(available&&!walletAvailable)diagnostic('wallet_available','wallet');walletAvailable=available;if(!confirming&&!checking&&!completed){walletSlot.hidden=!available;separator.hidden=!available;}};
           wallet.on('ready',event=>showWallets(Boolean(event.availablePaymentMethods?.applePay||event.availablePaymentMethods?.googlePay)));
-          // Availability can change after ready while Stripe checks the browser's wallets.
-          wallet.on('availablepaymentmethodschange',event=>showWallets(Boolean(event.paymentMethods?.applePay?.available||event.paymentMethods?.googlePay?.available)));
-          wallet.on('click',event=>{
-            if(!alive||confirming||checking||recoveringPayment||completed||walletOpen||purchase?.phase==='unknown'){event.reject();return;}
-            // Protect the original iframe from the moment the native sheet opens,
-            // including the bank/app switch before Stripe emits confirm. Resolve
-            // synchronously: Stripe requires this callback within one second.
-            walletOpen=true;walletDismissed=false;confirmationSlow=false;recoveryAttempted=false;syncPayButton();change.disabled=true;
-            try{event.resolve();const method=({apple_pay:'apple_pay',google_pay:'google_pay'})[event.expressPaymentType]||'wallet';diagnostic('wallet_opened',method);walletTimer=setTimeout(()=>slowConfirmation(method,'wallet_wait_timeout'),45000);}
-            catch{walletOpen=false;syncPayButton();change.disabled=false;diagnostic('wallet_error','wallet');paymentMessage('Peňaženku sa nepodarilo otvoriť. Skúste znova alebo použite platobnú kartu.','error');}
-          });
           wallet.on('confirm',confirm);
           const dismissed=(loadError=false)=>{
-            clearTimeout(walletTimer);walletOpen=false;walletDismissed=true;
+            walletDismissed=true;
             if(!alive||recoveringPayment)return;
             if(completed){inFlight=false;confirming=false;hidePayment();document.querySelector('#new-order').hidden=false;return;}
             // Dismissal can arrive AFTER authorization. Do not label it a
             // failed/unpaid payment or unlock the card while confirm is pending.
             if(inFlight||confirming||purchase?.phase==='unknown'){paymentMessage('Peňaženka je zatvorená. Overujeme výsledok platby…');setTimeout(()=>{if(alive)void paymentStatus(session.sessionId);},0);return;}
-            if(!checking){syncPayButton();change.disabled=false;walletSlot.hidden=!walletAvailable;separator.hidden=!walletAvailable;paymentMessage(loadError?'Peňaženku sa nepodarilo načítať. Môžete pokračovať platobnou kartou.':'Peňaženku ste zatvorili. Môžete zaplatiť kartou alebo ju otvoriť znova.',loadError?'error':'info');}
+            if(!checking){syncPayButton();change.disabled=false;walletSlot.hidden=!walletAvailable;separator.hidden=!walletAvailable;paymentMessage(loadError?'Peňaženku sa nepodarilo načítať. Môžete pokračovať platobnou kartou.':'Platobné okno sa zatvorilo. Ak ste platbu nepotvrdili, môžete pokračovať kartou.',loadError?'error':'info');}
           };
           wallet.on('cancel',()=>{if(alive){diagnostic('wallet_cancelled','wallet');dismissed();}});
           wallet.on('loaderror',()=>{if(alive){diagnostic('wallet_error','wallet');showWallets(false);dismissed(true);}});
@@ -364,7 +353,7 @@
         payment.mount('#payment-slot');
       }else{walletSlot.hidden=true;pay.disabled=false;}
       pay.addEventListener('click',submit);
-      return {destroy,sessionId:session.sessionId,get inFlight(){return inFlight||walletOpen;},get recoverable(){return (inFlight||walletOpen||recoveryAttempted)&&(walletDismissed||confirmationSlow);},get autoRecover(){return walletDismissed&&!recoveryAttempted;},recoveryStarted(){recoveryAttempted=true;},verifiedPaid(){if(walletDismissed){inFlight=false;walletOpen=false;confirming=false;}},refreshControls:syncPayButton,retry:readyForRetry};
+      return {destroy,sessionId:session.sessionId,get inFlight(){return inFlight;},get recoverable(){return (inFlight||recoveryAttempted)&&confirmationSlow;},recoveryStarted(){recoveryAttempted=true;},verifiedPaid(){if(walletDismissed){inFlight=false;confirming=false;}},refreshControls:syncPayButton,retry:readyForRetry};
     }catch(error){destroy();throw error;}
   }
   async function preparePayment(input,{freshVisit=false}={}){
@@ -453,12 +442,14 @@
     try{await preparePayment(purchase.input);}catch(error){handlePrepareError(error);}
   });
   window.addEventListener('storage',event=>{
-    if(event.key!==purchaseStorage||!event.newValue||preparing||checking)return;
+    if(event.key!==purchaseStorage||!event.newValue||preparing||checking||recoveringPayment)return;
     // An open checkout keeps its own original attempt even when another tab buys again.
-    if(returned||returnedCheckout){if(!embedded?.inFlight)void paymentStatus();return;}
+    if(returned||returnedCheckout){if(!embedded)void paymentStatus();return;}
     try{const value=JSON.parse(event.newValue);if(value?.sessionId){purchase=value;void paymentStatus(value.sessionId);}}catch{}
   });
-  window.addEventListener('pageshow',event=>{if(event.persisted&&(returned||returnedCheckout||purchase?.sessionId)&&!embedded?.inFlight)void paymentStatus();});
+  // Keep a mounted checkout intact during a native wallet/bank app switch.
+  // Checkout exposes no reliable pre-confirmation "wallet opened" event.
+  window.addEventListener('pageshow',event=>{if(event.persisted&&(returned||returnedCheckout||purchase?.sessionId)&&!embedded&&!recoveringPayment)void paymentStatus();});
   configurationPromise=api('/api/checkout/config').then(value=>{configuration=value;document.querySelector('#payment-note').textContent=value.enabled?'Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.':'Platby teraz nie sú dostupné. Skúste to o chvíľu alebo nám napíšte na miky@pixelkovia.rodulab.com.';update();}).catch(()=>{diagnostic('config_error');document.querySelector('#payment-note').textContent='Platobnú službu sa nepodarilo načítať. Skontrolujte spojenie a obnovte stránku.';});
   if(purchase?.input){const input=purchase.input;form.elements.email.value=input.email;if(input.baseId===baseId){atlasSelected=input.atlasIncluded;giftSelected=!!input.giftGame;voucherCode=input.voucherCode;input.books.forEach(id=>selected.add(id));}}
   update();

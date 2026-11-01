@@ -21,9 +21,11 @@ function install(options){
   createExpressCheckoutElement(config){s.walletElements++;s.walletConfig=config;const events={},button=document.createElement('button');button.type='button';button.textContent='Fixture '+options.wallet;
    const event={expressPaymentType:options.wallet,paymentFailed(){s.walletFailed++;}};
    s.confirmWallet=async()=>{s.nativeReturned=false;await events.confirm(event);s.nativeReturned=true;queueMicrotask(()=>s.nativeComplete=s.destroyed===0);};
-   button.addEventListener('click',()=>{let resolved=!events.click;events.click?.({expressPaymentType:options.wallet,resolve(){resolved=true;s.walletResolved++;},reject(){resolved=false;}});if(resolved&&!options.walletDelayConfirm)void s.confirmWallet();});
-   s.walletAvailability=available=>events.availablepaymentmethodschange?.({paymentMethods:{applePay:{available},googlePay:{available}}});s.cancel=()=>events.cancel?.({});
-   return {on(t,h){events[t]=h;},mount(sel){document.querySelector(sel).append(button);events.ready?.({availablePaymentMethods:s.walletAvailable?{applePay:options.wallet==='apple_pay',googlePay:options.wallet==='google_pay'}:null});},destroy(){s.destroyed++;button.remove();}};
+   button.addEventListener('click',()=>{if(!options.walletDelayConfirm)void s.confirmWallet();});
+   s.cancel=()=>events.cancel?.({});
+   // This is Checkout's narrowed Express Element contract, not the generic
+   // Elements contract. click/availablepaymentmethodschange are unsupported.
+   return {on(t,h){if(!['ready','focus','blur','escape','loaderror','confirm','cancel'].includes(t))throw Error('Unsupported Checkout Express event: '+t);events[t]=h;},mount(sel){document.querySelector(sel).append(button);events.ready?.({availablePaymentMethods:s.walletAvailable?{applePay:options.wallet==='apple_pay',googlePay:options.wallet==='google_pay'}:null});},destroy(){s.destroyed++;button.remove();}};
   }
  };}});
 }
