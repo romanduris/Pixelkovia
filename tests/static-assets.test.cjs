@@ -12,7 +12,7 @@ for(const route of inventory.public){
 }
 assert.ok(versioned>25);
 for(const [route,file]of Object.entries(inventory.protected)){assert.ok(!inventory.public.includes(route));assert.ok(fs.existsSync(path.join(root,'_protected',file.file)));assert.ok(['game','run','admin','customer','book-before','book-after'].includes(file.role));}
-for(const file of ['app.js','game-data.js','cipko-game.js','game-bridge.js'])assert.equal(fs.readFileSync(path.join(root,'_protected',file),'utf8'),fs.readFileSync(file,'utf8'));
+for(const file of ['app.js','game-data.js','cipko-game.js','game-bridge.js','printables.js','print-materials.js','site-content.js'])assert.equal(fs.readFileSync(path.join(root,'_protected',file),'utf8'),fs.readFileSync(file,'utf8'));
 for(const file of ['parent.html','game.html','storyboard.html','game-data.js','assets/printables/vsetky-materialy.pdf'])assert.ok(!fs.existsSync(path.join(root,file)));
 assert.ok(fs.existsSync(root+'/_worker.js'));
 console.log('PASS: exact current assets, versioned public resources, explicit roles and mandatory Worker boundary.');

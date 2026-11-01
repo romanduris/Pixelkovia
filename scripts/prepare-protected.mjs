@@ -6,7 +6,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 async function files(directory,prefix=''){const list=[];for(const item of await readdir(directory,{withFileTypes:true})){const relative=prefix+item.name;if(item.isDirectory())list.push(...await files(path.join(directory,item.name),relative+'/'));else list.push(relative);}return list;}
 export async function prepareProtected(output){
   const publicFiles=(await files(output)).filter(f=>!f.startsWith('_')).map(f=>'/'+f),inventory={};
-  const code=['site-config.js','game-data.js','story-text.js','prep-store.js','print-materials.js','site-content.js','cipko-game.js','app.js','game-bridge.js'];
+  const code=['site-config.js','game-data.js','story-text.js','prep-store.js','print-materials.js','printables.js','site-content.js','cipko-game.js','app.js','game-bridge.js'];
   const documents=[['/hra','game.html','run'],['/admin/storyboard','storyboard.html','admin'],['/materialy','printables.html','game'],['/kniznica/citat','library-read.html','customer']];
   const add=async(route,file,role,document=false)=>{const target=path.join(output,'_protected',file);await mkdir(path.dirname(target),{recursive:true});await cp(path.join(root,file),target);inventory[route]={file,role,document};};
   for(const file of code)await add('/'+file,file,'game');

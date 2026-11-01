@@ -39,7 +39,7 @@
   const internalSheetLink=id=>`/materialy#${id}`;
   function sheetActions(id){return `<div class="material-actions storyboard-sheet-actions"><a class="btn small secondary" href="${internalSheetLink(id)}" target="_blank" rel="noopener noreferrer">Skontrolovať tlačený dokument</a></div>`;}
   function worksheetReview(id,stageId){
-    const material=materials.find(item=>item.id===id),image=id==='p1'?'assets/miky-sheet-preview.png':`assets/printables/${id}-preview.png`;
+    const material=materials.find(item=>item.id===id),image=id==='p1'?'assets/miky-sheet-preview.webp':`assets/printables/${id}-preview.webp`;
     return `<div class="worksheet-review"><a class="worksheet-image" href="${internalSheetLink(id)}" target="_blank" rel="noopener noreferrer" aria-label="Otvoriť tlačený list Úloha ${Number(id.slice(1))} – ${esc(material.title)}"><img src="${image}" alt="Tlačený pracovný list ${esc(material.title)}" loading="lazy" width="794" height="1123"></a><div class="worksheet-text">${PRINT_MATERIALS.summary(id,stageId)}</div></div>`;
   }
   function copyButton(target,label,kind){return `<button class="copy-toggle ${kind}-toggle" data-action="toggle-copy" data-target="${target}" aria-controls="${target}" aria-expanded="false">${label}</button>`;}
