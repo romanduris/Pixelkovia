@@ -28,12 +28,13 @@ function install(options){
 }
 async function open(browser,options={}){
  const width=options.width||390,context=await browser.newContext({viewport:{width,height:844},isMobile:width<600,hasTouch:width<600}),page=await context.newPage();
- const f={posts:[],releases:[],reads:0,createLost:false,createError:0,statusError:false,releaseError:false,enabled:true,state:'ready',paid:false,delivered:false,totalCents:1499,labels:['Rodinná hra Pixelkovia','Atlas Pixelkov'],orderCount:1,...options};
+ const f={posts:[],releases:[],diagnostics:[],reads:0,createLost:false,createError:0,statusError:false,releaseError:false,enabled:true,state:'ready',paid:false,delivered:false,totalCents:1499,labels:['Rodinná hra Pixelkovia','Atlas Pixelkov'],orderCount:1,...options};
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await context.addInitScript(install,{wallet:'google_pay',...options});
  await context.addInitScript(({purchase,denyStorage})=>{if(denyStorage){Object.defineProperty(window,'localStorage',{get(){throw Error('Storage unavailable');}});Object.defineProperty(window,'sessionStorage',{get(){throw Error('Storage unavailable');}});}else if(purchase)localStorage.setItem('pixelkovia-checkout-attempt',JSON.stringify(purchase));},{purchase:options.purchase,denyStorage:options.denyStorage});
  await context.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());if(url.origin!==origin)return route.abort();
+  if(url.pathname==='/api/checkout/diagnostic'){f.diagnostics.push(req.postDataJSON());return f.diagnosticError?route.abort():route.fulfill({json:{received:true}});}
   if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:f.enabled,checkout:'elements',publishableKey:'pk_test_fixture',wallets:{applePay:true,googlePay:true}}});
   if(url.pathname==='/api/checkout/session'){
    const input=req.postDataJSON();f.posts.push(input);
@@ -57,7 +58,7 @@ async function open(browser,options={}){
  await page.goto(origin+'/checkout'+(options.query||''));
  await page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled||!document.querySelector('#payment-panel').hidden||document.querySelector('#payment-note').textContent.includes('nie sú dostupné'));
  async function voucher(code){await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill(code);await page.locator('#voucher-form').evaluate(el=>el.requestSubmit());}
- async function start(){await page.locator('[name=email]').fill('family@example.invalid');await page.locator('.checkout-buy').click();await page.locator('#stripe-pay').waitFor();}
+ async function start(){await page.locator('[name=email]').fill('family@example.invalid');await page.locator('.checkout-buy').click();try{await page.locator('#stripe-pay').waitFor();}catch(error){error.message+='\nFixture: '+JSON.stringify({query:options.query,posts:f.posts.length,totalCents:f.totalCents,status:await page.locator('#payment-status').innerText(),note:await page.locator('#payment-note').innerText(),errors});throw error;}}
  async function finish(result={type:'success'}){await page.evaluate(result=>inlineFixture.finish(result),result);}
  async function close(){if(errors.length)throw Error('Browser errors: '+errors.join('; '));await context.close();}
  return {page,context,f,voucher,start,finish,close};

@@ -8,7 +8,8 @@ import {passwordLogin,passwordLogout,sessionCookie,clearCookie} from './password
 import {fakeCustomerCount} from './fake-customers.mjs';
 import {customerLogin,customerLogout,customerCookie} from './customer-auth.mjs';
 import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './customer-portal.mjs';
-import {checkoutConfig,createCheckout,verifiedCheckoutStatus,releaseCheckout,paymentWebhook,sendPending} from './commerce.mjs';
+import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,releaseCheckout,paymentWebhook,sendPending,auditPayments} from './commerce.mjs';
+import {browserPaymentEvent,paymentReport,paymentLog,attemptFor} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
@@ -62,7 +63,8 @@ async function customerApi(request,env,path){
   if(path==='/api/customer/complete'&&request.method==='POST')return json(await gameEvent(db,run,{...input,type:'complete'}));
   throw new HttpError(404,'Endpoint neexistuje.');
 }
-export default {async scheduled(event,env){await sendPending(env);},async fetch(request,env,context){
+export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env)]);},async fetch(request,env,context){
+  let paymentInput;
   try{
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
@@ -72,8 +74,9 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
       if(checkoutId?!/^[a-f0-9-]{36}$/.test(checkoutId):!/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(session||''))throw new HttpError(400,'Neplatná platobná relácia.');
       return json(await verifiedCheckoutStatus(env,session,checkoutId));
     }
-    if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);return json(await createCheckout(env,{...await body(request),__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
-    if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);return json(await releaseCheckout(env,await body(request)));}
+    if(path==='/api/checkout/diagnostic'&&request.method==='POST'){sameOrigin(request);return json(await browserPaymentEvent(request,env,await body(request)));}
+    if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await createCheckout(env,{...paymentInput,__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
+    if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await releaseCheckout(env,paymentInput));}
     if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env,context));
     if(path==='/api/support/webhook'&&request.method==='POST')return json(await supportWebhook(request,env));
     if(path==='/api/customer/login'&&request.method==='POST'){
@@ -111,6 +114,11 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
     if(request.method!=='GET'&&request.method!=='HEAD')throw new HttpError(405,'Administrátorské rozhranie je v tejto etape iba na čítanie.');
     if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',fakeCustomers:await fakeCustomerCount(env.TQ_DB),webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH_SECRET});
     if(path==='/api/admin/products')return json(await query(env.TQ_DB,'SELECT * FROM products ORDER BY id'));
+    if(path==='/api/admin/payments'){
+      const report=await paymentReport(env,url.searchParams,commerceReady(env));
+      if(context?.waitUntil&&(!report.checks.length||report.checks.some(c=>Date.now()-c.checked_at>600000)))context.waitUntil(auditPayments(env));
+      return json(report);
+    }
     if(path.startsWith('/api/admin/library/'))return json(editorBook(path.slice('/api/admin/library/'.length)));
     if(path==='/api/admin/dashboard')return json(await dashboard(env.TQ_DB,filters(url.searchParams)));
     if(path==='/api/admin/analytics')return json(await analytics(env.TQ_DB,filters(url.searchParams)));
@@ -124,7 +132,14 @@ export default {async scheduled(event,env){await sendPending(env);},async fetch(
     // Never return the demo UI on a remote host, even if a local configuration is accidentally deployed.
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
     return secureAsset(await env.ASSETS.fetch(request));
-  }catch(error){return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.',...(error instanceof HttpError&&error.code==='previous_payment_paid'?{code:error.code}:{})},error instanceof HttpError?error.status:500);}
+  }catch(error){
+    const path=new URL(request.url).pathname;
+    if((!(error instanceof HttpError)||error.status>=500)&&['/api/checkout/session','/api/checkout/status','/api/checkout/release'].includes(path)){
+      const log=(async()=>{let attempt;try{attempt=await attemptFor(env,{attemptKey:paymentInput?.attemptKey,sessionId:new URL(request.url).searchParams.get('session_id')});}catch{}
+        await paymentLog(env,{type:path.endsWith('/session')?'session_error':path.endsWith('/release')?'release_error':'status_error',attemptId:attempt?.id,code:error.type});})();
+      if(context?.waitUntil)context.waitUntil(log);else await log;
+    }
+    return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.',...(error instanceof HttpError&&error.code==='previous_payment_paid'?{code:error.code}:{})},error instanceof HttpError?error.status:500);}
 }};
 
 function secureAsset(response){

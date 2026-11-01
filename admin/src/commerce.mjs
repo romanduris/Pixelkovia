@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import {HttpError} from './auth.mjs';
+import {paymentLog,orderPaymentLog,paymentFailureKey,observePayment,monitorCheck,prunePaymentLog} from './payment-monitor.mjs';
 import {first,query,statement,execute,uuid,randomToken,hash} from './db.mjs';
 import {credentials,emailAddress} from './customer-auth.mjs';
 import {quote,product,offer} from './catalog.mjs';
@@ -60,11 +61,13 @@ export async function verifiedCheckoutStatus(env,sessionId,checkoutId){
   const attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',sessionId);
   if(!attempt)return {...order,state:'unknown',retryAllowed:false};
   const session=await readSession(env,attempt),intent=session.payment_intent;
-  if(intent?.latest_charge?.refunded===true||(order.orderCount&&!order.paid))return {...order,paid:false,state:'refunded',retryAllowed:false};
+  if(intent?.latest_charge?.refunded===true||(order.orderCount&&!order.paid)){await observePayment(env,attempt,'refunded',intent);return {...order,paid:false,state:'refunded',retryAllowed:false};}
   const paid=settledPaid(session,attempt);
   const ready=session.status==='open'&&(!intent||['requires_payment_method','canceled'].includes(intent.status));
   const failed=ready&&!!intent?.last_payment_error;
   const url=ready&&session.ui_mode==='hosted_page'?hostedUrl(session.url):null;
+  const observed=paid||order.paid?(attempt.total_cents===0?'free':'paid'):safelyExpired(session)?'expired':failed?'failed':ready?'ready':'pending';
+  await observePayment(env,attempt,observed,intent);
   return {...order,sessionId,paid:paid||order.paid,noPaymentRequired:paid?attempt.total_cents===0:order.noPaymentRequired,state:paid||order.paid?'paid':safelyExpired(session)?'expired':failed?'failed':ready?'ready':'pending',retryAllowed:ready||safelyExpired(session),canEdit:ready||safelyExpired(session),checkoutUrl:url,totalCents:attempt.total_cents,labels:JSON.parse(attempt.selection).map(id=>product(id).name).concat(attempt.gift_game?['Druhá hra pre ďalšiu rodinu']:[]),orderCount:order.orderCount||(paid?(attempt.gift_game?2:1):0)};
 }
 function hostedUrl(value){try{const url=new URL(value);if(url.protocol==='https:'&&url.hostname==='checkout.stripe.com'&&!url.username&&!url.password&&!url.port&&url.pathname.startsWith('/c/pay/'))return url.href;}catch{}return null;}
@@ -130,6 +133,7 @@ export async function createCheckout(env,input){
   const hosted=input.uiMode==='hosted';
   const session=await stripe(env).checkout.sessions.create({mode:'payment',ui_mode:hosted?'hosted_page':input.uiMode==='elements'?'elements':'form',locale:'sk',excluded_payment_method_types:excludedMethods,wallet_options:{link:{display:'never'}},adaptive_pricing:{enabled:false},customer_email:email,client_reference_id:id,line_items:lines,...(hosted?{success_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}&product='+q.baseId,cancel_url:ORIGIN+'/checkout?checkout_id='+id+'&canceled=1&product='+q.baseId,branding_settings:{display_name:'Pixelkovia',background_color:'#0d1424',button_color:'#ace9cf',font_family:'inter',border_style:'rounded'},custom_text:{submit:{message:'Po potvrdenej platbe vám pošleme e-mail s prístupom k dobrodružstvu. Každý nákup má vlastné heslo.'}}}:{return_url:ORIGIN+'/checkout?session_id={CHECKOUT_SESSION_ID}'}),integration_identifier:'pixelkovia_'+id.replaceAll('-','').slice(0,8).split('').map(c=>String.fromCharCode(97+parseInt(c,16))).join(''),metadata:{checkout_attempt:id,...(q.voucher?{voucher_code:q.voucher}:{})},expires_at:Math.floor(at/1000)+1800},{idempotencyKey:id});
   await execute(env.TQ_DB,'UPDATE checkout_attempts SET stripe_session_id=? WHERE id=?',session.id,id);
+  await paymentLog(env,{type:'session_created',attemptId:id,productId:q.baseId,dedupe:id});
   return checkoutReply(session,{total_cents:q.totalCents,voucher_code:q.voucher});
 }
 async function encryptionKey(secret){return crypto.subtle.importKey('raw',Uint8Array.from(secret.match(/../g),x=>parseInt(x,16)),'AES-GCM',false,['encrypt','decrypt']);}
@@ -189,7 +193,10 @@ export async function sendPending(env){
       const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':'access/'+row.order_id},body:JSON.stringify({from:'Piko · Pixelkovia <Piko@pixelkovia.rodulab.com>',to:[data.email],reply_to:offer.contactEmail,subject:data.gift?'Vaša druhá hra Pixelkovia – na preposlanie':'Váš prístup do sveta Pixelkov',...accessEmail(data)})});
       if(!response.ok)throw Error('Email provider rejected delivery');const sent=await response.json();
       await db.batch([statement(db,"UPDATE access_deliveries SET status='sent',encrypted_message=NULL,sent_at=?,provider_reference=? WHERE order_id=?",at,sent.id,row.order_id),statement(db,"UPDATE email_events SET status='sent',sent_at=?,provider_reference=? WHERE id=?",at,sent.id,'access-'+row.order_id)]);
-    }catch{await db.batch([statement(db,"UPDATE access_deliveries SET status='failed' WHERE order_id=?",row.order_id),statement(db,"UPDATE email_events SET status='failed' WHERE id=?",'access-'+row.order_id)]);}
+      await orderPaymentLog(env,row.order_id,'delivery_sent',row.order_id);
+    }catch{await db.batch([statement(db,"UPDATE access_deliveries SET status='failed' WHERE order_id=?",row.order_id),statement(db,"UPDATE email_events SET status='failed' WHERE id=?",'access-'+row.order_id)]);
+      await orderPaymentLog(env,row.order_id,'delivery_failed',row.order_id+':'+Math.floor(at/600000));
+    }
   }
 }
 export async function paymentWebhook(request,env,context){
@@ -199,9 +206,49 @@ export async function paymentWebhook(request,env,context){
   bytes+=decoder.decode();
   let event;try{event=await stripe(env).webhooks.constructEventAsync(bytes,request.headers.get('stripe-signature'),env.STRIPE_WEBHOOK_SECRET,undefined,Stripe.createSubtleCryptoProvider());}catch{throw new HttpError(400,'Neplatný podpis platobnej udalosti.');}
   if(await first(env.TQ_DB,'SELECT id FROM payment_events WHERE id=?',event.id))return {received:true};
+  try{
   if(['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)&&(event.data.object.payment_status==='paid'||(event.type==='checkout.session.completed'&&event.data.object.payment_status==='no_payment_required')))await fulfill(env,event.data.object.id);
   if(event.type==='charge.refunded'&&event.data.object.refunded===true){await env.TQ_DB.batch([statement(env.TQ_DB,'INSERT OR IGNORE INTO payment_refunds VALUES(?,?)',event.data.object.payment_intent,Date.now()),statement(env.TQ_DB,"UPDATE orders SET status='refunded' WHERE external_reference IN(SELECT stripe_session_id FROM checkout_attempts WHERE payment_intent=?) OR id IN(SELECT co.order_id FROM checkout_orders co JOIN checkout_attempts a ON a.id=co.attempt_id WHERE a.payment_intent=?)",event.data.object.payment_intent,event.data.object.payment_intent)]);}
   await execute(env.TQ_DB,'INSERT OR IGNORE INTO payment_events VALUES(?,?,?)',event.id,event.data.object.id,Date.now());
+  }catch(error){await paymentLog(env,{type:'webhook_error',source:'server',code:error.type,dedupe:event.id});throw error;}
+  // Signed events are linked only to this application's Sessions, never another business.
+  try{
+    const object=event.data.object;
+    let attempt;
+    if(event.type==='payment_intent.payment_failed'){
+      attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE payment_intent=?',object.id);
+      if(!attempt){const page=await stripe(env).checkout.sessions.list({payment_intent:object.id,limit:10});
+        for(const session of page.data){attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',session.id);if(attempt){verifySession(env,session,attempt);break;}}}
+      if(attempt)await paymentLog(env,{type:'payment_failed',source:'stripe',attemptId:attempt.id,code:object.last_payment_error?.decline_code||object.last_payment_error?.code,dedupe:paymentFailureKey(object)});
+    }else if(event.type==='checkout.session.async_payment_failed'){
+      attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',object.id);
+      if(attempt){await readSession(env,attempt);await paymentLog(env,{type:'payment_failed',source:'stripe',attemptId:attempt.id,dedupe:event.id});}
+    }else if(event.type==='charge.refunded'&&object.refunded===true){
+      const attempts=await query(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE payment_intent=?',object.payment_intent);
+      for(const a of attempts)await observePayment(env,a,'refunded');
+    }else if(event.type.startsWith('checkout.session.')){
+      attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',object.id);
+      if(attempt)await verifiedCheckoutStatus(env,object.id);
+    }
+  }catch{await paymentLog(env,{type:'status_error',source:'server',dedupe:event.id});}
   if(context?.waitUntil)context.waitUntil(sendPending(env));else await sendPending(env);
   return {received:true};
+}
+
+// Server audit continues after a customer closes their browser. It only reads Stripe;
+// fulfillment remains exclusively in the verified, signed payment webhook.
+export async function auditPayments(env){
+  if(!commerceReady(env))return;
+  try{
+    const hooks=await stripe(env).webhookEndpoints.list({limit:100});
+    const hook=hooks.data.find(h=>h.url===ORIGIN+'/api/stripe/webhook'&&h.status==='enabled');
+    const required=['checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','payment_intent.payment_failed','charge.refunded'];
+    await monitorCheck(env,'webhook',!!hook&&(hook.enabled_events.includes('*')||required.every(e=>hook.enabled_events.includes(e))));
+    await monitorCheck(env,'stripe',true);
+  }catch{await monitorCheck(env,'stripe',false);}
+  const attempts=await query(env.TQ_DB,`SELECT a.* FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id
+    WHERE a.created_at>? AND a.stripe_session_id IS NOT NULL AND (p.state IS NULL OR p.state IN('ready','pending','failed') OR (p.state IN('paid','free') AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.external_reference=a.stripe_session_id)))
+    ORDER BY coalesce(p.checked_at,0),a.created_at LIMIT 8`,Date.now()-7*86400000);
+  for(const a of attempts){try{await verifiedCheckoutStatus(env,a.stripe_session_id);}catch(error){await paymentLog(env,{type:'status_error',attemptId:a.id,code:error.type});}}
+  await prunePaymentLog(env);
 }

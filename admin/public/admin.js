@@ -6,8 +6,8 @@ const money=(cents,currency='EUR')=>new Intl.NumberFormat('sk-SK',{style:'curren
 const time=ms=>ms==null?'—':ms>=3600000?number(ms/3600000)+' h':ms>=60000?number(ms/60000)+' min':number(ms/1000)+' s';
 const stateNames={purchased:'Zakúpené, neaktivované',preparing:'Pripravuje hru',playing:'Rozhrané',completed:'Dokončené',expired:'Prístup vypršal',active:'Aktívna relácia',valid:'Platné',revoked:'Odňaté',pending:'Čaká na platbu','payment-pending':'Čaká na platbu',paid:'Zaplatené',refunded:'Vrátené',cancelled:'Zrušené',draft:'Koncept',blocked:'Blokované',queued:'Čaká na odoslanie',sent:'Odoslané',failed:'Chyba'};
 const badge=status=>`<span class="status ${escape(status)}">${escape(stateNames[status]||status)}</span>`;
-const titles={dashboard:['Overview','Zákazníci, tržby a priebeh hry na jednom mieste.'],orders:['Objednávky','Nákupy, produkty a platby zákazníkov Pixelkovia.'],analytics:['Herná analýza','Od prvého nákupu po poslednú stopu. Celý príbeh každého zákazníka.']};
-const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false};
+const titles={payments:['Platby a chyby','Overené úhrady, zlyhania formulára a doručenie prístupov.'],dashboard:['Overview','Zákazníci, tržby a priebeh hry na jednom mieste.'],orders:['Objednávky','Nákupy, produkty a platby zákazníkov Pixelkovia.'],analytics:['Herná analýza','Od prvého nákupu po poslednú stopu. Celý príbeh každého zákazníka.']};
+const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'1',paymentCategory:''};
 let loadingId=0,detailId=0,debounce;
 async function api(path,params){const response=await fetch(path+(params?.toString()?'?'+params:''),{credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/admin/login');throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
 function midnight(day){const utc=Date.parse(day+'T00:00:00Z');const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(utc).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const represented=Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));return new Date(utc-(represented-utc)).toISOString();}
@@ -23,6 +23,38 @@ function dashboard(data){
   const m=data.metrics,revenues=Object.entries(m.revenueByCurrency).map(([currency,cents])=>money(cents,currency)).join(' / ')||money(0);
   const metrics=[['Zákazníci',m.customers,'Unikátne zákaznícke ID'],['Zaplatené objednávky',m.paidOrders,'Unikátne objednávky'],['Tržby',revenues,'Zaplatené položky v kohorte'],['Zakúpené hry',m.purchasedGames,'Zakúpené oprávnenia'],['Neaktivované hry',m.unactivated,'Oprávnenia bez spustenia'],['Aktivované hry',m.activated,'Oprávnenia s aktiváciou'],['Rozhrané hry',m.playing,'Aktívne herné relácie'],['Dokončené hrania',m.completed,'Vrátane samostatných opakovaní'],['Priemerné dokončenie',time(m.meanCompletionMs),'Uplynutý čas dokončených relácií'],['Medián dokončenia',time(m.medianCompletionMs),'Uplynutý čas dokončených relácií']];
   return `<div class="metrics">${metrics.map(([label,value,note])=>`<article class="metric"><span class="label">${label}</span><strong>${typeof value==='number'?number(value):escape(value)}</strong><small>${note}</small></article>`).join('')}</div><div class="chart-grid">${chart('Nákupy v čase',data.charts.purchases)}${chart('Aktivácie v čase',data.charts.activations,'chart-mint')}${chart('Dokončenia v čase',data.charts.completions,'chart-amber')}</div><article class="panel"><h2>Sedem úloh. Jedna spoločná cesta.</h2><p class="caption">Priechod počítame po herných reláciách; každé opakovanie má vlastný priebeh.</p><div class="funnel">${data.funnel.map(s=>`<div class="funnel-cell"><strong>ÚLOHA ${s.stage.toString().padStart(2,'0')}</strong><span>${s.solved}</span><small>z ${s.started} začatých</small><div class="progress-track"><i data-width="${s.started?s.solved/s.started*100:0}"></i></div><p>${escape(s.title)}</p></div>`).join('')}</div></article><p class="definition">${escape(data.cohort)}</p>`;
+}
+const paymentStateNames={paid:'Zaplatené',free:'Potvrdené zdarma',refunded:'Vrátené',failed:'Posledný pokus neúspešný',pending:'Overuje sa',ready:'Formulár otvorený',expired:'Vypršalo bez úhrady',unknown:'Zatiaľ neoverené'};
+const paymentProductNames={'episode-1':'Hra Pixelkovia','story-book-before':'Ako vznikli Pixelkovia','story-book-after':'Po veľkom záblesku','pixel-atlas':'Atlas Pixelkov'};
+function paymentHealth(d,compact=false){
+  const attention=d.health==='attention',stale=d.health==='stale';
+  const title=attention?'Platby vyžadujú pozornosť':stale?'Kontrola platieb nie je aktuálna':'Monitorovanie platieb je aktívne';
+  const notes=[];
+  if(!d.enabled)notes.push('Platby sú vypnuté alebo chýba konfigurácia.');
+  if(d.errors24)notes.push(`Technické signály za posledných 24 hodín: ${d.errors24}. Otvorte záznamy a skontrolujte príčinu.`);
+  if(d.declines24)notes.push(`Platby s neúspešným pokusom potvrdeným Stripe za posledných 24 hodín: ${d.declines24}. Niektoré mohli pri ďalšom pokuse prejsť; nemusí ísť o chybu stránky.`);
+  if(d.deliveries.failed||d.deliveries.delayed)notes.push(`Prístupové e-maily: chyby odoslania ${d.deliveries.failed}; čakajúce dlhšie než 10 minút ${d.deliveries.delayed}.`);
+  if(d.fulfillmentDelayed)notes.push(`${d.fulfillmentDelayed} potvrdených platieb čaká na vytvorenie prístupu dlhšie než 2 minúty.`);
+  if(d.checks.some(c=>!c.ok))notes.push('Serverová kontrola Stripe alebo nastavenia webhooku zlyhala.');
+  if(stale)notes.push('Posledná serverová kontrola chýba alebo je staršia než 30 minút. Stav nemožno považovať za aktuálne overený.');
+  if(!notes.length)notes.push('Kontroly nehlásia technický problém. Priebeh jednotlivých nákupov nájdete v záznamoch.');
+  return `<section class="payment-health ${attention?'attention':stale?'stale':'observing'}" aria-label="Stav platieb"><div><span class="eyebrow">PLATBY · POSLEDNÝCH 24 HODÍN</span><h2>${title}</h2>${notes.map(n=>`<p>${escape(n)}</p>`).join('')}<p class="payment-last">Posledná dokončená peňažná platba: <strong>${d.lastSuccessAt?date(d.lastSuccessAt):'Zatiaľ žiadna zaznamenaná úhrada'}</strong></p><small>Načítané ${date(d.generatedAt)} · Obnova každých 30 sekúnd počas otvorenia administrácie.</small></div>${compact?'<a class="button" href="#payments">Otvoriť platby a chyby →</a>':''}</section>`;
+}
+function payments(d){
+  const count=(category,source)=>d.recent.filter(r=>r.category===category&&(!source||r.source===source)).reduce((n,r)=>n+r.count,0);
+  const affected=(category,source)=>d.recent.filter(r=>r.category===category&&r.source===source).reduce((n,r)=>n+(r.attempts||0),0);
+  const metrics=[['Zaplatené platby',d.counts.paid,'Overené na serveri · jedna platba aj s darčekom'],['Technické signály',d.technical,'Formulár, spojenie, server alebo odoslanie prístupu'],['Platby s neúspešným pokusom',affected('bank','stripe'),'Potvrdené Stripe; neskôr môžu byť zaplatené'],['Hlásenia prehliadača',count('bank','browser'),'Nepotvrdená platba · výsledok overuje server'],['Overujú sa',d.counts.pending,'Prebiehajúce spracovanie; neznamená zamietnutie'],['Zdarma / vrátené',`${d.counts.free} / ${d.counts.refunded}`,'Objednávky zdarma sa nepočítajú medzi peňažné platby']];
+  const source={stripe:'Stripe · overené',server:'Server',browser:'Prehliadač · hlásenie'};
+  const categories={technical:'Technický signál',bank:'Nepotvrdená platba',validation:'Oprava údajov',customer:'Krok zákazníka',lifecycle:'Priebeh platby'};
+  return paymentHealth(d)+`<div class="payment-tools"><label>Obdobie nákupov a záznamov<select id="payment-days">${options([['1','Posledných 24 hodín'],['7','Posledných 7 dní'],['30','Posledných 30 dní']],state.paymentDays)}</select></label><button id="refresh-payments" type="button" class="button secondary">Obnoviť teraz ↻</button></div><div class="metrics payment-metrics">${metrics.map(([label,value,note])=>`<article class="metric"><span class="label">${label}</span><strong>${escape(value)}</strong><small>${note}</small></article>`).join('')}</div><section class="panel"><h2>Čo práve vieme overiť</h2><div class="payment-checks">${[['Príjem platieb',d.enabled?'Zapnutý':'Vypnutý',null],...['stripe','webhook'].map(id=>{const c=d.checks.find(c=>c.id===id);return [id==='stripe'?'Spojenie so Stripe':'Nastavenie Stripe webhooku',!c?'Kontrola zatiaľ neprebehla':!c.ok?'Kontrola zlyhala':d.generatedAt-c.checked_at>1800000?'Kontrola je neaktuálna':'Kontrola prešla',c?.checked_at];})].map(([label,status,at])=>`<div><strong>${label}</strong><span>${status}</span>${at?`<small>${date(at)}</small>`:''}</div>`).join('')}</div><p class="caption">Server kontroluje rozpracované platby každých 10 minút aj po odchode zákazníka. Potvrdenie úhrady a vytvorenie prístupu prebieha cez podpísaný Stripe webhook. Neprítomnosť chýb sama osebe nedokazuje, že každá budúca platba prejde.</p></section><section class="panel"><h2>Nákupy v zvolenom období <span class="count-pill">${d.total}</span></h2><p class="caption">Otvorený alebo vypršaný formulár nie je dôkaz zlyhania. Neoverené staršie relácie nemajú spätne vymyslený výsledok. Neúplné údaje karty: ${count('validation')} hlásení.</p>${table(['Vytvorené','Produkty','Suma','Stav','Posledné overenie','Platobná relácia'],d.rows.map(r=>[date(r.createdAt),escape(r.products.map(p=>paymentProductNames[p]||p).join(' · ')),money(r.totalCents),`<span class="status ${escape(r.state)}">${escape(paymentStateNames[r.state])}</span>`,date(r.checkedAt),`<code class="payment-reference">${escape(r.sessionId||r.id)}</code>`]))}<p class="caption">Najnovších 100 nákupov. Darčeková hra tvorí druhý prístup v jednej platbe; opakovaný nákup má samostatnú reláciu.</p></section><section class="panel"><div class="payment-log-heading"><div><h2>Záznamy priebehu a chýb</h2><p class="caption">Záznamy sa uchovávajú 90 dní. Rovnaký opakovaný signál zoskupujeme v päťminútovom okne. Hlásenie prehliadača nie je potvrdenie banky.</p></div><label>Zobraziť<select id="payment-category">${options([['','Všetky udalosti'],['technical','Technické signály'],['bank','Nepotvrdené platby'],['validation','Oprava údajov'],['customer','Kroky zákazníka'],['lifecycle','Priebeh platby']],state.paymentCategory)}</select></label></div>${table(['Čas','Udalosť','Zdroj','Doplnenie','Platobná relácia'],d.logs.map(l=>[date(l.created_at),`<strong class="payment-category-${escape(l.category)}">${escape(l.label)}</strong><small>${escape(categories[l.category])}</small>`,escape(source[l.source]),escape([l.code,({card:'Karta',apple_pay:'Apple Pay',google_pay:'Google Pay',wallet:'Peňaženka',free:'Zdarma'})[l.method]].filter(Boolean).join(' · ')||'—'),`<code class="payment-reference">${escape(l.stripe_session_id||l.attempt_id||'Pred vytvorením relácie')}</code>`]))}<p class="caption">Najnovších 200 záznamov pre zvolený filter. Údaje karty, heslá a platobné tajomstvá sa nezaznamenávajú. Ak prehliadač stratí internet úplne, jeho hlásenie sa nemusí doručiť. Prehľad preto dopĺňa serverová kontrola.</p></section>`;
+}
+function paymentParams(){return new URLSearchParams({days:state.paymentDays,category:state.paymentCategory});}
+async function refreshPaymentHealth(){
+  if(!state.context||document.hidden||$('#view').getAttribute('aria-busy')==='true')return;
+  const view=currentView();if(view==='payments'){void load();return;}if(view!=='dashboard')return;
+  const id=loadingId;
+  try{const d=await api('/api/admin/payments');if(id===loadingId&&currentView()==='dashboard')$('#payment-overview').innerHTML=paymentHealth(d,true);}
+  catch{if(id===loadingId&&$('#payment-overview'))$('#payment-overview').innerHTML='<section class="payment-health attention" role="alert"><h2>Stav platieb sa nepodarilo načítať</h2><p>Aktuálny stav nie je overený. Skúste obnoviť administráciu.</p><a href="#payments" class="button">Otvoriť platby a chyby →</a></section>';}
 }
 function orders(rows){return table(['Objednávka','Zákazník','Produkty','Nákup','Suma','Platba'],rows.map(o=>[`<strong>${escape(o.id)}</strong>`,`<button class="link-button" data-customer="${escape(o.customer_id)}">${escape(o.customer_name)}</button><small>${escape(o.email)}</small>`,escape(o.products),date(o.created_at),`<strong class="order-total">${money(o.total_cents,o.currency)}</strong>`,badge(o.status)]))+`<p class="definition">Najnovších 200 objednávok vo vybranej kohorte. Platby sa overujú na serveri; každý nákup má samostatný prístup.</p>`;}
 const checklistNames={printed:'Materiály stiahnuté a vytlačené',placed:'Materiály rozmiestnené po byte','device-understood':'Hra sa bude hrať na tomto telefóne'};
@@ -63,13 +95,18 @@ async function load(){
   $('#page-title').textContent=titles[view][0];$('#page-description').textContent=titles[view][1];$('#breadcrumb').textContent=titles[view][0];
   document.body.classList.toggle('analysis-wide',view==='analytics'&&state.wide);
   document.querySelectorAll('[data-page]').forEach(a=>{a.classList.toggle('active',a.dataset.page===view);if(a.dataset.page===view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  $('#filters').hidden=view==='payments';
   $('#notice').textContent='';$('#view').setAttribute('aria-busy','true');
   try{
-    const p=params();if(view==='analytics'){p.set('view','journey');for(const [key,value] of Object.entries({page:state.page,q:state.q,state:state.status,sort:state.sort,direction:state.sort==='customer'?'asc':'desc',version:state.version,portal:state.portal}))p.set(key,value);}
+    const p=view==='payments'?paymentParams():params();if(view==='analytics'){p.set('view','journey');for(const [key,value] of Object.entries({page:state.page,q:state.q,state:state.status,sort:state.sort,direction:state.sort==='customer'?'asc':'desc',version:state.version,portal:state.portal}))p.set(key,value);}
     const data=await api('/api/admin/'+(view==='analytics'?'customers':view),p);if(id!==loadingId)return;
     const focused=document.activeElement?.id,selection=document.activeElement?.selectionStart;
-    $('#view').innerHTML=({dashboard,orders,analytics})[view](data);state.page=data.page||state.page;
+    $('#view').innerHTML=({dashboard,orders,analytics,payments})[view](data);state.page=data.page||state.page;
     if(view==='dashboard'){
+      $('#view').insertAdjacentHTML('afterbegin','<div id="payment-overview"></div>');
+      const paymentData=await api('/api/admin/payments').catch(()=>null);
+      if(id!==loadingId)return;
+      $('#payment-overview').innerHTML=paymentData?paymentHealth(paymentData,true):'<section class="payment-health attention" role="alert"><h2>Stav platieb sa nepodarilo načítať</h2><p>Aktuálny stav nie je overený.</p><a class="button" href="#payments">Otvoriť platby a chyby →</a></section>';
       const reviews=await api('/api/admin/feedback');
       if(id!==loadingId)return;
       $('#view').insertAdjacentHTML('beforeend','<section class="panel"><h2>Hodnotenia hráčov</h2>'+table(['Hodnotenie','Rodina','Komentár','Dátum'],reviews.map(r=>[r.stars+' / 5 ★',escape(r.name),escape(r.comment),date(r.created_at)]))+'</section>');
@@ -78,7 +115,7 @@ async function load(){
     document.querySelectorAll('[data-width]').forEach(e=>{e.style.width=e.dataset.width+'%';});
     if(focused==='customer-search'){$('#customer-search').focus({preventScroll:true});$('#customer-search').setSelectionRange(selection,selection);}
     for(const c of data.rows||[])if(state.expanded.has(c.customer_id)&&!state.details.has(c.customer_id))fetchInlineDetail(c.customer_id);
-  }catch(error){if(id!==loadingId)return;$('#view').innerHTML=empty('Dáta sa nepodarilo načítať.');$('#notice').textContent=error.message;}
+  }catch(error){if(id!==loadingId)return;$('#view').innerHTML=empty('Dáta sa nepodarilo načítať.');$('#notice').textContent=error.message;if(view==='payments')$('#view').innerHTML='<section class="payment-health attention" role="alert"><h2>Stav platieb nie je overený</h2><p>Prehľad sa nepodarilo načítať. Obnovte administráciu a skontrolujte pripojenie.</p><button class="button" id="refresh-payments">Skúsiť znova</button></section>';}
   finally{if(id===loadingId)$('#view').setAttribute('aria-busy','false');}
 }
 async function fetchInlineDetail(customerId){
@@ -96,8 +133,9 @@ $('#clear-filters').addEventListener('click',()=>{$('#filters').reset();Object.a
 window.addEventListener('hashchange',()=>{state.page=1;load();});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.wide){state.wide=false;document.body.classList.remove('analysis-wide');$('#view .journey-board')?.classList.remove('is-wide');const b=$('#expand-analysis');if(b){b.textContent='⛶ Rozšíriť na celú šírku';b.setAttribute('aria-pressed','false');b.focus();}}});
 $('#view').addEventListener('input',e=>{if(e.target.id==='customer-search'){state.q=e.target.value;state.page=1;clearTimeout(debounce);debounce=setTimeout(load,300);}});
-$('#view').addEventListener('change',e=>{const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
+$('#view').addEventListener('change',e=>{if(e.target.id==='payment-days'||e.target.id==='payment-category'){state[e.target.id==='payment-days'?'paymentDays':'paymentCategory']=e.target.value;load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
 $('#view').addEventListener('click',async e=>{
+  if(e.target.closest('#refresh-payments')){load();return;}
   const pager=e.target.closest('[data-pagination]');if(pager){state.page+=Number(pager.dataset.pagination);load();return;}
   if(e.target.closest('#expand-analysis')){state.wide=!state.wide;document.body.classList.toggle('analysis-wide',state.wide);$('#view .journey-board').classList.toggle('is-wide',state.wide);const b=$('#expand-analysis');b.textContent=state.wide?'↙ Zmenšiť':'⛶ Rozšíriť na celú šírku';b.setAttribute('aria-pressed',String(state.wide));return;}
   const retry=e.target.closest('[data-retry]');if(retry){fetchInlineDetail(retry.dataset.retry);return;}
@@ -128,3 +166,6 @@ $('#close-detail').addEventListener('click',()=>{detailId++;$('#detail').close()
   const products=await api('/api/admin/products');$('#product').insertAdjacentHTML('beforeend',products.map(p=>`<option value="${escape(p.id)}">${escape(p.name)}</option>`).join(''));
   await load();
 }catch(error){$('#notice').textContent=error.message;$('#view').innerHTML=empty('Administrátorské prihlásenie alebo konfigurácia nie sú dostupné.');$('#view').setAttribute('aria-busy','false');}})();
+
+setInterval(refreshPaymentHealth,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshPaymentHealth();});

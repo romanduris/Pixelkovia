@@ -2,6 +2,24 @@
 
 .filters[hidden]{display:none}.chart{overflow-x:auto}.chart .bar-column{flex-shrink:0}
 
+.payment-health{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 26px;margin-bottom:24px;border:1px solid #4c8474;border-radius:10px;background:#152f2c;color:#cbecdf}
+.payment-health h2{margin:8px 0 12px;font-size:23px;letter-spacing:-.03em;color:#e6f6ef}
+.payment-health p{margin:7px 0;font-size:13px;line-height:1.7;max-width:850px}
+.payment-health small{font-size:11px;line-height:1.7;display:block;opacity:.85}
+.payment-health .button{flex-shrink:0}.payment-health.attention{border-color:#ea7b88;background:#3c202f;color:#ffd1d7}.payment-health.attention h2{color:#ffe2e6}
+.payment-health.stale{border-color:#d1ab65;background:#342b21;color:#f7dcac}.payment-health.stale h2{color:#ffedcd}
+.payment-tools,.payment-log-heading{display:flex;align-items:end;gap:16px;justify-content:space-between;margin-bottom:22px}
+.payment-tools label,.payment-log-heading label{display:flex;flex-direction:column;gap:8px;font-size:12px;color:#b8c9df}
+.payment-tools select,.payment-log-heading select{min-height:44px;font-size:13px;max-width:100%;border:1px solid #3c4c6d;background:#19243d;color:#dae3f6;padding:8px 12px;border-radius:5px;color-scheme:dark}
+.payment-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+.payment-checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:20px 0}
+.payment-checks>div{display:flex;flex-direction:column;gap:10px;padding:18px;background:#19273e;border:1px solid #405473;border-radius:7px;font-size:13px}
+.payment-checks small{font-size:11px;color:#a6bbd4}.payment-reference{display:block;max-width:260px;overflow-wrap:anywhere;white-space:normal;font-size:10px;line-height:1.6}
+td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-bank{color:#f0d49a}.status.failed{background:#4a2637;color:#ffc2cd}
+.payment-log-heading>div{max-width:750px}.payment-log-heading label{flex-shrink:0}.payment-last strong{color:inherit}
+@media(max-width:1000px){.payment-health{flex-direction:column;align-items:start}.payment-checks{grid-template-columns:1fr}.payment-log-heading{align-items:start;flex-direction:column}}
+@media(max-width:750px){.payment-health{padding:20px 17px;gap:16px}.payment-health h2{font-size:21px;line-height:1.4}.payment-health p{font-size:13px}.payment-health .button{width:100%;text-align:center;white-space:normal}.payment-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.payment-tools{flex-wrap:wrap}.payment-tools label,.payment-tools select,.payment-log-heading label{width:100%}.payment-reference{max-width:190px}}
+
 .admin-identity{display:flex;align-items:center;gap:16px;font-size:11px;color:var(--muted)}#logout-button[hidden]{display:none}
 
 /* Product administration and customer journey. */

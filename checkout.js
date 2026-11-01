@@ -27,6 +27,12 @@
   function persistPurchase(){try{if(purchase)localStorage.setItem(purchaseStorage,JSON.stringify(purchase));else localStorage.removeItem(purchaseStorage);}catch{}}
   async function api(url,options={}){const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(15000),...options});const data=await response.json();if(!response.ok){const error=Error(data.error||pendingMessage);error.status=response.status;error.code=data.code;throw error;}return data;}
   const post=(url,input)=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)});
+  // No payment awaits diagnostics. Send fixed event names only, without Stripe
+  // errors, field values, card data, email, URL or payment client secrets.
+  function diagnostic(type,method='unknown'){
+    const data={type,method,productId:baseId,attemptKey:purchase?.attemptKey};
+    setTimeout(()=>{try{void fetch('/api/checkout/diagnostic',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),keepalive:true,signal:AbortSignal.timeout(4000)}).catch(()=>{});}catch{}},0);
+  }
   function trackSession(session){purchase.sessionId=session.sessionId;returned=session.sessionId;returnedCheckout=null;persistPurchase();const url=new URL(location.href);url.searchParams.delete('checkout_id');url.searchParams.delete('canceled');url.searchParams.set('session_id',session.sessionId);history.replaceState(null,'',url);}
   function hidePayment(){document.querySelector('#payment-slot').hidden=true;document.querySelector('#express-checkout-slot').hidden=true;document.querySelector('#wallet-separator').hidden=true;document.querySelector('#stripe-pay').hidden=true;}
 
@@ -153,7 +159,7 @@
       for(let i=0;i<6;i++){
         let value;
         try{value=await api('/api/checkout/status?'+(sessionId?'session_id='+encodeURIComponent(sessionId):'checkout_id='+encodeURIComponent(returnedCheckout)));}
-        catch(error){paymentMessage(error.status&&error.status<500?'Platobnú reláciu sa nepodarilo nájsť. Ak ste platili, platbu neopakujte a napíšte nám na miky@pixelkovia.rodulab.com.':'Spojenie sa prerušilo a výsledok platby sa nepodarilo overiť. Prosíme, neplaťte znova. Po obnovení spojenia overte stav pôvodnej platby.','error');return;}
+        catch(error){diagnostic('status_error');paymentMessage(error.status&&error.status<500?'Platobnú reláciu sa nepodarilo nájsť. Ak ste platili, platbu neopakujte a napíšte nám na miky@pixelkovia.rodulab.com.':'Spojenie sa prerušilo a výsledok platby sa nepodarilo overiť. Prosíme, neplaťte znova. Po obnovení spojenia overte stav pôvodnej platby.','error');return;}
         if(value.sessionId){sessionId=value.sessionId;returned=value.sessionId;if(purchase&&purchase.sessionId!==sessionId)purchase=null;}
         if(value.labels&&(form.classList.contains('bank-return')||!purchase))showSummary(value);
         if(value.paid){
@@ -228,28 +234,32 @@
         try{
           const validation=await loaded.actions.validateElements();
           if(!alive)return;
-          if(validation.type==='error'){readyForRetry(validation.error.validation_errors?.[0]?.message||validation.error.message||'Skontrolujte údaje karty označené vo formulári.');return;}
-        }catch{if(alive)readyForRetry('Údaje karty sa nepodarilo overiť. Skontrolujte pripojenie a skúste to znova.');return;}
+          if(validation.type==='error'){diagnostic('validation_error','card');readyForRetry(validation.error.validation_errors?.[0]?.message||validation.error.message||'Skontrolujte údaje karty označené vo formulári.');return;}
+        }catch{diagnostic('validation_connection_error','card');if(alive)readyForRetry('Údaje karty sa nepodarilo overiť. Skontrolujte pripojenie a skúste to znova.');return;}
       }
       if(!alive)return;
+      const method=event?({apple_pay:'apple_pay',google_pay:'google_pay'}[event.expressPaymentType]||'wallet'):session.totalCents===0?'free':'card';
+      diagnostic('confirm_started',method);
       inFlight=true;if(purchase){purchase.phase='confirming';persistPurchase();}
       paymentMessage(session.totalCents===0?'Potvrdzujem objednávku…':'Spracúvam platbu…');
       // A slow bank dialog must keep its original Stripe elements and confirmation alive.
-      const watchdog=setTimeout(()=>{if(alive&&inFlight){if(purchase){purchase.phase='unknown';persistPurchase();}paymentMessage(pendingMessage);document.querySelector('#check-payment').hidden=false;}},20000);
+      const watchdog=setTimeout(()=>{if(alive&&inFlight){diagnostic('confirmation_timeout',method);if(purchase){purchase.phase='unknown';persistPurchase();}paymentMessage(pendingMessage);document.querySelector('#check-payment').hidden=false;}},20000);
       let outcome;
       try{
         // return_url is owned by the server. Supplying returnUrl here throws before charging.
         outcome=await loaded.actions.confirm({redirect:'if_required',...(event?{expressCheckoutConfirmEvent:event}:{})});
-      }catch{outcome=null;}
+      }catch{diagnostic('confirm_error',method);outcome=null;}
       finally{clearTimeout(watchdog);inFlight=false;}
       if(!alive)return;
       if(outcome?.type==='error'&&outcome.error?.code==='paymentFailed'&&!completed){
+        diagnostic('payment_failed_client',method);
         const message=outcome.error.message||'Platbu banka nepotvrdila. Skúste inú kartu.';
         event?.paymentFailed?.({reason:'fail',message});
         // Wait for the native callback to return before restoring or polling the page.
         setTimeout(()=>{if(alive){if(checking){setTimeout(()=>{if(alive)void paymentStatus(session.sessionId);},1600);}else readyForRetry(message);}},0);
         return;
       }
+      if(outcome?.type==='error'&&outcome.error?.code!=='paymentFailed')diagnostic('confirm_error',method);
       if(purchase){purchase.phase=completed?'paid':'unknown';if(!completed)persistPurchase();}
       // Unclassified errors require Stripe verification, never a new payment by assumption.
       setTimeout(()=>{if(alive)void paymentStatus(session.sessionId);},0);
@@ -263,16 +273,16 @@
       if(session.totalCents>0){
         payment=checkout.createPaymentElement({layout:'tabs',fields:{billingDetails:{email:'never',phone:'never'}},wallets:{applePay:'never',googlePay:'never',link:'never'}});
         payment.on('ready',()=>{if(alive){cardReady=true;syncPayButton();}});
-        payment.on('loaderror',()=>{if(alive){cardReady=false;syncPayButton();paymentMessage('Údaje karty sa nepodarilo načítať. Skontrolujte pripojenie a obnovte pôvodný formulár.','error');document.querySelector('#retry-payment').hidden=false;}});
+        payment.on('loaderror',()=>{if(alive){diagnostic('element_error','card');cardReady=false;syncPayButton();paymentMessage('Údaje karty sa nepodarilo načítať. Skontrolujte pripojenie a obnovte pôvodný formulár.','error');document.querySelector('#retry-payment').hidden=false;}});
         if(configuration.wallets?.applePay||configuration.wallets?.googlePay){
           wallet=checkout.createExpressCheckoutElement({buttonHeight:44,layout:{maxColumns:2,maxRows:1},paymentMethods:{applePay:configuration.wallets?.applePay?'always':'never',googlePay:configuration.wallets?.googlePay?'always':'never',link:'never',paypal:'never',amazonPay:'never',klarna:'never'}});
-          const showWallets=available=>{walletAvailable=available;if(alive&&!confirming&&!checking&&!completed){walletSlot.hidden=!available;separator.hidden=!available;}};
+          const showWallets=available=>{if(available&&!walletAvailable)diagnostic('wallet_available','wallet');walletAvailable=available;if(alive&&!confirming&&!checking&&!completed){walletSlot.hidden=!available;separator.hidden=!available;}};
           wallet.on('ready',event=>showWallets(Boolean(event.availablePaymentMethods?.applePay||event.availablePaymentMethods?.googlePay)));
           // Availability can change after ready while Stripe checks the browser's wallets.
           wallet.on('availablepaymentmethodschange',event=>showWallets(Boolean(event.paymentMethods?.applePay?.available||event.paymentMethods?.googlePay?.available)));
           wallet.on('confirm',confirm);
-          wallet.on('cancel',()=>{if(alive&&!confirming)paymentMessage('Peňaženku ste zatvorili. Platbu ste nepotvrdili.');});
-          wallet.on('loaderror',()=>showWallets(false));
+          wallet.on('cancel',()=>{diagnostic('wallet_cancelled','wallet');if(alive&&!confirming)paymentMessage('Peňaženku ste zatvorili. Platbu ste nepotvrdili.');});
+          wallet.on('loaderror',()=>{diagnostic('wallet_error','wallet');showWallets(false);});
           wallet.mount('#express-checkout-slot');
         }else{walletSlot.hidden=true;}
         payment.mount('#payment-slot');
@@ -283,7 +293,7 @@
   }
   async function preparePayment(input,{freshVisit=false}={}){
     if(preparing)return;
-    preparing=true;
+    preparing=true;let stage='session_error';
     try{
       await configurationPromise;if(!configuration?.enabled)throw Error('Platby sa teraz nepodarilo načítať. Skúste to znova.');
       let session=await post('/api/checkout/session',input);
@@ -296,11 +306,11 @@
         session=await post('/api/checkout/session',input);trackSession(session);rememberSummary(session);
       }
       if(!session.clientSecret)throw Error('Platobný formulár sa nepodarilo obnoviť. Skúste to znova.');
-      await loadStripe();paymentMessage('');embedded?.destroy();embedded=await mountPayment(session);
+      stage='sdk_error';await loadStripe();paymentMessage('');embedded?.destroy();embedded=await mountPayment(session);
       document.querySelector('#change-order').hidden=false;document.querySelector('#change-order').disabled=false;
       if(purchase){purchase.phase='ready';persistPurchase();}
       panel.scrollIntoView({behavior:'smooth',block:'start'});document.querySelector('#payment-note').textContent='Objednávku dokončite v zabezpečenom formulári nižšie.';
-    }finally{preparing=false;}
+    }catch(error){if(!error.status||error.status>=500)diagnostic(stage);throw error;}finally{preparing=false;}
   }
   const emailInput=form.elements.email,emailError=document.querySelector('#email-error');
   function validateEmail(){
@@ -353,7 +363,7 @@
       if(purchase)await post('/api/checkout/release',{attemptKey:purchase.attemptKey});
       else if(returned){const value=await api('/api/checkout/status?session_id='+encodeURIComponent(returned));if(!value.paid&&!['expired','refunded'].includes(value.state))throw Error(pendingMessage);}
       freshOrder();form.scrollIntoView({behavior:'smooth',block:'start'});
-    }catch{paymentMessage('Pôvodnú platbu sa zatiaľ nepodarilo bezpečne uzavrieť. Prosíme, neplaťte znova. Overte stav pôvodnej platby.','error');document.querySelector('#check-payment').hidden=!purchase?.sessionId;document.querySelector('#retry-payment').hidden=!!purchase?.sessionId;}
+    }catch{diagnostic('release_error');paymentMessage('Pôvodnú platbu sa zatiaľ nepodarilo bezpečne uzavrieť. Prosíme, neplaťte znova. Overte stav pôvodnej platby.','error');document.querySelector('#check-payment').hidden=!purchase?.sessionId;document.querySelector('#retry-payment').hidden=!!purchase?.sessionId;}
     finally{change.disabled=false;}
   }
   document.querySelector('#change-order').addEventListener('click',()=>void resetOrder());
@@ -371,7 +381,7 @@
     try{const value=JSON.parse(event.newValue);if(value?.sessionId){purchase=value;void paymentStatus(value.sessionId);}}catch{}
   });
   window.addEventListener('pageshow',event=>{if(event.persisted&&(returned||returnedCheckout||purchase?.sessionId)&&!embedded?.inFlight)void paymentStatus();});
-  configurationPromise=api('/api/checkout/config').then(value=>{configuration=value;document.querySelector('#payment-note').textContent=value.enabled?'Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.':'Platby teraz nie sú dostupné. Skúste to o chvíľu alebo nám napíšte na miky@pixelkovia.rodulab.com.';update();}).catch(()=>{document.querySelector('#payment-note').textContent='Platobnú službu sa nepodarilo načítať. Skontrolujte spojenie a obnovte stránku.';});
+  configurationPromise=api('/api/checkout/config').then(value=>{configuration=value;document.querySelector('#payment-note').textContent=value.enabled?'Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.':'Platby teraz nie sú dostupné. Skúste to o chvíľu alebo nám napíšte na miky@pixelkovia.rodulab.com.';update();}).catch(()=>{diagnostic('config_error');document.querySelector('#payment-note').textContent='Platobnú službu sa nepodarilo načítať. Skontrolujte spojenie a obnovte stránku.';});
   if(purchase?.input){const input=purchase.input;form.elements.email.value=input.email;if(input.baseId===baseId){atlasSelected=input.atlasIncluded;giftSelected=!!input.giftGame;voucherCode=input.voucherCode;input.books.forEach(id=>selected.add(id));}}
   update();
   const recovering=returned||returnedCheckout||purchase?.sessionId;

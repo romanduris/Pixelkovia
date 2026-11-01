@@ -45,10 +45,12 @@ test('password-only authentication works in actual Workers/D1 runtime and gates 
   for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
   const unauth=await mf.dispatchFetch('https://admin.example.invalid/',{redirect:'manual'});assert.equal(unauth.status,303);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/customers')).status,401);
+  assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments')).status,401);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/login')).status,200);
   const login=await mf.dispatchFetch('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify({password})});
   assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
   const authenticated=await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}});assert.equal(authenticated.status,200);
+  const paymentReport=await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments',{headers:{cookie}});assert.equal(paymentReport.status,200);assert.equal((await paymentReport.json()).health,'attention');
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/',{headers:{cookie}})).status,200);
   const logout=await mf.dispatchFetch('https://admin.example.invalid/api/admin/logout',{method:'POST',headers:{origin:'https://admin.example.invalid',cookie}});assert.equal(logout.status,200);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}})).status,401);
