@@ -21,6 +21,7 @@ export const paymentTypes={
   payment_failed_client:['bank','Prehliadač hlási nepotvrdenú platbu'],
   payment_failed:['bank','Stripe potvrdil neúspešný pokus o platbu'],
   wallet_cancelled:['customer','Zákazník zatvoril peňaženku'],
+  wallet_opened:['lifecycle','Zákazník otvoril natívnu peňaženku'],
   wallet_available:['lifecycle','Prehliadač ponúkol peňaženku'],
   paid:['lifecycle','Stripe potvrdil zaplatenie'],
   free:['lifecycle','Stripe potvrdil objednávku zdarma'],
@@ -30,8 +31,8 @@ export const paymentTypes={
   delivery_failed:['technical','Nepodarilo sa odoslať prístupový e-mail'],
   delivery_sent:['lifecycle','Prístupový e-mail odovzdaný poskytovateľovi']
 };
-const clientTypes=new Set(['config_error','sdk_error','element_error','wallet_error','validation_error','validation_connection_error','confirm_started','confirm_error','confirmation_timeout','payment_failed_client','wallet_cancelled','wallet_available','status_error','session_error','release_error']);
-const codes=new Set(['card_declined','insufficient_funds','expired_card','incorrect_cvc','incorrect_number','invalid_number','invalid_expiry_month','invalid_expiry_year','invalid_cvc','authentication_required','payment_intent_authentication_failure','processing_error','do_not_honor','generic_decline','fraudulent','lost_card','stolen_card','try_again_later','transaction_not_allowed','issuer_not_available','StripeConnectionError','StripeAPIError','StripeAuthenticationError','StripePermissionError','StripeRateLimitError','StripeInvalidRequestError']);
+const clientTypes=new Set(['config_error','sdk_error','element_error','wallet_error','validation_error','validation_connection_error','confirm_started','confirm_error','confirmation_timeout','payment_failed_client','wallet_cancelled','wallet_opened','wallet_available','status_error','session_error','release_error']);
+const codes=new Set(['card_declined','insufficient_funds','expired_card','incorrect_cvc','incorrect_number','invalid_number','invalid_expiry_month','invalid_expiry_year','invalid_cvc','authentication_required','payment_intent_authentication_failure','processing_error','do_not_honor','generic_decline','fraudulent','lost_card','stolen_card','try_again_later','transaction_not_allowed','issuer_not_available','StripeConnectionError','StripeAPIError','StripeAuthenticationError','StripePermissionError','StripeRateLimitError','StripeInvalidRequestError','billing_phone_missing','billing_email_missing','return_url_conflict','sdk_integration_error','confirmation_error']);
 const products=new Set(['episode-1','story-book-before','story-book-after']);
 const methods=new Set(['card','apple_pay','google_pay','wallet','free','unknown']);
 export const safePaymentCode=value=>codes.has(value)?value:'';

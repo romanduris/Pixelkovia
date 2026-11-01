@@ -29,11 +29,12 @@ test('real inline Stripe preserves the original page and validates fields withou
   assert.equal(replaced.status,'expired','actual Stripe closes the abandoned desktop Session before the phone can pay');
   assert.equal(replaced.payment_intent,null);assert.equal(current.status,'open');assert.equal(current.payment_intent,null);assert.notEqual(phone.sessionId,desktop.sessionId);
   browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await context.newPage();
-  let blocked=0,active;
+  let blocked=0,active;const diagnostics=[];
   await context.route('**/*',async route=>{
    const url=new URL(route.request().url());
    if(url.hostname==='pixelkovia.rodulab.com'){
     if(url.pathname==='/api/checkout/config')return route.fulfill({json:checkoutConfig(env)});
+    if(url.pathname==='/api/checkout/diagnostic'){diagnostics.push(route.request().postDataJSON());return route.fulfill({json:{received:true}});}
     if(url.pathname==='/api/checkout/session'){
      active=await createCheckout(env,route.request().postDataJSON());created.push(active.sessionId);return route.fulfill({json:active});
     }
@@ -68,6 +69,16 @@ test('real inline Stripe preserves the original page and validates fields withou
   const expiry=card.locator('input[name="expiry"]'),cvc=card.locator('input[name="cvc"]');
   await expiry.fill('0120');await cvc.fill('1');await page.locator('#stripe-pay').click();await page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled);
   assert.ok(await number.isEditable());assert.ok(await page.locator('#payment-slot').isVisible());assert.equal(blocked,0);
+  // Cover the branch that blank/invalid fields never reach: complete, public
+  // Stripe test values, while every payment-data/confirmation request is blocked.
+  // The former phone:'never' configuration threw IntegrationError at this point.
+  assert.equal(await card.locator('input[name="phone"]').count(),0,'phone collection is not required for this digital purchase');
+  await number.fill('4242424242424242');await expiry.fill('1230');await cvc.fill('123');
+  await page.locator('#stripe-pay').click();
+  await page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled&&document.querySelector('#payment-status').textContent.includes('Potvrdenie platby sa nedokončilo'));
+  assert.ok(blocked>0,'complete valid fields reach the deliberately blocked payment boundary');
+  assert.ok(await number.isEditable());assert.ok(await page.locator('#retry-payment').isVisible());
+  assert.ok(!diagnostics.some(e=>['billing_phone_missing','billing_email_missing','sdk_integration_error'].includes(e.code)),'the real SDK accepts our billing collection contract');
   const unchanged=await client.checkout.sessions.retrieve(active.sessionId);assert.equal(unchanged.payment_intent,null);assert.equal(unchanged.payment_status,'unpaid');
   if(process.env.CHECKOUT_SCREENSHOT_DIR){await page.locator('#payment-slot').scrollIntoViewIfNeeded();await page.screenshot({path:process.env.CHECKOUT_SCREENSHOT_DIR+'/stripe-inline-validation-390.png',fullPage:false});}
  }finally{

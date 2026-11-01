@@ -3,6 +3,18 @@ const {launch,open,cachedPurchase,sessionId}=require('./helpers/inline-checkout.
 (async()=>{const browser=await launch(),cases=[];try{
  for(const wallet of ['apple_pay','google_pay']){
   {
+   const t=await open(browser,{wallet,walletDelayConfirm:true});await t.start();await t.page.getByRole('button',{name:'Fixture '+wallet}).click();
+   assert.equal(await t.page.evaluate(()=>inlineFixture.walletResolved),1);assert.equal(await t.page.evaluate(()=>inlineFixture.calls.length),0);assert.ok(await t.page.locator('#stripe-pay').isDisabled());assert.ok(await t.page.locator('#change-order').isDisabled());
+   await t.page.evaluate(()=>{window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));window.dispatchEvent(new StorageEvent('storage',{key:'pixelkovia-checkout-attempt',newValue:'{}'}));inlineFixture.walletAvailability(false);});
+   await t.page.waitForTimeout(50);assert.equal(t.f.reads,0,'returning from a native app cannot poll and hide its still-open wallet');assert.ok(await t.page.locator('#express-checkout-slot').isVisible());assert.ok(await t.page.locator('#payment-slot').isVisible());
+   await t.page.evaluate(()=>{void inlineFixture.confirmWallet();});await t.page.waitForFunction(()=>inlineFixture.calls.length===1);t.f.paid=true;await t.finish();await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');
+   assert.equal(await t.page.evaluate(()=>inlineFixture.destroyed),0);assert.equal(t.f.posts.length,1);await t.close();cases.push(wallet+': native app return before confirm preserves wallet and does not offer a second payment');
+  }
+  {
+   const t=await open(browser,{wallet,walletDelayConfirm:true});await t.start();await t.page.getByRole('button',{name:'Fixture '+wallet}).click();await t.page.evaluate(()=>inlineFixture.cancel());
+   assert.ok(await t.page.locator('#stripe-pay').isEnabled());assert.ok(await t.page.locator('#change-order').isEnabled());assert.equal(await t.page.evaluate(()=>inlineFixture.calls.length),0);await t.close();cases.push(wallet+': cancel before confirm releases only the native UI guard');
+  }
+  {
    const t=await open(browser,{wallet});await t.start();let unblock;t.f.statusGate=new Promise(resolve=>{unblock=resolve;});
    await t.page.getByRole('button',{name:'Fixture '+wallet}).click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);t.f.paid=true;await t.finish();await t.page.waitForFunction(()=>inlineFixture.nativeReturned);
    assert.equal(await t.page.evaluate(()=>inlineFixture.nativeComplete),true);assert.equal(await t.page.evaluate(()=>inlineFixture.destroyed),0);assert.equal(await t.page.evaluate(()=>inlineFixture.calls[0].wallet),wallet);assert.equal(await t.page.evaluate(()=>inlineFixture.calls[0].hasReturnUrl),false);assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),0);
@@ -17,6 +29,12 @@ const {launch,open,cachedPurchase,sessionId}=require('./helpers/inline-checkout.
    const t=await open(browser,{wallet});await t.start();await t.page.evaluate(()=>inlineFixture.cancel());assert.match(await t.page.locator('#payment-status').innerText(),/zatvorili/);assert.equal(await t.page.evaluate(()=>inlineFixture.calls.length),0);
    await t.page.getByRole('button',{name:'Fixture '+wallet}).click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);await t.finish({type:'error',error:{code:'paymentFailed',message:'Platba bola zamietnutá.',paymentFailed:{declineCode:'generic_decline'}}});await t.page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled);assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),1);assert.equal(t.f.posts.length,1);await t.close();cases.push(wallet+': cancel and confirmed decline keep same order');
   }
+ }
+ {
+  const t=await open(browser,{wallet:'google_pay',walletDelayConfirm:true});await t.start();await t.page.getByRole('button',{name:'Fixture google_pay'}).click();
+  await t.page.evaluate(()=>{inlineFixture.wrongTotal=true;void inlineFixture.confirmWallet();});await t.page.waitForFunction(()=>inlineFixture.nativeReturned);
+  assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),1);assert.equal(await t.page.evaluate(()=>inlineFixture.calls.length),0);assert.ok(await t.page.locator('#change-order').isEnabled());assert.ok(await t.page.locator('#retry-payment').isVisible());assert.ok(await t.page.locator('#stripe-pay').isDisabled());
+  await t.page.evaluate(()=>inlineFixture.wrongTotal=false);await t.page.locator('#retry-payment').click();await t.page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled);await t.close();cases.push('price mismatch before native confirm releases the wallet guard without charging and permits recovery');
  }
  {
   const t=await open(browser,{walletAvailable:false});await t.start();assert.ok(await t.page.locator('#express-checkout-slot').isHidden());await t.page.evaluate(()=>inlineFixture.walletAvailability(true));assert.ok(await t.page.locator('#express-checkout-slot').isVisible());await t.close();cases.push('late Stripe wallet availability reveals original wallet slot');

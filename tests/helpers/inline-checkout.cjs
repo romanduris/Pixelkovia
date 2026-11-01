@@ -4,7 +4,7 @@ const origin='https://pixelkovia.rodulab.com',sessionId='cs_test_inline_fixture1
 const engine={chromium,webkit}[process.env.QA_BROWSER||'chromium'];
 async function launch(){return engine.launch({headless:true,...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',JSC_useJIT:'0'}}:{})});}
 function install(options){
- const s=window.inlineFixture={calls:[],validated:0,destroyed:0,cardElements:0,walletElements:0,walletFailed:0,nativeReturned:false,nativeComplete:false,totalCents:1499,validationError:options.validationError||false,wrongTotal:options.wrongTotal||false,cardLoadError:options.cardLoadError||false,walletAvailable:options.walletAvailable!==false,loadError:options.loadError||false};
+ const s=window.inlineFixture={calls:[],validated:0,destroyed:0,cardElements:0,walletElements:0,walletFailed:0,walletResolved:0,nativeReturned:false,nativeComplete:false,totalCents:1499,validationError:options.validationError||false,wrongTotal:options.wrongTotal||false,cardLoadError:options.cardLoadError||false,walletAvailable:options.walletAvailable!==false,loadError:options.loadError||false};
  window.Stripe=(key,config)=>({initCheckoutElementsSdk(init){s.init=init;s.locale=config.locale;return {
   on(type,handler){if(type==='change')s.change=handler;},
   async loadActions(){if(s.loadError)return {type:'error',error:{message:'SDK failed',code:null}};return {type:'success',actions:{
@@ -14,13 +14,14 @@ function install(options){
     // This is the actual Checkout contract, not the older PaymentIntent error shape.
     if(args.returnUrl)throw Error('return_url is already server-owned');
     s.calls.push({redirect:args.redirect,wallet:args.expressCheckoutConfirmEvent?.expressPaymentType,hasReturnUrl:'returnUrl' in args});
-    return new Promise((resolve,reject)=>{s.finish=r=>r?.throw?reject(Error('Network interrupted')):resolve(r);});
+    return new Promise((resolve,reject)=>{s.finish=r=>{if(r?.throw){const error=Error(r.message||'Network interrupted');error.name=r.name||'Error';reject(error);}else resolve(r);};});
    }
   }};},
   createPaymentElement(config){s.cardElements++;s.cardConfig=config;const div=document.createElement('div');div.textContent='Stripe card fields';div.style.height='150px';const events={};return {on(t,h){events[t]=h;},mount(sel){document.querySelector(sel).append(div);events[s.cardLoadError?'loaderror':'ready']?.({});},destroy(){div.remove();}};},
   createExpressCheckoutElement(config){s.walletElements++;s.walletConfig=config;const events={},button=document.createElement('button');button.type='button';button.textContent='Fixture '+options.wallet;
    const event={expressPaymentType:options.wallet,paymentFailed(){s.walletFailed++;}};
-   button.addEventListener('click',async()=>{s.nativeReturned=false;await events.confirm(event);s.nativeReturned=true;queueMicrotask(()=>s.nativeComplete=s.destroyed===0);});
+   s.confirmWallet=async()=>{s.nativeReturned=false;await events.confirm(event);s.nativeReturned=true;queueMicrotask(()=>s.nativeComplete=s.destroyed===0);};
+   button.addEventListener('click',()=>{let resolved=!events.click;events.click?.({expressPaymentType:options.wallet,resolve(){resolved=true;s.walletResolved++;},reject(){resolved=false;}});if(resolved&&!options.walletDelayConfirm)void s.confirmWallet();});
    s.walletAvailability=available=>events.availablepaymentmethodschange?.({paymentMethods:{applePay:{available},googlePay:{available}}});s.cancel=()=>events.cancel?.({});
    return {on(t,h){events[t]=h;},mount(sel){document.querySelector(sel).append(button);events.ready?.({availablePaymentMethods:s.walletAvailable?{applePay:options.wallet==='apple_pay',googlePay:options.wallet==='google_pay'}:null});},destroy(){s.destroyed++;button.remove();}};
   }

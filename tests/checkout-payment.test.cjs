@@ -28,6 +28,20 @@ const {launch,open}=require('./helpers/inline-checkout.cjs');
  for(const kind of ['returned-error','thrown-error']){
   const t=await open(browser);await t.start();await t.page.locator('#stripe-pay').click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);await t.finish(kind==='thrown-error'?{throw:true}:{type:'error',error:{code:null,message:'Unknown result'}});await t.page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled);assert.ok(await t.page.locator('#payment-slot').isVisible());assert.ok(t.f.reads>0);assert.equal(t.f.posts.length,1);await t.close();cases.push(kind+' requires server verification before retry');
  }
+ {
+  const t=await open(browser,{wallet:'google_pay'});await t.start();await t.page.getByRole('button',{name:'Fixture google_pay'}).click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);
+  await t.finish({throw:true,name:'IntegrationError',message:'You specified never for fields.billing_details.phone but the corresponding billing data was not provided.'});
+  await t.page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled);
+  assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),1,'known pre-confirmation errors close the native sheet without waiting for its timeout');
+  assert.equal(await t.page.evaluate(()=>inlineFixture.nativeReturned),true);assert.match(await t.page.locator('#payment-status').innerText(),/Potvrdenie platby sa nedokončilo/);assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');assert.ok(await t.page.locator('#retry-payment').isVisible());
+  await t.page.waitForTimeout(30);assert.ok(t.f.diagnostics.some(e=>e.type==='confirm_error'&&e.code==='billing_phone_missing'));assert.ok(!JSON.stringify(t.f.diagnostics).includes('corresponding billing data'));
+  await t.close();cases.push('SDK billing precondition closes wallet, logs a fixed safe code and explains the verified unpaid result');
+ }
+ {
+  const t=await open(browser,{wallet:'google_pay'});await t.start();await t.page.getByRole('button',{name:'Fixture google_pay'}).click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);t.f.state='pending';await t.finish({throw:true});
+  await t.page.waitForFunction(()=>document.querySelector('#payment-status').textContent.startsWith('Overujeme'));assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),0);assert.ok(await t.page.locator('#stripe-pay').isHidden());t.f.paid=true;
+  await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.equal(t.f.posts.length,1);assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),0);await t.close();cases.push('unknown confirmation error keeps bank processing protected and accepts a late verified success');
+ }
  for(const option of ['cardLoadError','loadError','wrongTotal']){
   const t=await open(browser,{[option]:true});await t.page.locator('[name=email]').fill('family@example.invalid');await t.page.locator('.checkout-buy').click();await t.page.locator('#retry-payment').waitFor();assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');await t.page.evaluate(option=>inlineFixture[option]=false,option);await t.page.locator('#retry-payment').click();await t.page.waitForFunction(()=>!document.querySelector('#stripe-pay').hidden&&!document.querySelector('#stripe-pay').disabled);assert.deepEqual(t.f.posts[0],t.f.posts[1]);await t.close();cases.push(option+' recovers the original attempt');
  }

@@ -28,6 +28,8 @@ test('browser telemetry is bounded, deduplicated, private, and cannot report a s
     assert.equal((await worker.fetch(request(data),f.env)).status,200);
     const rows=await query(f.db,"SELECT * FROM payment_log WHERE source='browser'");assert.equal(rows.length,1);
     const saved=JSON.stringify(rows);for(const secret of ['NEVER_STORE','4242424242424242','monitor@example.invalid',f.input.attemptKey])assert.ok(!saved.includes(secret));
+    assert.equal((await worker.fetch(request({...data,type:'confirm_error',code:'billing_phone_missing'}),f.env)).status,200);
+    assert.equal((await first(f.db,"SELECT code FROM payment_log WHERE type='confirm_error'")).code,'billing_phone_missing');
     assert.equal((await worker.fetch(new Request(origin+'/api/admin/payments'),f.env)).status,403);
     assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
     for(let n=0;n<61;n++)await worker.fetch(request(data),f.env);
