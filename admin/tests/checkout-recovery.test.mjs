@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import Stripe from 'stripe';
 import {fresh} from './support.mjs';
 import {first,execute} from '../src/db.mjs';
-import {createCheckout,releaseCheckout,verifiedCheckoutStatus,checkoutConfig,paymentWebhook} from '../src/commerce.mjs';
+import {createCheckout,releaseCheckout,verifiedCheckoutStatus,checkoutConfig,paymentWebhook,fulfill,unseal} from '../src/commerce.mjs';
 import worker from '../src/worker.mjs';
 const origin='https://pixelkovia.rodulab.com';
 function fixture(){
@@ -83,11 +83,11 @@ test('unknown and processing cannot release the guard; edit expires original Ses
   await assert.rejects(()=>createCheckout(f.env,f.input),e=>e.status===409,'stale tabs cannot reopen a released attempt');
  }finally{f.db.close();}
 });
-test('paid repeat purchases require an explicit new-purchase action and remain independent',async()=>{
+test('a fresh purchase after a verified paid order needs no extra confirmation and remains independent',async()=>{
  const f=fixture();try{
   const a=await createCheckout(f.env,f.input),s=f.sessions.get(a.sessionId);s.status='complete';s.payment_status='paid';
-  await assert.rejects(()=>createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()}),e=>e.status===409);
-  const b=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),newPurchase:true});assert.notEqual(b.sessionId,s.id);
+  assert.equal((await createCheckout(f.env,f.input)).sessionId,s.id,'replaying the paid attempt returns the original Session');
+  const b=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()});assert.notEqual(b.sessionId,s.id);
   assert.equal(f.sessions.size,2);await assert.rejects(()=>createCheckout(f.env,f.input),e=>e.status===409,'the old tab remains closed after an explicit next purchase');
  }finally{f.db.close();}
 });
@@ -108,9 +108,9 @@ test('webhook acknowledges before delayed mail; duplicates/out-of-order success 
   assert.equal((await first(f.db,'SELECT attempts FROM access_deliveries')).attempts,1);
  }finally{globalThis.fetch=original;f.db.close();}
 });
-test('production uses hosted Checkout; recovery routes enforce origin and verify Stripe state',async()=>{
+test('production uses inline Checkout with eligible wallets; recovery enforces origin and verified Stripe state',async()=>{
  const f=fixture();try{
-  assert.deepEqual(checkoutConfig(f.env),{enabled:true,checkout:'hosted'});
+  assert.deepEqual(checkoutConfig(f.env),{enabled:true,checkout:'elements',publishableKey:'pk_test_fixture',wallets:{applePay:true,googlePay:true}});
   const a=await createCheckout(f.env,f.input);
   const status=await worker.fetch(new Request(origin+'/api/checkout/status?session_id='+a.sessionId),f.env);assert.equal(status.status,200);assert.equal((await status.json()).state,'ready');
   const foreign=await worker.fetch(new Request(origin+'/api/checkout/release',{method:'POST',headers:{origin:'https://foreign.invalid','content-type':'application/json'},body:JSON.stringify(f.input)}),f.env);assert.equal(foreign.status,403);
@@ -140,7 +140,7 @@ test('free Session can be safely edited, while only completed verified zero-cost
  }finally{f.db.close();}
 });
 
-test('hosted Checkout has one owner for confirmation and return URLs, preserves cart and resumes one Session',async()=>{
+test('legacy hosted Sessions remain recoverable with their original parameters',async()=>{
  const f=fixture();try{
   const input={...f.input,uiMode:'hosted',books:['story-book-before','story-book-after'],giftGame:true};
   const a=await createCheckout(f.env,input),s=f.sessions.get(a.sessionId);
@@ -186,4 +186,27 @@ test('a lost create response cannot lock the buyer forever or allow an unverifie
    if(providerCreated)assert.equal([...f.sessions.values()][0].status,'expired','a found Session is closed before replacing it');
   }finally{f.db.close();}
  }
+});
+
+
+test('a repeat gift purchase with the same email creates isolated access without a newPurchase flag',async()=>{
+ const f=fixture();try{
+  const a=await createCheckout(f.env,f.input),s=f.sessions.get(a.sessionId);s.status='complete';s.payment_status='paid';s.payment_intent='pi_first';await fulfill(f.env,s.id);
+  const input={...f.input,attemptKey:crypto.randomUUID(),books:['story-book-before','story-book-after'],giftGame:true};
+  const b=await createCheckout(f.env,input),second=f.sessions.get(b.sessionId);assert.notEqual(b.sessionId,a.sessionId);assert.equal(b.totalCents,2997);
+  second.status='complete';second.payment_status='paid';second.payment_intent='pi_second';await fulfill(f.env,second.id);await fulfill(f.env,second.id);
+  assert.equal((await first(f.db,'SELECT COUNT(*) n FROM orders')).n,3);assert.equal((await first(f.db,'SELECT COUNT(*) n FROM customers')).n,3);
+  const rows=await f.db.prepare('SELECT encrypted_message FROM access_deliveries').all();
+  const messages=await Promise.all(rows.results.map(r=>unseal(r.encrypted_message,f.env.CUSTOMER_AUTH_SECRET)));assert.equal(new Set(messages.map(m=>m.password)).size,3);
+  assert.equal(messages.filter(m=>m.gift).length,1);
+ }finally{f.db.close();}
+});
+
+test('two fresh clicks after a paid purchase can create only one new unresolved payment',async()=>{
+ const f=fixture();try{
+  const a=await createCheckout(f.env,f.input),s=f.sessions.get(a.sessionId);s.status='complete';s.payment_status='paid';
+  const values=await Promise.allSettled([createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()}),createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()})]);
+  assert.equal(values.filter(v=>v.status==='fulfilled').length,1);assert.equal(values.find(v=>v.status==='rejected').reason.status,409);assert.equal(f.sessions.size,2);
+  assert.equal((await first(f.db,'SELECT COUNT(*) n FROM checkout_requests WHERE active=1')).n,1);
+ }finally{f.db.close();}
 });

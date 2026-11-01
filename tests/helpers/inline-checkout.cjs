@@ -1,0 +1,66 @@
+const fs=require('node:fs'),path=require('node:path');
+const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const origin='https://pixelkovia.rodulab.com',sessionId='cs_test_inline_fixture123456';
+const engine={chromium,webkit}[process.env.QA_BROWSER||'chromium'];
+async function launch(){return engine.launch({headless:true,...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',JSC_useJIT:'0'}}:{})});}
+function install(options){
+ const s=window.inlineFixture={calls:[],validated:0,destroyed:0,cardElements:0,walletElements:0,walletFailed:0,nativeReturned:false,nativeComplete:false,totalCents:1499,validationError:options.validationError||false,wrongTotal:options.wrongTotal||false,cardLoadError:options.cardLoadError||false,walletAvailable:options.walletAvailable!==false,loadError:options.loadError||false};
+ window.Stripe=(key,config)=>({initCheckoutElementsSdk(init){s.init=init;s.locale=config.locale;return {
+  on(type,handler){if(type==='change')s.change=handler;},
+  async loadActions(){if(s.loadError)return {type:'error',error:{message:'SDK failed',code:null}};return {type:'success',actions:{
+   getSession(){return {currency:'eur',minorUnitsAmountDivisor:100,total:{total:{minorUnitsAmount:s.totalCents+(s.wrongTotal?1:0)}}};},
+   async validateElements(){s.validated++;return s.validationError?{type:'error',error:{code:'validation_error',message:'Validation failed',validation_errors:[{element:'payment',message:'Číslo vašej karty je neúplné.'}]}}:{type:'success'};},
+   confirm(args){
+    // This is the actual Checkout contract, not the older PaymentIntent error shape.
+    if(args.returnUrl)throw Error('return_url is already server-owned');
+    s.calls.push({redirect:args.redirect,wallet:args.expressCheckoutConfirmEvent?.expressPaymentType,hasReturnUrl:'returnUrl' in args});
+    return new Promise((resolve,reject)=>{s.finish=r=>r?.throw?reject(Error('Network interrupted')):resolve(r);});
+   }
+  }};},
+  createPaymentElement(config){s.cardElements++;s.cardConfig=config;const div=document.createElement('div');div.textContent='Stripe card fields';div.style.height='150px';const events={};return {on(t,h){events[t]=h;},mount(sel){document.querySelector(sel).append(div);events[s.cardLoadError?'loaderror':'ready']?.({});},destroy(){div.remove();}};},
+  createExpressCheckoutElement(config){s.walletElements++;s.walletConfig=config;const events={},button=document.createElement('button');button.type='button';button.textContent='Fixture '+options.wallet;
+   const event={expressPaymentType:options.wallet,paymentFailed(){s.walletFailed++;}};
+   button.addEventListener('click',async()=>{s.nativeReturned=false;await events.confirm(event);s.nativeReturned=true;queueMicrotask(()=>s.nativeComplete=s.destroyed===0);});
+   s.walletAvailability=available=>events.availablepaymentmethodschange?.({paymentMethods:{applePay:{available},googlePay:{available}}});s.cancel=()=>events.cancel?.({});
+   return {on(t,h){events[t]=h;},mount(sel){document.querySelector(sel).append(button);events.ready?.({availablePaymentMethods:s.walletAvailable?{applePay:options.wallet==='apple_pay',googlePay:options.wallet==='google_pay'}:null});},destroy(){s.destroyed++;button.remove();}};
+  }
+ };}});
+}
+async function open(browser,options={}){
+ const width=options.width||390,context=await browser.newContext({viewport:{width,height:844},isMobile:width<600,hasTouch:width<600}),page=await context.newPage();
+ const f={posts:[],releases:[],reads:0,createLost:false,createError:0,statusError:false,releaseError:false,enabled:true,state:'ready',paid:false,delivered:false,totalCents:1499,labels:['Rodinná hra Pixelkovia','Atlas Pixelkov'],orderCount:1,...options};
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await context.addInitScript(install,{wallet:'google_pay',...options});
+ await context.addInitScript(({purchase,denyStorage})=>{if(denyStorage){Object.defineProperty(window,'localStorage',{get(){throw Error('Storage unavailable');}});Object.defineProperty(window,'sessionStorage',{get(){throw Error('Storage unavailable');}});}else if(purchase)localStorage.setItem('pixelkovia-checkout-attempt',JSON.stringify(purchase));},{purchase:options.purchase,denyStorage:options.denyStorage});
+ await context.route('**/*',async route=>{
+  const req=route.request(),url=new URL(req.url());if(url.origin!==origin)return route.abort();
+  if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:f.enabled,checkout:'elements',publishableKey:'pk_test_fixture',wallets:{applePay:true,googlePay:true}}});
+  if(url.pathname==='/api/checkout/session'){
+   const input=req.postDataJSON();f.posts.push(input);
+   f.totalCents=input.voucherCode==='free'?0:input.voucherCode==='1e'?100:input.baseId==='episode-1'?(input.books.length===2?1998:1499+input.books.length*499)+(input.giftGame?999:0):499*(1+input.books.length);
+   await page.evaluate(total=>inlineFixture.totalCents=total,f.totalCents);
+   if(f.createLost){f.createLost=false;return route.abort();}
+   if(f.createError)return route.fulfill({status:f.createError,json:{error:'Skontrolujte objednávku.'}});
+   return route.fulfill({json:{sessionId,uiMode:input.uiMode==='hosted'?'hosted_page':'elements',...(input.uiMode==='hosted'?{checkoutUrl:'https://checkout.stripe.com/c/pay/'+sessionId}:{clientSecret:'fixture'}),totalCents:f.totalCents,state:f.createState||'open'}});
+  }
+  if(url.pathname==='/api/checkout/status'){
+   f.reads++;if(f.statusError)return route.abort();if(f.statusGate)await f.statusGate;
+   return route.fulfill({json:{sessionId,paid:f.paid,delivered:f.delivered,noPaymentRequired:f.totalCents===0,state:f.paid?'paid':f.state,totalCents:f.totalCents,labels:f.labels,orderCount:f.orderCount}});
+  }
+  if(url.pathname==='/api/checkout/release'){
+   f.releases.push(req.postDataJSON());return f.releaseError?route.fulfill({status:409,json:{error:'Overujeme pôvodnú platbu.'}}):route.fulfill({json:{released:true}});
+  }
+  let file=url.pathname==='/'?'index.html':url.pathname.slice(1);if(!path.extname(file))file+='.html';const target=path.join(process.cwd(),'dist/funnel',file);
+  if(!fs.existsSync(target)||!fs.statSync(target).isFile())return route.fulfill({status:404,body:''});
+  return route.fulfill({contentType:{'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png'}[path.extname(file)]||'application/octet-stream',body:fs.readFileSync(target)});
+ });
+ await page.goto(origin+'/checkout'+(options.query||''));
+ await page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled||!document.querySelector('#payment-panel').hidden||document.querySelector('#payment-note').textContent.includes('nie sú dostupné'));
+ async function voucher(code){await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill(code);await page.locator('#voucher-form').evaluate(el=>el.requestSubmit());}
+ async function start(){await page.locator('[name=email]').fill('family@example.invalid');await page.locator('.checkout-buy').click();await page.locator('#stripe-pay').waitFor();}
+ async function finish(result={type:'success'}){await page.evaluate(result=>inlineFixture.finish(result),result);}
+ async function close(){if(errors.length)throw Error('Browser errors: '+errors.join('; '));await context.close();}
+ return {page,context,f,voucher,start,finish,close};
+}
+function cachedPurchase(overrides={}){const input={baseId:'episode-1',books:[],atlasIncluded:true,giftGame:false,email:'family@example.invalid',uiMode:'elements',attemptKey:'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'};return {attemptKey:input.attemptKey,input,sessionId,phase:'ready',...overrides};}
+module.exports={launch,open,cachedPurchase,origin,sessionId};

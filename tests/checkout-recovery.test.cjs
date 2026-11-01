@@ -1,87 +1,67 @@
 const assert=require('node:assert/strict');
-const {launch,open,cachedPurchase,sessionId,checkoutUrl,origin}=require('./helpers/hosted-checkout.cjs');
+const {launch,open,cachedPurchase,sessionId}=require('./helpers/inline-checkout.cjs');
 (async()=>{const browser=await launch(),cases=[];try{
- {
-  const t=await open(browser,{createLost:true});await t.start();await t.page.locator('#retry-payment').waitFor();
-  await t.page.reload();await t.page.locator('#retry-payment').click();await t.page.waitForURL(checkoutUrl);
-  assert.equal(t.f.posts.length,2);assert.deepEqual(t.f.posts[0],t.f.posts[1]);await t.close();cases.push('lost create response and refresh reuse exact request and key');
- }
- for(const state of ['ready','failed','expired','pending','refunded','unknown']){
-  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId,state});
-  if(state==='pending'){
-   assert.match(await t.page.locator('#payment-status').innerText(),/Overujeme|neplaťte znova/);assert.ok(await t.page.locator('#change-order').isHidden());assert.ok(await t.page.locator('#continue-payment').isHidden());
-  }else{
-   await t.page.waitForFunction(()=>!document.querySelector('#payment-status').textContent.includes('Overujeme výsledok'));
-   if(['ready','failed'].includes(state)){
-    assert.ok(await t.page.locator('#continue-payment').isVisible());assert.equal(await t.page.locator('#continue-payment').getAttribute('href'),checkoutUrl);
-    if(state==='failed')assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');
-    await t.page.locator('#continue-payment').click();await t.page.waitForURL(checkoutUrl);assert.equal(t.f.posts.length,0);
-   }
-   if(state==='expired'){await t.page.locator('#change-order').click();await t.page.waitForFunction(()=>!document.querySelector('#customer-email').disabled);assert.equal(t.f.releases.length,1);}
-   if(state==='refunded')assert.ok(await t.page.locator('#new-order').isVisible());
-   if(state==='unknown')assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');
+ for(const wallet of ['apple_pay','google_pay']){
+  {
+   const t=await open(browser,{wallet});await t.start();let unblock;t.f.statusGate=new Promise(resolve=>{unblock=resolve;});
+   await t.page.getByRole('button',{name:'Fixture '+wallet}).click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);t.f.paid=true;await t.finish();await t.page.waitForFunction(()=>inlineFixture.nativeReturned);
+   assert.equal(await t.page.evaluate(()=>inlineFixture.nativeComplete),true);assert.equal(await t.page.evaluate(()=>inlineFixture.destroyed),0);assert.equal(await t.page.evaluate(()=>inlineFixture.calls[0].wallet),wallet);assert.equal(await t.page.evaluate(()=>inlineFixture.calls[0].hasReturnUrl),false);assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),0);
+   unblock();await t.page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Platba je potvrdená'));await t.close();cases.push(wallet+': native callback returns before server polling and elements survive');
   }
-  await t.close();cases.push('return state '+state);
+  {
+   const t=await open(browser,{wallet});await t.start();await t.page.clock.install();await t.page.getByRole('button',{name:'Fixture '+wallet}).click();await t.page.clock.runFor(21000);
+   assert.match(await t.page.locator('#payment-status').innerText(),/neplaťte znova/);assert.ok(await t.page.locator('#payment-slot').isVisible());assert.ok(await t.page.locator('#express-checkout-slot').isVisible());assert.ok(await t.page.locator('#change-order').isDisabled());assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),0);
+   t.f.paid=true;await t.finish();await t.page.clock.runFor(50);await t.page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Platba je potvrdená'));assert.equal(t.f.posts.length,1);await t.close();cases.push(wallet+': slow native confirmation keeps original form alive');
+  }
+  {
+   const t=await open(browser,{wallet});await t.start();await t.page.evaluate(()=>inlineFixture.cancel());assert.match(await t.page.locator('#payment-status').innerText(),/zatvorili/);assert.equal(await t.page.evaluate(()=>inlineFixture.calls.length),0);
+   await t.page.getByRole('button',{name:'Fixture '+wallet}).click();await t.page.waitForFunction(()=>inlineFixture.calls.length===1);await t.finish({type:'error',error:{code:'paymentFailed',message:'Platba bola zamietnutá.',paymentFailed:{declineCode:'generic_decline'}}});await t.page.waitForFunction(()=>!document.querySelector('#stripe-pay').disabled);assert.equal(await t.page.evaluate(()=>inlineFixture.walletFailed),1);assert.equal(t.f.posts.length,1);await t.close();cases.push(wallet+': cancel and confirmed decline keep same order');
+  }
  }
  {
-  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:false,orderCount:2});
-  await t.page.waitForFunction(()=>document.querySelector('#payment-status').textContent.includes('Platba je potvrdená'));
-  assert.match(await t.page.locator('#payment-status').innerText(),/dva samostatné e-maily/i);assert.ok(await t.page.locator('#open-portal').isHidden());
-  t.f.delivered=true;await t.page.locator('#check-payment').click();await t.page.locator('#open-portal').waitFor();assert.ok(await t.page.locator('#check-payment').isHidden());assert.equal(t.f.posts.length,0);await t.close();cases.push('paid before mail, then two messages ready');
+  const t=await open(browser,{walletAvailable:false});await t.start();assert.ok(await t.page.locator('#express-checkout-slot').isHidden());await t.page.evaluate(()=>inlineFixture.walletAvailability(true));assert.ok(await t.page.locator('#express-checkout-slot').isVisible());await t.close();cases.push('late Stripe wallet availability reveals original wallet slot');
  }
  {
-  const t=await open(browser,{query:'?checkout_id=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&canceled=1',denyStorage:true});
-  await t.page.locator('#continue-payment').waitFor();await t.page.locator('#continue-payment').click();await t.page.waitForURL(checkoutUrl);assert.equal(t.f.posts.length,0);await t.close();cases.push('cancel URL recovers same Session with browser storage denied');
- }
- {
-  const t=await open(browser,{purchase:cachedPurchase({input:{...cachedPurchase().input,uiMode:'elements'},phase:'unknown'})});
-  await t.page.locator('#change-order').waitFor();await t.page.locator('#change-order').click();assert.equal(t.f.releases.length,1);
-  await t.page.waitForFunction(()=>!document.querySelector('#customer-email').disabled);await t.start();await t.page.waitForURL(checkoutUrl);assert.equal(t.f.posts[0].uiMode,'hosted');await t.close();cases.push('stuck legacy checkout closes original before a hosted order');
- }
- {
-  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId,statusError:true});
-  await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='error');
-  assert.ok(await t.page.locator('#change-order').isHidden());assert.match(await t.page.locator('#payment-status').innerText(),/neplaťte znova/);
-  await t.page.screenshot({path:'/tmp/pixelkovia-payment-network-390.png',fullPage:true});
-  t.f.statusError=false;await t.page.locator('#check-payment').click();await t.page.locator('#continue-payment').waitFor();assert.equal(t.f.posts.length,0);await t.close();cases.push('network error is visible and retry checks original payment');
- }
- {
-  const t=await open(browser,{purchase:cachedPurchase(),releaseError:true});await t.page.locator('#change-order').waitFor();await t.page.locator('#change-order').click();
-  await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='error');assert.equal(t.f.posts.length,0);assert.ok(await t.page.locator('#customer-email').isDisabled());await t.close();cases.push('release failure keeps purchase locked');
- }
- {
-  const t=await open(browser,{purchase:cachedPurchase(),paid:true,delivered:true});await t.page.locator('#new-order').waitFor();await t.page.locator('#new-order').click();await t.start();await t.page.waitForURL(checkoutUrl);
-  assert.equal(t.f.posts[0].newPurchase,true);assert.notEqual(t.f.posts[0].attemptKey,cachedPurchase().attemptKey);await t.close();cases.push('explicit repeat purchase gets a new key');
- }
- {
-  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId});await t.page.locator('#continue-payment').waitFor();
-  await t.page.evaluate(()=>{const v=JSON.parse(localStorage.getItem('pixelkovia-checkout-attempt'));v.sessionId='cs_test_unrelatedorder12345';window.dispatchEvent(new StorageEvent('storage',{key:'pixelkovia-checkout-attempt',newValue:JSON.stringify(v)}));});
-  assert.equal(t.f.posts.length,0);assert.ok(t.page.url().includes(sessionId));await t.close();cases.push('another tab never replaces return-linked order');
- }
- {
-  const t=await open(browser,{configError:true});await t.page.locator('#reload-payments').waitFor();assert.equal(t.f.posts.length,0);
-  t.f.configError=false;await t.page.locator('#reload-payments').click();await t.page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled);await t.close();cases.push('configuration outage retries without refresh');
+  const t=await open(browser,{createLost:true});await t.page.locator('[name=email]').fill('family@example.invalid');await t.page.locator('.checkout-buy').click();await t.page.locator('#retry-payment').waitFor();await t.page.reload();await t.page.locator('#stripe-pay').waitFor();assert.deepEqual(t.f.posts[0],t.f.posts[1]);await t.close();cases.push('lost create response and refresh retain original exact payload and key');
  }
  for(const createError of [400,403,409,429,500]){
-  const t=await open(browser,{createError});await t.start();await t.page.locator('#retry-payment').waitFor();assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');
-  const original=t.f.posts[0];t.f.createError=0;await t.page.locator('#retry-payment').evaluate(el=>{el.click();el.click();});await t.page.waitForURL(checkoutUrl);assert.deepEqual(t.f.posts[1],original);assert.equal(t.f.posts.length,2);await t.close();cases.push('HTTP '+createError+' recovers one original request');
+  const t=await open(browser,{createError});await t.page.locator('[name=email]').fill('family@example.invalid');await t.page.locator('.checkout-buy').click();await t.page.locator('#retry-payment').waitFor();assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');t.f.createError=0;await t.page.locator('#retry-payment').click();await t.page.locator('#stripe-pay').waitFor();assert.deepEqual(t.f.posts[0],t.f.posts[1]);await t.close();cases.push('HTTP '+createError+' recovers the same inline attempt');
  }
  {
-  const t=await open(browser);await t.start();await t.page.waitForURL(checkoutUrl);await t.page.goBack();await t.page.locator('#continue-payment').waitFor();assert.equal(t.f.posts.length,1);await t.close();cases.push('browser back restores original unpaid Session');
+  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId,state:'pending',statusError:true});await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='error');assert.match(await t.page.locator('#payment-status').innerText(),/neplaťte znova/);assert.ok(await t.page.locator('#change-order').isDisabled());t.f.statusError=false;t.f.paid=true;await t.page.locator('#check-payment').click();await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.equal(t.f.posts.length,0);await t.close();cases.push('connection loss never marks a payment failed or permits a replacement');
  }
  {
-  const t=await open(browser,{purchase:cachedPurchase(),state:'pending'});await t.page.clock.install();await t.page.clock.runFor(8500);
-  await t.page.waitForFunction(()=>!document.querySelector('#check-payment').disabled);assert.ok(await t.page.locator('#change-order').isHidden());assert.ok(await t.page.locator('#continue-payment').isHidden());
-  t.f.paid=true;await t.page.locator('#check-payment').click();await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.equal(t.f.posts.length,0);await t.close();cases.push('polling stops safely and a late confirmed payment recovers');
+  const t=await open(browser,{purchase:cachedPurchase({phase:'unknown'}),query:'?session_id='+sessionId,state:'pending'});await t.page.waitForFunction(()=>!document.querySelector('#check-payment').disabled,{},{timeout:15000});assert.ok(await t.page.locator('#change-order').isDisabled());assert.ok(await t.page.locator('#check-payment').isEnabled());t.f.paid=true;await t.page.locator('#check-payment').click();await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');await t.close();cases.push('polling stops safely and late success can be checked');
  }
  {
-  const t=await open(browser,{query:'?session_id='+sessionId,denyStorage:true,state:'expired'});await t.page.locator('#change-order').waitFor();await t.page.locator('#change-order').click();await t.page.waitForFunction(()=>!document.querySelector('#customer-email').disabled);assert.equal(t.f.posts.length,0);await t.close();cases.push('verified expiry releases UI with storage denied');
+  const t=await open(browser,{purchase:cachedPurchase(),query:'?session_id='+sessionId,state:'ready'});await t.page.locator('#retry-payment').waitFor();await t.page.locator('#retry-payment').click();await t.page.locator('#stripe-pay').waitFor();assert.equal(t.f.posts.length,1);await t.page.reload();await t.page.locator('#retry-payment').waitFor();await t.page.locator('#retry-payment').click();await t.page.locator('#stripe-pay').waitFor();assert.deepEqual(t.f.posts[0],t.f.posts[1]);await t.close();cases.push('unpaid return and refresh restore the same embedded Session');
  }
  {
-  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:true,totalCents:0});await t.page.locator('#open-portal').waitFor();assert.match(await t.page.locator('#payment-status').innerText(),/Objednávka zdarma je potvrdená/);await t.close();cases.push('verified free order has correct success copy');
+  const t=await open(browser,{purchase:cachedPurchase({phase:'paid'})});assert.ok(await t.page.locator('.checkout-buy').isEnabled());assert.ok(await t.page.locator('#payment-panel').isHidden());await t.start();assert.equal(t.f.posts.length,1);assert.notEqual(t.f.posts[0].attemptKey,cachedPurchase().attemptKey);assert.equal(t.f.posts[0].newPurchase,undefined);await t.close();cases.push('known paid cache allows a natural repeat purchase without a confirmation wall');
  }
  {
-  const t=await open(browser,{query:'?session_id='+sessionId,labels:['<img src=x onerror=alert(1)>']});await t.page.locator('#continue-payment').waitFor();assert.equal(await t.page.locator('#returned-order-items img').count(),0);assert.match(await t.page.locator('#returned-order-items').innerText(),/<img/);await t.close();cases.push('server summary is rendered as plain text');
+  const t=await open(browser,{purchase:cachedPurchase({phase:'unknown'}),paid:true});await t.page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled);assert.ok(await t.page.locator('#payment-panel').isHidden());t.f.paid=false;await t.start();assert.notEqual(t.f.posts[0].attemptKey,cachedPurchase().attemptKey);await t.close();cases.push('verified old paid cache clears when returning from the funnel');
+ }
+ {
+  const t=await open(browser,{query:'?product=story-book-before',purchase:cachedPurchase({phase:'paid'})});await t.start();assert.equal(t.f.posts[0].baseId,'story-book-before');assert.equal(t.f.totalCents,499);await t.close();cases.push('book upsell after a game purchase uses the shared inline checkout');
+ }
+ {
+  const old=cachedPurchase();old.input.uiMode='hosted';const t=await open(browser,{purchase:old});await t.page.locator('#stripe-pay').waitFor();assert.equal(t.f.posts.length,2);assert.equal(t.f.releases.length,1);assert.equal(t.f.posts[0].uiMode,'hosted');assert.equal(t.f.posts[1].uiMode,'elements');assert.notEqual(t.f.posts[0].attemptKey,t.f.posts[1].attemptKey);assert.ok(t.page.url().startsWith('https://pixelkovia.rodulab.com'));await t.close();cases.push('old unpaid hosted attempt is safely closed before inline migration');
+ }
+ {
+  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:false,orderCount:2});await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.match(await t.page.locator('#payment-status').innerText(),/dva samostatné e-maily/);assert.ok(await t.page.locator('#check-payment').isVisible());t.f.delivered=true;await t.page.locator('#check-payment').click();await t.page.waitForFunction(()=>document.querySelector('#check-payment').hidden);await t.close();cases.push('two access emails have their own delivery status after payment');
+ }
+ for(const state of ['expired','refunded','unknown']){
+  const t=await open(browser,{query:'?session_id='+sessionId,denyStorage:true,state});await t.page.waitForFunction(()=>!document.querySelector('#payment-status').textContent.startsWith('Overujeme'));
+  if(state==='expired'){await t.page.locator('#change-order').click();await t.page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled);}
+  if(state==='unknown')assert.equal(await t.page.locator('#payment-status').getAttribute('data-tone'),'error');await t.close();cases.push(state+' is handled without granting access');
+ }
+ {
+  const t=await open(browser,{query:'?session_id='+sessionId,paid:true,delivered:true,totalCents:0});await t.page.waitForFunction(()=>document.querySelector('#payment-status').dataset.tone==='success');assert.match(await t.page.locator('#payment-status').innerText(),/voucherom/);await t.close();cases.push('verified free return shows correct confirmation');
+ }
+ {
+  const old=cachedPurchase({phase:'creating'});delete old.sessionId;old.input.uiMode='hosted';
+  const t=await open(browser,{purchase:old});await t.page.locator('#stripe-pay').waitFor();assert.equal(t.f.posts.length,2);assert.equal(t.f.posts[1].uiMode,'elements');assert.equal(t.f.releases.length,1);assert.ok(await t.page.locator('#new-order').isHidden());await t.close();cases.push('the old previous-payment warning cache restores inline without another confirmation wall');
  }
  console.log(JSON.stringify({browser:process.env.QA_BROWSER||'chromium',passed:cases.length,cases},null,2));
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

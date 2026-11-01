@@ -7,8 +7,8 @@ const ORIGIN='https://pixelkovia.rodulab.com',enc=new TextEncoder();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stripe=env=>env.STRIPE_CLIENT||new Stripe(env.STRIPE_SECRET_KEY,{apiVersion:'2026-08-26.dahlia',maxNetworkRetries:2,httpClient:Stripe.createFetchHttpClient()});
 export const commerceReady=env=>env.PAYMENTS_ENABLED==='true'&&!!(env.STRIPE_SECRET_KEY&&env.STRIPE_PUBLISHABLE_KEY&&env.STRIPE_WEBHOOK_SECRET&&env.CUSTOMER_AUTH_SECRET&&env.RESEND_API_KEY&&env.MAIL_DOMAIN_VERIFIED==='true');
-// Hosted Checkout owns card validation, bank authentication and eligible wallets.
-export function checkoutConfig(env){return {enabled:commerceReady(env),checkout:'hosted'};}
+// One inline Checkout implementation serves the game and every book purchase.
+export function checkoutConfig(env){const enabled=commerceReady(env);return {enabled,checkout:'elements',publishableKey:enabled?env.STRIPE_PUBLISHABLE_KEY:null,wallets:{applePay:true,googlePay:true}};}
 const pendingMessage='Overujeme vašu platbu. Prosíme, neplaťte znova. Potvrdenie a prístup vám po úspešnej úhrade prídu e-mailom.';
 const requestHash=async key=>{
   if(typeof key!=='string'||!/^[-a-zA-Z0-9_]{32,100}$/.test(key))throw new HttpError(400,'Neplatný identifikátor nákupu.');
@@ -68,7 +68,7 @@ export async function verifiedCheckoutStatus(env,sessionId,checkoutId){
   return {...order,sessionId,paid:paid||order.paid,noPaymentRequired:paid?attempt.total_cents===0:order.noPaymentRequired,state:paid||order.paid?'paid':safelyExpired(session)?'expired':failed?'failed':ready?'ready':'pending',retryAllowed:ready||safelyExpired(session),canEdit:ready||safelyExpired(session),checkoutUrl:url,totalCents:attempt.total_cents,labels:JSON.parse(attempt.selection).map(id=>product(id).name).concat(attempt.gift_game?['Druhá hra pre ďalšiu rodinu']:[]),orderCount:order.orderCount||(paid?(attempt.gift_game?2:1):0)};
 }
 function hostedUrl(value){try{const url=new URL(value);if(url.protocol==='https:'&&url.hostname==='checkout.stripe.com'&&!url.username&&!url.password&&!url.port&&url.pathname.startsWith('/c/pay/'))return url.href;}catch{}return null;}
-function checkoutReply(session,attempt){return {sessionId:session.id,totalCents:attempt.total_cents,state:settledPaid(session,attempt)?'paid':safelyExpired(session)?'expired':'open',...(session.ui_mode==='hosted_page'?{checkoutUrl:hostedUrl(session.url)}:{clientSecret:session.client_secret})};}
+function checkoutReply(session,attempt){return {sessionId:session.id,uiMode:session.ui_mode,totalCents:attempt.total_cents,state:settledPaid(session,attempt)?'paid':safelyExpired(session)?'expired':'open',...(session.ui_mode==='hosted_page'?{checkoutUrl:hostedUrl(session.url)}:{clientSecret:session.client_secret})};}
 export async function createCheckout(env,input){
   if(!commerceReady(env))throw new HttpError(503,'Predaj práve pripravujeme. Platba sa nespustila.');
   const email=emailAddress(typeof input.email==='string'?input.email.trim():null),name=typeof input.name==='string'?input.name.trim().slice(0,120):'';
@@ -103,7 +103,7 @@ export async function createCheckout(env,input){
     if(active){
       if(!active.stripe_session_id)throw new HttpError(409,pendingMessage);
       const session=await readSession(env,active);
-      if(!safelyExpired(session)&&!(settledPaid(session,active)&&input.newPurchase===true)){const error=new HttpError(409,settledPaid(session,active)?'Predchádzajúca platba je potvrdená. Prístup vám príde e-mailom. Ďalšiu samostatnú objednávku vytvorte iba zámerne.':pendingMessage);if(settledPaid(session,active))error.code='previous_payment_paid';throw error;}
+      if(!safelyExpired(session)&&!settledPaid(session,active))throw new HttpError(409,pendingMessage);
       await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',active.id);
     }
     try{await env.TQ_DB.batch([
