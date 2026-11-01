@@ -254,3 +254,21 @@ test('pending checkout returns an actionable reason and logs the block without d
   assert.equal((await first(f.db,"SELECT count(*) n FROM payment_log WHERE type='checkout_blocked'")).n,1);
  }finally{f.db.close();}
 });
+
+test('interrupted-payment recovery rechecks inactive keys and refuses an already paid purchase',async()=>{
+ const f=fixture();try{
+  const a=await createCheckout(f.env,f.input),s=f.sessions.get(a.sessionId),input={attemptKey:f.input.attemptKey,retryPayment:true};
+  s.status='complete';s.payment_status='paid';
+  await assert.rejects(()=>releaseCheckout(f.env,input),e=>e.status===409&&e.code==='checkout_just_paid');
+  await execute(f.db,'UPDATE checkout_requests SET active=0');
+  await assert.rejects(()=>releaseCheckout(f.env,input),e=>e.status===409&&e.code==='checkout_just_paid','an inactive key does not mean an unpaid Session');
+  s.status='open';s.payment_status='unpaid';
+  assert.equal((await releaseCheckout(f.env,input)).released,true);assert.equal(s.status,'expired');
+  assert.equal((await releaseCheckout(f.env,input)).released,true,'a lost release response may be retried after verifying the expired Session');
+  s.status='open';s.payment_intent={id:'pi_processing',status:'processing'};
+  await assert.rejects(()=>releaseCheckout(f.env,input),e=>e.status===409&&e.code==='checkout_pending');
+  await assert.rejects(()=>releaseCheckout(f.env,{...input,attemptKey:crypto.randomUUID()}),e=>e.status===404);
+  await assert.rejects(()=>releaseCheckout(f.env,{...input,retryPayment:'true'}),e=>e.status===400);
+  assert.equal(f.sessions.size,1);assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+ }finally{f.db.close();}
+});

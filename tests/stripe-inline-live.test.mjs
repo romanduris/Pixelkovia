@@ -6,7 +6,7 @@ import {createRequire} from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fresh} from '../admin/tests/support.mjs';
-import {createCheckout,checkoutConfig,verifiedCheckoutStatus} from '../admin/src/commerce.mjs';
+import {createCheckout,checkoutConfig,verifiedCheckoutStatus,releaseCheckout} from '../admin/src/commerce.mjs';
 const require=createRequire(new URL('../admin/package.json',import.meta.url));
 test('real inline Stripe preserves the original page and validates fields without charging', {skip:process.env.STRIPE_INLINE_SMOKE!=='1',timeout:180000},async()=>{
  const Stripe=require('stripe'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
@@ -24,10 +24,15 @@ test('real inline Stripe preserves the original page and validates fields withou
   }
   const deviceInput={baseId:'episode-1',books:[],atlasIncluded:true,email:'inline-device-qa@example.invalid',uiMode:'elements',voucherCode:'1e'};
   const desktop=await createCheckout(env,{...deviceInput,attemptKey:crypto.randomUUID()});created.push(desktop.sessionId);
-  const phone=await createCheckout(env,{...deviceInput,attemptKey:crypto.randomUUID()});created.push(phone.sessionId);
+  const phoneInput={...deviceInput,attemptKey:crypto.randomUUID()},phone=await createCheckout(env,phoneInput);created.push(phone.sessionId);
   const replaced=await client.checkout.sessions.retrieve(desktop.sessionId),current=await client.checkout.sessions.retrieve(phone.sessionId);
   assert.equal(replaced.status,'expired','actual Stripe closes the abandoned desktop Session before the phone can pay');
   assert.equal(replaced.payment_intent,null);assert.equal(current.status,'open');assert.equal(current.payment_intent,null);assert.notEqual(phone.sessionId,desktop.sessionId);
+  await releaseCheckout(env,{attemptKey:phoneInput.attemptKey,retryPayment:true});
+  assert.equal((await client.checkout.sessions.retrieve(phone.sessionId)).status,'expired','interrupted recovery verifies actual Stripe expiration before replacing the form');
+  await releaseCheckout(env,{attemptKey:phoneInput.attemptKey,retryPayment:true}); // Lost-response replay rechecks the inactive key.
+  const recovered=await createCheckout(env,{...deviceInput,attemptKey:crypto.randomUUID()});created.push(recovered.sessionId);
+  assert.notEqual(recovered.sessionId,phone.sessionId);assert.equal((await client.checkout.sessions.retrieve(recovered.sessionId)).payment_intent,null);
   browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await context.newPage();
   let blocked=0,active;const diagnostics=[];
   await context.route('**/*',async route=>{

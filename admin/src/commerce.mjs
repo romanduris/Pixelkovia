@@ -44,12 +44,15 @@ async function recoverLostSession(env,attempt){
   }while(starting_after);
   return false;
 }
-async function closeCheckoutAttempt(env,row){
+async function closeCheckoutAttempt(env,row,{retryPayment=false}={}){
   if(!row.stripe_session_id){
     if(Date.now()-row.created_at<=1800000)throw checkoutConflict('checkout_preparing',row.id);
     if(!await recoverLostSession(env,row)){await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);return;}
   }
   let session=await readSession(env,row);
+  // Recovery of an interrupted payment must never turn a verified success into
+  // another purchase. Explicitly buying again keeps its separate existing path.
+  if(retryPayment&&settledPaid(session,row))throw checkoutConflict('checkout_just_paid',row.id);
   if(!settledPaid(session,row)&&!safelyExpired(session)){
     if(!canCloseUnpaid(session,row))throw checkoutConflict('checkout_pending',row.id);
     // Expiration closes the original Stripe Session before another can be created.
@@ -65,8 +68,12 @@ async function closeCheckoutAttempt(env,row){
   await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);
 }
 export async function releaseCheckout(env,input){
-  const row=await first(env.TQ_DB,'SELECT a.* FROM checkout_requests r JOIN checkout_attempts a ON a.id=r.attempt_id WHERE r.request_key=? AND r.active=1',await requestHash(input.attemptKey));
-  if(row)await closeCheckoutAttempt(env,row);
+  if(input.retryPayment!==undefined&&typeof input.retryPayment!=='boolean')throw new HttpError(400,'Neplatná obnova platby.');
+  // Also recheck an inactive retry key: a lost release response or another tab
+  // must not let the browser assume that the original Session cannot charge.
+  const row=await first(env.TQ_DB,'SELECT a.* FROM checkout_requests r JOIN checkout_attempts a ON a.id=r.attempt_id WHERE r.request_key=? AND (r.active=1 OR ?=1)',await requestHash(input.attemptKey),input.retryPayment===true?1:0);
+  if(!row&&input.retryPayment)throw new HttpError(404,'Pôvodnú platbu sa nepodarilo bezpečne overiť.');
+  if(row)await closeCheckoutAttempt(env,row,{retryPayment:input.retryPayment===true});
   return {released:true};
 }
 export async function verifiedCheckoutStatus(env,sessionId,checkoutId){
