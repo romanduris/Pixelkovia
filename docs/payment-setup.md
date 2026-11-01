@@ -55,6 +55,14 @@ Ponuka používa jeden výber oboch kníh: hra 14,99 € a knihy spolu 4,99 € 
 
 Migrácia `0010_checkout_requests.sql` pridáva atómový zámok aktívneho nákupu pre e-mail a jedinečný identifikátor pokusu. Opakované POST požiadavky s rovnakým pokusom vracajú pôvodnú reláciu a používajú rovnaký Stripe idempotency key. Pri novom kľúči z iného zariadenia sa pôvodný bezpečne uzatvoriteľný nezaplatený formulár najprv expiruje cez Stripe a expirácia sa znovu overí. Až potom vznikne náhrada; druhý prehliadač nedostane pôvodný client secret. Rozbehnuté spracovanie a bankové overenie sa neuzatvoria. Ak počas expirácie vyhrá potvrdenie úhrady, náhrada nevznikne. Súbežné náhrady nesmú ponechať dve otvorené platiteľné relácie; blokovanie dostane konkrétny dôvod a záznam v managemente. Nové kliknutie na nákup po overenej úhrade vytvorí nezávislý nákup bez ďalšej potvrdzovacej obrazovky. Stavové API overuje Stripe samostatne od webhooku a e-mailu, ale nevytvára účty ani oprávnenia. Webhook odovzdá posielanie správ do `context.waitUntil`.
 
+## Spôsob úhrady v managemente
+
+V `/admin#payments` má prehľad nákupov stĺpec **Spôsob úhrady**: Google Pay, Apple Pay, Karta, Iná peňaženka, Zdarma alebo Zatiaľ nezistené. Údaj pochádza z overenej Stripe Session s rozbaleným `payment_intent.latest_charge.payment_method_details.card.wallet.type`; zoznam povolených metód ani hlásenie prehliadača neurčujú skutočnú úhradu. Stripe opisuje peňaženku v [údajoch konkrétnej úhrady](https://github.com/stripe/stripe-python/blob/master/stripe/_charge.py).
+
+Migrácia `0012_payment_methods.sql` uchováva iba pevné označenie metódy, väzbu na nákup a čas overenia. Neuchováva číslo karty, posledné číslice, odtlačok ani token peňaženky. Chýbajúce údaje nikdy neprepíšu už overenú metódu. Refund a premazanie 90-dňovej diagnostiky označenie zachovajú. Existujúca serverová kontrola postupne dopĺňa chýbajúcu metódu pri dokončených nákupoch z posledných siedmich dní. Staršie či nedostatočné údaje sa neodhadujú.
+
+V záznamoch priebehu zostáva oddelený pokus hlásený prehliadačom od úhrady overenej cez Stripe; neúspešný pokus cez peňaženku nesmie označiť neskoršiu platbu kartou. Získanie metódy je súčasťou diagnostiky a zlyhanie jej uloženia neblokuje nákup ani vytvorenie prístupu.
+
 ## Druhá hra pre ďalšiu rodinu
 
 K základnej hre možno výslovne pridať druhú hru za **9,99 €**. Bez kníh je súčet 24,98 €; s balíkom kníh 29,97 €. Atlas je voliteľný a zdarma. Samostatná kniha nemá ponuku druhej hry. Používa sa iba e-mail kupujúceho, bez mena a ďalšieho formulára pre príjemcu.

@@ -3,6 +3,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const origin='https://pixelkovia.rodulab.com';
 const now=Date.now();
 const report={generatedAt:now,days:1,category:'',enabled:true,health:'observing',counts:{paid:2,free:1,refunded:0,failed:0,pending:1,ready:3,expired:2,unknown:0},total:9,technical:0,errors24:0,recent:[],deliveries:{failed:0,delayed:0},fulfillmentDelayed:0,lastSuccessAt:now-10000,checks:[{id:'stripe',ok:1,checked_at:now},{id:'webhook',ok:1,checked_at:now}],rows:[{id:'test-attempt',sessionId:'cs_test_admin_fixture',totalCents:1499,createdAt:now,checkedAt:now,state:'paid',products:['episode-1']}],logs:[]};
+report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index)=>({...report.rows[0],id:'method-'+index,sessionId:'cs_test_admin_fixture'+index,state:method==='free'?'free':method==='unknown'?'ready':'paid',method,totalCents:method==='free'?0:1499}));
 (async()=>{const browser=await chromium.launch({headless:true});try{
   const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false;const calls=[];
   page.on('pageerror',e=>errors.push(e.message));
@@ -23,6 +24,8 @@ const report={generatedAt:now,days:1,category:'',enabled:true,health:'observing'
   await page.goto(origin+'/admin#payments');await page.locator('.payment-health.observing').waitFor();
   assert.equal(await page.locator('#filters').isVisible(),false);assert.equal(await page.locator('.payment-metrics .metric').count(),6);
   assert.ok((await page.locator('#view').innerText()).includes('Zaplatené'));assert.ok((await page.locator('#view').innerText()).includes('Kontrola prešla'));
+  assert.ok(await page.getByRole('columnheader',{name:'Spôsob úhrady'}).isVisible());
+  for(const method of ['Google Pay','Apple Pay','Karta','Zdarma','Zatiaľ nezistené'])assert.ok(await page.getByRole('cell',{name:method,exact:true}).isVisible());
   await page.locator('#payment-days').selectOption('7');await page.waitForFunction(()=>document.querySelector('#view').getAttribute('aria-busy')==='false');assert.ok(calls.some(p=>p.includes('days=7')));
   attention=true;await page.locator('#refresh-payments').click();await page.locator('.payment-health.attention').waitFor();
   assert.ok((await page.locator('.payment-health').innerText()).includes('Prístupové e-maily'));await page.locator('#payment-category').selectOption('technical');await page.locator('.payment-category-technical').waitFor();

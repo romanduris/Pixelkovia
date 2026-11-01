@@ -38,6 +38,12 @@ const codes=new Set(['card_declined','insufficient_funds','expired_card','incorr
 const products=new Set(['episode-1','story-book-before','story-book-after']);
 const methods=new Set(['card','apple_pay','google_pay','wallet','free','unknown']);
 export const safePaymentCode=value=>codes.has(value)?value:'';
+export function stripePaymentMethod(intent){
+  const details=intent?.latest_charge?.payment_method_details;
+  if(details?.type!=='card'||!details.card)return 'unknown';
+  const wallet=details.card.wallet;
+  return wallet?(['apple_pay','google_pay'].includes(wallet.type)?wallet.type:'wallet'):'card';
+}
 export const paymentFailureKey=intent=>intent?.last_payment_error?.charge||[intent?.id,safePaymentCode(intent?.last_payment_error?.code),safePaymentCode(intent?.last_payment_error?.decline_code)].join(':');
 // Observability must never change whether a payment succeeds or is fulfilled.
 export async function paymentLog(env,{type,source='server',attemptId=null,code='',method='unknown',productId='',dedupe='',at=Date.now()}){
@@ -70,8 +76,12 @@ export async function browserPaymentEvent(request,env,input){
 export async function observePayment(env,attempt,state,intent){
   try{
     const at=Date.now(),paid=state==='paid'||state==='free';
+    const method=state==='free'?'free':['paid','refunded'].includes(state)?stripePaymentMethod(intent):'unknown';
     await execute(env.TQ_DB,`INSERT INTO payment_observations VALUES(?,?,?,?) ON CONFLICT(attempt_id) DO UPDATE SET state=excluded.state,checked_at=excluded.checked_at,paid_at=coalesce(payment_observations.paid_at,excluded.paid_at)`,attempt.id,state,at,paid?at:null);
-    if(['paid','free','expired','refunded'].includes(state))await paymentLog(env,{type:state,source:'stripe',attemptId:attempt.id,dedupe:state});
+    // Browser attempts are kept in the log; only verified settled Stripe data
+    // can label the method that actually paid. Missing expansions never erase it.
+    if(method!=='unknown')await execute(env.TQ_DB,`INSERT INTO payment_methods VALUES(?,?,?) ON CONFLICT(attempt_id) DO UPDATE SET method=excluded.method,checked_at=excluded.checked_at`,attempt.id,method,at);
+    if(['paid','free','expired','refunded'].includes(state))await paymentLog(env,{type:state,source:'stripe',attemptId:attempt.id,method,dedupe:state});
     if(state==='failed')await paymentLog(env,{type:'payment_failed',source:'stripe',attemptId:attempt.id,code:intent?.last_payment_error?.decline_code||intent?.last_payment_error?.code,dedupe:paymentFailureKey(intent)});
   }catch{console.error('payment_monitor_observation_failed');}
 }
@@ -87,15 +97,15 @@ export async function paymentReport(env,params,ready){
   const category=params.get('category')||'';if(category&&!['technical','bank','validation','customer','lifecycle'].includes(category))throw new HttpError(400,'Neplatný filter.');
   const at=Date.now(),since=at-days*86400000,db=env.TQ_DB;
   // One row per Stripe Session, including a gift. Never count gift orders as two payments.
-  const attempts=await query(db,`SELECT a.id,a.stripe_session_id,a.total_cents,a.created_at,a.selection,p.state observed_state,p.checked_at,
+  const attempts=await query(db,`SELECT a.id,a.stripe_session_id,a.total_cents,a.created_at,a.selection,p.state observed_state,p.checked_at,m.method,
     (SELECT count(*) FROM checkout_orders co WHERE co.attempt_id=a.id) order_count,
     (SELECT min(o.status='paid') FROM orders o WHERE o.external_reference=a.stripe_session_id OR o.id IN(SELECT co.order_id FROM checkout_orders co WHERE co.attempt_id=a.id)) orders_paid,
     (SELECT max(o.status='refunded') FROM orders o WHERE o.external_reference=a.stripe_session_id OR o.id IN(SELECT co.order_id FROM checkout_orders co WHERE co.attempt_id=a.id)) has_refund
-    FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC`,since);
+    FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC`,since);
   const counts={paid:0,free:0,refunded:0,failed:0,pending:0,ready:0,expired:0,unknown:0},rows=[];
   for(const a of attempts){
     const status=a.has_refund?'refunded':a.orders_paid===1?(a.total_cents===0?'free':'paid'):a.observed_state||'unknown';counts[status]++;
-    if(rows.length<100)rows.push({id:a.id,sessionId:a.stripe_session_id,totalCents:a.total_cents,createdAt:a.created_at,checkedAt:a.checked_at,state:status,products:JSON.parse(a.selection)});
+    if(rows.length<100)rows.push({id:a.id,sessionId:a.stripe_session_id,totalCents:a.total_cents,createdAt:a.created_at,checkedAt:a.checked_at,state:status,method:a.method||'unknown',products:JSON.parse(a.selection)});
   }
   const recent=await query(db,'SELECT category,source,count(*) count,count(DISTINCT attempt_id) attempts FROM payment_log WHERE created_at>=? GROUP BY category,source',since);
   const technical=recent.filter(r=>r.category==='technical').reduce((n,r)=>n+r.count,0);

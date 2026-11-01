@@ -268,8 +268,8 @@ export async function auditPayments(env){
     await monitorCheck(env,'webhook',!!hook&&(hook.enabled_events.includes('*')||required.every(e=>hook.enabled_events.includes(e))));
     await monitorCheck(env,'stripe',true);
   }catch{await monitorCheck(env,'stripe',false);}
-  const attempts=await query(env.TQ_DB,`SELECT a.* FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id
-    WHERE a.created_at>? AND a.stripe_session_id IS NOT NULL AND (p.state IS NULL OR p.state IN('ready','pending','failed') OR (p.state IN('paid','free') AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.external_reference=a.stripe_session_id)))
+  const attempts=await query(env.TQ_DB,`SELECT a.* FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
+    WHERE a.created_at>? AND a.stripe_session_id IS NOT NULL AND (p.state IS NULL OR p.state IN('ready','pending','failed') OR (p.state IN('paid','free','refunded') AND m.attempt_id IS NULL) OR (p.state IN('paid','free') AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.external_reference=a.stripe_session_id)))
     ORDER BY coalesce(p.checked_at,0),a.created_at LIMIT 8`,Date.now()-7*86400000);
   for(const a of attempts){try{await verifiedCheckoutStatus(env,a.stripe_session_id);}catch(error){await paymentLog(env,{type:'status_error',attemptId:a.id,code:error.type});}}
   await prunePaymentLog(env);

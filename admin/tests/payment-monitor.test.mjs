@@ -5,7 +5,7 @@ import {fresh} from './support.mjs';
 import {first,execute,query} from '../src/db.mjs';
 import worker from '../src/worker.mjs';
 import {createCheckout,verifiedCheckoutStatus,paymentWebhook,fulfill,auditPayments} from '../src/commerce.mjs';
-import {paymentReport,paymentLog,browserPaymentEvent,observePayment,monitorCheck,prunePaymentLog} from '../src/payment-monitor.mjs';
+import {paymentReport,paymentLog,browserPaymentEvent,observePayment,stripePaymentMethod,monitorCheck,prunePaymentLog} from '../src/payment-monitor.mjs';
 const origin='https://pixelkovia.rodulab.com';
 function fixture(){
   const db=fresh(),sessions=new Map(),sdk=new Stripe('sk_test_monitor_fixture');
@@ -18,6 +18,47 @@ function fixture(){
   return {db,env,input,event,sessions};
 }
 const request=input=>new Request(origin+'/api/checkout/diagnostic',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(input)});
+test('payment method extraction distinguishes verified wallets, plain cards and missing details',()=>{
+  const intent=wallet=>({latest_charge:{payment_method_details:{type:'card',card:{wallet,last4:'NEVER_STORE',fingerprint:'NEVER_STORE'}}}});
+  for(const method of ['apple_pay','google_pay'])assert.equal(stripePaymentMethod(intent({type:method})),method);
+  assert.equal(stripePaymentMethod(intent(null)),'card');
+  assert.equal(stripePaymentMethod(intent({type:'NEVER_STORE'})),'wallet');
+  for(const value of [null,'pi_unexpanded',{latest_charge:'ch_unexpanded'},{latest_charge:{payment_method_details:{type:'card'}}},{latest_charge:{payment_method_details:{type:'link'}}}])assert.equal(stripePaymentMethod(value),'unknown');
+});
+test('actual paid method wins over browser attempts and survives missing details, refunds and log pruning',async()=>{
+  for(const actualMethod of ['google_pay','card']){
+  const f=fixture();try{
+    const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);
+    await browserPaymentEvent(request({}),f.env,{type:'confirm_started',method:'apple_pay',productId:'episode-1',attemptKey:f.input.attemptKey});
+    await verifiedCheckoutStatus(f.env,s.id);
+    let report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].method,'unknown');
+    s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_method',status:'succeeded',latest_charge:{payment_method_details:{type:'card',card:{wallet:actualMethod==='card'?null:{type:actualMethod},last4:'NEVER_STORE',fingerprint:'NEVER_STORE'}}}};
+    await verifiedCheckoutStatus(f.env,s.id);
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].method,actualMethod);assert.equal(report.counts.paid,1);
+    assert.equal(report.logs.find(l=>l.type==='paid').method,actualMethod);assert.equal(report.logs.find(l=>l.type==='confirm_started').method,'apple_pay');assert.ok(!JSON.stringify(report).includes('NEVER_STORE'));
+    s.payment_intent.latest_charge='ch_unexpanded';await verifiedCheckoutStatus(f.env,s.id);
+    assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).rows[0].method,actualMethod);
+    s.payment_intent.latest_charge={refunded:true};await verifiedCheckoutStatus(f.env,s.id);
+    await execute(f.db,'UPDATE payment_log SET created_at=?',Date.now()-91*86400000);await prunePaymentLog(f.env);
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].state,'refunded');assert.equal(report.rows[0].method,actualMethod);assert.equal(report.logs.length,0);assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+  }finally{f.db.close();}
+  }
+});
+test('signed successful payments record Apple Pay or card even without browser telemetry; audit backfills old settled purchases',async()=>{
+  const f=fixture();try{
+    for(const method of ['apple_pay','card']){
+      const session=await createCheckout(f.env,{...f.input,email:method+'@example.invalid',attemptKey:crypto.randomUUID()}),s=f.sessions.get(session.sessionId);
+      s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_'+method,status:'succeeded',latest_charge:{payment_method_details:{type:'card',card:{wallet:method==='card'?null:{type:method}}}}};
+      // Simulate a legacy completed purchase whose method has not been recorded.
+      if(method==='apple_pay'){
+        await fulfill(f.env,s.id);const a=await first(f.db,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',s.id);await observePayment(f.env,a,'paid');
+        await auditPayments(f.env);
+      }else{const sender=f.env.RESEND_API_KEY;f.env.RESEND_API_KEY='';try{await paymentWebhook(f.event('checkout.session.completed',s,'evt_'+method),f.env);}finally{f.env.RESEND_API_KEY=sender;}}
+      const report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows.find(r=>r.sessionId===s.id).method,method);
+    }
+    const report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.counts.paid,2);assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,2);assert.equal(report.logs.filter(l=>l.source==='browser').length,0);
+  }finally{f.db.close();}
+});
 test('browser telemetry is bounded, deduplicated, private, and cannot report a successful payment',async()=>{
   const f=fixture();try{
     const session=await createCheckout(f.env,f.input);
@@ -64,6 +105,7 @@ test('payment report counts a paid gift once, separates free and refund, and fla
     await monitorCheck(f.env,'stripe',true);await monitorCheck(f.env,'webhook',true);
     report=await paymentReport(f.env,new URLSearchParams(),true);
     assert.equal(report.counts.paid,1);assert.equal(report.counts.free,1);assert.equal(report.total,2);assert.equal(report.fulfillmentDelayed,0);assert.ok(report.lastSuccessAt);
+    assert.equal(report.rows.find(r=>r.sessionId===z.id).method,'free');
     await execute(f.db,"UPDATE orders SET status='refunded' WHERE external_reference=? OR external_reference=?",s.id,s.id+':gift');
     report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.counts.refunded,1);assert.equal(report.counts.paid,0);
     await assert.rejects(()=>paymentReport(f.env,new URLSearchParams({days:'10000'}),true),e=>e.status===400);
