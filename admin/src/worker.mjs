@@ -134,12 +134,14 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     return secureAsset(await env.ASSETS.fetch(request));
   }catch(error){
     const path=new URL(request.url).pathname;
+    const checkoutCode=['checkout_pending','checkout_preparing','checkout_just_paid'].includes(error.code);
+    if(checkoutCode){const log=paymentLog(env,{type:'checkout_blocked',attemptId:error.attemptId});if(context?.waitUntil)context.waitUntil(log);else await log;}
     if((!(error instanceof HttpError)||error.status>=500)&&['/api/checkout/session','/api/checkout/status','/api/checkout/release'].includes(path)){
       const log=(async()=>{let attempt;try{attempt=await attemptFor(env,{attemptKey:paymentInput?.attemptKey,sessionId:new URL(request.url).searchParams.get('session_id')});}catch{}
         await paymentLog(env,{type:path.endsWith('/session')?'session_error':path.endsWith('/release')?'release_error':'status_error',attemptId:attempt?.id,code:error.type});})();
       if(context?.waitUntil)context.waitUntil(log);else await log;
     }
-    return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.',...(error instanceof HttpError&&error.code==='previous_payment_paid'?{code:error.code}:{})},error instanceof HttpError?error.status:500);}
+    return json({error:error instanceof HttpError?error.message:'Požiadavku sa nepodarilo spracovať.',...(error instanceof HttpError&&(checkoutCode||error.code==='previous_payment_paid')?{code:error.code}:{})},error instanceof HttpError?error.status:500);}
 }};
 
 function secureAsset(response){

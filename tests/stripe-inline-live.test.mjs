@@ -22,6 +22,12 @@ test('real inline Stripe preserves the original page and validates fields withou
    assert.equal(s.return_url,'https://pixelkovia.rodulab.com/checkout?session_id={CHECKOUT_SESSION_ID}');
    await client.checkout.sessions.expire(s.id);assert.equal((await verifiedCheckoutStatus(env,s.id)).state,'expired');
   }
+  const deviceInput={baseId:'episode-1',books:[],atlasIncluded:true,email:'inline-device-qa@example.invalid',uiMode:'elements',voucherCode:'1e'};
+  const desktop=await createCheckout(env,{...deviceInput,attemptKey:crypto.randomUUID()});created.push(desktop.sessionId);
+  const phone=await createCheckout(env,{...deviceInput,attemptKey:crypto.randomUUID()});created.push(phone.sessionId);
+  const replaced=await client.checkout.sessions.retrieve(desktop.sessionId),current=await client.checkout.sessions.retrieve(phone.sessionId);
+  assert.equal(replaced.status,'expired','actual Stripe closes the abandoned desktop Session before the phone can pay');
+  assert.equal(replaced.payment_intent,null);assert.equal(current.status,'open');assert.equal(current.payment_intent,null);assert.notEqual(phone.sessionId,desktop.sessionId);
   browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await context.newPage();
   let blocked=0,active;
   await context.route('**/*',async route=>{

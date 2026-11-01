@@ -11,6 +11,14 @@ export const commerceReady=env=>env.PAYMENTS_ENABLED==='true'&&!!(env.STRIPE_SEC
 // One inline Checkout implementation serves the game and every book purchase.
 export function checkoutConfig(env){const enabled=commerceReady(env);return {enabled,checkout:'elements',publishableKey:enabled?env.STRIPE_PUBLISHABLE_KEY:null,wallets:{applePay:true,googlePay:true}};}
 const pendingMessage='Overujeme vašu platbu. Prosíme, neplaťte znova. Potvrdenie a prístup vám po úspešnej úhrade prídu e-mailom.';
+function checkoutConflict(code,attemptId){
+  const messages={
+    checkout_pending:'Predchádzajúca platba sa ešte dokončuje. Ak ste ju potvrdili na inom zariadení, overte jej výsledok tam alebo skontrolujte e-mail s prístupom. Zatiaľ neplaťte znova.',
+    checkout_preparing:'Pôvodný platobný formulár sa ešte pripravuje. Počkajte chvíľu a skúste pokračovať znova. Týmto krokom ste platbu nepotvrdili.',
+    checkout_just_paid:'Predchádzajúca platba bola práve potvrdená. Skontrolujte e-mail s prístupom; túto platbu už neopakujte.'
+  };
+  const error=new HttpError(409,messages[code]);error.code=code;error.attemptId=attemptId;return error;
+}
 const requestHash=async key=>{
   if(typeof key!=='string'||!/^[-a-zA-Z0-9_]{32,100}$/.test(key))throw new HttpError(400,'Neplatný identifikátor nákupu.');
   return hash(key);
@@ -22,6 +30,7 @@ function verifySession(env,session,attempt){
 }
 const settledPaid=(session,attempt)=>session.status==='complete'&&(session.payment_status==='paid'||(attempt.voucher_code==='free'&&attempt.total_cents===0&&session.payment_status==='no_payment_required'));
 const safelyExpired=session=>session.status==='expired'&&['unpaid','no_payment_required'].includes(session.payment_status)&&(!session.payment_intent||['canceled','requires_payment_method'].includes(session.payment_intent.status));
+const canCloseUnpaid=(session,row)=>session.status==='open'&&(session.payment_status==='unpaid'||(row.total_cents===0&&row.voucher_code==='free'&&session.payment_status==='no_payment_required'))&&(!session.payment_intent||['requires_payment_method','canceled'].includes(session.payment_intent.status));
 async function readSession(env,attempt){const session=await stripe(env).checkout.sessions.retrieve(attempt.stripe_session_id,{expand:['payment_intent.latest_charge']});verifySession(env,session,attempt);return session;}
 // Reconcile a lost create response even after its original 30-minute window.
 // No replacement may open while a Stripe request can still create that Session.
@@ -35,23 +44,29 @@ async function recoverLostSession(env,attempt){
   }while(starting_after);
   return false;
 }
-export async function releaseCheckout(env,input){
-  const row=await first(env.TQ_DB,'SELECT a.* FROM checkout_requests r JOIN checkout_attempts a ON a.id=r.attempt_id WHERE r.request_key=? AND r.active=1',await requestHash(input.attemptKey));
-  if(!row)return {released:true};
+async function closeCheckoutAttempt(env,row){
   if(!row.stripe_session_id){
-    if(Date.now()-row.created_at<=1800000)throw new HttpError(409,pendingMessage);
-    if(!await recoverLostSession(env,row)){await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);return {released:true};}
+    if(Date.now()-row.created_at<=1800000)throw checkoutConflict('checkout_preparing',row.id);
+    if(!await recoverLostSession(env,row)){await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);return;}
   }
   let session=await readSession(env,row);
   if(!settledPaid(session,row)&&!safelyExpired(session)){
-    const intent=session.payment_intent;
-    if(session.status!=='open'||!(session.payment_status==='unpaid'||(row.total_cents===0&&row.voucher_code==='free'&&session.payment_status==='no_payment_required'))||(intent&&!['requires_payment_method','canceled'].includes(intent.status)))throw new HttpError(409,pendingMessage);
+    if(!canCloseUnpaid(session,row))throw checkoutConflict('checkout_pending',row.id);
     // Expiration closes the original Stripe Session before another can be created.
-    await stripe(env).checkout.sessions.expire(session.id);
+    let expirationError;
+    try{await stripe(env).checkout.sessions.expire(session.id);}catch(error){expirationError=error;}
     session=await readSession(env,row);
-    if(!safelyExpired(session))throw new HttpError(409,pendingMessage);
+    // A concurrent expiry or a lost expiry response is safe only after a fresh
+    // Stripe read. A payment that wins this race must never open a replacement.
+    if(settledPaid(session,row))throw checkoutConflict('checkout_just_paid',row.id);
+    if(!safelyExpired(session)){if(!canCloseUnpaid(session,row))throw checkoutConflict('checkout_pending',row.id);if(expirationError)throw expirationError;throw checkoutConflict('checkout_pending',row.id);}
+    await observePayment(env,row,'expired',session.payment_intent);
   }
   await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',row.id);
+}
+export async function releaseCheckout(env,input){
+  const row=await first(env.TQ_DB,'SELECT a.* FROM checkout_requests r JOIN checkout_attempts a ON a.id=r.attempt_id WHERE r.request_key=? AND r.active=1',await requestHash(input.attemptKey));
+  if(row)await closeCheckoutAttempt(env,row);
   return {released:true};
 }
 export async function verifiedCheckoutStatus(env,sessionId,checkoutId){
@@ -104,17 +119,17 @@ export async function createCheckout(env,input){
   if(!existing){
     const active=await first(env.TQ_DB,'SELECT a.* FROM checkout_requests r JOIN checkout_attempts a ON a.id=r.attempt_id WHERE r.email_key=? AND r.active=1',emailKey)||await first(env.TQ_DB,`SELECT a.* FROM checkout_attempts a WHERE lower(a.email)=? AND a.stripe_session_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM checkout_requests r WHERE r.attempt_id=a.id) ORDER BY a.created_at DESC LIMIT 1`,email.toLowerCase());
     if(active){
-      if(!active.stripe_session_id)throw new HttpError(409,pendingMessage);
-      const session=await readSession(env,active);
-      if(!safelyExpired(session)&&!settledPaid(session,active))throw new HttpError(409,pendingMessage);
-      await execute(env.TQ_DB,'UPDATE checkout_requests SET active=0 WHERE attempt_id=?',active.id);
+      // A phone has a different browser key from the desktop. An abandoned,
+      // unpaid form must not lock the email. Close and verify it before creating
+      // a new Session; never disclose its client secret to the new browser.
+      await closeCheckoutAttempt(env,active);
     }
     try{await env.TQ_DB.batch([
       statement(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices,gift_game,gift_price_cents,fixed_total_voucher) VALUES(?,?,?,?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher==='free'?'free':null,JSON.stringify(prices),q.giftGame?1:0,q.giftTotalCents,q.voucher==='1e'?'1e':null),
       statement(env.TQ_DB,'INSERT INTO checkout_requests(request_key,email_key,payload_hash,attempt_id) VALUES(?,?,?,?)',requestKey,emailKey,payloadHash,id)
     ]);}catch(error){
       existing=await first(env.TQ_DB,'SELECT * FROM checkout_requests WHERE request_key=?',requestKey);
-      if(!existing){if(await first(env.TQ_DB,'SELECT request_key FROM checkout_requests WHERE email_key=? AND active=1',emailKey))throw new HttpError(409,pendingMessage);throw error;}
+      if(!existing){const active=await first(env.TQ_DB,'SELECT attempt_id FROM checkout_requests WHERE email_key=? AND active=1',emailKey);if(active)throw checkoutConflict('checkout_preparing',active.attempt_id);throw error;}
     }
   }
   if(existing){

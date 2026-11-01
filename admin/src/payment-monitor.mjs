@@ -5,6 +5,7 @@ import {first,query,execute,hash} from './db.mjs';
 // request body, IP, email, card details, client secret or arbitrary browser text.
 export const paymentTypes={
   session_created:['lifecycle','Platobný formulár vytvorený'],
+  checkout_blocked:['lifecycle','Pokračovanie nákupu čaká na uzavretie pôvodného pokusu'],
   session_error:['technical','Nepodarilo sa pripraviť platbu'],
   status_error:['technical','Nepodarilo sa overiť stav platby'],
   release_error:['technical','Nepodarilo sa bezpečne uzavrieť pôvodnú platbu'],

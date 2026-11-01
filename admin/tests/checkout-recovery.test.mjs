@@ -36,16 +36,17 @@ test('lost create response and concurrent requests use one attempt and Stripe id
   assert.equal(a.sessionId,b.sessionId);assert.equal(f.sessions.size,1);assert.equal(f.requests.size,1);
   assert.equal((await first(f.db,'SELECT COUNT(*) n FROM checkout_attempts')).n,1);
   await assert.rejects(()=>createCheckout(f.env,{...f.input,books:['story-book-before']}),e=>e.status===409);
-  await assert.rejects(()=>createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),newPurchase:true}),e=>e.status===409);
-  assert.equal(f.sessions.size,1,'a new browser key cannot bypass an unresolved purchase');
+  const replacement=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),newPurchase:true});
+  assert.equal(f.sessions.get(a.sessionId).status,'expired','the original uncharged form is closed before a new device can pay');
+  assert.notEqual(replacement.sessionId,a.sessionId);assert.equal([...f.sessions.values()].filter(s=>s.status==='open').length,1);
  }finally{f.db.close();}
 });
 test('racing tabs with different keys cannot create two unresolved Stripe Sessions',async()=>{
  const f=fixture();try{
   const results=await Promise.allSettled([createCheckout(f.env,f.input),createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()})]);
-  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
-  assert.equal(results.find(r=>r.status==='rejected').reason.status,409);
-  assert.equal(f.sessions.size,1);assert.equal((await first(f.db,'SELECT COUNT(*) n FROM checkout_attempts')).n,1);
+  assert.ok(results.some(r=>r.status==='fulfilled'));for(const r of results.filter(r=>r.status==='rejected'))assert.equal(r.reason.status,409);
+  assert.equal([...f.sessions.values()].filter(s=>s.status==='open').length,1,'racing replacement requests leave only one payable Session');
+  assert.equal((await first(f.db,'SELECT COUNT(*) n FROM checkout_requests WHERE active=1')).n,1);
  }finally{f.db.close();}
 });
 test('status separates verified payment from delayed webhook and email, and validates totals and refunds',async()=>{
@@ -118,12 +119,11 @@ test('production uses inline Checkout with eligible wallets; recovery enforces o
  }finally{f.db.close();}
 });
 
-test('pre-migration open Sessions block a new purchase until verified expiration',async()=>{
+test('a new phone checkout safely expires an unpaid legacy Session before replacing it',async()=>{
  const f=fixture();try{
   const a=await createCheckout(f.env,f.input);await execute(f.db,'DELETE FROM checkout_requests');
-  await assert.rejects(()=>createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),newPurchase:true}),e=>e.status===409);
-  f.sessions.get(a.sessionId).status='expired';
-  const b=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()});assert.notEqual(b.sessionId,a.sessionId);
+  const b=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),newPurchase:true});assert.notEqual(b.sessionId,a.sessionId);
+  assert.equal(f.sessions.get(a.sessionId).status,'expired');assert.equal(f.sessions.get(b.sessionId).status,'open');
  }finally{f.db.close();}
 });
 test('free Session can be safely edited, while only completed verified zero-cost status is paid',async()=>{
@@ -206,7 +206,51 @@ test('two fresh clicks after a paid purchase can create only one new unresolved 
  const f=fixture();try{
   const a=await createCheckout(f.env,f.input),s=f.sessions.get(a.sessionId);s.status='complete';s.payment_status='paid';
   const values=await Promise.allSettled([createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()}),createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()})]);
-  assert.equal(values.filter(v=>v.status==='fulfilled').length,1);assert.equal(values.find(v=>v.status==='rejected').reason.status,409);assert.equal(f.sessions.size,2);
+  assert.ok(values.some(v=>v.status==='fulfilled'));for(const v of values.filter(v=>v.status==='rejected'))assert.equal(v.reason.status,409);
+  assert.equal([...f.sessions.values()].filter(s=>s.status==='open').length,1,'replacement never leaves two payable Sessions');
+  assert.equal(s.status,'complete','the original paid purchase is preserved');
   assert.equal((await first(f.db,'SELECT COUNT(*) n FROM checkout_requests WHERE active=1')).n,1);
+ }finally{f.db.close();}
+});
+
+test('second-device recovery covers cards, declined cards, free vouchers, books and legacy forms',async()=>{
+ for(const uiMode of ['elements','hosted','form'])for(const baseId of ['episode-1','story-book-before','story-book-after'])for(const intentStatus of [null,'requires_payment_method','canceled']){
+  const f=fixture();try{
+   const input={...f.input,baseId,uiMode,voucherCode:intentStatus==='canceled'?'free':'1e'};
+   const original=await createCheckout(f.env,input),s=f.sessions.get(original.sessionId);
+   if(intentStatus)s.payment_intent={id:'pi_old',status:intentStatus,last_payment_error:{code:'card_declined'}};
+   const next=await createCheckout(f.env,{...input,uiMode:'elements',attemptKey:crypto.randomUUID()});
+   assert.equal(s.status,'expired');assert.equal(f.sessions.get(next.sessionId).status,'open');assert.notEqual(next.clientSecret,undefined);
+   assert.notEqual(next.sessionId,original.sessionId);assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+  }finally{f.db.close();}
+ }
+});
+test('expiry response loss and concurrent expiry are reconciled, but an unclosed Session cannot be replaced',async()=>{
+ for(const mode of ['lost-response','already-expired','failed-open','provider-outage']){
+  const f=fixture();try{
+   const original=await createCheckout(f.env,f.input),s=f.sessions.get(original.sessionId);
+   f.env.STRIPE_CLIENT.checkout.sessions.expire=async()=>{if(['lost-response','already-expired'].includes(mode))s.status='expired';if(mode==='provider-outage')f.failRead(true);throw Error('Expiry response unavailable');};
+   if(['lost-response','already-expired'].includes(mode)){const next=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()});assert.notEqual(next.sessionId,s.id);assert.equal(s.status,'expired');}
+   else{await assert.rejects(()=>createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()}));assert.equal(f.sessions.size,1);assert.equal((await first(f.db,'SELECT active FROM checkout_requests')).active,1);}
+  }finally{f.db.close();}
+ }
+});
+test('payment or bank authentication winning the expiration race never creates a second Session',async()=>{
+ for(const state of ['paid','processing','requires_action']){
+  const f=fixture();try{
+   const original=await createCheckout(f.env,f.input),s=f.sessions.get(original.sessionId);
+   f.env.STRIPE_CLIENT.checkout.sessions.expire=async()=>{s.payment_intent={id:'pi_racing',status:state==='paid'?'succeeded':state};if(state==='paid'){s.status='complete';s.payment_status='paid';}throw Error('Cannot expire now');};
+   await assert.rejects(()=>createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID()}),e=>e.status===409&&e.code===(state==='paid'?'checkout_just_paid':'checkout_pending'));
+   assert.equal(f.sessions.size,1);assert.equal((await first(f.db,'SELECT active FROM checkout_requests')).active,1);
+   assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0,'recovery itself never fulfills a purchase');
+  }finally{f.db.close();}
+ }
+});
+test('pending checkout returns an actionable reason and logs the block without disclosing the old Session',async()=>{
+ const f=fixture();try{
+  const original=await createCheckout(f.env,f.input);f.sessions.get(original.sessionId).payment_intent={id:'pi_pending',status:'processing'};
+  const r=await worker.fetch(new Request(origin+'/api/checkout/session',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify({...f.input,attemptKey:crypto.randomUUID()})}),f.env);
+  assert.equal(r.status,409);const data=await r.json();assert.equal(data.code,'checkout_pending');assert.match(data.error,/inom zariadení/);assert.ok(!JSON.stringify(data).includes(original.sessionId));assert.ok(!JSON.stringify(data).includes('fixture_secret'));
+  assert.equal((await first(f.db,"SELECT count(*) n FROM payment_log WHERE type='checkout_blocked'")).n,1);
  }finally{f.db.close();}
 });

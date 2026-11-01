@@ -331,7 +331,7 @@
     embedded?.destroy();embedded=null;creating=true;
     panel.hidden=false;form.classList.add('payment-open');lockOrder(true);update();hidePayment();
     document.querySelector('#check-payment').hidden=!purchase?.sessionId;
-    document.querySelector('#retry-payment').hidden=false;document.querySelector('#retry-payment').textContent='Obnoviť pôvodný formulár';
+    document.querySelector('#retry-payment').hidden=error.code==='checkout_just_paid';document.querySelector('#retry-payment').textContent=['checkout_pending','checkout_preparing'].includes(error.code)?'Znova overiť a pokračovať':'Obnoviť pôvodný formulár';
     document.querySelector('#new-order').hidden=true;document.querySelector('#change-order').hidden=false;document.querySelector('#change-order').disabled=false;
     paymentMessage(error.status&&error.status<500?error.message:'Formulár sa nepodarilo načítať. Skontrolujte spojenie a obnovte pôvodnú objednávku. Týmto krokom platbu nepotvrdzujete.','error');
   }

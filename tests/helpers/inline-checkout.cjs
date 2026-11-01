@@ -27,13 +27,20 @@ function install(options){
  };}});
 }
 async function open(browser,options={}){
+ const {backend,...browserOptions}=options;
  const width=options.width||390,context=await browser.newContext({viewport:{width,height:844},isMobile:width<600,hasTouch:width<600}),page=await context.newPage();
  const f={posts:[],releases:[],diagnostics:[],reads:0,createLost:false,createError:0,statusError:false,releaseError:false,enabled:true,state:'ready',paid:false,delivered:false,totalCents:1499,labels:['Rodinná hra Pixelkovia','Atlas Pixelkov'],orderCount:1,...options};
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await context.addInitScript(install,{wallet:'google_pay',...options});
+ await context.addInitScript(install,{wallet:'google_pay',...browserOptions});
  await context.addInitScript(({purchase,denyStorage})=>{if(denyStorage){Object.defineProperty(window,'localStorage',{get(){throw Error('Storage unavailable');}});Object.defineProperty(window,'sessionStorage',{get(){throw Error('Storage unavailable');}});}else if(purchase)localStorage.setItem('pixelkovia-checkout-attempt',JSON.stringify(purchase));},{purchase:options.purchase,denyStorage:options.denyStorage});
  await context.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());if(url.origin!==origin)return route.abort();
+  if(backend&&url.pathname.startsWith('/api/checkout/')){
+   if(url.pathname==='/api/checkout/session')f.posts.push(req.postDataJSON());
+   const response=await backend(req),data=await response.json();
+   if(url.pathname==='/api/checkout/session'&&response.ok){f.totalCents=data.totalCents;await page.evaluate(total=>inlineFixture.totalCents=total,f.totalCents);}
+   return route.fulfill({status:response.status,json:data});
+  }
   if(url.pathname==='/api/checkout/diagnostic'){f.diagnostics.push(req.postDataJSON());return f.diagnosticError?route.abort():route.fulfill({json:{received:true}});}
   if(url.pathname==='/api/checkout/config')return route.fulfill({json:{enabled:f.enabled,checkout:'elements',publishableKey:'pk_test_fixture',wallets:{applePay:true,googlePay:true}}});
   if(url.pathname==='/api/checkout/session'){
