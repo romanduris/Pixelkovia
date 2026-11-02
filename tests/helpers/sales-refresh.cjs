@@ -21,20 +21,34 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  const ratings=await gallery.locator('.review-stars').allTextContents();
  assert.deepEqual(ratings,Array(6).fill('★★★★★'));
  assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.getAttribute('aria-label').includes(`${[...el.textContent].filter(c=>c==='★').length} z 5`))),true);
- assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia · 5/5','Adam K. · 5/5','Jana · 5/5','Zuzana · 5/5','Martin · 5/5','Tomas · 5/5']);
- assert.doesNotMatch(await page.locator('#hodnotenia').innerText(),/ilustračné|ukážkové/i);
+ assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia','Adam K.','Jana','Zuzana','Martin','Tomas']);
+ assert.doesNotMatch(await page.locator('#hodnotenia').innerText(),/5\s*\/\s*5|ilustračné|ukážkové/i);
+ assert.equal(await page.locator('#reviews-title').textContent(),'Čo hovoria rodičia.');
+ const layout=await track.evaluate(el=>{
+  const card=el.firstElementChild,author=card.querySelector('.review-author').getBoundingClientRect(),stars=card.querySelector('.review-stars').getBoundingClientRect();
+  const quote=card.querySelector('blockquote').getBoundingClientRect();
+  return {cardRatio:card.getBoundingClientRect().width/el.clientWidth,sameRow:Math.abs((author.top+author.bottom-stars.top-stars.bottom)/2)<2,quoteBelow:quote.top>Math.max(author.bottom,stars.bottom),fontSize:parseFloat(getComputedStyle(card.querySelector('blockquote p')).fontSize)};
+ });
+ assert.ok(layout.sameRow&&layout.quoteBelow,'author and stars share a header above the review');
+ assert.equal(layout.fontSize,width<=700?15:16);
+ if(width<=700)assert.ok(layout.cardRatio>.88&&layout.cardRatio<.92,'mobile shows one review and a peek of the next');
+ else assert.ok(layout.cardRatio>.47&&layout.cardRatio<.5,'desktop shows two reviews');
  assert.equal(await page.locator('[itemtype*="Review"],[itemtype*="AggregateRating"],script[type="application/ld+json"]').count(),0,'review cards do not add aggregate metadata');
  await page.emulateMedia({reducedMotion:'reduce'});
  const settled=async index=>page.waitForFunction(index=>{
   const track=document.querySelector('#review-gallery-track'),slides=[...track.children];
   const target=Math.min(slides[index].offsetLeft-slides[0].offsetLeft,track.scrollWidth-track.clientWidth);
-  return Math.abs(track.scrollLeft-target)<2&&document.querySelector('.review-counter').textContent===`${index+1} / ${slides.length}`;
+  const range=innerWidth<=700?`${index+1}`:`${index+1}–${index+2}`;
+  return Math.abs(track.scrollLeft-target)<2&&document.querySelector('.review-counter').textContent===`${range} / 6`;
  },index);
+ const lastStart=width<=700?5:4;
  await track.scrollIntoViewIfNeeded();
+ await settled(0);
  await gallery.locator('[data-gallery-next]').click();await settled(1);
- await track.focus();await page.keyboard.press('End');await settled(5);
+ await track.focus();await page.keyboard.press('End');await settled(lastStart);
  assert.equal(await gallery.locator('[data-gallery-next]').getAttribute('aria-disabled'),'true');
- await gallery.locator('[data-gallery-prev]').click();await settled(4);
+ await page.keyboard.press('ArrowRight');await settled(lastStart);
+ await gallery.locator('[data-gallery-prev]').click();await settled(lastStart-1);
  await track.focus();await page.keyboard.press('Home');await settled(0);
  if(swipe){
   await track.scrollIntoViewIfNeeded();

@@ -110,15 +110,20 @@ body[data-environment="sales"]>.site-footer{max-width:1320px;padding:22px 56px;b
 
 /* Compact mobile introduction: leave the lower illustration visible on arrival. */
 .funnel-hero-top>.hero-price{margin-top:22px;margin-bottom:0}
-.review-gallery{max-width:720px;margin:auto;min-width:0}
+.funnel-reviews{padding-block:40px}
+.funnel-reviews .funnel-section-heading{margin-bottom:20px}
+.funnel-reviews h2{font-size:34px;line-height:1.25;margin:10px 0 0}
+.review-gallery{max-width:1000px;margin:auto;min-width:0}
 .review-gallery-track{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:12px}
 .review-gallery-track::-webkit-scrollbar{display:none}
-.review-card{flex:0 0 90%;min-width:0;scroll-snap-align:start;background:#172637;border:1px solid #425565;border-radius:12px;padding:30px;display:flex;flex-direction:column}
+.review-card{flex:0 0 calc((100% - 12px)/2);min-width:0;scroll-snap-align:start;background:#172637;border:1px solid #425565;border-radius:12px;padding:22px}
 .review-card:last-child{scroll-snap-align:end}
-.review-stars{font-size:22px;letter-spacing:4px;color:#edcf8c;line-height:1.4}
-.review-card blockquote{margin:19px 0 24px;flex:1}.funnel-section .review-card blockquote p{font-size:18px;line-height:1.8;color:#e4ebe7;margin:0}
+.review-card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.review-stars{flex-shrink:0;font-size:18px;letter-spacing:2px;color:#edcf8c;line-height:1.2;white-space:nowrap}
+.review-card blockquote{margin:14px 0 0}.funnel-section .review-card blockquote p{font-size:16px;line-height:1.6;color:#e4ebe7;margin:0}
 .funnel-section .review-author{font-size:14px;font-weight:650;line-height:1.6;color:#b5dfcf;margin:0}
 .review-counter{font:12px/1.5 Manrope,sans-serif;color:#bedccb;min-width:62px;text-align:center}
+.review-gallery .family-gallery-controls{margin-top:12px}
 .review-gallery-track:focus-visible{outline:2px solid #cab5f4;outline-offset:3px}
 @media(max-width:700px){
  .funnel-hero{height:clamp(500px,calc(100svh - 78px),620px)}
@@ -132,7 +137,8 @@ body[data-environment="sales"]>.site-footer{max-width:1320px;padding:22px 56px;b
  .funnel-hero-description{display:none}.hero-actions{display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap;margin-top:0}
  .hero-actions .funnel-cta{flex:1;min-height:48px;font-size:13px;padding:12px 16px;gap:14px}.hero-look{font-size:10px;min-height:44px;padding:0}
  .funnel-hero-bottom>.sales-status{font-size:9px;line-height:1.6;margin-top:7px}
- .review-card{padding:24px 22px}.funnel-section .review-card blockquote p{font-size:16px}.review-stars{font-size:20px}
+ .funnel-reviews{padding-block:32px}.funnel-reviews .funnel-section-heading{margin-bottom:18px}.funnel-reviews h2{font-size:28px}
+ .review-card{flex-basis:90%;padding:20px}.funnel-section .review-card blockquote p{font-size:15px}.review-card blockquote{margin-top:12px}
 }
 @media(max-width:370px){
  .funnel-hero-top{top:16px;left:16px;right:16px}.funnel-hero h1{font-size:28px}.hero-subtitle{font-size:12px;max-width:270px}

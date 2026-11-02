@@ -6,20 +6,29 @@
     const slides=[...track.children],dots=[...gallery.querySelectorAll('[data-gallery-dot]')];
     const previous=gallery.querySelector('[data-gallery-prev]'),next=gallery.querySelector('[data-gallery-next]');
     const status=gallery.querySelector('[data-gallery-status]');
+    const reviews=gallery.hasAttribute('data-review-gallery');
     let current=0,frame=0;
-    const positions=()=>slides.map(slide=>Math.min(slide.offsetLeft-slides[0].offsetLeft,track.scrollWidth-track.clientWidth));
+    const positions=()=>{
+      const stops=slides.map(slide=>Math.min(slide.offsetLeft-slides[0].offsetLeft,Math.max(0,track.scrollWidth-track.clientWidth)));
+      // Two visible reviews share the final stop; count it once for navigation.
+      return reviews?stops.filter((stop,i)=>i===0||Math.abs(stop-stops[i-1])>1):stops;
+    };
     const update=()=>{
       frame=0;
       const stops=positions();
       const index=stops.reduce((best,x,i)=>Math.abs(x-track.scrollLeft)<Math.abs(stops[best]-track.scrollLeft)?i:best,0);
       current=index;
       dots.forEach((dot,i)=>{if(i===index)dot.setAttribute('aria-current','true');else dot.removeAttribute('aria-current');});
-      previous.setAttribute('aria-disabled',String(index===0));next.setAttribute('aria-disabled',String(index===slides.length-1));
-      const reviews=gallery.hasAttribute('data-review-gallery');
-      status.textContent=reviews?`${index+1} / ${slides.length}`:`Obrázok ${index+1} z ${slides.length}`;
-      if(reviews)status.setAttribute('aria-label',`Hodnotenie ${index+1} z ${slides.length}`);
+      previous.setAttribute('aria-disabled',String(index===0));next.setAttribute('aria-disabled',String(index===stops.length-1));
+      const last=index+slides.length-stops.length+1;
+      const range=last>index+1?`${index+1}–${last}`:`${index+1}`;
+      status.textContent=reviews?`${range} / ${slides.length}`:`Obrázok ${index+1} z ${slides.length}`;
+      if(reviews)status.setAttribute('aria-label',last>index+1?`Hodnotenia ${index+1} až ${last} z ${slides.length}`:`Hodnotenie ${index+1} z ${slides.length}`);
     };
-    const go=index=>track.scrollTo({left:positions()[Math.max(0,Math.min(slides.length-1,index))],behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});
+    const go=index=>{
+      const stops=positions();
+      track.scrollTo({left:stops[Math.max(0,Math.min(stops.length-1,index))],behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});
+    };
     previous.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
     dots.forEach((dot,i)=>dot.addEventListener('click',()=>go(i)));
     track.addEventListener('scroll',()=>{if(!frame)frame=requestAnimationFrame(update);},{passive:true});
@@ -27,7 +36,7 @@
       const index={ArrowLeft:current-1,ArrowRight:current+1,Home:0,End:slides.length-1}[event.key];
       if(index!==undefined){event.preventDefault();go(index);}
     });
-    new ResizeObserver(()=>{track.scrollTo({left:positions()[current],behavior:'instant'});update();}).observe(track);
+    new ResizeObserver(()=>{const stops=positions();track.scrollTo({left:stops[Math.min(current,stops.length-1)],behavior:'instant'});update();}).observe(track);
     update();
   }
   function initFaq(){
