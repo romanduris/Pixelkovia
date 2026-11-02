@@ -16,12 +16,12 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  const response=await page.request.get(new URL(await icon.getAttribute('href'),page.url()).href);
  assert.equal(response.status(),200);assert.equal((await response.body()).subarray(1,4).toString(),'PNG');
  const gallery=page.locator('[data-review-gallery]'),track=gallery.locator('[data-gallery-track]');
- assert.equal(await gallery.locator('.review-card').count(),5);
- assert.equal(await gallery.locator('.review-stars').count(),5);
+ assert.equal(await gallery.locator('.review-card').count(),6);
+ assert.equal(await gallery.locator('.review-stars').count(),6);
  const ratings=await gallery.locator('.review-stars').allTextContents();
- assert.deepEqual(ratings,Array(5).fill('★★★★★'));
+ assert.deepEqual(ratings,Array(6).fill('★★★★★'));
  assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.getAttribute('aria-label').includes(`${[...el.textContent].filter(c=>c==='★').length} z 5`))),true);
- assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia · 5/5','Adam K. · 5/5','Jana · 5/5','Zuzana · 5/5','Martin · 5/5']);
+ assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia · 5/5','Adam K. · 5/5','Jana · 5/5','Zuzana · 5/5','Martin · 5/5','Tomas · 5/5']);
  assert.doesNotMatch(await page.locator('#hodnotenia').innerText(),/ilustračné|ukážkové/i);
  assert.equal(await page.locator('[itemtype*="Review"],[itemtype*="AggregateRating"],script[type="application/ld+json"]').count(),0,'review cards do not add aggregate metadata');
  await page.emulateMedia({reducedMotion:'reduce'});
@@ -32,9 +32,9 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  },index);
  await track.scrollIntoViewIfNeeded();
  await gallery.locator('[data-gallery-next]').click();await settled(1);
- await track.focus();await page.keyboard.press('End');await settled(4);
+ await track.focus();await page.keyboard.press('End');await settled(5);
  assert.equal(await gallery.locator('[data-gallery-next]').getAttribute('aria-disabled'),'true');
- await gallery.locator('[data-gallery-prev]').click();await settled(3);
+ await gallery.locator('[data-gallery-prev]').click();await settled(4);
  await track.focus();await page.keyboard.press('Home');await settled(0);
  if(swipe){
   await track.scrollIntoViewIfNeeded();
