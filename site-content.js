@@ -12,7 +12,7 @@
     {id:'p3',task:'03',title:'Plugyho digitálny zámok',where:'Indícia 3 · pod stoličkou',copy:'Prilepte pod sedadlo stoličky a označte „Úloha 3“. Nájdete ju podľa Pixiinho odkazu.',status:'Hotový list A4',character:'plugy'},
     {id:'p4',task:'04',title:'Doručte stratenú správu',where:'Indícia pri topánkach',copy:'Celý list k úlohe 4 bez strihania ukryte do čistej suchej topánky. Deti najprv opravia mostíky a potom doručia správu. Hrá sa iba na papieri.',status:'Hotový list A4',character:'pingy'},
     {id:'p5',task:'05',title:'Čipkove štyri hry',where:'Samostatná indícia · posteľ',copy:'List k úlohe 5 ukryte pod vankúš v detskej posteli. Jeho QR otvorí štyri hry. Po dohraní deti pokračujú na papieri.',status:'Hotový list A4',character:'cipko'},
-    {id:'p6',task:'06',title:'Opravte poškodené správy',where:'Indícia 6 · chladnička',copy:'List k úlohe 6 vložte do suchého uzavretého obalu do chladničky. List k úlohe 7 ukryte pod gauč. Označte „Úloha 6“.',status:'Hotový list A4',character:'guardy'},
+    {id:'p6',task:'06',title:'Opravte poškodené správy',where:'Indícia 6 · chladnička',copy:'List k úlohe 6 dajte do chladničky na miesto, kam deti ľahko dosiahnu. List k úlohe 7 ukryte pod gauč. Označte „Úloha 6“.',status:'Hotový list A4',character:'guardy'},
     {id:'p7',task:'07',title:'Posledný návratový znak',where:'Samostatná indícia · pod gaučom',copy:'Vytlačenú indíciu ukryte pod gauč na dosah ruky. Na jednej veľkej obrazovke deti vyfarbia správne dvojice a získajú posledný návratový znak do spoločného hesla.',status:'Hotový list A4',character:'piko'}
   ];
   const {purchase}=SITE_CONFIG;

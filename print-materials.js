@@ -158,7 +158,7 @@
     symbols:{label:'Úloha pod stoličkou',placement:'Vytlačenú indíciu prilepte pod sedadlo stoličky.',hint:'Dopočítajte tvary; v telefóne označte všetky políčka s ich hodnotami.'},
     cipher:{label:'Úloha pri topánkach',placement:'Vytlačenú indíciu ukryte do čistej suchej topánky.',hint:'Opravte mostíky, potom sledujte zhodné symboly a zbierajte písmená.'},
     maze:{label:'Úloha v posteli',placement:'Vytlačenú indíciu dajte pod vankúš v detskej posteli.',hint:'Číslice z hier vymeňte podľa papierového kľúča za časti slova.'},
-    search:{label:'Úloha v chladničke',placement:'Vytlačenú indíciu dajte do chladničky v suchom uzavretom obale.',hint:'Oprava presne doplní biele políčka správy. Dve bez opravy prečiarknite. Číslice pri opravených správach čítajte zhora nadol; nič neprepisujte ani nepreskupujte.'},
+    search:{label:'Úloha v chladničke',placement:'Vytlačenú indíciu dajte do chladničky na miesto, kam deti ľahko dosiahnu.',hint:'Oprava presne doplní biele políčka správy. Dve bez opravy prečiarknite. Číslice pri opravených správach čítajte zhora nadol; nič neprepisujte ani nepreskupujte.'},
     code:{label:'Úloha pod gaučom',placement:'Vytlačenú indíciu ukryte pod gauč na dosah ruky.',hint:'Vyfarbite presne ○★, △□ a +◇. Poradie symbolov platí; objaví sa návratový znak O.'},
     finale:{label:'Finále',placement:'Užite si rozlúčku. Diplom a Atlas sú voliteľné.',hint:'Žiadna ďalšia úloha už nečaká.'}
   };

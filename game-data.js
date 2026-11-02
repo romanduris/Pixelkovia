@@ -129,12 +129,12 @@ window.GAME = {
         "Nastavte vonkajšie D oproti vnútornému A. Každé písmeno na vonkajšom kruhu prečítajte na vnútornom kruhu.",
         "K sa prečíta ako H, O ako L a D ako A. Prvé slovo je HĽADAJ."
       ],
-      "parent": "Obálku 2 s celým listom k úlohe 2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. List k úlohe 3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. List k úlohe 6 je v chladničke v suchom uzavretom obale. List k úlohe 7 ukryte pod gauč.",
+      "parent": "Obálku 2 s celým listom k úlohe 2 položte pri okne na bezpečné miesto na dosah detí. Oba kruhy vystrihujú až deti. Okno sa neotvára a na parapet sa nelezie. List k úlohe 3 vložte do samostatnej obálky Úloha 3 a prilepte pod sedadlo stoličky. List k úlohe 6 je v chladničke na mieste, kam deti ľahko dosiahnu. List k úlohe 7 ukryte pod gauč.",
       "transition": "Rozlúštená veta posiela deti hľadať ďalšiu indíciu pod stoličkami. Pixiina úloha sa končí na papieri, bez obrazovky po vyriešení.",
       "character": "pixi",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; List k úlohe 6 patrí do chladničky v suchom uzavretom obale. List k úlohe 7 ukryte pod gauč."
+        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; List k úlohe 6 patrí do chladničky na miesto, kam deti ľahko dosiahnu. List k úlohe 7 ukryte pod gauč."
       ],
       "narrative": {
         "before": [
@@ -172,12 +172,12 @@ window.GAME = {
         "Dva rovnaké trojuholníky dávajú 6. Jeden má hodnotu 3. Potom dopočítajte kruh a štvorec.",
         "Trojuholník je 3, kruh 2 a štvorec 4. Označte každé políčko s 2, 3 alebo 4. Čísla 1, 5 a 6 nechajte zhasnuté. Opätovným ťuknutím sa výber zruší."
       ],
-      "parent": "List k úlohe 3 je v samostatnej obálke (indícii) pod sedadlom stoličky. List k úlohe 4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. List k úlohe 5 ukryte pod vankúš v detskej posteli. List k úlohe 6 je v chladničke v suchom uzavretom obale. List k úlohe 7 ukryte pod gauč.",
+      "parent": "List k úlohe 3 je v samostatnej obálke (indícii) pod sedadlom stoličky. List k úlohe 4 vložte do obálky (indície) 3 a ukryte dovnútra čistej suchej topánky. List k úlohe 5 ukryte pod vankúš v detskej posteli. List k úlohe 6 je v chladničke na mieste, kam deti ľahko dosiahnu. List k úlohe 7 ukryte pod gauč.",
       "transition": "Pingyho indíciu hľadajte pri dvojiciach cestovateľov, ktoré majú jazyk, no nerozprávajú. Na cestu vyrazia iba s vašimi nohami.",
       "character": "plugy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu.",
-        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; List k úlohe 6 patrí do chladničky v suchom uzavretom obale. List k úlohe 7 ukryte pod gauč."
+        "Pixiina úloha sa rieši na papieri. Plugyho indícia Úloha 3 je pod sedadlom stoličky; List k úlohe 6 patrí do chladničky na miesto, kam deti ľahko dosiahnu. List k úlohe 7 ukryte pod gauč."
       ],
       "narrative": {
         "before": [
@@ -272,7 +272,7 @@ window.GAME = {
         "Číslice z hier zapisujte zľava doprava. Každú nájdite v kľúči na tomto liste.",
         "Časti slova v poradí sú CH – LAD – NIČ – KA."
       ],
-      "parent": "List k úlohe 5 ukryte pod vankúš v detskej posteli. List k úlohe 6 je v suchom uzavretom obale v chladničke. List k úlohe 7 ukryte pod gauč. Štyri hry dajú 7294 → CHLADNIČKA; nič sa nezadáva do telefónu. QR na liste k úlohe 6 otvorí úlohu 6.",
+      "parent": "List k úlohe 5 ukryte pod vankúš v detskej posteli. List k úlohe 6 je v chladničke na mieste, kam deti ľahko dosiahnu. List k úlohe 7 ukryte pod gauč. Štyri hry dajú 7294 → CHLADNIČKA; nič sa nezadáva do telefónu. QR na liste k úlohe 6 otvorí úlohu 6.",
       "transition": "Po štvrtej hre získate návratový znak L a číslice 7294. Dokončite tajničku na papieri a choďte hľadať ďalšiu indíciu do chladničky. Naskenujte QR na nájdenom liste.",
       "character": "cipko",
       "dramaturgy": [
@@ -313,7 +313,7 @@ window.GAME = {
         "Čierne políčka opravy presne zaplnia biele políčka poškodenej správy. Vzory neotáčajte; dve správy nemajú vhodnú opravu.",
         "Prvú správu s číslicou 5 doplní oprava 3. Správy s 9 a 0 prečiarknite. Zostávajúce číslice čítajte zhora nadol; nič neprepisujte ani nepreskupujte."
       ],
-      "parent": "Vytlačenú indíciu k úlohe 6 dajte do suchého uzavretého obalu do chladničky na dosah detí. Označte Úloha 6. Vytlačenú indíciu k úlohe 7 ukryte samostatne pod gauč na dosah ruky.",
+      "parent": "Vytlačenú indíciu k úlohe 6 dajte do chladničky na miesto, kam deti ľahko dosiahnu. Označte Úloha 6. Vytlačenú indíciu k úlohe 7 ukryte samostatne pod gauč na dosah ruky.",
       "transition": "Správny číselný kód obnoví bezpečnú cestu. Správa ochrancu pošle deti pod gauč po poslednú indíciu.",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
