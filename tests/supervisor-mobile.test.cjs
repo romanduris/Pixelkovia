@@ -26,13 +26,14 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const first=await page.evaluate(()=>fetch('/api/customer/portal').then(r=>r.json()));const firstEntitlement=first.entitlement.id;
   assert.equal((await page.evaluate(()=>fetch('/supervisor-preparation.json').then(r=>r.json()))).length,7);
   await page.locator('[data-library-book="story-book-before"].is-owned').waitFor();
-  for(const width of [320,360,390,430]){
+  for(const width of [320,360,390,430,901]){
    await page.setViewportSize({width,height:844});await page.evaluate(()=>scrollTo(0,0));
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`no horizontal overflow at ${width}`);
    const targets=await page.locator('[data-expand],.download,#logout').evaluateAll(nodes=>nodes.map(n=>({width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height})));
    assert.ok(targets.every(t=>t.width>=44&&t.height>=44),'comfortable touch targets');
    assert.ok((await page.locator('.supervisor-hero').boundingBox()).height<130,'compact introduction');
-   const labels=await page.locator('.task-progress li').evaluateAll(nodes=>nodes.map(n=>{const label=n.querySelector('span').getBoundingClientRect(),marker=n.querySelector('b').getBoundingClientRect(),item=n.getBoundingClientRect();return {above:label.bottom<=marker.top,inside:label.left>=item.left-.5&&label.right<=item.right+.5};}));assert.ok(labels.every(n=>n.above&&n.inside),'names fit above the task markers');
+   const labels=await page.locator('.task-progress li').evaluateAll(nodes=>nodes.map(n=>{const label=n.querySelector('span').getBoundingClientRect(),marker=n.querySelector('b').getBoundingClientRect(),item=n.getBoundingClientRect();return {above:label.bottom<=marker.top,inside:label.left>=item.left-.5&&label.right<=item.right+.5,unwrapped:n.querySelector('span').scrollWidth<=n.querySelector('span').clientWidth};}));assert.ok(labels.every(n=>n.above&&n.inside&&n.unwrapped),'names fit above the task markers');
+   assert.deepEqual(await page.locator('.task-progress li>span').allTextContents(),['Kúpeľňa','Okno','Stolička','Topánky','Posteľ','Chladnička','Gauč']);
    assert.deepEqual(await page.locator('.task-progress b').allTextContents(),['U1','U2','U3','U4','U5','U6','U7']);await page.locator('.game-progress').screenshot({path:`/tmp/progress-${engine.name()}-${width}.png`});
    await page.screenshot({path:`/tmp/portal-${engine.name()}-${width}.png`,fullPage:true});
   }
@@ -61,7 +62,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'enlarged text reflows');await page.screenshot({path:`/tmp/portal-${engine.name()}-large-text.png`,fullPage:true});
   await page.reload();await page.locator('#start-game').waitFor();
   const desktop=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1280,height:900}});await desktop.addCookies(await context.cookies());const desk=await desktop.newPage();await desk.goto(server.url+'/Supervisor');await desk.locator('#start-game').waitFor();await desk.locator('[data-library-book="story-book-before"].is-owned').waitFor();assert.ok(await desk.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await desk.screenshot({path:`/tmp/portal-${engine.name()}-desktop.png`,fullPage:true});await desktop.close();
-  await page.locator('#start-game').tap();await page.waitForURL('**/hra');await page.goto(server.url+'/Supervisor');await page.getByText('Vaša hra práve prebieha.').waitFor();assert.match(await page.locator('.current-task').innerText(),/Teraz: U1 · Signály/);
+  await page.locator('#start-game').tap();await page.waitForURL('**/hra');await page.goto(server.url+'/Supervisor');await page.getByText('Vaša hra práve prebieha.').waitFor();assert.match(await page.locator('.current-task').innerText(),/Teraz: U1 · Kúpeľňa/);
   assert.equal(await page.locator('.saved-preparation').getAttribute('open'),null);assert.equal(await page.locator('#start-game').isEnabled(),true);
   await page.locator('#logout').tap();await page.locator('#customer-login').waitFor();await signIn(secondPassword);
   assert.match(await page.locator('[data-preparation-count]').innerText(),/0 z 3/);assert.equal(await page.locator('.placement-item input:checked').count(),0);

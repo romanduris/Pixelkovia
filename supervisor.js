@@ -3,7 +3,7 @@
   const root=document.querySelector('#supervisor'),logout=document.querySelector('#logout');
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const required=['printed','placed','device-understood'];
-  const taskNames=['Signály','Správa','Most','Doručenie','Opravy','Kód','Návrat'];
+  const taskNames=['Kúpeľňa','Okno','Stolička','Topánky','Posteľ','Chladnička','Gauč'];
   const icon=name=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${{printer:'<path d="M7 8V3h10v5M7 17H4V8h16v9h-3M7 14h10v7H7zM17 11h.01"/>',chevron:'<path d="m6 9 6 6 6-6"/>',arrow:'<path d="M5 12h14m-6-6 6 6-6 6"/>'}[name]}</svg>`;
   let visitKey;try{visitKey=sessionStorage.getItem('pixelkovia-portal-visit')||crypto.randomUUID();sessionStorage.setItem('pixelkovia-portal-visit',visitKey);}catch{visitKey=crypto.randomUUID();}
   let data,busy=false,rendered='',localChecks={},placements=[],saveError='',identityEpoch=0,loadSequence=0;
