@@ -28,6 +28,7 @@ html{scroll-padding-top:22px;scroll-padding-bottom:100px}
 .funnel-section{padding:56px 16px;border-bottom:1px solid #303d4e;scroll-margin-top:22px;scroll-margin-bottom:95px}
 .funnel-section h2,.funnel-final h2{font:600 clamp(31px,3.1vw,43px)/1.18 Manrope,sans-serif;letter-spacing:-.045em;color:#f6efe3;margin:12px 0 18px}
 .funnel-section h2 em,.funnel-final h2 em{font:500 1.17em/1.03 Caveat,cursive;color:var(--sale-purple);letter-spacing:-.025em}
+#offer-title em{white-space:nowrap}
 .funnel-section p{font-size:15px;line-height:1.8;color:var(--sale-soft)}
 .funnel-section-heading{max-width:720px;margin:0 auto 30px;text-align:center}.funnel-section-heading>p{max-width:620px;margin:0 auto}
 .evidence-layout{display:grid;grid-template-columns:1.06fr 1fr;align-items:center;gap:50px;max-width:1100px;margin:auto}
