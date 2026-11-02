@@ -19,8 +19,13 @@
 
 /* Keep the task names above their U1–U7 markers on phones as well. */
 .task-progress li{display:grid;grid-template-rows:auto 40px;align-items:end;justify-items:center;gap:6px}.task-progress li>span{display:flex;align-items:center;justify-content:center;align-self:stretch;width:100%;min-width:0;font-size:12px;line-height:1.4;white-space:nowrap;overflow-wrap:normal;hyphens:none}.task-progress b{font-size:15px}
-@media(max-width:600px){.task-progress{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:14px}.task-progress li{grid-template-rows:auto 36px}}
+@media(max-width:600px){.task-progress li{grid-template-rows:auto 36px}}
 @media(max-width:359px){.task-progress{gap:4px}.task-progress li{grid-template-rows:auto 34px}.task-progress b{font-size:14px}}
 
-/* Preserve full location names when the game card is narrow on desktop too. */
-@container(max-width:480px){.task-progress{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:14px}}
+/* Always keep U1–U7 together; shorten only the labels on narrow cards. */
+.task-location-short{display:none}
+@container(max-width:480px){
+ .task-location-full{display:none}
+ .task-location-short{display:inline}
+ .task-progress li>span{font-size:11px}
+}

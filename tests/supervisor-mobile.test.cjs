@@ -32,8 +32,9 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    const targets=await page.locator('[data-expand],.download,#logout').evaluateAll(nodes=>nodes.map(n=>({width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height})));
    assert.ok(targets.every(t=>t.width>=44&&t.height>=44),'comfortable touch targets');
    assert.ok((await page.locator('.supervisor-hero').boundingBox()).height<130,'compact introduction');
-   const labels=await page.locator('.task-progress li').evaluateAll(nodes=>nodes.map(n=>{const label=n.querySelector('span').getBoundingClientRect(),marker=n.querySelector('b').getBoundingClientRect(),item=n.getBoundingClientRect();return {above:label.bottom<=marker.top,inside:label.left>=item.left-.5&&label.right<=item.right+.5,unwrapped:n.querySelector('span').scrollWidth<=n.querySelector('span').clientWidth};}));assert.ok(labels.every(n=>n.above&&n.inside&&n.unwrapped),'names fit above the task markers');
-   assert.deepEqual(await page.locator('.task-progress li>span').allTextContents(),['Kúpeľňa','Okno','Stolička','Topánky','Posteľ','Chladnička','Gauč']);
+   const labels=await page.locator('.task-progress li').evaluateAll(nodes=>nodes.map(n=>{const label=n.querySelector('span').getBoundingClientRect(),marker=n.querySelector('b').getBoundingClientRect(),item=n.getBoundingClientRect();return {markerTop:marker.top,above:label.bottom<=marker.top,inside:label.left>=item.left-.5&&label.right<=item.right+.5,unwrapped:n.querySelector('span').scrollWidth<=n.querySelector('span').clientWidth};}));assert.ok(labels.every(n=>n.above&&n.inside&&n.unwrapped),'names fit above the task markers');
+   assert.ok(labels.every(n=>Math.abs(n.markerTop-labels[0].markerTop)<1),'all seven markers stay in one row at '+width+'px');
+   assert.deepEqual(await page.locator('.task-location-full').allTextContents(),['Kúpeľňa','Okno','Stolička','Topánky','Posteľ','Chladnička','Gauč']);
    assert.deepEqual(await page.locator('.task-progress b').allTextContents(),['U1','U2','U3','U4','U5','U6','U7']);await page.locator('.game-progress').screenshot({path:`/tmp/progress-${engine.name()}-${width}.png`});
    await page.screenshot({path:`/tmp/portal-${engine.name()}-${width}.png`,fullPage:true});
   }
