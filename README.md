@@ -3,7 +3,7 @@
 Jediná aktívna aplikácia: **https://pixelkovia.rodulab.com**.
 
 - `/` a `/checkout`: predaj hry, dvoch kníh a bezplatného Atlasu.
-- `/Supervisor`: rodičovský portál, samostatné prihlasovacie údaje pre každý nákup, PDF materiály, knižnica, tri potvrdenia prípravy, postup siedmimi úlohami a hodnotenie.
+- `/Supervisor`: rodičovský portál, samostatné prihlasovacie údaje pre každý nákup, PDF materiály, knižnica, tri potvrdenia prípravy, rozbaľovací zoznam siedmich úkrytov, postup úlohami a hodnotenie. Príprava aj jednotlivé úkryty sa ukladajú na server ku konkrétnej hre. Umiestnenia sa pri zostavení preberajú z rodičovského návodu a zostávajú za plateným prístupom.
 - `/hra`: pôvodná hra so siedmimi nezmenenými úlohami. QR odkazy smerujú sem s parametrom `signal`.
 - `/admin`: produktová administrácia, objednávky, priebeh hrania a hodnotenia. `/admin/storyboard` vyžaduje to isté administrátorské prihlásenie.
 
@@ -42,6 +42,8 @@ Nastavenie: [docs/payment-setup.md](docs/payment-setup.md). Bez overených kľú
 ## Overenie
 
 ```sh
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/supervisor-mobile.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/supervisor-mobile.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/customer-journey.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs
@@ -51,6 +53,8 @@ node tests/static-assets.test.cjs
 node tests/digital-identity.test.cjs
 node tests/paper-puzzles.test.cjs
 ```
+
+Mobilný test portálu overuje dotykové ovládanie pri 320/360/390/430 px, desktop pri 1280 px, rozbalenie úkrytov a vysvetlenia telefónu, individuálne aj spoločné potvrdenie, obnovu po chybe ukladania a prepnutie medzi dvoma nákupmi s rovnakým e-mailom.
 
 Predvolené testy používajú Chromium; `QA_BROWSER=webkit` volí WebKit. Dňa 28. 10. 2026 prešla celá cesta aj platobné scenáre v oboch prehliadačoch. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Checkout kontroluje šírky 360, 390, 430 a 1360 px, ceny, návrat k objednávke a chybové stavy s riadenou náhradou Stripe SDK. Testy nevytvárajú produkčných zákazníkov ani platby; neoverujú fyzické zariadenie, banku ani doručenie skutočného e-mailu. Prístupové údaje fixture zostávajú v testovacom procese.
 

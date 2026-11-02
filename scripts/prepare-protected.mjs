@@ -1,7 +1,8 @@
-import {cp,mkdir,readdir,writeFile} from 'node:fs/promises';
+import {cp,mkdir,readFile,readdir,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {build} from '../admin/node_modules/esbuild/lib/main.js';
+import vm from 'node:vm';
 const root=fileURLToPath(new URL('../',import.meta.url));
 async function files(directory,prefix=''){const list=[];for(const item of await readdir(directory,{withFileTypes:true})){const relative=prefix+item.name;if(item.isDirectory())list.push(...await files(path.join(directory,item.name),relative+'/'));else list.push(relative);}return list;}
 export async function prepareProtected(output){
@@ -10,6 +11,14 @@ export async function prepareProtected(output){
   const documents=[['/hra','game.html','run'],['/admin/storyboard','storyboard.html','admin'],['/materialy','printables.html','game'],['/kniznica/citat','library-read.html','customer']];
   const add=async(route,file,role,document=false)=>{const target=path.join(output,'_protected',file);await mkdir(path.dirname(target),{recursive:true});await cp(path.join(root,file),target);inventory[route]={file,role,document};};
   for(const file of code)await add('/'+file,file,'game');
+  // Publish only preparation copy from the existing parent guide, behind the
+  // same paid-game authorization. No solutions enter the public portal bundle.
+  const preparation={window:{}};
+  vm.createContext(preparation);
+  for(const file of ['game-data.js','story-text.js','print-materials.js'])vm.runInContext(await readFile(path.join(root,file),'utf8'),preparation);
+  const placements=preparation.window.GAME.stages.slice(1,8).map((stage,index)=>({id:'placed-'+(index+1),label:stage.label,placement:preparation.window.PRINT_MATERIALS.parentInstructions[stage.id].placement}));
+  await writeFile(path.join(output,'_protected/supervisor-preparation.json'),JSON.stringify(placements)+'\n');
+  inventory['/supervisor-preparation.json']={file:'supervisor-preparation.json',role:'game',document:false};
   await add('/signal-print.css','signal-print.css','game');
   for(const [route,file,role]of documents)await add(route,file,role,true);
   for(const file of await files(path.join(root,'assets'))){

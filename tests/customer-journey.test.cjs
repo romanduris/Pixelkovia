@@ -16,7 +16,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
     await page.locator('[data-library-book="story-book-before"].is-owned').waitFor();assert.equal(await page.locator('[data-library-book="story-book-after"].is-owned').count(),0);
     assert.equal((await requestGet('/assets/printables/vsetky-materialy.pdf')).status(),200);
     assert.equal((await requestGet('/admin/storyboard')).status(),303);
-    await page.locator('[data-device-help]').click();assert.equal(await page.locator('#device-help').isVisible(),true);await page.locator('[data-close-help]').last().click();
+    await page.locator('[aria-controls="phone-details"]').click();assert.equal(await page.locator('#phone-details').isVisible(),true);await page.locator('[aria-controls="phone-details"]').click();
     for(const width of [390,1280]){await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Supervisor overflow');await page.screenshot({path:'/tmp/pixelkovia-supervisor-'+engine.name()+'-'+width+'.png',fullPage:true});}
     await page.locator('[data-preparation="printed"]').check();await page.waitForFunction(()=>!document.querySelector('#start-status').textContent.includes('Uklad'));await page.waitForTimeout(150);
     await page.locator('[data-preparation="placed"]').check();await page.waitForTimeout(150);

@@ -3,6 +3,7 @@ import {first,query,execute,statement,uuid,hash,randomToken} from './db.mjs';
 import {stages} from './game-rules.mjs';
 import {checklist} from './checklist.mjs';
 const DAY=86400000;
+const placementKeys=stages.map((_,index)=>'placed-'+(index+1));
 const clean=s=>String(s).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').toUpperCase();
 export async function entitlement(db,customerId,id,at=Date.now()){
   const row=await first(db,`SELECT e.*,p.content_ready,p.episode_id,o.status payment_status FROM entitlements e JOIN products p ON p.id=e.product_id JOIN order_items i ON i.id=e.order_item_id JOIN orders o ON o.id=i.order_id WHERE e.id=? AND e.customer_id=?`,id,customerId);
@@ -13,12 +14,20 @@ export async function entitlement(db,customerId,id,at=Date.now()){
 export async function readChecklist(db,customerId,id){
   await entitlement(db,customerId,id);
   const rows=await query(db,'SELECT step_key,completed,updated_at FROM checklist_progress WHERE entitlement_id=?',id);
-  return {steps:checklist.map(s=>({...s,completed:rows.some(r=>r.step_key===s.id&&r.completed===1),updatedAt:rows.find(r=>r.step_key===s.id)?.updated_at||null})),scope:'server'};
+  const placed=rows.some(r=>r.step_key==='placed'&&r.completed===1);
+  return {steps:checklist.map(s=>({...s,completed:rows.some(r=>r.step_key===s.id&&r.completed===1),updatedAt:rows.find(r=>r.step_key===s.id)?.updated_at||null})),placements:placementKeys.map(id=>({id,completed:rows.find(r=>r.step_key===id)?.completed===1||(!rows.some(r=>r.step_key===id)&&placed)})),scope:'server'};
 }
 export async function saveChecklist(db,customerId,id,values,at=Date.now()){
   await entitlement(db,customerId,id,at);
-  if(!values || typeof values!=='object'||Array.isArray(values)||Object.keys(values).some(key=>!checklist.some(s=>s.id===key)||typeof values[key]!=='boolean'))throw new HttpError(400,'Neplatné kroky checklistu.');
-  const batch=Object.entries(values).map(([key,checked])=>statement(db,`INSERT INTO checklist_progress VALUES(?,?,?,?) ON CONFLICT(entitlement_id,step_key) DO UPDATE SET completed=excluded.completed,updated_at=CASE WHEN completed<>excluded.completed THEN excluded.updated_at ELSE updated_at END`,id,key,checked?1:0,at));
+  if(!values || typeof values!=='object'||Array.isArray(values)||Object.keys(values).some(key=>(!checklist.some(s=>s.id===key)&&!placementKeys.includes(key))||typeof values[key]!=='boolean'))throw new HttpError(400,'Neplatné kroky checklistu.');
+  const input={...values},batch=[];
+  if(Object.hasOwn(input,'placed'))for(const key of placementKeys)input[key]=input.placed;
+  const placing=placementKeys.some(key=>Object.hasOwn(input,key));
+  // Older purchases have only the single confirmation. Seed their seven items
+  // before a partial edit, and derive the main confirmation in the same batch.
+  if(placing)for(const key of placementKeys)batch.push(statement(db,`INSERT INTO checklist_progress SELECT ?,?,COALESCE((SELECT completed FROM checklist_progress WHERE entitlement_id=? AND step_key='placed'),0),? ON CONFLICT(entitlement_id,step_key) DO NOTHING`,id,key,id,at));
+  for(const [key,checked]of Object.entries(input))batch.push(statement(db,`INSERT INTO checklist_progress VALUES(?,?,?,?) ON CONFLICT(entitlement_id,step_key) DO UPDATE SET completed=excluded.completed,updated_at=CASE WHEN completed<>excluded.completed THEN excluded.updated_at ELSE updated_at END`,id,key,checked?1:0,at));
+  if(placing)batch.push(statement(db,`INSERT INTO checklist_progress SELECT ?,'placed',CASE WHEN COUNT(*)=? THEN 1 ELSE 0 END,? FROM checklist_progress WHERE entitlement_id=? AND step_key IN (${placementKeys.map(()=>'?').join(',')}) AND completed=1 ON CONFLICT(entitlement_id,step_key) DO UPDATE SET completed=excluded.completed,updated_at=CASE WHEN completed<>excluded.completed THEN excluded.updated_at ELSE updated_at END`,id,placementKeys.length,at,id,...placementKeys));
   if(batch.length)await db.batch(batch);
   return readChecklist(db,customerId,id);
 }
@@ -41,7 +50,7 @@ export async function activate(db,customerId,id,activationKey,{replay=false,at=D
   if(await first(db,"SELECT id FROM game_runs WHERE entitlement_id=? AND status='active'",id))throw new HttpError(409,'Hra už má aktívnu reláciu. Prenos telefónu zatiaľ nie je pripojený.');
   if(e.first_completed_at!==null&&!replay)throw new HttpError(409,'Pre ďalšie hranie vedome zvoľte opakovanie.');
   if(replay&&e.first_completed_at===null)throw new HttpError(409,'Prvé hranie ešte nie je dokončené.');
-  const done=await first(db,'SELECT COUNT(*) count FROM checklist_progress WHERE entitlement_id=? AND completed=1',id);
+  const done=await first(db,`SELECT COUNT(*) count FROM checklist_progress WHERE entitlement_id=? AND completed=1 AND step_key IN (${checklist.map(()=>'?').join(',')})`,id,...checklist.map(s=>s.id));
   if(done.count!==checklist.length)throw new HttpError(409,'Dokončite povinnú prípravu aj potvrdenie telefónu.');
   const count=await first(db,'SELECT COUNT(*) count FROM game_runs WHERE entitlement_id=?',id);
   const runId=uuid(),token=randomToken(),digest=await hash(token);
