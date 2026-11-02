@@ -214,7 +214,7 @@
     const preparation={envelope:'Kúpeľňa',document:'Pri okne',symbols:'Pod stoličkou',cipher:'Pri topánkach',maze:'V posteli',search:'V chladničke',code:'Pod gaučom'};
     const cards=GAME.stages.filter(stage=>preparation[stage.id]).map((stage,index)=>{
       const location=preparation[stage.id],setup=parentInstructions[stage.id].placement;
-      const answer=stage.id==='maze'?'7294 → CHLADNIČKA':stage.id==='symbols'?'△ = 3, ○ = 2, □ = 4 → v telefóne znak 9.':solutionAnswer(stage);
+      const answer=stage.id==='maze'?'7294 → CHLADNIČKA':stage.id==='symbols'?'△ = 3, ○ = 2, □ = 4 → v telefóne znak 9. Plugyho hádanka: TOPÁNKA → úkryt úlohy 4.':solutionAnswer(stage);
       const reward=!(stage.finalLetter||stage.reward)?'':`<p class="guide-reward"><strong>Návratový znak:</strong> <b>${esc(stage.finalLetter||stage.reward)}</b></p>`;
       return `<section class="guide-stage" data-stage="${esc(stage.id)}"><div class="guide-stage-heading"><span class="guide-step"><small>ÚLOHA</small><b>${index+1}</b></span><h3>${esc(location)}</h3></div><p class="guide-setup">${esc(setup)}</p><p class="gm-solution" aria-label="Riešenie etapy"><strong>${stage.id==='code'?'Záverečné heslo':'Riešenie'}:</strong> <span class="guide-answer-value">${esc(answer)}</span></p>${reward}</section>`;
     });
