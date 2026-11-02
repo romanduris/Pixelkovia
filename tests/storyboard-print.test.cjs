@@ -59,7 +59,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.equal(normalize(await page.locator('#gm-code .worksheet-text').textContent()),normalize(await printed.evaluate(()=>{const box=document.createElement('div');box.innerHTML=PRINT_MATERIALS.summary('p7','code');return box.textContent;})),'final password shows the printed ordering card');
  for(const id of ['code','finale'])assert.equal(await page.locator('#gm-'+id+' [data-target^="stage-"]').count(),0,'no duplicate story panel');
  const guideText=await printed.locator('#rodicovsky-navod').innerText();
- assert.match(guideText,/plnohodnotne hrateľná aj na čiernobielych listoch/);assert.match(guideText,/chladničke/);assert.equal(await printed.locator('.guide-hint').count(),7);assert.match(await printed.evaluate(()=>PRINT_MATERIALS.stageSolution('maze',true)),/7294 → CHLADNIČKA/);
+ assert.match(guideText,/plnohodnotne hrateľná aj na čiernobielych listoch/);assert.match(guideText,/chladničke/);assert.equal(await printed.locator('.guide-hint').count(),0);assert.match(await printed.evaluate(()=>PRINT_MATERIALS.stageSolution('maze',true)),/7294 → CHLADNIČKA/);
  assert.deepEqual(await printed.locator('.guide-intro h3').allTextContents(),['1. Vytlačte','2. Ukryte','3. Otvorte rodičovský portál','4. Hra sa môže začať!']);assert.match(await printed.locator('.guide-tools').innerText(),/Deti potrebujú:[\s\S]*nožnice[\s\S]*ceruzku[\s\S]*pastelku[\s\S]*telefón/);
  assert.equal(await page.locator('#gm-intro video').count(),0,'intro uses a video button');
  assert.ok(await page.locator('#gm-intro .video-message-button svg').isVisible());
