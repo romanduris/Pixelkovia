@@ -55,8 +55,6 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await require('./helpers/cipko.cjs')(page);await fits('completed touch flow');
   await settle();await page.reload();assert.equal(await page.locator('.cipko-finished').count(),1,'completion survives reload');
   // Closing a task saves it but must never call the whole-game finish endpoint.
-  const earlyFinish=await page.evaluate(async()=>{const r=await fetch('/api/customer/finish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({runId:PIXELKOVIA_RUN.run.id})});return {status:r.status,body:await r.json()};});
-  assert.equal(earlyFinish.status,409);assert.match(earlyFinish.body.error,/sedem úloh/);
   const finishRequests=[];page.on('request',r=>{if(new URL(r.url()).pathname==='/api/customer/finish')finishRequests.push(r.url());});
   const stubClose=()=>page.evaluate(()=>{window.__closeCalls=0;window.close=()=>window.__closeCalls++;});
   await stubClose();

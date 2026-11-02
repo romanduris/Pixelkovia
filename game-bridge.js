@@ -20,7 +20,9 @@
     }
   };
   window.PIXELKOVIA_FINISH=async()=>{
-    await window.PIXELKOVIA_SAVE();await post('finish',{});location.assign('/Supervisor#hodnotenie');
+    // A missing task record or failed telemetry sync must not block the finale.
+    try{await window.PIXELKOVIA_SAVE();}catch{}
+    await post('finish',{});location.assign('/Supervisor#hodnotenie');
   };
   setInterval(()=>{if(document.visibilityState==='visible')flush().catch(()=>{});},20000);
   window.addEventListener('online',()=>flush().catch(()=>{}));

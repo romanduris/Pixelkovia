@@ -7,6 +7,8 @@ Jediná aktívna aplikácia: **https://pixelkovia.rodulab.com**.
 - `/hra`: pôvodná hra so siedmimi nezmenenými úlohami. QR odkazy smerujú sem s parametrom `signal`.
 - `/admin`: produktová administrácia, objednávky, priebeh hrania a hodnotenia. `/admin/storyboard` vyžaduje to isté administrátorské prihlásenie.
 
+Tlačidlo „Koniec hry“ v závere uloží ukončenie a otvorí hodnotenie v rodičovskom portáli aj pri chýbajúcom zázname úlohy alebo chybe synchronizácie. Počet vyriešených úloh vychádza zo skutočne uložených záznamov; ukončenie nedopĺňa chýbajúce riešenia. Chyba samotného ukončenia ponechá možnosť skúsiť ho znova. Zatvorenie okna po jednotlivej úlohe iba uloží postup. Autorizácia nákupu a herného telefónu zostáva povinná.
+
 ## Zostavenie a nasadenie
 
 Node.js 24+, Python s `pypdf`; závislosti backendu sú pripnuté v `admin/package-lock.json`.
@@ -46,6 +48,8 @@ PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/supervisor-mobile.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/supervisor-mobile.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/customer-journey.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/finale-recovery.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/finale-recovery.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/checkout-payment.test.cjs
 node tests/books-content.test.cjs
@@ -57,6 +61,8 @@ node tests/paper-puzzles.test.cjs
 Mobilný test portálu overuje dotykové ovládanie pri 320/360/390/430 px, desktop pri 1280 px, rozbalenie úkrytov a vysvetlenia telefónu, individuálne aj spoločné potvrdenie, obnovu po chybe ukladania a prepnutie medzi dvoma nákupmi s rovnakým e-mailom.
 
 Predvolené testy používajú Chromium; `QA_BROWSER=webkit` volí WebKit. Dňa 28. 10. 2026 prešla celá cesta aj platobné scenáre v oboch prehliadačoch. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Checkout kontroluje šírky 360, 390, 430 a 1360 px, ceny, návrat k objednávke a chybové stavy s riadenou náhradou Stripe SDK. Testy nevytvárajú produkčných zákazníkov ani platby; neoverujú fyzické zariadenie, banku ani doručenie skutočného e-mailu. Prístupové údaje fixture zostávajú v testovacom procese.
+
+Dňa 2. 11. 2026 v Chromium prešli `customer-journey`, `finale-recovery`, `cipko-mobile-fit` a `supervisor-mobile`, vrátane mobilných obrazoviek a výpadkov pri ukončení hry. Opätovné overenie vo WebKit 27.2 (Playwright 1.64.1) v tomto Codespace zablokoval pád stránky, reprodukovaný aj na `data:text/html,<h1>ok</h1>` bez kódu aplikácie. Tieto kontroly preto nepotvrdzujú aktuálny výsledok na iPhone/Safari.
 
 ## QR a tlač
 

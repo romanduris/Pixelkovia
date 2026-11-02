@@ -2,6 +2,7 @@
 dist/
 # Cloudflare CLI cache, never deployment source
 .wrangler/
+.build-check/
 
 .projects/cache
 .projects/vault

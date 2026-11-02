@@ -76,11 +76,10 @@ export async function gameEvent(db,run,input,at=Date.now()){
   if(duplicate){if(duplicate.run_id!==run.id||duplicate.request_hash!==fingerprint)throw new HttpError(409,'Konflikt kľúča udalosti.');return {duplicate:true,accepted:duplicate.type==='solved',completed:duplicate.type==='completed'?true:undefined,hint:duplicate.type==='hint'?stages[duplicate.stage-1].hints[JSON.parse(duplicate.metadata).hintIndex]:undefined,run:await publicRun(db,run.id)};}
   if(run.status!=='active')throw new HttpError(409,'Táto relácia už nie je aktívna.');
   if(type==='complete'){
-    const count=await first(db,'SELECT COUNT(*) count FROM game_stage_progress WHERE run_id=? AND completed_at IS NOT NULL',run.id);
-    if(count.count!==stages.length)throw new HttpError(409,'Najskôr vyriešte všetkých sedem úloh.');
+    // Ending the finale completes the run, not any missing task records.
     const result=await db.batch([
-      statement(db,"INSERT INTO game_events SELECT ?,id,NULL,'completed',?,?,'{}' FROM game_runs WHERE id=? AND status='active' AND current_stage=8",eventId,at,fingerprint,run.id),
-      statement(db,"UPDATE game_runs SET status='completed',completed_at=?,last_at=? WHERE id=? AND EXISTS(SELECT 1 FROM game_events WHERE id=?)",at,at,run.id,eventId),
+      statement(db,"INSERT INTO game_events SELECT ?,id,NULL,'completed',?,?,'{}' FROM game_runs WHERE id=? AND status='active'",eventId,at,fingerprint,run.id),
+      statement(db,"UPDATE game_runs SET status='completed',current_stage=8,completed_at=?,last_at=? WHERE id=? AND EXISTS(SELECT 1 FROM game_events WHERE id=?)",at,at,run.id,eventId),
       statement(db,'UPDATE entitlements SET expires_at=CASE WHEN first_completed_at IS NULL THEN NULL ELSE expires_at END,first_completed_at=COALESCE(first_completed_at,?),replay_until=COALESCE(replay_until,?) WHERE id=? AND EXISTS(SELECT 1 FROM game_events WHERE id=?)',at,at+DAY,run.entitlement_id,eventId)
     ]);
     if(!result[0].meta.changes)throw new HttpError(409,'Relácia sa medzičasom zmenila.');
