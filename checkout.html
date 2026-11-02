@@ -26,10 +26,10 @@
     <form id="checkout-form" class="checkout-layout" autocomplete="on" novalidate>
       <div class="checkout-content">
         <section class="checkout-panel base-product" aria-labelledby="base-heading">
-          <div class="base-labels"><span class="checkout-step">01 / VAŠA HRA</span><span class="launch-badge">Early Access</span></div>
-          <div class="base-product-heading"><img src="assets/sales/characters/piko.webp" width="64" height="64" alt="Piko, modrý sprievodca hrou"><div><h2 id="base-heading">Hra Pixelkovia – Stratený signál</h2><p>Rodinné dobrodružstvo na doma</p><strong data-base-price>14,99 €</strong><small class="planned-price">Štandardná cena: <s data-planned-price>29,99 €</s></small></div></div>
+          <div class="base-labels"><span class="checkout-step">01 / VAŠA HRA</span><span class="launch-badge">Uvádzacia cena</span></div>
+          <div class="base-product-heading"><img src="assets/sales/characters/piko.webp" width="64" height="64" alt="Piko, modrý sprievodca hrou"><div><h2 id="base-heading">Hra Pixelkovia – Stratený signál</h2><p>Rodinné dobrodružstvo na doma</p><strong data-base-price>14,99 €</strong></div></div>
           <ul><li>7 záhad · 45–60 minút spoločnej zábavy</li><li>Videá, hlasové správy a materiály na vytlačenie</li></ul>
-          <p class="early-access-note"><strong>Prvá vlna Pixelkov je otvorená.</strong> Získajte kompletné dobrodružstvo za zvýhodnenú cenu.</p>
+          <p class="early-access-note"><strong>Príprava do 5 minút.</strong> Jeden nákup na jedno spoločné hranie. Atlas Pixelkov máte k hre zdarma.</p>
         </section>
         <section class="checkout-panel details-panel" aria-labelledby="details-heading">
           <label id="details-heading" class="field-label" for="customer-email">Kam vám pošleme dobrodružstvo?</label>
@@ -44,18 +44,16 @@
         </section>
       </div>
       <aside class="checkout-summary" aria-labelledby="summary-heading"><div class="summary-inner">
-        <div class="base-labels"><span class="checkout-step">SÚHRN OBJEDNÁVKY</span><span class="summary-access">Early Access</span></div><h2 id="summary-heading">Vaše dobrodružstvo</h2>
+        <div class="base-labels"><span class="checkout-step">SÚHRN OBJEDNÁVKY</span><span class="summary-access">Uvádzacia cena</span></div><h2 id="summary-heading">Vaše dobrodružstvo</h2>
         <p id="returned-order-items" class="returned-order-items" hidden></p>
         <div class="summary-items">
           <div class="summary-row summary-base"><span>Rodinná hra Pixelkovia</span><strong data-summary-base-price>14,99 €</strong></div><div id="summary-books"></div><div id="summary-additional-game" class="summary-row" hidden><span>Darčeková hra pre ďalšiu rodinu</span><strong></strong></div>
           <div class="summary-row gift-row"><span>Atlas Pixelkov</span><strong>ZDARMA</strong></div>
         </div>
-        <div class="summary-total"><span>Celkom<small class="summary-price-note">Early Access · bez predplatného</small></span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div>
-        <details id="price-calculation" class="price-calculation">
-          <summary><span id="summary-saving-label">Zvýhodnenie oproti štandardným cenám:</span><span class="saving-amount"><strong id="summary-saving">17,99 €</strong><span class="calculation-arrow" aria-hidden="true"></span></span><span class="visually-hidden">Ako sa vypočítala cena?</span></summary>
+        <div class="summary-total"><span>Celkom<small class="summary-price-note">Uvádzacia cena · bez predplatného</small></span><strong id="order-total" aria-live="polite" aria-atomic="true">14,99 €</strong></div>
+        <details id="price-calculation" class="price-calculation" hidden>
+          <summary><span id="summary-saving-label">Zľavy na vybrané doplnky:</span><span class="saving-amount"><strong id="summary-saving">0,00 €</strong><span class="calculation-arrow" aria-hidden="true"></span></span><span class="visually-hidden">Ako sa vypočítala cena?</span></summary>
           <div class="calculation-content">
-            <div id="summary-early-discount" class="summary-discount"><span>Zľava Early Access</span><strong>−15,00 €</strong></div>
-            <div id="summary-atlas-discount" class="summary-discount"><span>Zľava na Atlas Pixelkov</span><strong>−2,99 €</strong></div>
             <div id="summary-gift-discount" class="summary-discount" hidden><span>Zľava z druhej hry</span><strong></strong></div>
             <div id="summary-discount" class="summary-discount" hidden></div>
           </div>
@@ -63,7 +61,7 @@
         <div id="summary-voucher" class="summary-discount" role="status" aria-live="polite" aria-atomic="true" hidden></div>
         <button class="checkout-buy" type="button" disabled aria-describedby="payment-note">Pokračovať k platbe <span aria-hidden="true">→</span></button>
         <button class="checkout-voucher-link" id="voucher-open" type="button" aria-haspopup="dialog" aria-controls="voucher-dialog">Mám zľavový kód</button>
-        <p class="payment-note" id="payment-note"><strong>Platby zatiaľ nie sú spustené.</strong> Objednávka ani platba nevznikne a e-mail sa neodošle.</p>
+        <p class="payment-note" id="payment-note">Overujeme dostupnosť bezpečnej platby…</p>
         <section id="payment-panel" class="embedded-payment" hidden aria-labelledby="payment-heading"><h2 id="payment-heading">Bezpečná platba</h2><p class="payment-method-note">Zabezpečená platba kartou</p><div id="express-checkout-slot"></div><p id="wallet-separator" class="wallet-separator" hidden>alebo zaplaťte kartou</p><div id="payment-slot"></div><button id="stripe-pay" class="stripe-pay" type="button" hidden disabled>Zaplatiť</button><p id="payment-status" role="status" aria-live="polite" aria-atomic="true"></p><button id="check-payment" class="btn secondary" type="button" hidden>Overiť stav pôvodnej platby</button><button id="retry-payment" class="btn secondary" type="button" hidden>Skúsiť znova v pôvodnej relácii</button><button id="new-order" class="btn secondary" type="button" hidden>Vytvoriť ďalšiu samostatnú objednávku</button><button id="change-order" class="btn secondary" type="button">Upraviť objednávku</button></section>
         <div class="checkout-guarantee"><span aria-hidden="true">14</span><p><strong>Bezpečná platba · 14-dňová garancia spokojnosti</strong><a href="index.html#garancia">Podmienky vrátenia peňazí →</a></p></div>
       </div></aside>

@@ -34,7 +34,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url())});
    await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"progressVersion":2,"stage":3,"started":true}'));
    await page.goto(BASE+'/');await page.evaluate(()=>document.fonts.ready);
-   assert.equal(await page.locator('#app>section').count(),10);assert.equal(await page.locator('.faq-item').count(),19);
+   assert.equal(await page.locator('#app>section').count(),11);assert.equal(await page.locator('.faq-item').count(),19);
    assert.equal(await page.locator('.character-card').count(),7);
    assert.equal(await page.locator('.evidence-screen img[src="assets/sales/game-lock-partial.webp"]').count(),1);
    assert.equal(await page.locator('.bonus-book-art .book-cover-title').count(),1);
@@ -76,7 +76,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await require('./helpers/book-offer.cjs').previews(page);
    await page.locator('.funnel-hero .funnel-cta').click();await page.waitForURL(url=>/\/checkout(?:\.html)?$/.test(url.pathname));
    await page.locator('#book-options input').first().waitFor();
-   assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('#payment-note').innerText(),/Platby ešte pripravujeme/);
+   assert.ok(await page.locator('.checkout-buy').isDisabled());assert.match(await page.locator('#payment-note').innerText(),/Platby teraz nie sú dostupné/);
    assert.equal(await page.locator('.checkout-intro,.checkout-status').count(),0);
    assert.equal(await page.locator('#order-total').innerText(),'14,99 €');
    await require('./helpers/book-offer.cjs').checkout(page);
