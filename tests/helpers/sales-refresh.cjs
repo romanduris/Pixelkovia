@@ -16,26 +16,25 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  const response=await page.request.get(new URL(await icon.getAttribute('href'),page.url()).href);
  assert.equal(response.status(),200);assert.equal((await response.body()).subarray(1,4).toString(),'PNG');
  const gallery=page.locator('[data-review-gallery]'),track=gallery.locator('[data-gallery-track]');
- assert.equal(await gallery.locator('.review-card').count(),10);
- assert.equal(await gallery.locator('.review-stars').count(),10);
+ assert.equal(await gallery.locator('.review-card').count(),5);
+ assert.equal(await gallery.locator('.review-stars').count(),5);
  const ratings=await gallery.locator('.review-stars').allTextContents();
- assert.equal(ratings.filter(text=>text==='★★★★★').length,8);
- assert.equal(ratings.filter(text=>text==='★★★★☆').length,2);
+ assert.deepEqual(ratings,Array(5).fill('★★★★★'));
  assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.getAttribute('aria-label').includes(`${[...el.textContent].filter(c=>c==='★').length} z 5`))),true);
- assert.equal(await gallery.locator('.review-example').evaluateAll(nodes=>nodes.every(el=>el.textContent.includes('Ilustračné hodnotenie'))),true);
- assert.match(await page.locator('#hodnotenia .funnel-section-heading').innerText(),/Nejde o skutočné ani overené recenzie/);
- assert.equal(await page.locator('[itemtype*="Review"],[itemtype*="AggregateRating"],script[type="application/ld+json"]').count(),0,'examples are not structured customer ratings');
+ assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia · 5/5','Adam K. · 5/5','Jana · 5/5','Zuzana · 5/5','Martin · 5/5']);
+ assert.doesNotMatch(await page.locator('#hodnotenia').innerText(),/ilustračné|ukážkové/i);
+ assert.equal(await page.locator('[itemtype*="Review"],[itemtype*="AggregateRating"],script[type="application/ld+json"]').count(),0,'review cards do not add aggregate metadata');
  await page.emulateMedia({reducedMotion:'reduce'});
  const settled=async index=>page.waitForFunction(index=>{
   const track=document.querySelector('#review-gallery-track'),slides=[...track.children];
   const target=Math.min(slides[index].offsetLeft-slides[0].offsetLeft,track.scrollWidth-track.clientWidth);
-  return Math.abs(track.scrollLeft-target)<2&&document.querySelector('.review-counter').textContent===`${index+1} / 10`;
+  return Math.abs(track.scrollLeft-target)<2&&document.querySelector('.review-counter').textContent===`${index+1} / ${slides.length}`;
  },index);
  await track.scrollIntoViewIfNeeded();
  await gallery.locator('[data-gallery-next]').click();await settled(1);
- await track.focus();await page.keyboard.press('End');await settled(9);
+ await track.focus();await page.keyboard.press('End');await settled(4);
  assert.equal(await gallery.locator('[data-gallery-next]').getAttribute('aria-disabled'),'true');
- await gallery.locator('[data-gallery-prev]').click();await settled(8);
+ await gallery.locator('[data-gallery-prev]').click();await settled(3);
  await track.focus();await page.keyboard.press('Home');await settled(0);
  if(swipe){
   await track.scrollIntoViewIfNeeded();

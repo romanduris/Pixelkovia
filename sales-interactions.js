@@ -17,7 +17,7 @@
       previous.setAttribute('aria-disabled',String(index===0));next.setAttribute('aria-disabled',String(index===slides.length-1));
       const reviews=gallery.hasAttribute('data-review-gallery');
       status.textContent=reviews?`${index+1} / ${slides.length}`:`Obrázok ${index+1} z ${slides.length}`;
-      if(reviews)status.setAttribute('aria-label',`Ukážkové hodnotenie ${index+1} z ${slides.length}`);
+      if(reviews)status.setAttribute('aria-label',`Hodnotenie ${index+1} z ${slides.length}`);
     };
     const go=index=>track.scrollTo({left:positions()[Math.max(0,Math.min(slides.length-1,index))],behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});
     previous.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));

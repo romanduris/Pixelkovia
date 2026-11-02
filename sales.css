@@ -117,7 +117,7 @@ body[data-environment="sales"]>.site-footer{max-width:1320px;padding:22px 56px;b
 .review-card:last-child{scroll-snap-align:end}
 .review-stars{font-size:22px;letter-spacing:4px;color:#edcf8c;line-height:1.4}
 .review-card blockquote{margin:19px 0 24px;flex:1}.funnel-section .review-card blockquote p{font-size:18px;line-height:1.8;color:#e4ebe7;margin:0}
-.funnel-section .review-example{font-size:11px;line-height:1.6;color:#a9bccb;margin:0}
+.funnel-section .review-author{font-size:14px;font-weight:650;line-height:1.6;color:#b5dfcf;margin:0}
 .review-counter{font:12px/1.5 Manrope,sans-serif;color:#bedccb;min-width:62px;text-align:center}
 .review-gallery-track:focus-visible{outline:2px solid #cab5f4;outline-offset:3px}
 @media(max-width:700px){
