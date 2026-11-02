@@ -1,7 +1,7 @@
 /* Four touch games. Progress lives inside the existing saved team adventure. */
 (() => {
   const titles=['Rozsvieť pixely po poradí','Poskladaj obrázok','Nájdi dvojice','Rozsvieť cestu'];
-  const instructions=['Ťukaj na čísla od 1 do 16. Nájdeš ich všetky v správnom poradí?','Poskladaj deväť dielikov podľa malého obrázka. Dielik potiahni, alebo naň ťukni a vyber miesto.','Otáčaj kartičky a nájdi šesť rovnakých dvojíc.','Otáčaj dieliky potrubia. Vytvor neprerušenú cestu od VSTUPU až k JADRU.'];
+  const instructions=['Ťukaj na čísla od 1 do 16. Nájdeš ich všetky v správnom poradí?','Poskladaj 12 dielikov podľa vzoru. Dielik potiahni alebo naň ťukni a vyber miesto.','Otáčaj kartičky a nájdi šesť rovnakých dvojíc.','Otáčaj dieliky potrubia. Vytvor neprerušenú cestu od VSTUPU až k JADRU.'];
   const faces=['☀','★','☾','◆','♥','✚','☾','♥','☀','✚','★','◆'];
   const pixelOrder=[9,3,14,6,1,12,7,16,10,5,2,13,4,15,11,8];
   // A single winding route visits all nine tiles; turns are relative to an up/right elbow.
@@ -9,13 +9,20 @@
   const pipeStart=[1,0,2,2,1,0,2,1,0];
   function data(state){
     if(!state.cipko||state.cipko.version!==2){
-      state.cipko={version:2,round:0,won:false,pixels:[],tiles:Array(9).fill(null),selected:null,matched:[],open:[],turns:[...pipeStart]};
+      state.cipko={version:2,round:0,won:false,pixels:[],tiles:Array(12).fill(null),selected:null,matched:[],open:[],turns:[...pipeStart]};
     }
-    return state.cipko;
+    // The new picture has different cuts: preserve the other rounds and rewards.
+    const c=state.cipko;
+    if(c.tiles.length!==12){
+      const solved=c.round>1||(c.round===1&&c.won);
+      c.tiles=Array.from({length:12},(_,i)=>solved?i:null);c.selected=null;
+      if(c.round===1&&!c.won)c.notice='';
+    }
+    return c;
   }
   const button=(kind,index,content,attrs='')=>`<button type="button" data-action="cipko" data-kind="${kind}" data-index="${index}" ${attrs}>${content}</button>`;
   function digitsHTML(c){return `<ol class="cipko-digits" aria-label="Získané číslice">${GAME.cipkoPuzzle.digits.map((n,i)=>`<li><small>${i+1}. hra</small><strong>${i<c.round||(i===c.round&&c.won)?n:'·'}</strong></li>`).join('')}</ol>`;}
-  const piece=(i)=>`<span class="cipko-piece" style="--piece-x:${i%3*50}%;--piece-y:${Math.floor(i/3)*50}%" aria-hidden="true"></span>`;
+  const piece=(i)=>`<span class="cipko-piece" style="--piece-x:${(i%3+.5)*100/3}%;--piece-y:${Math.floor(i/3)*100/3}%" aria-hidden="true"></span>`;
   function pipe(c){
     return `<div class="cipko-pipe-board"><div class="cipko-port cipko-inlet"><span>VSTUP →</span><i></i></div><div class="cipko-port cipko-outlet"><span>VÝSTUP →<br>JADRO</span><i></i></div><div class="cipko-pipes">${c.turns.map((rotation,i)=>{
       const svg=`<svg viewBox="0 0 80 80" aria-hidden="true"><path d="${pipeElbows.has(i)?'M40 0V40H80':'M0 40H80'}" transform="rotate(${rotation*90} 40 40)"/></svg>`;
@@ -28,10 +35,10 @@
     if(c.won)return `${digitsHTML(c)}<div class="cipko-win" role="status"><span>✓ ${titles[r]}</span><h1 tabindex="-1">Podarilo sa!</h1><p>Zapíš si do ${r+1}. políčka na papieri číslicu:</p><strong class="cipko-prize">${GAME.cipkoPuzzle.digits[r]}</strong><p>Číslica tu zostane uložená.</p>${button('next',0,'Ďalšia hra →','class="btn"')}</div>`;
     let board='';
     if(r===0)board=`<div class="cipko-pixels">${pixelOrder.map(value=>button('pixel',value,c.pixels.includes(value)?'✓':value,`class="cipko-pixel ${c.pixels.includes(value)?'collected':''}" aria-label="Pixel ${value}" ${c.pixels.includes(value)?'disabled':''}`)).join('')}</div><p class="cipko-status" role="status">${c.notice||`Hľadaj číslo ${c.pixels.length+1}.`} Rozsvietené: ${c.pixels.length} / 16</p>`;
-    if(r===1)board=`<div class="cipko-puzzle-layout"><div class="cipko-jigsaw"><img class="cipko-reference" src="assets/characters/cipko.png" alt="Takto vyzerá hotový obrázok"><div class="cipko-slots">${c.tiles.map((v,i)=>button('slot',i,v===null?`<span>${i+1}</span>`:piece(v),`class="cipko-slot ${v===null?'':'placed'}" aria-label="Miesto ${i+1}${v===null?'':', správne vyplnené'}" ${v===null?'':'disabled'}`)).join('')}</div></div><div class="cipko-tray" aria-label="Dieliky obrázka">${[7,2,4,0,8,3,6,1,5].filter(i=>!c.tiles.includes(i)).map(i=>button('select',i,piece(i),`draggable="true" class="cipko-tile ${c.selected===i?'selected':''}" aria-pressed="${c.selected===i}" aria-label="Vybrať dielik ${i+1}"`)).join('')}</div></div><p class="cipko-status" role="status">${c.notice||'Vyber dielik a jeho miesto.'}</p>`;
+    if(r===1)board=`<div class="cipko-puzzle-layout"><div class="cipko-jigsaw"><div class="cipko-slots">${c.tiles.map((v,i)=>button('slot',i,v===null?`<span>${i+1}</span>`:piece(v),`class="cipko-slot ${v===null?'':'placed'}" aria-label="Miesto ${i+1}${v===null?'':', správne vyplnené'}" ${v===null?'':'disabled'}`)).join('')}</div></div><div class="cipko-tray" aria-label="Dieliky obrázka">${[7,11,2,4,0,8,3,10,6,1,9,5].filter(i=>!c.tiles.includes(i)).map(i=>button('select',i,piece(i),`draggable="true" class="cipko-tile ${c.selected===i?'selected':''}" aria-pressed="${c.selected===i}" aria-label="Vybrať dielik ${i+1}"`)).join('')}</div></div><p class="cipko-status" role="status">${c.notice||'Vyber dielik a jeho miesto.'}</p>`;
     if(r===2)board=`<div class="cipko-memory">${faces.map((face,i)=>{const match=c.matched.includes(i),show=match||c.open.includes(i);return button('card',i,show?face:'?',`class="cipko-card ${match?'matched':''} ${show?'flipped':''}" aria-label="Karta ${i+1}: ${show?face:'otočiť'}" ${match?'disabled':''}`);}).join('')}</div><p class="cipko-status" role="status">${c.open.length===2?'Tieto dve sú rozdielne. Vyber ďalšiu kartičku.':`Nájdené dvojice: ${c.matched.length/2} / 6`}</p>`;
     if(r===3)board=pipe(c);
-    return `<p class="cipko-round">HRA ${r+1} ZO 4</p><h1 tabindex="-1">${titles[r]}</h1><p class="cipko-instruction">${instructions[r]}</p>${board}${digitsHTML(c)}`;
+    return `<p class="cipko-round">HRA ${r+1} ZO 4</p><h1 tabindex="-1">${titles[r]}</h1><div class="cipko-instruction-row"><p class="cipko-instruction">${instructions[r]}</p>${r===1?'<img class="cipko-reference" src="assets/characters/cipko.png" alt="Takto vyzerá hotový obrázok">':''}</div>${board}${digitsHTML(c)}`;
   }
   function act(state,kind,index){
     const c=data(state);if(c.round>=4)return;
@@ -43,7 +50,7 @@
       c.won=c.pixels.length===16;
     }
     if(c.round===1){
-      if(kind==='select'&&Number.isInteger(index)&&index>=0&&index<9&&!c.tiles.includes(index)){c.selected=index;c.notice='Teraz vyber miesto v obrázku.';}
+      if(kind==='select'&&Number.isInteger(index)&&index>=0&&index<12&&!c.tiles.includes(index)){c.selected=index;c.notice='Teraz vyber miesto v obrázku.';}
       if(kind==='slot'&&c.tiles[index]===null&&c.selected!==null){if(index===c.selected){c.tiles[index]=c.selected;c.selected=null;c.notice='Dielik zapadol! Vyber ďalší.';}else c.notice='Sem ešte nepasuje. Skús iné miesto.';}
       c.won=c.tiles.every((v,i)=>v===i);
     }

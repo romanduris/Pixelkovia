@@ -6,8 +6,9 @@ module.exports=async function solveCipko(page,{touch=true}={}){
  await use('pixel',16);assert.match(await page.locator('.cipko-status').innerText(),/Najprv nájdi/);
  for(let i=1;i<=16;i++)if(!await page.locator(`[data-kind="pixel"][data-index="${i}"]`).isDisabled())await use('pixel',i);
  await next(7);
+ assert.equal(await page.locator('.cipko-slot').count(),12);assert.equal(await page.locator('.cipko-tile').count(),12);
  await use('select',0);await use('slot',1);assert.match(await page.locator('.cipko-status').innerText(),/nepasuje/);
- for(let i=0;i<9;i++)if(!await page.locator(`[data-kind="slot"][data-index="${i}"]`).isDisabled()){await use('select',i);await use('slot',i);}
+ for(let i=0;i<12;i++)if(!await page.locator(`[data-kind="slot"][data-index="${i}"]`).isDisabled()){await use('select',i);await use('slot',i);}
  await next(2);
  await use('card',0);await use('card',1);assert.match(await page.locator('.cipko-status').innerText(),/rozdielne/);
  for(const pair of [[0,8],[1,10],[2,6],[3,11],[4,7],[5,9]])for(const i of pair)await use('card',i);
