@@ -8,7 +8,7 @@
 .parent-guide{font:12px/1.4 Arial,sans-serif;color:#142840;background:#fff;padding:28px;min-height:0;border-top:4px solid #35547d;print-color-adjust:exact;-webkit-print-color-adjust:exact}
 .parent-guide .guide-heading{max-width:none;margin:0 0 13px;padding:0 0 13px;border-bottom:2px solid #35547d;display:flex;align-items:center;justify-content:space-between;gap:15px}
 .parent-guide .label{font:9px/1.3 monospace;letter-spacing:1px;color:#334d70}
-.parent-guide h2{font:800 25px/1.15 monospace;letter-spacing:-.8px;margin:7px 0;color:#172e4d}
+.parent-guide h2{font:800 23px/1.15 monospace;letter-spacing:-.8px;margin:7px 0;color:#172e4d}
 .parent-guide .guide-heading p{margin:0;font-size:11px;color:#334d70}
 .guide-stamp{flex-shrink:0;text-align:center;border:1px solid #9aaec6;padding:8px;color:#35547d;font:8px/1.5 monospace;letter-spacing:.7px;background:#f5f8fc}
 .guide-stamp strong{display:block;font-size:21px;letter-spacing:3px}
@@ -41,7 +41,7 @@
   .parent-guide{width:186mm;min-height:266mm;padding:0;border:0;font-size:8pt;line-height:1.3}
   .parent-guide .guide-heading{display:flex;margin-bottom:2mm;padding-bottom:2mm;gap:3mm}
   .parent-guide .label{font-size:6pt;letter-spacing:.6pt}
-  .parent-guide h2{font-size:18pt;margin:1.5mm 0}
+  .parent-guide h2{font-size:17pt;margin:1.5mm 0}
   .parent-guide .guide-heading p{font-size:7pt}
   .guide-stamp{padding:1mm 3mm;font-size:6pt;line-height:1.2}.guide-stamp strong{font-size:15pt}.guide-stamp span{font-size:4.5pt}
   .parent-guide h3{font-size:8.5pt;margin-bottom:1.5mm}
@@ -595,10 +595,10 @@
 .parent-guide .guide-intro{display:grid;grid-template-columns:minmax(0,1fr) 180px;column-gap:24px;row-gap:8px;margin:0 0 12px}
 .parent-guide .guide-intro>section{grid-column:1;position:relative;min-width:0;border:0;background:white;padding:4px 8px 8px 44px}
 .parent-guide .guide-intro>section::before{content:"";position:absolute;left:15px;top:32px;bottom:-12px;border-left:1px solid #b8d3cd}
-.parent-guide .guide-intro h3{font:700 16px/1.4 Arial,sans-serif;display:flex;align-items:center;gap:7px;margin:0 0 4px}
+.parent-guide .guide-intro h3{font:700 15px/1.4 Arial,sans-serif;display:flex;align-items:center;gap:7px;margin:0 0 4px}
 .parent-guide .guide-intro h3>span{position:absolute;left:0;top:2px;display:grid;place-items:center;box-sizing:border-box;width:32px;height:32px;border:1px solid #96bcb2;border-radius:8px;background:#eff7f4;color:#234c49;font:700 18px/1 monospace}
 .guide-prep-icon{width:19px;height:19px;flex:none;fill:none;stroke:#3b726c;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.parent-guide .guide-intro p{font-size:14px;line-height:1.45;margin:0}
+.parent-guide .guide-intro p{font-size:13px;line-height:1.45;margin:0}
 .parent-guide .guide-credentials{margin-top:5px!important}
 .parent-guide .guide-ready{border-radius:7px;background:#eef7f1!important}
 .parent-guide .guide-ready::before{display:none}
@@ -608,13 +608,13 @@
 .guide-portal-qr figcaption{font:10px/1.5 Arial,sans-serif;margin-top:5px;overflow-wrap:anywhere}
 .guide-portal-qr a{color:#172e4d;text-underline-offset:2px}
 .parent-guide .guide-tools{padding:6px 0;margin:0 0 12px;background:white;border:0;border-top:1px solid #d6e3e0}
-.parent-guide .guide-tools p{margin:0;font-size:14px;line-height:1.45}
+.parent-guide .guide-tools p{margin:0;font-size:13px;line-height:1.45}
 @media screen and (max-width:600px){
  .parent-guide .guide-intro{grid-template-columns:minmax(0,1fr);row-gap:12px}
  .parent-guide .guide-intro>section{padding-left:44px}
- .parent-guide .guide-intro h3{font-size:17px;align-items:center}
+ .parent-guide .guide-intro h3{font-size:16px;align-items:center}
  .parent-guide .guide-intro h3>span{top:1px}
- .parent-guide .guide-intro p,.parent-guide .guide-tools p{font-size:16px;line-height:1.5}
+ .parent-guide .guide-intro p,.parent-guide .guide-tools p{font-size:15px;line-height:1.5}
  .guide-portal-qr{position:relative;grid-column:1;grid-row:auto;justify-self:start;margin:-8px 0 0 44px;padding:0 0 8px;border:0;text-align:left}
  .guide-portal-qr>strong{display:none}
  .guide-portal-qr img{width:140px;height:140px;margin:0}
@@ -625,17 +625,17 @@
  .parent-guide .guide-intro{grid-template-columns:minmax(0,1fr) 43mm;column-gap:4mm;row-gap:1mm;margin-bottom:2mm}
  .parent-guide .guide-intro>section{padding:.6mm 1mm 1mm 10mm}
  .parent-guide .guide-intro>section::before{left:3.5mm;top:7.5mm;bottom:-2mm}
- .parent-guide .guide-intro h3{font-size:11pt;gap:1.5mm;margin-bottom:1mm}
+ .parent-guide .guide-intro h3{font-size:10.5pt;gap:1.5mm;margin-bottom:1mm}
  .parent-guide .guide-intro h3>span{top:.3mm;width:7mm;height:7mm;border-radius:1.5mm;font-size:13pt}
  .guide-prep-icon{width:4.5mm;height:4.5mm}
- .parent-guide .guide-intro p{font-size:9.5pt;line-height:1.4}
+ .parent-guide .guide-intro p{font-size:9pt;line-height:1.4}
  .parent-guide .guide-credentials{margin-top:1mm!important}
  .guide-portal-qr{padding:3mm 0 3mm 3mm}
  .guide-portal-qr>strong{font-size:9pt;margin-bottom:2mm}
  .guide-portal-qr img{width:32mm;height:32mm}
  .guide-portal-qr figcaption{font-size:7.5pt;line-height:1.4;margin-top:1mm}
  .parent-guide .guide-tools{padding:1.5mm 0;margin-bottom:2mm}
- .parent-guide .guide-tools p{font-size:9.5pt;line-height:1.4;margin:0}
+ .parent-guide .guide-tools p{font-size:9pt;line-height:1.4;margin:0}
 }
 
 /* A friendly, ink-light header and clear numbered hiding-place cards. */
@@ -644,11 +644,11 @@
 .parent-guide .guide-stage{border-color:#c2cfd9;border-left:3px solid #71a7a0;border-radius:8px;padding:12px}.parent-guide .guide-stage-heading{border-bottom:0;padding-bottom:0;margin-bottom:8px;gap:10px}
 .parent-guide .guide-step{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:36px;height:36px;line-height:1;background:#edf6f3;border:1px solid #90b5aa;border-radius:5px}.guide-step small{font:700 6px/1 Arial,sans-serif;letter-spacing:.3px}.guide-step b{font:800 20px/1 monospace}
 .parent-guide p.gm-solution{padding:6px 8px;margin:6px 0;background:#f0f5f7;border-radius:5px}.guide-answer-value{font-weight:700;color:#172e4d}.parent-guide .guide-reward{display:flex;align-items:center;gap:8px;margin-top:7px}.guide-reward b{display:inline-grid;place-items:center;min-width:23px;height:23px;border:1px solid #91b2a6;border-radius:4px;background:#eff7f2;color:#224b43;font:800 16px/1 monospace}
-@media screen and (max-width:600px){.parent-guide .guide-heading{padding:12px;gap:8px}.guide-piko{width:64px;height:80px}.parent-guide .guide-heading h2{font-size:21px}.parent-guide .guide-heading .label{font-size:8px;letter-spacing:.5px}}
-@media print{.parent-guide .guide-heading{padding:1.5mm 3mm;border-bottom-width:.8mm;border-radius:2.5mm;margin-bottom:2mm}.guide-piko{width:18mm;height:18mm}.parent-guide .guide-heading p{font-size:8pt;line-height:1.4}.parent-guide .guide-stage{padding:1.5mm;border-left-width:.8mm;border-radius:2mm}.parent-guide .guide-stage-heading{gap:2mm;margin-bottom:1mm}.parent-guide .guide-step{width:7mm;height:7mm;border-radius:1mm;gap:.5mm}.guide-step small{font-size:4.5pt}.guide-step b{font-size:12pt}.parent-guide .guide-stage-heading h3{font-size:10pt}.parent-guide .guide-setup,.parent-guide p.gm-solution,.parent-guide .guide-reward{font-size:9.5pt;line-height:1.4}.parent-guide p.gm-solution{padding:1mm 2mm;margin:1mm 0}.parent-guide .guide-reward{gap:2mm;margin-top:.8mm}.guide-reward b{min-width:5mm;height:5mm;font-size:12pt}.guide-column{gap:.6mm}}
+@media screen and (max-width:600px){.parent-guide .guide-heading{padding:12px;gap:8px}.guide-piko{width:64px;height:80px}.parent-guide .guide-heading h2{font-size:20px}.parent-guide .guide-heading .label{font-size:8px;letter-spacing:.5px}}
+@media print{.parent-guide .guide-heading{padding:1.5mm 3mm;border-bottom-width:.8mm;border-radius:2.5mm;margin-bottom:2mm}.guide-piko{width:18mm;height:18mm}.parent-guide .guide-heading p{font-size:8pt;line-height:1.4}.parent-guide .guide-stage{padding:1.5mm;border-left-width:.8mm;border-radius:2mm}.parent-guide .guide-stage-heading{gap:2mm;margin-bottom:1mm}.parent-guide .guide-step{width:7mm;height:7mm;border-radius:1mm;gap:.5mm}.guide-step small{font-size:4.5pt}.guide-step b{font-size:12pt}.parent-guide .guide-stage-heading h3{font-size:10pt}.parent-guide .guide-setup,.parent-guide p.gm-solution,.parent-guide .guide-reward{font-size:9pt;line-height:1.4}.parent-guide p.gm-solution{padding:1mm 2mm;margin:1mm 0}.parent-guide .guide-reward{gap:2mm;margin-top:.8mm}.guide-reward b{min-width:5mm;height:5mm;font-size:12pt}.guide-column{gap:.6mm}}
 
 .parent-guide .guide-opening-hint{font-size:11px;line-height:1.4;margin:6px 0 0}.guide-opening-hint strong{color:#234c71}.parent-guide .guide-opening{border-left-color:#8797bc}
-@media print{.parent-guide .guide-opening-hint{font-size:9.5pt;line-height:1.4;margin:1mm 0 0}}
+@media print{.parent-guide .guide-opening-hint{font-size:9pt;line-height:1.4;margin:1mm 0 0}}
 
 /* Task identification sits at the upper-left sheet edge, outside the title inset. */
 .miky-print-heading>.label,.worksheet-heading>.label{position:relative;left:-22px;top:-22px}
@@ -657,8 +657,8 @@
 
 /* Consistent type hierarchy across preparation and parent reference cards. */
 @media screen{
- .parent-guide .guide-setup,.parent-guide p.gm-solution,.parent-guide .guide-reward,.parent-guide .guide-opening-hint{font-size:14px;line-height:1.45}
- .parent-guide .guide-stage-heading h3{font-size:15px;line-height:1.4;margin:0}
+ .parent-guide .guide-setup,.parent-guide p.gm-solution,.parent-guide .guide-reward,.parent-guide .guide-opening-hint{font-size:13px;line-height:1.45}
+ .parent-guide .guide-stage-heading h3{font-size:14px;line-height:1.4;margin:0}
  .parent-guide .guide-section-label{font-size:10px;line-height:1.5;margin:14px 0 10px}
  .parent-guide .guide-step small{font-size:7px}
  .parent-guide .guide-setup{margin:0}
@@ -666,8 +666,8 @@
  .parent-guide .guide-opening-hint{margin-top:8px}
 }
 @media screen and (max-width:600px){
- .parent-guide .guide-setup,.parent-guide p.gm-solution,.parent-guide .guide-reward,.parent-guide .guide-opening-hint{font-size:16px;line-height:1.5}
- .parent-guide .guide-stage-heading h3{font-size:17px}
+ .parent-guide .guide-setup,.parent-guide p.gm-solution,.parent-guide .guide-reward,.parent-guide .guide-opening-hint{font-size:15px;line-height:1.5}
+ .parent-guide .guide-stage-heading h3{font-size:16px}
  .parent-guide .guide-reward{flex-wrap:wrap}
  .parent-guide .guide-section-label{font-size:11px}
  .parent-guide .guide-prep-icon{width:20px;height:20px}
@@ -676,7 +676,7 @@
 @media print{
  .parent-guide .guide-section-label{font-size:7pt;line-height:1.4;margin-bottom:2mm}
  .parent-guide .guide-column{gap:1.5mm}
- .parent-guide .guide-stage-heading h3{font-size:10.5pt;line-height:1.4;margin:0}
+ .parent-guide .guide-stage-heading h3{font-size:10pt;line-height:1.4;margin:0}
  .parent-guide .guide-setup{margin:0}
  .parent-guide p.gm-solution{margin:1.5mm 0}
  .parent-guide .guide-opening-hint{margin-top:1.5mm}
