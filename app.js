@@ -13,14 +13,14 @@
   let plugyRevealTimer = null;
   let finaleEndTimer = null;
   let finaleStartTimer = null;
+  let restoredProgress = false;
   try {
     let saved = JSON.parse(localStorage.getItem(KEY));
     if (saved && saved.progressVersion===PROGRESS_VERSION && Number.isInteger(saved.stage) && saved.stage >= 0 && saved.stage <= FINAL_STAGE && Array.isArray(saved.completed)) {
       const completed = saved.completed.filter((n,i,a) => Number.isInteger(n) && n >= 1 && n <= TASK_COUNT && a.indexOf(n) === i);
       // QR links can open tasks independently; retain completed tasks even with gaps.
-      if (saved.stage === 0 || saved.callDone) {
-        progress = {...fresh(), ...saved, completed:completed.sort((a,b)=>a-b), hints:saved.hints && typeof saved.hints === 'object' ? saved.hints : {}};
-      }
+      progress = {...fresh(), ...saved, completed:completed.sort((a,b)=>a-b), hints:saved.hints && typeof saved.hints === 'object' ? saved.hints : {}};
+      restoredProgress = true;
     }
   } catch (_) { /* Local storage is optional, including in file:// mode. */ }
   const state = () => preview || progress;
@@ -631,14 +631,15 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)ping();});
   if(window.PIXELKOVIA_RUN){
     const run=window.PIXELKOVIA_RUN.run;
-    let hasSaved=false;try{hasSaved=!!localStorage.getItem(KEY);}catch{}
-    if(!hasSaved){
+    if(!restoredProgress){
       progress.completed=run.stages.filter(s=>s.completed_at!==null).map(s=>s.stage);
       progress.hints=Object.fromEntries(run.stages.map(s=>[s.stage,s.hints]));
       progress.metrics=Object.fromEntries(run.stages.map(s=>[s.stage,{attempts:s.attempts,wrong:s.wrong_attempts}]));
       progress.callDone=run.stages.length>0;
       progress.stage=run.current_stage;
     }
+    // Keep an unfinished introduction resumable without rendering the sales page.
+    if(progress.stage===0)progress.stage=run.current_stage;
     progress.started=true;view='player';
   }
   // Printed QR codes open their signal without an on-screen continue action.

@@ -7,6 +7,8 @@ Jediná aktívna aplikácia: **https://pixelkovia.rodulab.com**.
 - `/hra`: pôvodná hra so siedmimi nezmenenými úlohami. QR odkazy smerujú sem s parametrom `signal`.
 - `/admin`: produktová administrácia, objednávky, priebeh hrania a hodnotenia. `/admin/storyboard` vyžaduje to isté administrátorské prihlásenie.
 
+Rodičovský portál označuje prípravnú časť „Príprava na hru“. Po spustení hry je príprava zbalená nad tlačidlom „Spustiť hru“ a priebehom tímu; tlačidlo pokračuje v existujúcej relácii.
+
 Tlačidlo „Koniec hry“ v závere uloží ukončenie a otvorí hodnotenie v rodičovskom portáli aj pri chýbajúcom zázname úlohy alebo chybe synchronizácie. Počet vyriešených úloh vychádza zo skutočne uložených záznamov; ukončenie nedopĺňa chýbajúce riešenia. Chyba samotného ukončenia ponechá možnosť skúsiť ho znova. Zatvorenie okna po jednotlivej úlohe iba uloží postup. Autorizácia nákupu a herného telefónu zostáva povinná.
 
 ## Zostavenie a nasadenie
