@@ -11,7 +11,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const observe=p=>{p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(/Content Security Policy|Refused to execute|Executing inline script/.test(m.text()))csp.push(m.text());});};observe(page);
   const get=(route,cookie='')=>server.mf.dispatchFetch(server.url+route,{headers:{cookie},redirect:'manual'});
   const previewPaths=['/assets/miky-sheet-preview.webp',...Array.from({length:6},(_,i)=>`/assets/printables/p${i+2}-preview.webp`)];
-  for(const route of [...previewPaths,'/printables.js','/assets/printables/vsetky-materialy.pdf','/_protected/printables.html','/printables.html'])assert.equal((await get(route)).status,404,route+' must stay private');
+  for(const route of [...previewPaths,'/assets/supervisor-qr.svg','/printables.js','/assets/printables/vsetky-materialy.pdf','/_protected/printables.html','/printables.html'])assert.equal((await get(route)).status,404,route+' must stay private');
   assert.equal((await get('/materialy')).status,303);
   await page.goto(server.url+'/admin/login');await page.locator('#password').fill(server.adminPassword);await page.locator('#login-button').click();await page.waitForURL('**/admin');
   await page.goto(server.url+'/admin/storyboard');await page.locator('.studio-timeline').waitFor();assert.equal(await page.locator('.storyboard').count(),9);
@@ -23,6 +23,12 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.ok(!response.headers()['content-security-policy'].match(/script-src[^;]*'unsafe-inline'/));
   assert.equal(await printed.locator('.sheet').first().getAttribute('id'),'rodicovsky-navod');assert.equal(await printed.locator('#circles svg').count(),2);
   await printed.locator('.sheet img').evaluateAll(images=>Promise.all(images.map(img=>img.decode())));
+  const guide=printed.locator('#rodicovsky-navod');
+  assert.equal(await guide.locator('.guide-intro>section').count(),4,'four short preparation steps');
+  assert.equal(await guide.locator('.guide-safety').count(),0);assert.equal(await guide.locator('.guide-tools p').count(),1);
+  assert.match(await guide.locator('.guide-portal-step').innerText(),/Prihlasovacie údaje nájdete v e-maile/);
+  assert.ok((await guide.locator('.guide-portal-qr a').evaluateAll(links=>links.map(a=>a.href))).every(url=>url==='https://pixelkovia.rodulab.com/Supervisor'));
+  assert.ok(await guide.locator('.guide-portal-qr img').evaluate(img=>img.naturalWidth>0),'the portal QR loads through the real authorization boundary');
   await printed.evaluate(()=>{window.__printCalls=0;window.print=()=>window.__printCalls++;});await printed.getByRole('button',{name:'Vytlačiť podklady'}).click();assert.equal(await printed.evaluate(()=>window.__printCalls),1);
   const cookie=(await context.cookies(server.url)).map(c=>c.name+'='+c.value).join('; ');
   for(const id of ['rodicovsky-navod','p1','p2','p3','p4','p5','p6','p7','diplom','vsetky-materialy']){
@@ -34,6 +40,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   for(const id of ['p1','p2','p3','p4','p5','p6','p7']){
    await printed.goto(server.url+'/materialy?sheet='+id);assert.equal(await printed.locator('.sheet:visible').count(),1);assert.ok(await printed.locator('#'+id).isVisible());assert.match(await printed.locator('#pdf-download').getAttribute('href'),new RegExp('/'+id+'\\.pdf$'));
   }
+  await printed.goto(server.url+'/materialy?sheet=rodicovsky-navod');
   await printed.setViewportSize({width:390,height:844});assert.ok(await printed.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   const customer=await browser.newContext({ignoreHTTPSErrors:true}),portal=await customer.newPage();observe(portal);await portal.goto(server.url+'/Supervisor');await portal.locator('#login-email').fill(server.email);await portal.locator('#login-password').fill(server.customerPassword);await portal.locator('#customer-login button').click();await portal.locator('#start-game').waitFor();
   await portal.goto(server.url+'/materialy');assert.equal(await portal.locator('.sheet').count(),9,'a paid game customer also receives the complete printable set');const customerCookie=(await customer.cookies(server.url)).map(c=>c.name+'='+c.value).join('; ');assert.equal((await get('/admin/storyboard',customerCookie)).status,303);
