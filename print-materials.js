@@ -19,7 +19,7 @@
   const sheetStages={p1:'envelope',p2:'document',p3:'symbols',p4:'cipher',p5:'maze'};
   for(const [id,stageId] of Object.entries(sheetStages)) {
     const stage=window.GAME.stages.find(stage=>stage.id===stageId);
-    sheets[id]=sheets[id].replace(/(<div class="label">)([^<]+)/, '$1'+stage.label+' / $2');
+    sheets[id]=sheets[id].replace(/(<div class="label">)([^<]+)/, id==='p1'?'$1PIXELKOVIA / '+stage.label:'$1'+stage.label+' / $2');
     if(id!=='p1') {
       sheets[id]=sheets[id].replace('class="sheet"','class="sheet story-sheet"');
       sheets[id]=sheets[id].replace(/<span class="sheet-avatar"[^>]*><\/span>/,'');
