@@ -33,6 +33,12 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.match(await guide.locator('.guide-portal-step').innerText(),/Prihlasovacie údaje nájdete v e-maile/);
   assert.ok((await guide.locator('.guide-portal-qr a').evaluateAll(links=>links.map(a=>a.href))).every(url=>url==='https://pixelkovia.rodulab.com/Supervisor'));
   assert.ok(await guide.locator('.guide-portal-qr img').evaluate(img=>img.naturalWidth>0),'the portal QR loads through the real authorization boundary');
+  await printed.setViewportSize({width:850,height:1200});await printed.emulateMedia({media:'print'});
+  const printSteps=await guide.locator('.guide-intro>section').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect(),h=n.querySelector('h3');return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,headingSize:getComputedStyle(h).fontSize};}));
+  const printQr=await guide.locator('.guide-portal-qr').boundingBox();
+  assert.ok(printSteps.every((s,i)=>s.left===printSteps[0].left&&s.headingSize===printSteps[0].headingSize&&(!i||s.top>=printSteps[i-1].bottom)),'print steps keep a consistent alignment, heading size and reading order');
+  assert.ok(printQr.x>=printSteps[2].right&&printQr.y>=printSteps[0].top&&printQr.y+printQr.height<=printSteps[3].bottom,'the print QR occupies its own column beside the whole sequence');
+  await printed.emulateMedia({media:null});await printed.setViewportSize({width:1512,height:1100});
   await printed.evaluate(()=>{window.__printCalls=0;window.print=()=>window.__printCalls++;});await printed.getByRole('button',{name:'Vytlačiť podklady'}).click();assert.equal(await printed.evaluate(()=>window.__printCalls),1);
   const cookie=(await context.cookies(server.url)).map(c=>c.name+'='+c.value).join('; ');
   for(const id of ['rodicovsky-navod','p1','p2','p3','p4','p5','p6','p7','diplom','vsetky-materialy']){
@@ -45,7 +51,12 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await printed.goto(server.url+'/materialy?sheet='+id);assert.equal(await printed.locator('.sheet:visible').count(),1);assert.ok(await printed.locator('#'+id).isVisible());assert.match(await printed.locator('#pdf-download').getAttribute('href'),new RegExp('/'+id+'\\.pdf$'));
   }
   await printed.goto(server.url+'/materialy?sheet=rodicovsky-navod');
-  await printed.setViewportSize({width:390,height:844});assert.ok(await printed.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  for(const width of [320,390,430]){
+   await printed.setViewportSize({width,height:844});assert.ok(await printed.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal scroll at '+width+'px');
+   const third=await guide.locator('.guide-portal-step').boundingBox(),qr=await guide.locator('.guide-portal-qr').boundingBox(),fourth=await guide.locator('.guide-ready').boundingBox();
+   assert.ok(qr.y>=third.y+third.height-12&&qr.y+qr.height<=fourth.y,'mobile QR follows step three without overlapping the next step');
+  }
+  await printed.setViewportSize({width:390,height:844});await guide.screenshot({path:'/tmp/pixelkovia-parent-steps-'+engine.name()+'.png'});
   const customer=await browser.newContext({ignoreHTTPSErrors:true}),portal=await customer.newPage();observe(portal);await portal.goto(server.url+'/Supervisor');await portal.locator('#login-email').fill(server.email);await portal.locator('#login-password').fill(server.customerPassword);await portal.locator('#customer-login button').click();await portal.locator('#start-game').waitFor();
   await portal.goto(server.url+'/materialy');assert.equal(await portal.locator('.sheet').count(),9,'a paid game customer also receives the complete printable set');const customerCookie=(await customer.cookies(server.url)).map(c=>c.name+'='+c.value).join('; ');assert.equal((await get('/admin/storyboard',customerCookie)).status,303);
   assert.deepEqual(errors,[]);assert.deepEqual(csp,[]);await customer.close();await context.close();
