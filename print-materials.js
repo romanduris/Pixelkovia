@@ -218,6 +218,9 @@
       const reward=!(stage.finalLetter||stage.reward)?'':`<p class="guide-reward"><strong>Návratový znak:</strong> <b>${esc(stage.finalLetter||stage.reward)}</b></p>`;
       return `<section class="guide-stage" data-stage="${esc(stage.id)}"><div class="guide-stage-heading"><span class="guide-step"><small>ÚLOHA</small><b>${index+1}</b></span><h3>${esc(location)}</h3></div><p class="guide-setup">${esc(setup)}</p><p class="gm-solution" aria-label="Riešenie etapy"><strong>${stage.id==='code'?'Záverečné heslo':'Riešenie'}:</strong> <span class="guide-answer-value">${esc(answer)}</span></p>${reward}</section>`;
     });
+    const introQuote=GAME.pikoMessage.find(line=>line.includes('Indícia jedna'));
+    const introCard=`<section class="guide-stage guide-opening" data-stage="intro"><div class="guide-stage-heading"><span class="guide-step"><small>ÚVOD</small><b>0</b></span><h3>Úvodné video</h3></div><p class="guide-setup">Vo videu pozorne počúvajte záver pred prerušením spojenia.</p><p class="gm-solution" aria-label="Riešenie úvodu"><strong>Riešenie:</strong> <span class="guide-answer-value">„${esc(introQuote)}“ → Kúpeľňa.</span></p><p class="guide-opening-hint"><strong>Nápoveda pre deti:</strong> „Pustite si video znova. Kam vás posiela hľadať prvú indíciu?“</p></section>`;
+    const guideCards=[introCard,...cards];
     return `<section class="sheet parent-guide" id="rodicovsky-navod"><header class="guide-heading"><div><div class="label">PIXELKOVIA / LEN PRE RODIČA</div><h2>Ťahák pre rodiča</h2><p>Vytlačte, ukryte a spustite. Deti ďalej povedie hra.</p></div><img class="guide-piko" src="assets/atlas/piko.webp" width="88" height="88" alt="Piko, váš sprievodca"></header>
       <div class="guide-intro">
         <section><h3>1. Vytlačte</h3><p>Úlohy 1–7 jednostranne na A4, mierka 100 %. Ideálne farebne; hra je plnohodnotne hrateľná aj na čiernobielych listoch. Nestrihajte ich.</p></section>
@@ -226,7 +229,7 @@
         <section class="guide-ready"><h3>4. Hra sa môže začať!</h3><p>V portáli ťuknite na <strong>Spustiť hru</strong>. Deti už povedie príbeh.</p></section>
       </div>
       <div class="guide-tools"><p><strong>Deti potrebujú:</strong> detské nožnice, ceruzku, tmavú pastelku a telefón s internetom.</p></div>
-      <div class="guide-section-label"><span>KAM S ÚLOHAMI · RIEŠENIA · NÁVRATOVÉ ZNAKY</span></div><div class="guide-stages"><div class="guide-column">${cards.slice(0,4).join('')}</div><div class="guide-column">${cards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Riešenia a návratové znaky si nechajte pre seba.</span></footer></section>`;
+      <div class="guide-section-label"><span>ÚVOD · ÚKRYTY · RIEŠENIA · NÁVRATOVÉ ZNAKY</span></div><div class="guide-stages"><div class="guide-column">${guideCards.slice(0,4).join('')}</div><div class="guide-column">${guideCards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Riešenia a návratové znaky si nechajte pre seba.</span></footer></section>`;
   }
   window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,stageSolution,gameMasterInstructions,bathroomSolution,bathroomInstructions,parentGuide};
 })();

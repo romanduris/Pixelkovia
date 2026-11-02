@@ -41,7 +41,7 @@ const normalize=value=>value.replace(/\s+/g,' ').trim();
  assert.match(await bathroom.locator('.gm-instructions>h3').innerText(),/Inštrukcie pre Game mastra/);
  assert.ok(!/Celý list P1|vložte do obálky|previažte/.test(await bathroom.locator('.gm-instructions').innerText()));
  assert.equal(await printed.locator('.sheet').first().getAttribute('id'),'rodicovsky-navod');
- assert.equal(await printed.locator('.guide-stage').count(),7);
+ assert.equal(await printed.locator('.guide-stage').count(),8);
  for(const id of await page.evaluate(()=>GAME.stages.map(stage=>stage.id))){
   const block=page.locator('#gm-'+id),toggle=block.locator('.storyboard-toggle');
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
