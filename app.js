@@ -502,12 +502,16 @@
       clearTimeout(finaleEndTimer);finaleEndTimer=null;
       clearTimeout(finaleStartTimer);finaleStartTimer=null;
       if(preview){preview=null;navigate('designer');return;}
-      if(window.PIXELKOVIA_FINISH){
-        save();b.disabled=true;b.textContent='Ukladám záver hry…';
-        window.PIXELKOVIA_FINISH().catch(error=>{b.disabled=false;b.textContent=error.message+' · Skúsiť znova';b.setAttribute('aria-live','polite');});return;
+      const closeWindow=()=>{
+        window.close();
+        setTimeout(()=>{if(!window.closed&&b.isConnected){b.disabled=false;b.textContent=a==='end-game'?'Hra skončila. Kartu môžete zavrieť.':'Okno môžete zavrieť.';b.setAttribute('aria-live','polite');}},350);
+      };
+      const persist=a==='end-game'?window.PIXELKOVIA_FINISH:window.PIXELKOVIA_SAVE;
+      if(persist){
+        save();b.disabled=true;b.textContent=a==='end-game'?'Ukladám záver hry…':'Ukladám postup…';
+        persist().then(()=>{if(a==='close-window')closeWindow();}).catch(error=>{b.disabled=false;b.textContent=error.message+' · Skúsiť znova';b.setAttribute('aria-live','polite');});return;
       }
-      window.close();
-      setTimeout(()=>{if(!window.closed&&b.isConnected){b.textContent=a==='end-game'?'Hra skončila. Kartu môžete zavrieť.':'Okno môžete zavrieť.';b.setAttribute('aria-live','polite');}},350);return;
+      closeWindow();return;
     }
     if(a==='finale-video-toggle'){
       const video=app.querySelector('#finale-video');

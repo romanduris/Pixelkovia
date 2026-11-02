@@ -4,7 +4,7 @@
   const key='pixelkovia-pending-'+context.run.id;
   let latest,scheduled,sending=false;
   try{latest=JSON.parse(localStorage.getItem(key));}catch{}
-  const post=async(path,input)=>{const r=await fetch('/api/customer/'+path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({runId:context.run.id,...input})});if(!r.ok)throw Error('Postup sa nepodarilo uložiť. Skontrolujte internet a skúste to znova.');return r.json();};
+  const post=async(path,input)=>{const r=await fetch('/api/customer/'+path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({runId:context.run.id,...input})});const value=await r.json().catch(error=>{if(r.ok)throw error;return null;});if(!r.ok)throw Error(typeof value?.error==='string'?value.error:'Postup sa nepodarilo uložiť. Skontrolujte internet a skúste to znova.');return value;};
   async function flush(){
     if(sending||!latest)return;
     sending=true;const snapshot=latest;
@@ -12,10 +12,15 @@
     finally{sending=false;}
   }
   window.PIXELKOVIA_TRACK=progress=>{latest=progress;try{localStorage.setItem(key,JSON.stringify(progress));}catch{}clearTimeout(scheduled);scheduled=setTimeout(()=>flush().catch(()=>{}),300);};
-  window.PIXELKOVIA_FINISH=async()=>{
+  window.PIXELKOVIA_SAVE=async()=>{
     clearTimeout(scheduled);
-    while(sending)await new Promise(resolve=>setTimeout(resolve,100));
-    await flush();await post('finish',{});location.assign('/Supervisor#hodnotenie');
+    while(sending||latest){
+      if(sending){await new Promise(resolve=>setTimeout(resolve,100));continue;}
+      await flush();
+    }
+  };
+  window.PIXELKOVIA_FINISH=async()=>{
+    await window.PIXELKOVIA_SAVE();await post('finish',{});location.assign('/Supervisor#hodnotenie');
   };
   setInterval(()=>{if(document.visibilityState==='visible')flush().catch(()=>{});},20000);
   window.addEventListener('online',()=>flush().catch(()=>{}));
