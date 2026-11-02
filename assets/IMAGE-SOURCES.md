@@ -14,3 +14,5 @@ Postavičky v `characters/` sú schválená súprava siedmich živých elektroni
 - `brand/`: ikony odvodené od schváleného Pika.
 
 Zdrojom generovaných ilustrácií bol vstavaný imagegen s referenciami schválených postáv. Webové varianty sú optimalizované pre zobrazenie a tlač. Licencia fontu Caveat je v `fonts/OFL-Caveat.txt`.
+
+Platobné značky v `admin/public/payment-methods/`: `apple-pay.svg` je nezmenená oficiálna značka z [Apple Pay Marketing Guidelines](https://developer.apple.com/apple-pay/marketing/), `google-pay.svg` je nezmenená oficiálna značka z [Google Pay Brand Guidelines](https://developers.google.com/pay/api/web/guides/brand-guidelines). `card.svg` je vlastná všeobecná vektorová ikona karty. Všetky tri sa načítavajú lokálne v administrácii.

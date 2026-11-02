@@ -15,6 +15,10 @@
 .payment-checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:20px 0}
 .payment-checks>div{display:flex;flex-direction:column;gap:10px;padding:18px;background:#19273e;border:1px solid #405473;border-radius:7px;font-size:13px}
 .payment-checks small{font-size:11px;color:#a6bbd4}.payment-reference{display:block;max-width:260px;overflow-wrap:anywhere;white-space:normal;font-size:10px;line-height:1.6}
+.payment-method-mark{display:inline-flex;align-items:center;justify-content:center;width:64px;height:34px;vertical-align:middle}
+.payment-method-mark img{display:block;width:52px;height:34px;object-fit:contain;flex-shrink:0}
+/* Google's SVG includes clear space; match the visible mark's height. */
+.payment-method-mark img[src$="/google-pay.svg"]{width:93px;height:63px}
 td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-bank{color:#f0d49a}.status.failed{background:#4a2637;color:#ffc2cd}
 .payment-log-heading>div{max-width:750px}.payment-log-heading label{flex-shrink:0}.payment-last strong{color:inherit}
 @media(max-width:1000px){.payment-health{flex-direction:column;align-items:start}.payment-checks{grid-template-columns:1fr}.payment-log-heading{align-items:start;flex-direction:column}}
