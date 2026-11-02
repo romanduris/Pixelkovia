@@ -178,7 +178,7 @@
           completed=true;update();document.querySelector('#payment-heading').textContent='Ďakujeme za objednávku';
           embedded?.verifiedPaid();
           const confirmed=value.noPaymentRequired?'✓ Objednávka s voucherom je potvrdená.':'✓ Platba je potvrdená.';
-          paymentMessage(confirmed+(value.orderCount===2?(value.delivered?' Dva e-maily s rôznymi heslami sme odovzdali na odoslanie. Druhý je pre ďalšiu rodinu.':' Pripravujeme dva samostatné e-maily s rôznymi heslami. Druhý môžete preposlať ďalšej rodine.'):(value.delivered?' E-mail s prístupom sme odovzdali na odoslanie. Skontrolujte aj priečinok Spam.':' Prístupový e-mail pre vás pripravujeme. Platbu už neopakujte.')),'success');
+          paymentMessage(confirmed+(value.orderCount===2?(value.delivered?' Dva e-maily s rôznymi heslami sme odovzdali na odoslanie. Druhý je pre ďalšiu rodinu.':' Pripravujeme dva samostatné e-maily s rôznymi heslami. Druhý môžete preposlať ďalšej rodine.'):(value.delivered?' E-mail s prístupom sme odovzdali na odoslanie. Skontrolujte aj priečinok Spam.':' Prístupový e-mail pre vás pripravujeme.')),'success');
           if(purchase){forgetSavedPurchase();purchase.phase='paid';}
           if(!embedded?.inFlight)hidePayment();
           change.hidden=true;check.hidden=true;next.hidden=!!embedded?.inFlight;return;
