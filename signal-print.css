@@ -624,3 +624,8 @@
 
 .parent-guide .guide-opening-hint{font-size:11px;line-height:1.4;margin:6px 0 0}.guide-opening-hint strong{color:#234c71}.parent-guide .guide-opening{border-left-color:#8797bc}
 @media print{.parent-guide .guide-opening-hint{font-size:9.5pt;line-height:1.4;margin:1mm 0 0}}
+
+/* Task identification sits at the upper-left sheet edge, outside the title inset. */
+.miky-print-heading>.label,.worksheet-heading>.label{position:relative;left:-22px;top:-22px}
+@media screen and (max-width:600px){.miky-print-heading>.label,.worksheet-heading>.label{left:-10px;top:-10px}}
+@media print{.miky-print-heading>.label,.worksheet-heading>.label{left:-4mm;top:-4mm}}
