@@ -67,4 +67,4 @@ Pri chýbajúcej odpovedi po potvrdení sa po 20 sekundách automaticky overí s
 
 `tests/checkout-wallet-recovery.test.cjs` prepája reálny klient, Worker a izolovanú databázu s nahradenou prepravou Stripe. Overuje obe peňaženky, hru aj obe knihy, následnú kartu, už zaplatený výsledok, čakajúcu banku/3-D Secure, súbeh úhrady s expiráciou, stratenú odpoveď, neznámy stav, neskoré callbacky a chýbajúci callback. Skutočné Stripe API navyše overuje expiráciu a opakované bezpečné uzavretie cez `tests/stripe-inline-live.test.mjs`. Management zaznamenáva dlhé čakanie na výsledok potvrdenia a bezpečnú obnovu; bez obsahu polí či správ SDK.
 
-Položky pre fyzický Google Pay, Apple Pay a kompletný živý nákup zostávajú otvorené. Dĺžka natívnej odozvy z konkrétneho telefónu zatiaľ nie je preukázaná ako vyriešená.
+Aktualizácia 2. 11. 2026: vlastník potvrdil, že Google Pay po oprave funguje bez problémov; príslušný bod backlogu je uzavretý na základe jeho potvrdenia. Konkrétny čas odozvy ani samostatné fyzické skúšky zrušenia a následnej karty neboli osobitne zdokumentované. Reálny test Apple Pay a kompletný E2E nákup zostávajú otvorené.
