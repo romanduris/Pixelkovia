@@ -14,6 +14,7 @@ const fonts = {
 };
 const variants = ['A','B','C'];
 const textBounds = {A:[],B:[],C:[]};
+const cPhotoBounds = [];
 const escape = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 const svg = markup => Buffer.from(markup);
 const fullSvg = content => svg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${content}</svg>`);
@@ -73,17 +74,19 @@ async function coverB() {
 async function coverC() {
   const layers = [];
   const photos = [
-    {file:'assets/sales/family-opening-mobile.webp',crop:{left:0,top:200,width:1200,height:1000},x:196},
-    {file:'assets/sales/family-code-mobile.webp',crop:{left:0,top:250,width:700,height:582},x:616},
-    {file:'assets/sales/family-code-mobile.webp',crop:{left:650,top:420,width:550,height:458},x:1036}
+    {file:'assets/sales/family-opening-mobile.webp',crop:{left:0,top:200,width:1200,height:1000},x:270},
+    {file:'assets/sales/family-code-mobile.webp',crop:{left:0,top:420,width:700,height:582},x:645},
+    {file:'assets/sales/family-code-mobile.webp',crop:{left:650,top:420,width:550,height:458},x:1020}
   ];
   for (const photo of photos) {
-    const image = await sharp(source(photo.file)).extract(photo.crop).resize(405,337,{fit:'cover'}).png().toBuffer();
-    layers.push({input:await rounded(image,405,337,18),left:photo.x,top:335});
+    const image = await sharp(source(photo.file)).extract(photo.crop).resize(350,270,{fit:'cover'}).png().toBuffer();
+    layers.push({input:await rounded(image,350,270,18),left:photo.x,top:395});
+    cPhotoBounds.push({source:photo.file,x:photo.x,y:395,width:350,height:270});
   }
-  await addText(layers,'C','PIXELKOVIA · STRATENÝ SIGNÁL',230,87,24,palette.green,'body');
-  await addText(layers,'C','ZÁHADY, KTORÉ OŽIJÚ',228,146,64,palette.navy);
-  await addText(layers,'C','U VÁS DOMA',228,242,64,palette.green);
+  await addText(layers,'C','PIXELKOVIA · STRATENÝ SIGNÁL',302,88,22,palette.green,'body');
+  await addText(layers,'C','DOBRODRUŽSTVO',300,142,72,palette.navy);
+  await addText(layers,'C','U VÁS DOMA',300,232,72,palette.green);
+  await addText(layers,'C','7 záhad • 45–60 minút • Pre deti 7–13 rokov',302,332,28,palette.green,'body');
   await save('C',layers,palette.paper);
 }
 
@@ -126,7 +129,7 @@ async function main() {
   await comparison('desktop',820,312,variant => sharp(path.join(out,`cover-${variant}.png`)).extract({left:0,top:48,width:1640,height:624}).resize(820,312).png().toBuffer(),'Desktop · 820 × 312 px · stredový vertikálny výrez');
   await comparison('mobile',640,360,mobile,'Mobil · 640 × 360 px · stredový horizontálny výrez');
   await comparison('mobile-profile',640,464,async variant => profileOverlay(await mobile(variant)),'Mobil · modelové prekrytie návrhom profilovej fotografie A');
-  await fs.writeFile(path.join(out,'cover-layout.json'),JSON.stringify({canvas:{width:W,height:H},safeArea:{x:180,y:48,width:1280,height:624},textBounds,avatar:{preview:'profile-A.png',mobileBounds:{x:216,y:256,width:208,height:208},sourceEquivalent:{cx:820,cy:720,r:208}},cropSimulationOnly:true},null,2)+'\n');
+  await fs.writeFile(path.join(out,'cover-layout.json'),JSON.stringify({canvas:{width:W,height:H},safeArea:{x:180,y:48,width:1280,height:624},variantSafeAreas:{C:{x:260,y:48,width:1120,height:624}},textBounds,photoBounds:{C:cPhotoBounds},avatar:{preview:'profile-A.png',mobileBounds:{x:216,y:256,width:208,height:208},sourceEquivalent:{cx:820,cy:720,r:208}},cropSimulationOnly:true},null,2)+'\n');
   console.log('Saved cover-A/B/C.png (1640 × 720), three comparison sheets and measured text bounds. No deployment.');
 }
 main().catch(error => {console.error(error); process.exitCode=1;});

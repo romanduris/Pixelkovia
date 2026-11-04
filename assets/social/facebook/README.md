@@ -27,7 +27,7 @@ Ide iba o návrhy. Web na tieto súbory neodkazuje a príprava neobsahuje žiadn
 
 - `cover-A.png`: hlavná predajná verzia. Pôvodný Piko pred detailom schválenej obývačky, slogan „VÁŠ DOMOV. ICH DOBRODRUŽSTVO.“ a podtext „Interaktívna rodinná hra plná záhad“.
 - `cover-B.png`: pôvodná spoločná scéna všetkých siedmich Pixelkov v obývačke, bez prekresľovania alebo zmeny mierky. Slogan „OBJAVTE TAJNÝ SVET PIXELKOV“ a podtext „Dobrodružstvo sa začína u vás doma.“
-- `cover-C.png`: tri detaily z dvoch schválených ilustrácií rodinného hrania: indície, spoločné riešenie pracovného listu a partia Pixelkov na telefóne. Slogan „ZÁHADY, KTORÉ OŽIJÚ U VÁS DOMA“. Nejde o zákaznícke fotografie ani dokumentárny záber z hry.
+- `cover-C.png`: tri detaily z dvoch schválených ilustrácií rodinného hrania: indície, spoločné riešenie pracovného listu a partia Pixelkov na telefóne. Slogan „DOBRODRUŽSTVO U VÁS DOMA“ a podtext „7 záhad • 45–60 minút • Pre deti 7–13 rokov“. Nejde o zákaznícke fotografie ani dokumentárny záber z hry.
 
 Každý cover je samostatný nepriehľadný PNG, presne **1640 × 720 px**, s profilom sRGB. Ide výhradne o kompozície pôvodných podkladov, bez nového generovania obrázkov, dopĺňania postáv alebo retuše ich identity. Vo variante A sa Piko rovnomerne zmenšuje na 60 %; vo variante B zostáva spoločná scéna v pôvodnej mierke. Ostatné operácie sú výrezy, typografia a kontrastné prechody za textom. Podstatné časti postáv neprekrýva farebný prechod.
 
@@ -40,6 +40,8 @@ Typografia používa rovnaké rodiny ako aktuálna predajná stránka: **Manrope
 - `cover-previews-mobile-profile.png`: rovnaké mobilné výrezy s modelovým kruhovým prekrytím predchádzajúcim návrhom `profile-A.png`. Priemer kruhu vrátane bieleho okraja je 208 px; stred je v bode (320, 360). Pod náhľadom je pridaná plocha na zobrazenie celej profilovej fotografie.
 
 Texty a hlavné tváre sú uložené v centrálnej oblasti X = 180–1460 a Y = 48–672. Dolný stred zostáva použiteľný pre prekrytie profilovou fotografiou. Náhľady sú orientačnou simuláciou, nie garanciou konkrétneho rozhrania Facebooku; skutočný orez treba skontrolovať pri nahratí. Text a tváre boli vizuálne overené v oboch výrezoch aj pri prekrytí.
+
+Variant C má konzervatívnejšiu vnútornú oblasť X = 260–1380. Ilustrácie sa nachádzajú medzi X = 270 a 1370, takže v mobilnom výreze ostáva na každej strane 45 px voľného priestoru. Text začína 60 px od ľavého okraja mobilného výrezu; celý vrátane parametrov hry je nad miestom prekrytia. Prostredný detail presúva ukazujúcu ruku a ceruzku vyššie; profilovka môže zakryť spodnú časť pracovného listu. Tváre na bočných ilustráciách zostávajú mimo kruhu.
 
 ## Opätovné zostavenie coverov
 

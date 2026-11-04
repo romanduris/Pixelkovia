@@ -9,6 +9,14 @@
     "width": 1280,
     "height": 624
   },
+  "variantSafeAreas": {
+    "C": {
+      "x": 260,
+      "y": 48,
+      "width": 1120,
+      "height": 624
+    }
+  },
   "textBounds": {
     "A": [
       {
@@ -117,33 +125,68 @@
     "C": [
       {
         "text": "PIXELKOVIA · STRATENÝ SIGNÁL",
-        "x": 230,
-        "y": 87,
-        "width": 352,
-        "height": 25,
+        "x": 302,
+        "y": 88,
+        "width": 325,
+        "height": 21,
         "font": "DM Sans Medium",
-        "size": 24,
+        "size": 22,
         "color": "#233b33"
       },
       {
-        "text": "ZÁHADY, KTORÉ OŽIJÚ",
-        "x": 228,
-        "y": 146,
-        "width": 696,
-        "height": 75,
+        "text": "DOBRODRUŽSTVO",
+        "x": 300,
+        "y": 142,
+        "width": 641,
+        "height": 70,
         "font": "Manrope ExtraBold",
-        "size": 64,
+        "size": 72,
         "color": "#0d1424"
       },
       {
         "text": "U VÁS DOMA",
-        "x": 228,
-        "y": 242,
-        "width": 382,
-        "height": 66,
+        "x": 300,
+        "y": 232,
+        "width": 429,
+        "height": 73,
         "font": "Manrope ExtraBold",
-        "size": 64,
+        "size": 72,
         "color": "#233b33"
+      },
+      {
+        "text": "7 záhad • 45–60 minút • Pre deti 7–13 rokov",
+        "x": 302,
+        "y": 332,
+        "width": 568,
+        "height": 22,
+        "font": "DM Sans Medium",
+        "size": 28,
+        "color": "#233b33"
+      }
+    ]
+  },
+  "photoBounds": {
+    "C": [
+      {
+        "source": "assets/sales/family-opening-mobile.webp",
+        "x": 270,
+        "y": 395,
+        "width": 350,
+        "height": 270
+      },
+      {
+        "source": "assets/sales/family-code-mobile.webp",
+        "x": 645,
+        "y": 395,
+        "width": 350,
+        "height": 270
+      },
+      {
+        "source": "assets/sales/family-code-mobile.webp",
+        "x": 1020,
+        "y": 395,
+        "width": 350,
+        "height": 270
       }
     ]
   },
