@@ -20,6 +20,7 @@
 
 ## P2 – Nápady na posúdenie (nie schválené na implementáciu)
 
+- [ ] **RoduLab – jednoduchý zastrešujúci web (po PoC).** Neskôr pripraviť stručnú dôveryhodnú prezentačnú stránku tvorcu digitálnych a interaktívnych projektov s Pixelkoviou ako aktuálnym projektom a kontaktnými údajmi; pred realizáciou potvrdiť názov a doménu (rodulab.com vs. RoduLabs.com). Neprezentovať neexistujúce referencie ani firmu.
 - [ ] **Možnosť „bumoferu“ – preskúmať, či to chceme.** Pracovný názov podľa poznámky; najprv upresniť význam, prínos pre hráča, náročnosť a rozhodnúť áno/nie. Bez automatickej implementácie.
 - [ ] **Vianočný darčekový nákup / darčekový poukaz.** Preskúmať jednoduché darovanie hry ako vianočného darčeka, prípadne nadväznosť na druhú licenciu.
 - [ ] **Zber a využitie spätnej väzby.** Po nazbieraní skutočných recenzií vyhodnotiť opakujúce sa pripomienky a použiť ich pri zlepšovaní prvej hry.
