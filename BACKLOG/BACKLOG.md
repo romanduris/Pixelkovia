@@ -20,6 +20,7 @@
 
 ## P2 – Nápady na posúdenie (nie schválené na implementáciu)
 
+- [ ] **RoduLab – jednoduchý zastrešujúci web (po PoC).** Potvrdený názov **RoduLab** (bez „s“) a doména **rodulab.com**. Neskôr pripraviť stručnú dôveryhodnú stránku interaktívneho/digitálneho štúdia: kto sme, čo robíme, kontakt a krátke prezentácie projektov **Pixelkovia, BTS Radar a Living Stones (kamienky)**. Pri každom uviesť len overené skutočnosti a pravdivý stav (hotový projekt vs. experiment); bez fiktívnych klientov, referencií alebo tvrdenia o registrovanej firme. Teraz nie je prioritou – najskôr predaj Pixelkovie.
 - [ ] **Možnosť „bumoferu“ – preskúmať, či to chceme.** Pracovný názov podľa poznámky; najprv upresniť význam, prínos pre hráča, náročnosť a rozhodnúť áno/nie. Bez automatickej implementácie.
 - [ ] **Vianočný darčekový nákup / darčekový poukaz.** Preskúmať jednoduché darovanie hry ako vianočného darčeka, prípadne nadväznosť na druhú licenciu.
 - [ ] **Zber a využitie spätnej väzby.** Po nazbieraní skutočných recenzií vyhodnotiť opakujúce sa pripomienky a použiť ich pri zlepšovaní prvej hry.
