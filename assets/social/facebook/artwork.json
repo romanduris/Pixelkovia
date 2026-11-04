@@ -1,0 +1,53 @@
+{
+  "status": "draft-for-approval",
+  "canvas": {
+    "width": 1024,
+    "height": 1024,
+    "colorSpace": "srgb",
+    "format": "PNG"
+  },
+  "character": {
+    "source": "assets/characters/piko.png",
+    "crop": {
+      "left": 116,
+      "top": 0,
+      "width": 1024,
+      "height": 1024
+    },
+    "transform": "Integer crop only; no scaling, recoloring, retouching, redrawing or generated character pixels.",
+    "sha256": "20e183d5348ff1e7fa844a555ef553f58d113d24920a2f033457ea3b77ea91db"
+  },
+  "paletteSource": "sales.css",
+  "backgrounds": {
+    "A": "sources/background-A.webp",
+    "B": "sources/background-B.webp",
+    "C": "sources/background-C.webp"
+  },
+  "generation": {
+    "tool": "built-in image_gen",
+    "scope": "Background plates only. The approved Piko is composited separately from the original transparent PNG.",
+    "prompts": [
+      {
+        "variant": "A",
+        "prompt": "Use case: ads-marketing. Asset type: BACKGROUND PLATE ONLY for a 1024 x 1024 Facebook profile portrait, full-bleed square. We will composite our existing approved blue pixel-painted mascot on top later using software; DO NOT draw any character, face, body, eyes, mascot, suit, objects, props, text, logos, watermarks, letters or symbols that look like lettering. Keep the central 80 percent of the frame spacious and calm for a large cloud-headed bust. Essential visual design must work inside a centered circular crop. Premium restrained brand art direction, smooth tonal transitions with an extremely subtle soft painted texture, crisp final quality, no photographic artifacts. Background depth must stay gentle so it cannot compete with an electric-blue subject. Variant A, premium dark brand background. Deep ink navy #0d1424, subtly lighter desaturated indigo at upper right, a restrained soft teal/cyan backlight halo centered at (512,440) diffusing through navy. Tiny hint of the brand's lavender #cab5f4 at far outer right. Elegant clean studio-like luminous atmosphere. Dark corners, clean broad empty center, no obvious ring, no stripes, no stars, no particles, no geometric ornament. No hard spotlight or white center. Keep richly dark and minimal."
+      },
+      {
+        "variant": "B",
+        "prompt": "Use case: ads-marketing. Asset type: BACKGROUND PLATE ONLY for a 1024 x 1024 Facebook profile portrait, full-bleed square. We will composite our existing approved blue pixel-painted mascot on top later using software; DO NOT draw any character, face, body, eyes, mascot, suit, objects, props, text, logos, watermarks, letters or symbols that look like lettering. Keep the central 80 percent of the frame spacious and calm for a large cloud-headed bust. Essential visual design must work inside a centered circular crop. Premium restrained brand art direction, smooth tonal transitions with an extremely subtle soft painted texture, crisp final quality, no photographic artifacts. Background depth must stay gentle so it cannot compete with an electric-blue subject. Variant B, bright welcoming family brand background. Warm ivory #f6f0e5 base, feather-light mint #ace9cf and very pale lavender #cab5f4 softly blending at opposite outside edges. Calm creamy center with subtle gentle light from upper left. Airy, sunny, sympathetic, premium and soft. Keep light overall and harmonious, avoid candy saturation. No confetti, shapes, patterns, stars, stripes, objects, or ornaments. No large warm yellow or orange zones."
+      },
+      {
+        "variant": "C",
+        "prompt": "Use case: ads-marketing. Asset type: BACKGROUND PLATE ONLY for a 1024 x 1024 Facebook profile portrait, full-bleed square. We will composite our existing approved blue pixel-painted mascot on top later using software; DO NOT draw any character, face, body, eyes, mascot, suit, objects, props, text, logos, watermarks, letters or symbols that look like lettering. Keep the central 80 percent of the frame spacious and calm for a large cloud-headed bust. Essential visual design must work inside a centered circular crop. Premium restrained brand art direction, smooth tonal transitions with an extremely subtle soft painted texture, crisp final quality, no photographic artifacts. Background depth must stay gentle so it cannot compete with an electric-blue subject. Variant C, restrained digital adventure background. Deep ink navy #0d1424 with very dark petrol teal and subtle indigo depth. A small number of faint teal and pale lavender light trails with elegant right-angle pixel-stepped bends behind the future subject near the outer left and outer right edges only; a few tiny square pixel lights around the side edges. Layering suggests gentle digital discovery, never outer space, never a sci-fi tunnel. Soft teal halo behind the future face. Keep the central 75 percent almost plain deep navy and preserve dark breathing room. No chaotic circuits, no dense star field, no glowing frame, no hard ring, no scene objects."
+      }
+    ]
+  },
+  "preview": {
+    "file": "comparison.png",
+    "circularDiametersPx": [
+      256,
+      96,
+      48
+    ],
+    "actualSize": true
+  }
+}
