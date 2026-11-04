@@ -1,0 +1,101 @@
+{
+  "status": "draft-for-approval",
+  "canvas": {
+    "width": 1640,
+    "height": 720,
+    "format": "PNG",
+    "space": "sRGB"
+  },
+  "method": "Deterministic composition of approved original project illustrations. No image generation or character redraws. Text is rendered separately from the original sales-page font families.",
+  "sourceSha256": {
+    "assets/characters/piko.png": "20e183d5348ff1e7fa844a555ef553f58d113d24920a2f033457ea3b77ea91db",
+    "assets/pixelkovia-room-desktop.webp": "af47090dec74e4613fee1a6e2a562ae7cd918d38ea012699dac8eeff826dcb15",
+    "assets/sales/family-opening-mobile.webp": "edd85f0399ca8a987d44eca46f51c2372fb209cea27a047be0309f590b2e73b9",
+    "assets/sales/family-code-mobile.webp": "f54ca1465617151c23c6e48fdd590e0e64a2ba1c53c99408b984be269ea7cc91",
+    "assets/social/facebook/sources/fonts/Manrope-ExtraBold.ttf": "a8291b05b2732801abdbbb6d06866c57431c3b990638462423e692151b5e0895",
+    "assets/social/facebook/sources/fonts/DM-Sans-Medium.ttf": "376427b5322148d8de1e03f263bcca4935a2d60ba71d9f94f4947ab664c711ae",
+    "assets/social/facebook/profile-A.png": "0b7760658301414326f2cb4b4e41456eb27f06e10db867a3ef2bcd0b0f2583c5"
+  },
+  "fontSource": "The exact Manrope and DM Sans families imported by styles.css. Local authoring copies retain their OFL licenses in sources/fonts/.",
+  "fontUrls": {
+    "Manrope": "https://fonts.gstatic.com/s/manrope/v23/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk59E-_F.ttf",
+    "DMSans": "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAkJxhTg.ttf"
+  },
+  "variants": {
+    "A": {
+      "title": "Hlavná predajná verzia",
+      "headline": "VÁŠ DOMOV. ICH DOBRODRUŽSTVO.",
+      "subline": "Interaktívna rodinná hra plná záhad",
+      "source": "Original Piko bust over a character-free crop of the approved room.",
+      "character": {
+        "crop": {
+          "left": 180,
+          "top": 30,
+          "width": 900,
+          "height": 1000
+        },
+        "scale": 0.6,
+        "x": 920,
+        "y": 70
+      }
+    },
+    "B": {
+      "title": "Tajný svet Pixelkov",
+      "headline": "OBJAVTE TAJNÝ SVET PIXELKOV",
+      "subline": "Dobrodružstvo sa začína u vás doma.",
+      "source": "The approved living-room scene; all seven characters stay together, without scaling or retouching.",
+      "scene": {
+        "crop": {
+          "left": 70,
+          "top": 170,
+          "width": 1530,
+          "height": 720
+        },
+        "x": 0,
+        "y": 0
+      }
+    },
+    "C": {
+      "title": "Skutočný zážitok z hry",
+      "headline": "ZÁHADY, KTORÉ OŽIJÚ U VÁS DOMA",
+      "source": "Three physically cropped details from two approved family-play illustrations in assets/sales/: clues, hands solving a worksheet, and the Pixelkovia group on the shared phone. They are illustrative scenes, not customer photographs. The center crop is partial and sits away from important faces in the profile-photo overlay area."
+    }
+  },
+  "cropSimulations": {
+    "desktop": {
+      "source": {
+        "left": 0,
+        "top": 48,
+        "width": 1640,
+        "height": 624
+      },
+      "output": {
+        "width": 820,
+        "height": 312
+      }
+    },
+    "mobile": {
+      "source": {
+        "left": 180,
+        "top": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "output": {
+        "width": 640,
+        "height": 360
+      }
+    },
+    "profile": {
+      "source": "profile-A.png",
+      "previewOnly": true,
+      "diameter": 208,
+      "center": {
+        "x": 320,
+        "y": 360
+      },
+      "note": "A conservative illustrative overlay, not a claim about exact Facebook UI geometry. Final platform crop must be verified on upload."
+    }
+  },
+  "deployment": "No deployment. Existing original illustrations, application sources and profile proposals are unchanged."
+}

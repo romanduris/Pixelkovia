@@ -22,3 +22,29 @@ node assets/social/facebook/render.cjs
 Autorovací nástroj používa existujúci `admin/node_modules/sharp` (pri príprave sharp 0.35.5). Inú lokálnu inštaláciu možno zadať cez `SHARP_MODULE`. Zdrojového Pika nemení a pri zmene jeho kontrolného súčtu zastaví zostavenie.
 
 Ide iba o návrhy. Web na tieto súbory neodkazuje a príprava neobsahuje žiadne nasadenie na živý web. Existujúci build môže obrazové podklady pribaliť do chránenej časti artefaktu; nepatria do verejného zoznamu súborov.
+
+# Facebook titulné obrázky — návrhy na schválenie
+
+- `cover-A.png`: hlavná predajná verzia. Pôvodný Piko pred detailom schválenej obývačky, slogan „VÁŠ DOMOV. ICH DOBRODRUŽSTVO.“ a podtext „Interaktívna rodinná hra plná záhad“.
+- `cover-B.png`: pôvodná spoločná scéna všetkých siedmich Pixelkov v obývačke, bez prekresľovania alebo zmeny mierky. Slogan „OBJAVTE TAJNÝ SVET PIXELKOV“ a podtext „Dobrodružstvo sa začína u vás doma.“
+- `cover-C.png`: tri detaily z dvoch schválených ilustrácií rodinného hrania: indície, spoločné riešenie pracovného listu a partia Pixelkov na telefóne. Slogan „ZÁHADY, KTORÉ OŽIJÚ U VÁS DOMA“. Nejde o zákaznícke fotografie ani dokumentárny záber z hry.
+
+Každý cover je samostatný nepriehľadný PNG, presne **1640 × 720 px**, s profilom sRGB. Ide výhradne o kompozície pôvodných podkladov, bez nového generovania obrázkov, dopĺňania postáv alebo retuše ich identity. Vo variante A sa Piko rovnomerne zmenšuje na 60 %; vo variante B zostáva spoločná scéna v pôvodnej mierke. Ostatné operácie sú výrezy, typografia a kontrastné prechody za textom. Podstatné časti postáv neprekrýva farebný prechod.
+
+Typografia používa rovnaké rodiny ako aktuálna predajná stránka: **Manrope** a **DM Sans**. Farby vychádzajú zo `sales.css`: tmavomodrá `#0d1424`, krémová `#f6f0e5`, mäta `#ace9cf`, levanduľová `#cab5f4` a zelená `#233b33`. Lokálne autorovacie kópie fontov a ich licencie OFL sú v `sources/fonts/`; neboli použité žiadne nové ilustračné podklady.
+
+## Porovnanie orezov
+
+- `cover-previews-desktop.png`: všetky tri varianty pri **820 × 312 px**, po stredovom výreze originálu na 1640 × 624 px od Y = 48.
+- `cover-previews-mobile.png`: všetky tri varianty pri **640 × 360 px**, po stredovom výreze na 1280 × 720 px od X = 180.
+- `cover-previews-mobile-profile.png`: rovnaké mobilné výrezy s modelovým kruhovým prekrytím predchádzajúcim návrhom `profile-A.png`. Priemer kruhu vrátane bieleho okraja je 208 px; stred je v bode (320, 360). Pod náhľadom je pridaná plocha na zobrazenie celej profilovej fotografie.
+
+Texty a hlavné tváre sú uložené v centrálnej oblasti X = 180–1460 a Y = 48–672. Dolný stred zostáva použiteľný pre prekrytie profilovou fotografiou. Náhľady sú orientačnou simuláciou, nie garanciou konkrétneho rozhrania Facebooku; skutočný orez treba skontrolovať pri nahratí. Text a tváre boli vizuálne overené v oboch výrezoch aj pri prekrytí.
+
+## Opätovné zostavenie coverov
+
+```sh
+node assets/social/facebook/render-covers.cjs
+```
+
+`covers-artwork.json` obsahuje pôvod podkladov, ich kontrolné súčty, presné slogany a parametre simulovaných výrezov. `cover-layout.json` zaznamenáva skutočné rozmery vyrastrovaných textov. Zdrojom úprav rozloženia je `render-covers.cjs`. Pôvodné ilustrácie aj návrhy profilových fotografií zostávajú nezmenené. Zostavenie návrhov nevykonáva nasadenie webu.
