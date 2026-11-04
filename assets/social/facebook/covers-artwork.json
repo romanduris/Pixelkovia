@@ -43,16 +43,25 @@
       "title": "Tajný svet Pixelkov",
       "headline": "OBJAVTE TAJNÝ SVET PIXELKOV",
       "subline": "Dobrodružstvo sa začína u vás doma.",
-      "source": "The approved living-room scene; all seven characters stay together, without scaling or retouching.",
+      "source": "The approved living-room group stays together and is uniformly scaled to 50%, without character retouching. Its room edges fade into a full-bleed character-free crop of the same original living room. All heads stay fully opaque. Text and heads are repositioned for the narrower crop and higher avatar shown in the user's Facebook screenshot.",
       "scene": {
         "crop": {
-          "left": 70,
-          "top": 170,
-          "width": 1530,
-          "height": 720
+          "left": 640,
+          "top": 260,
+          "width": 960,
+          "height": 640
         },
-        "x": 0,
-        "y": 0
+        "scale": 0.5,
+        "x": 820,
+        "y": 90
+      },
+      "screenshotSimulation": {
+        "basis": "Approximate geometry inferred from the user-supplied Facebook mobile screenshot; not a claim about universal Facebook dimensions.",
+        "crop": {"left":295,"top":0,"width":1050,"height":640},
+        "output": {"width":640,"height":390},
+        "avatar": {"sourceCx":820,"sourceCy":580,"sourceRadius":230,"previewDiameter":280,"previewCenter":{"x":320,"y":354}},
+        "ownerBubbleReserved": {"x":680,"y":313,"width":280,"height":130},
+        "previews": ["cover-B-mobile.png","cover-B-mobile-profile.png"]
       }
     },
     "C": {
@@ -96,7 +105,7 @@
         "x": 320,
         "y": 360
       },
-      "note": "A conservative illustrative overlay, not a claim about exact Facebook UI geometry. Final platform crop must be verified on upload."
+      "note": "Initial wider illustrative overlay. For the narrower actual mobile case shown by the user, use variant B's dedicated screenshotSimulation and cover-B-mobile previews. Final platform crop must be verified on upload."
     }
   },
   "deployment": "No deployment. Existing original illustrations, application sources and profile proposals are unchanged."

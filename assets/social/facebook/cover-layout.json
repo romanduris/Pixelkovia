@@ -10,6 +10,12 @@
     "height": 624
   },
   "variantSafeAreas": {
+    "B": {
+      "x": 350,
+      "y": 110,
+      "width": 950,
+      "height": 360
+    },
     "C": {
       "x": 260,
       "y": 48,
@@ -63,62 +69,62 @@
     "B": [
       {
         "text": "PIXELKOVIA · STRATENÝ SIGNÁL",
-        "x": 230,
-        "y": 86,
-        "width": 325,
-        "height": 21,
+        "x": 370,
+        "y": 120,
+        "width": 292,
+        "height": 19,
         "font": "DM Sans Medium",
-        "size": 22,
+        "size": 20,
         "color": "#ace9cf"
       },
       {
         "text": "OBJAVTE",
-        "x": 228,
-        "y": 160,
-        "width": 276,
-        "height": 49,
+        "x": 370,
+        "y": 168,
+        "width": 232,
+        "height": 41,
         "font": "Manrope ExtraBold",
-        "size": 64,
+        "size": 54,
         "color": "#f6f0e5"
       },
       {
         "text": "TAJNÝ SVET",
-        "x": 228,
-        "y": 239,
-        "width": 374,
-        "height": 66,
+        "x": 370,
+        "y": 225,
+        "width": 314,
+        "height": 55,
         "font": "Manrope ExtraBold",
-        "size": 64,
+        "size": 54,
         "color": "#cab5f4"
       },
       {
         "text": "PIXELKOV",
-        "x": 228,
-        "y": 334,
-        "width": 302,
-        "height": 49,
+        "x": 370,
+        "y": 300,
+        "width": 253,
+        "height": 41,
         "font": "Manrope ExtraBold",
-        "size": 64,
+        "size": 54,
         "color": "#f6f0e5"
       },
       {
-        "text": "Dobrodružstvo sa začína",
-        "x": 230,
-        "y": 434,
-        "width": 343,
-        "height": 24,
+        "text": "Dobrodružstvo sa",
+        "x": 370,
+        "y": 392,
+        "width": 228,
+        "height": 22,
         "font": "DM Sans Medium",
-        "size": 30,
+        "size": 28,
         "color": "#f6f0e5"
       },
       {
-        "text": "u vás doma.",
-        "x": 230,
-        "y": 477,
-        "width": 167,
-        "height": 24,
+        "text": "začína u vás doma.",
+        "x": 370,
+        "y": 430,
+        "width": 246,
+        "height": 22,
         "font": "DM Sans Medium",
-        "size": 30,
+        "size": 28,
         "color": "#f6f0e5"
       }
     ],
@@ -165,6 +171,59 @@
       }
     ]
   },
+  "faceBounds": {
+    "B": [
+      {
+        "id": "pixi",
+        "x": 852.5,
+        "y": 235,
+        "width": 72.5,
+        "height": 62.5
+      },
+      {
+        "id": "miky",
+        "x": 917.5,
+        "y": 183.5,
+        "width": 60,
+        "height": 75
+      },
+      {
+        "id": "piko",
+        "x": 975,
+        "y": 176,
+        "width": 85.5,
+        "height": 66.5
+      },
+      {
+        "id": "pingy",
+        "x": 1050,
+        "y": 128.5,
+        "width": 45,
+        "height": 50
+      },
+      {
+        "id": "plugy",
+        "x": 1068,
+        "y": 180,
+        "width": 64.5,
+        "height": 76.5
+      },
+      {
+        "id": "cipko",
+        "x": 1115,
+        "y": 222.5,
+        "width": 74.5,
+        "height": 65
+      },
+      {
+        "id": "guardy",
+        "x": 1187.5,
+        "y": 205,
+        "width": 75,
+        "height": 73.5
+      }
+    ]
+  },
   "photoBounds": {
     "C": [
       {
@@ -202,6 +261,29 @@
       "cx": 820,
       "cy": 720,
       "r": 208
+    }
+  },
+  "screenshotSimulationB": {
+    "crop": {
+      "left": 295,
+      "top": 0,
+      "width": 1050,
+      "height": 640
+    },
+    "output": {
+      "width": 640,
+      "height": 390
+    },
+    "avatar": {
+      "cx": 820,
+      "cy": 580,
+      "r": 230
+    },
+    "ownerBubble": {
+      "x": 680,
+      "y": 313,
+      "width": 280,
+      "height": 130
     }
   },
   "cropSimulationOnly": true

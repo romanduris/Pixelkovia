@@ -15,6 +15,14 @@ const fonts = {
 const variants = ['A','B','C'];
 const textBounds = {A:[],B:[],C:[]};
 const cPhotoBounds = [];
+// Observed screenshot: a narrower cover and an avatar reaching much higher.
+const bMobile = {
+  crop:{left:295,top:0,width:1050,height:640},
+  output:{width:640,height:390},
+  avatar:{cx:820,cy:580,r:230},
+  ownerBubble:{x:680,y:313,width:280,height:130}
+};
+const bFaceBounds = [];
 const escape = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 const svg = markup => Buffer.from(markup);
 const fullSvg = content => svg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${content}</svg>`);
@@ -57,17 +65,29 @@ async function coverA() {
 }
 
 async function coverB() {
-  // Integer translation only. All seven original characters remain together.
+  // A character-free part of the same room fills the entire standalone cover.
   const room = await sharp(source('assets/pixelkovia-room-desktop.webp'))
-    .extract({left:70,top:170,width:1530,height:720}).png().toBuffer();
+    .extract({left:0,top:0,width:700,height:900}).resize(W,H,{fit:'cover'}).png().toBuffer();
   const layers = [{input:room,left:0,top:0}];
-  layers.push({input:fullSvg(`<defs><linearGradient id="left" x1="0" x2="620" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${palette.navy}" stop-opacity=".98"/><stop offset=".6" stop-color="${palette.navy}" stop-opacity=".94"/><stop offset="1" stop-color="${palette.navy}" stop-opacity="0"/></linearGradient><linearGradient id="right" x1="1480" x2="1530" gradientUnits="userSpaceOnUse"><stop stop-color="${palette.navy}" stop-opacity="0"/><stop offset="1" stop-color="${palette.navy}"/></linearGradient></defs><rect width="620" height="720" fill="url(#left)"/><rect x="1480" width="50" height="720" fill="url(#right)"/>`),left:0,top:0});
-  await addText(layers,'B','PIXELKOVIA · STRATENÝ SIGNÁL',230,86,22,palette.mint,'body');
-  await addText(layers,'B','OBJAVTE',228,160,64,palette.paper);
-  await addText(layers,'B','TAJNÝ SVET',228,239,64,palette.lavender);
-  await addText(layers,'B','PIXELKOV',228,334,64,palette.paper);
-  await addText(layers,'B','Dobrodružstvo sa začína',230,434,30,palette.paper,'body');
-  await addText(layers,'B','u vás doma.',230,477,30,palette.paper,'body');
+  layers.push({input:fullSvg(`<defs><linearGradient id="shade"><stop stop-color="${palette.navy}" stop-opacity=".96"/><stop offset=".4" stop-color="${palette.navy}" stop-opacity=".92"/><stop offset=".7" stop-color="${palette.navy}" stop-opacity=".72"/><stop offset="1" stop-color="${palette.navy}" stop-opacity=".55"/></linearGradient></defs><rect width="1640" height="720" fill="url(#shade)"/>`),left:0,top:0});
+  // Preserve the whole approved group together; uniformly reduce it to 50%.
+  const group = await sharp(source('assets/pixelkovia-room-desktop.webp'))
+    .extract({left:640,top:260,width:960,height:640}).resize(480,320).png().toBuffer();
+  // Fade room edges into the full-bleed background; every head stays opaque.
+  const sideMask = svg('<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320"><defs><linearGradient id="a"><stop stop-color="white" stop-opacity="0"/><stop offset=".05" stop-color="white"/><stop offset=".95" stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient></defs><rect width="480" height="320" fill="url(#a)"/></svg>');
+  const endMask = svg('<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320"><defs><linearGradient id="a" x2="0" y2="1"><stop stop-color="white" stop-opacity="0"/><stop offset=".075" stop-color="white"/><stop offset=".82" stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient></defs><rect width="480" height="320" fill="url(#a)"/></svg>');
+  const scene = await sharp(group).ensureAlpha().composite([{input:sideMask,blend:'dest-in'},{input:endMask,blend:'dest-in'}]).png().toBuffer();
+  layers.push({input:scene,left:820,top:90});
+  const heads = {pixi:[705,550,145,125],miky:[835,447,120,150],piko:[950,432,171,133],pingy:[1100,337,90,100],plugy:[1136,440,129,153],cipko:[1230,525,149,130],guardy:[1375,490,150,147]};
+  for (const [id,[x,y,width,height]] of Object.entries(heads)) {
+    bFaceBounds.push({id,x:820+(x-640)/2,y:90+(y-260)/2,width:width/2,height:height/2});
+  }
+  await addText(layers,'B','PIXELKOVIA · STRATENÝ SIGNÁL',370,120,20,palette.mint,'body');
+  await addText(layers,'B','OBJAVTE',370,168,54,palette.paper);
+  await addText(layers,'B','TAJNÝ SVET',370,225,54,palette.lavender);
+  await addText(layers,'B','PIXELKOV',370,300,54,palette.paper);
+  await addText(layers,'B','Dobrodružstvo sa',370,392,28,palette.paper,'body');
+  await addText(layers,'B','začína u vás doma.',370,430,28,palette.paper,'body');
   await save('B',layers);
 }
 
@@ -103,6 +123,21 @@ async function profileOverlay(input) {
     .composite([{input,left:0,top:0},{input:border,left:216,top:256},{input:masked,left:222,top:262}]).png().toBuffer();
 }
 
+async function screenshotPreviewB() {
+  const preview = await sharp(path.join(out,'cover-B.png')).extract(bMobile.crop)
+    .resize(bMobile.output.width,bMobile.output.height).png().toBuffer();
+  await fs.writeFile(path.join(out,'cover-B-mobile.png'),preview);
+  const diameter = 280, inset = 6;
+  const avatar = await sharp(path.join(out,'profile-A.png')).resize(diameter-inset*2,diameter-inset*2).png().toBuffer();
+  const mask = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="268" height="268"><circle cx="134" cy="134" r="134" fill="white"/></svg>`);
+  const portrait = await sharp(avatar).ensureAlpha().composite([{input:mask,blend:'dest-in'}]).png().toBuffer();
+  const border = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280"><circle cx="140" cy="140" r="140" fill="#242424"/></svg>`);
+  await sharp({create:{width:640,height:500,channels:3,background:'#242424'}})
+    .composite([{input:preview,left:0,top:0},{input:border,left:180,top:214},{input:portrait,left:186,top:220}])
+    .withIccProfile('srgb').png({compressionLevel:9,adaptiveFiltering:true})
+    .toFile(path.join(out,'cover-B-mobile-profile.png'));
+}
+
 async function comparison(kind, width, height, makePreview, subtitle) {
   const boardWidth = width+80, rowHeight = height+58, boardHeight = 112+3*rowHeight+20;
   const layers = [];
@@ -129,7 +164,8 @@ async function main() {
   await comparison('desktop',820,312,variant => sharp(path.join(out,`cover-${variant}.png`)).extract({left:0,top:48,width:1640,height:624}).resize(820,312).png().toBuffer(),'Desktop · 820 × 312 px · stredový vertikálny výrez');
   await comparison('mobile',640,360,mobile,'Mobil · 640 × 360 px · stredový horizontálny výrez');
   await comparison('mobile-profile',640,464,async variant => profileOverlay(await mobile(variant)),'Mobil · modelové prekrytie návrhom profilovej fotografie A');
-  await fs.writeFile(path.join(out,'cover-layout.json'),JSON.stringify({canvas:{width:W,height:H},safeArea:{x:180,y:48,width:1280,height:624},variantSafeAreas:{C:{x:260,y:48,width:1120,height:624}},textBounds,photoBounds:{C:cPhotoBounds},avatar:{preview:'profile-A.png',mobileBounds:{x:216,y:256,width:208,height:208},sourceEquivalent:{cx:820,cy:720,r:208}},cropSimulationOnly:true},null,2)+'\n');
-  console.log('Saved cover-A/B/C.png (1640 × 720), three comparison sheets and measured text bounds. No deployment.');
+  await screenshotPreviewB();
+  await fs.writeFile(path.join(out,'cover-layout.json'),JSON.stringify({canvas:{width:W,height:H},safeArea:{x:180,y:48,width:1280,height:624},variantSafeAreas:{B:{x:350,y:110,width:950,height:360},C:{x:260,y:48,width:1120,height:624}},textBounds,faceBounds:{B:bFaceBounds},photoBounds:{C:cPhotoBounds},avatar:{preview:'profile-A.png',mobileBounds:{x:216,y:256,width:208,height:208},sourceEquivalent:{cx:820,cy:720,r:208}},screenshotSimulationB:bMobile,cropSimulationOnly:true},null,2)+'\n');
+  console.log('Saved 1640 × 720 covers, three comparison sheets, screenshot-based B mobile previews and layout bounds. No deployment.');
 }
 main().catch(error => {console.error(error); process.exitCode=1;});
