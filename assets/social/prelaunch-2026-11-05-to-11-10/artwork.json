@@ -1,0 +1,73 @@
+{
+  "title": "Pixelkovia – predštartová komunikácia, 5.–10. 11. 2026",
+  "created": "2026-11-05",
+  "canvas": {
+    "width": 1080,
+    "height": 1350,
+    "format": "PNG",
+    "profile": "sRGB"
+  },
+  "method": "Deterministic composition of existing approved illustrations, original character, physically cropped public worksheet excerpts and local brand typography. No AI artwork generation or character retouching.",
+  "typography": {
+    "heading": "Manrope ExtraBold",
+    "body": "DM Sans Medium",
+    "licenses": "../facebook/sources/fonts/OFL-*.txt"
+  },
+  "sourceSha256": {
+    "assets/characters/piko.png": "20e183d5348ff1e7fa844a555ef553f58d113d24920a2f033457ea3b77ea91db",
+    "assets/pixelkovia-room-mobile.webp": "c79a4e5fac24a2586b262d5ccbabb035329bf2b49a213559a7ad3b20b902b923",
+    "assets/pixelkovia-room-desktop.webp": "af47090dec74e4613fee1a6e2a562ae7cd918d38ea012699dac8eeff826dcb15",
+    "assets/sales/family-code-mobile.webp": "f54ca1465617151c23c6e48fdd590e0e64a2ba1c53c99408b984be269ea7cc91",
+    "assets/sales/family-opening-mobile.webp": "edd85f0399ca8a987d44eca46f51c2372fb209cea27a047be0309f590b2e73b9",
+    "assets/sales/public-previews/decoder.webp": "02581d20f9cdf28982b2387de827e8d4fed72bfee3e0fc7dbb3fbdf51f497071",
+    "assets/sales/public-previews/path.webp": "ae908481f1ffed8e289bad7c044a6dbe25788b732e6e5a3bad891a3ea4b69aa4",
+    "assets/sales/public-previews/signals.webp": "c28666c868ce71f22e6bcebc70b5f3b107e1b53bdca6495933fdb5d5089fa320",
+    "assets/social/facebook/sources/fonts/Manrope-ExtraBold.ttf": "a8291b05b2732801abdbbb6d06866c57431c3b990638462423e692151b5e0895",
+    "assets/social/facebook/sources/fonts/DM-Sans-Medium.ttf": "376427b5322148d8de1e03f263bcca4935a2d60ba71d9f94f4947ab664c711ae",
+    "assets/social/prelaunch-2026-11-05-to-11-10/sources/parent-guide-excerpt.png": "1b7de99ac620a472e272c84f80c5696cf5a4b06d4ad0280e65b671113b78e62e",
+    "assets/social/prelaunch-2026-11-05-to-11-10/sources/diploma-excerpt.png": "3d28ca9f9b0499b17e5e1281159bd3dee2b144db428edd20b7a34ad664d71fc7"
+  },
+  "derivedExcerpts": {
+    "sources/parent-guide-excerpt.png": {
+      "source": [
+        "printables.html",
+        "print-materials.js",
+        "signal-print.css",
+        "game-data.js",
+        "story-text.js",
+        "party.css"
+      ],
+      "selector": "#rodicovsky-navod",
+      "capture": "Chromium screenshot at 900 × 1300 viewport, screen CSS",
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 794,
+        "height": 510
+      },
+      "content": "Header and four preparation steps only. Ends above hiding locations and solutions."
+    },
+    "sources/diploma-excerpt.png": {
+      "source": [
+        "printables.html",
+        "print-materials.js",
+        "signal-print.css",
+        "party.css"
+      ],
+      "selector": "#diplom",
+      "capture": "Chromium screenshot at 900 × 1300 viewport, screen CSS",
+      "crop": {
+        "left": 28,
+        "top": 96,
+        "width": 738,
+        "height": 455
+      },
+      "content": "Piko, heading, team name line; lower half and footer physically excluded."
+    }
+  },
+  "copyEdits": [
+    "Added Slovak diacritics throughout.",
+    "Corrected supplied typo PATRJU to PÁTRAJÚ."
+  ],
+  "publication": false
+}

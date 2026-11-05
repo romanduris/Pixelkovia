@@ -1,0 +1,1130 @@
+{
+  "canvas": {
+    "width": 1080,
+    "height": 1350,
+    "profile": "sRGB",
+    "opaque": true
+  },
+  "textSafeMargins": {
+    "horizontal": 80,
+    "vertical": 60
+  },
+  "posts": [
+    {
+      "file": "post-01-objavte-tajny-svet-pixelkov.png",
+      "date": "2026-11-05",
+      "slide": null,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "OBJAVTE",
+          "x": 80,
+          "y": 200,
+          "width": 385,
+          "height": 68,
+          "size": 90,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "TAJNÝ SVET",
+          "x": 80,
+          "y": 287,
+          "width": 522,
+          "height": 91,
+          "size": 90,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "PIXELKOV",
+          "x": 80,
+          "y": 420,
+          "width": 423,
+          "height": 68,
+          "size": 90,
+          "font": "Manrope ExtraBold",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "Dobrodružstvo sa začína",
+          "x": 80,
+          "y": 547,
+          "width": 435,
+          "height": 30,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "u vás doma",
+          "x": 80,
+          "y": 598,
+          "width": 199,
+          "height": 29,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/pixelkovia-room-mobile.webp",
+          "operation": "uniform width 1080, then crop y=565, h=1350"
+        }
+      ]
+    },
+    {
+      "file": "post-02-slide-01-ako-funguje.png",
+      "date": "2026-11-06",
+      "slide": 1,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "AKO FUNGUJE",
+          "x": 80,
+          "y": 197,
+          "width": 541,
+          "height": 61,
+          "size": 80,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "PIXELKOVIA?",
+          "x": 80,
+          "y": 296,
+          "width": 496,
+          "height": 61,
+          "size": 80,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Rodinné dobrodružstvo",
+          "x": 80,
+          "y": 418,
+          "width": 415,
+          "height": 29,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "krok za krokom",
+          "x": 80,
+          "y": 469,
+          "width": 266,
+          "height": 28,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "1 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 45,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/characters/piko.png",
+          "x": 255,
+          "y": 552,
+          "width": 620,
+          "height": 620,
+          "operation": "trim transparent edges; uniform scale only"
+        }
+      ]
+    },
+    {
+      "file": "post-02-slide-02-rodic-pripravi.png",
+      "date": "2026-11-06",
+      "slide": 2,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "1. RODIČ",
+          "x": 80,
+          "y": 179,
+          "width": 324,
+          "height": 79,
+          "size": 80,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "PRIPRAVÍ HRU",
+          "x": 80,
+          "y": 276,
+          "width": 538,
+          "height": 81,
+          "size": 80,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Vytlačí materiály a ukryje",
+          "x": 80,
+          "y": 417,
+          "width": 454,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "indície po byte",
+          "x": 80,
+          "y": 467,
+          "width": 265,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "2 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 50,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/social/prelaunch-2026-11-05-to-11-10/sources/parent-guide-excerpt.png",
+          "x": 92,
+          "y": 600,
+          "width": 808,
+          "height": 554,
+          "angle": -3,
+          "crop": null
+        },
+        {
+          "source": "assets/sales/public-previews/decoder.webp",
+          "x": 650,
+          "y": 840,
+          "width": 338,
+          "height": 386,
+          "angle": 6,
+          "crop": {
+            "left": 0,
+            "top": 210,
+            "width": 703,
+            "height": 633
+          }
+        }
+      ]
+    },
+    {
+      "file": "post-02-slide-03-deti-patraju.png",
+      "date": "2026-11-06",
+      "slide": 3,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "2. DETI PÁTRAJÚ",
+          "x": 80,
+          "y": 177,
+          "width": 518,
+          "height": 68,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "A RIEŠIA HÁDANKY",
+          "x": 80,
+          "y": 265,
+          "width": 600,
+          "height": 68,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Každá indícia ich posunie ďalej",
+          "x": 80,
+          "y": 397,
+          "width": 546,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "3 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 51,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/sales/family-code-mobile.webp",
+          "x": 80,
+          "y": 535,
+          "width": 920,
+          "height": 650,
+          "crop": {
+            "left": 0,
+            "top": 260,
+            "width": 760,
+            "height": 700
+          }
+        }
+      ]
+    },
+    {
+      "file": "post-02-slide-04-velke-tajomstvo.png",
+      "date": "2026-11-06",
+      "slide": 4,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "3. SPOLOČNE OBJAVIA",
+          "x": 80,
+          "y": 180,
+          "width": 713,
+          "height": 65,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "VEĽKÉ TAJOMSTVO",
+          "x": 80,
+          "y": 265,
+          "width": 614,
+          "height": 68,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "A pomôžu Pikovi nájsť",
+          "x": 80,
+          "y": 398,
+          "width": 389,
+          "height": 38,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "stratených kamarátov",
+          "x": 80,
+          "y": 447,
+          "width": 391,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "4 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 52,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#ace9cf"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/pixelkovia-room-desktop.webp",
+          "x": 80,
+          "y": 555,
+          "width": 920,
+          "height": 613,
+          "crop": {
+            "left": 640,
+            "top": 260,
+            "width": 960,
+            "height": 640
+          }
+        }
+      ]
+    },
+    {
+      "file": "post-03-piko-potrebuje-pomoc.png",
+      "date": "2026-11-08",
+      "slide": null,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "PIKO POTREBUJE",
+          "x": 80,
+          "y": 198,
+          "width": 638,
+          "height": 58,
+          "size": 78,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "VAŠU POMOC",
+          "x": 80,
+          "y": 280,
+          "width": 514,
+          "height": 76,
+          "size": 78,
+          "font": "Manrope ExtraBold",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "Jeho kamaráti sa stratili",
+          "x": 80,
+          "y": 418,
+          "width": 425,
+          "height": 29,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/characters/piko.png",
+          "x": 220,
+          "y": 520,
+          "width": 680,
+          "height": 680,
+          "operation": "trim transparent edges; uniform scale only"
+        }
+      ]
+    },
+    {
+      "file": "post-04-jeden-telefon-sedem-indicii.png",
+      "date": "2026-11-09",
+      "slide": null,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "JEDEN TELEFÓN.",
+          "x": 80,
+          "y": 177,
+          "width": 523,
+          "height": 68,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "SEDEM INDÍCIÍ.",
+          "x": 80,
+          "y": 259,
+          "width": 477,
+          "height": 68,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "JEDNO",
+          "x": 80,
+          "y": 359,
+          "width": 217,
+          "height": 50,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "DOBRODRUŽSTVO.",
+          "x": 80,
+          "y": 426,
+          "width": 602,
+          "height": 65,
+          "size": 66,
+          "font": "Manrope ExtraBold",
+          "color": "#ace9cf"
+        },
+        {
+          "text": "Pixelkovia premenia váš domov",
+          "x": 80,
+          "y": 532,
+          "width": 525,
+          "height": 36,
+          "size": 36,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "na miesto plné záhad",
+          "x": 80,
+          "y": 582,
+          "width": 356,
+          "height": 36,
+          "size": 36,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#f6f0e5"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/sales/family-code-mobile.webp",
+          "x": 0,
+          "y": 645,
+          "width": 1080,
+          "height": 705,
+          "crop": {
+            "left": 0,
+            "top": 180,
+            "width": 1200,
+            "height": 1100
+          }
+        }
+      ]
+    },
+    {
+      "file": "post-05-slide-01-co-dostanete.png",
+      "date": "2026-11-10",
+      "slide": 1,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "ČO DOSTANETE",
+          "x": 80,
+          "y": 180,
+          "width": 590,
+          "height": 76,
+          "size": 78,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "PO ZAKÚPENÍ?",
+          "x": 80,
+          "y": 277,
+          "width": 553,
+          "height": 78,
+          "size": 78,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Všetko, čo potrebujete na rodinné",
+          "x": 80,
+          "y": 417,
+          "width": 573,
+          "height": 36,
+          "size": 36,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "dobrodružstvo doma",
+          "x": 80,
+          "y": 468,
+          "width": 356,
+          "height": 27,
+          "size": 36,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "1 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 45,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/sales/public-previews/path.webp",
+          "x": 605,
+          "y": 625,
+          "width": 377,
+          "height": 430,
+          "angle": 7,
+          "crop": null
+        },
+        {
+          "source": "assets/sales/public-previews/signals.webp",
+          "x": 565,
+          "y": 775,
+          "width": 394,
+          "height": 451,
+          "angle": -6,
+          "crop": null
+        },
+        {
+          "source": "assets/characters/piko.png",
+          "x": 80,
+          "y": 625,
+          "width": 530,
+          "height": 530,
+          "operation": "trim transparent edges; uniform scale only"
+        }
+      ]
+    },
+    {
+      "file": "post-05-slide-02-pribeh-v-mobile.png",
+      "date": "2026-11-10",
+      "slide": 2,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "INTERAKTÍVNY",
+          "x": 80,
+          "y": 177,
+          "width": 509,
+          "height": 72,
+          "size": 72,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "PRÍBEH V MOBILE",
+          "x": 80,
+          "y": 271,
+          "width": 589,
+          "height": 73,
+          "size": 72,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Piko vás bude sprevádzať",
+          "x": 80,
+          "y": 418,
+          "width": 449,
+          "height": 38,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "celým dobrodružstvom",
+          "x": 80,
+          "y": 467,
+          "width": 415,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "2 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 50,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/sales/family-opening-mobile.webp",
+          "x": 80,
+          "y": 565,
+          "width": 920,
+          "height": 620,
+          "crop": {
+            "left": 0,
+            "top": 250,
+            "width": 1200,
+            "height": 1000
+          }
+        }
+      ]
+    },
+    {
+      "file": "post-05-slide-03-pracovne-listy.png",
+      "date": "2026-11-10",
+      "slide": 3,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "7 PRACOVNÝCH",
+          "x": 80,
+          "y": 177,
+          "width": 560,
+          "height": 75,
+          "size": 74,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "LISTOV A INDÍCIÍ",
+          "x": 80,
+          "y": 273,
+          "width": 584,
+          "height": 74,
+          "size": 74,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Hádanky, stopy a úlohy",
+          "x": 80,
+          "y": 417,
+          "width": 409,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "na domáce pátranie",
+          "x": 80,
+          "y": 468,
+          "width": 356,
+          "height": 38,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "3 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 51,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/sales/public-previews/path.webp",
+          "x": 535,
+          "y": 630,
+          "width": 461,
+          "height": 528,
+          "angle": 6,
+          "crop": null
+        },
+        {
+          "source": "assets/sales/public-previews/decoder.webp",
+          "x": 108,
+          "y": 610,
+          "width": 508,
+          "height": 586,
+          "angle": -5,
+          "crop": null
+        }
+      ]
+    },
+    {
+      "file": "post-05-slide-04-navod-a-diplom.png",
+      "date": "2026-11-10",
+      "slide": 4,
+      "text": [
+        {
+          "text": "PIXELKOVIA",
+          "x": 80,
+          "y": 77,
+          "width": 171,
+          "height": 22,
+          "size": 30,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Stratený signál",
+          "x": 827,
+          "y": 79,
+          "width": 173,
+          "height": 25,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "RODIČOVSKÝ NÁVOD,",
+          "x": 80,
+          "y": 177,
+          "width": 645,
+          "height": 72,
+          "size": 63,
+          "font": "Manrope ExtraBold",
+          "color": "#0d1424"
+        },
+        {
+          "text": "NÁPOVEDY A DIPLOM",
+          "x": 80,
+          "y": 263,
+          "width": 635,
+          "height": 63,
+          "size": 63,
+          "font": "Manrope ExtraBold",
+          "color": "#233b33"
+        },
+        {
+          "text": "Príprava zaberie len chvíľu.",
+          "x": 80,
+          "y": 397,
+          "width": 472,
+          "height": 39,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "Zážitok ostane dlho.",
+          "x": 80,
+          "y": 448,
+          "width": 354,
+          "height": 29,
+          "size": 38,
+          "font": "DM Sans Medium",
+          "color": "#0d1424"
+        },
+        {
+          "text": "pixelkovia.rodulab.com",
+          "x": 80,
+          "y": 1260,
+          "width": 265,
+          "height": 24,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        },
+        {
+          "text": "4 / 4",
+          "x": 750,
+          "y": 1259,
+          "width": 52,
+          "height": 22,
+          "size": 25,
+          "font": "DM Sans Medium",
+          "color": "#233b33"
+        }
+      ],
+      "artwork": [
+        {
+          "source": "assets/social/prelaunch-2026-11-05-to-11-10/sources/parent-guide-excerpt.png",
+          "x": 95,
+          "y": 562,
+          "width": 797,
+          "height": 547,
+          "angle": -3,
+          "crop": null
+        },
+        {
+          "source": "assets/social/prelaunch-2026-11-05-to-11-10/sources/diploma-excerpt.png",
+          "x": 463,
+          "y": 855,
+          "width": 528,
+          "height": 365,
+          "angle": 5,
+          "crop": null
+        }
+      ]
+    }
+  ]
+}
