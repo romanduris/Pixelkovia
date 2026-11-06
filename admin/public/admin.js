@@ -7,7 +7,7 @@ const time=ms=>ms==null?'—':ms>=3600000?number(ms/3600000)+' h':ms>=60000?numb
 const stateNames={purchased:'Zakúpené, neaktivované',preparing:'Pripravuje hru',playing:'Rozhrané',completed:'Dokončené',expired:'Prístup vypršal',active:'Aktívna relácia',valid:'Platné',revoked:'Odňaté',pending:'Čaká na platbu','payment-pending':'Čaká na platbu',paid:'Zaplatené',refunded:'Vrátené',cancelled:'Zrušené',draft:'Koncept',blocked:'Blokované',queued:'Čaká na odoslanie',sent:'Odoslané',failed:'Chyba'};
 const badge=status=>`<span class="status ${escape(status)}">${escape(stateNames[status]||status)}</span>`;
 const titles={payments:['Platby a chyby','Overené úhrady, zlyhania formulára a doručenie prístupov.'],dashboard:['Overview','Zákazníci, tržby a priebeh hry na jednom mieste.'],orders:['Objednávky','Nákupy, produkty a platby zákazníkov Pixelkovia.'],analytics:['Herná analýza','Od prvého nákupu po poslednú stopu. Celý príbeh každého zákazníka.']};
-const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'1',paymentCategory:'',paymentStatus:'',paymentPage:1};
+const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'1',paymentCategory:'',paymentStatus:''};
 let loadingId=0,detailId=0,debounce;
 async function api(path,params){const response=await fetch(path+(params?.toString()?'?'+params:''),{credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/admin/login');throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
 function midnight(day){const utc=Date.parse(day+'T00:00:00Z');const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(utc).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const represented=Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));return new Date(utc-(represented-utc)).toISOString();}
@@ -63,8 +63,8 @@ function readPaymentLayout(){
   }catch{}
   return defaults;
 }
-let paymentLayout=readPaymentLayout(),paymentData=null,paymentDragColumn=null;
-const paymentUI={panels:new Set(),expanded:new Set(),columnQuery:''};
+let paymentLayout=readPaymentLayout(),paymentData=null,paymentDragColumn=null,paymentLoadingMore=false;
+const paymentUI={panels:new Set(),expanded:new Set(),columnQuery:'',loadError:''};
 function savePaymentLayout(){
   // Presentation preferences only. Never persist emails, rows or event contents.
   try{localStorage.setItem(paymentLayoutKey,JSON.stringify(paymentLayout));}catch{}
@@ -80,7 +80,7 @@ function syncPaymentShell(){
 }
 function capturePaymentUI(){
   const wrap=$('#payment-table-scroll'),strip=$('.payment-status-strip'),focused=document.activeElement;
-  const snapshot={left:wrap?.scrollLeft||0,top:wrap?.scrollTop||0,strip:strip?.scrollLeft||0,menu:$('.payment-column-menu')?.scrollTop||0,focus:focused?.id,focusAttempt:focused?.dataset?.paymentExpand,selection:focused?.id==='payment-column-search'?focused.selectionStart:null};
+  const snapshot={pageTop:window.scrollY,left:wrap?.scrollLeft||0,top:wrap?.scrollTop||0,strip:strip?.scrollLeft||0,menu:$('.payment-column-menu')?.scrollTop||0,focus:focused?.id,focusAttempt:focused?.dataset?.paymentExpand,selection:focused?.id==='payment-column-search'?focused.selectionStart:null};
   $('#view').querySelectorAll('details[data-payment-panel]').forEach(el=>{
     if(el.open)paymentUI.panels.add(el.dataset.paymentPanel);else paymentUI.panels.delete(el.dataset.paymentPanel);
   });
@@ -93,10 +93,10 @@ function restorePaymentUI(snapshot){
   const menu=$('.payment-column-menu');if(menu)menu.scrollTop=snapshot.menu;
   const focused=snapshot.focusAttempt?[...document.querySelectorAll('[data-payment-expand]')].find(el=>el.dataset.paymentExpand===snapshot.focusAttempt)||wrap:snapshot.focus&&document.getElementById(snapshot.focus);
   if(focused&&$('#view').contains(focused)){focused.focus({preventScroll:true});if(focused.id==='payment-column-search'&&snapshot.selection!=null)focused.setSelectionRange(snapshot.selection,snapshot.selection);}
+  window.scrollTo({top:snapshot.pageTop||0,behavior:'instant'});
 }
-function renderPaymentWorkspace(){
+function renderPaymentWorkspace(snapshot=capturePaymentUI()){
   if(!paymentData||currentView()!=='payments')return;
-  const snapshot=capturePaymentUI();
   $('#view').innerHTML=payments(paymentData);restorePaymentUI(snapshot);
 }
 const paymentPanelOpen=id=>paymentUI.panels.has(id)?' open':'';
@@ -181,14 +181,43 @@ function payments(d){
     return `<tr class="payment-attempt-row ${expanded?'is-expanded':''}" data-attempt="${escape(row.id)}">${visible.map(id=>`<td data-column="${id}" data-label="${paymentColumns[id]}">${paymentCell(row,id)}</td>`).join('')}<td class="payment-expand-cell"><button type="button" id="payment-attempt-toggle-${index}" class="payment-row-toggle" data-payment-expand="${escape(row.id)}" aria-label="Detail pokusu ${escape(row.email||row.id)}" aria-expanded="${expanded}" aria-controls="${detailId}"><span aria-hidden="true">${expanded?'−':'+'}</span></button></td></tr><tr class="payment-attempt-detail-row" id="${detailId}" ${expanded?'':'hidden'}><td colspan="${visible.length+1}">${expanded?paymentAttemptDetail(row,d):''}</td></tr>`;
   }).join('');
   const filtered=attemptStateNames[state.paymentStatus]||'Všetky stavy';
-  return `<nav class="payment-status-strip" aria-label="Filtrovať platby podľa stavu">${states.map(([id,label,count])=>`<button type="button" id="payment-state-${id||'all'}" class="payment-state-chip ${id?'state-'+id:''}" data-payment-state="${id}" aria-pressed="${state.paymentStatus===id}" aria-label="${label}: ${count}"><i aria-hidden="true"></i><span>${label}</span><strong>${count}</strong></button>`).join('')}</nav>
+  return `<nav class="payment-status-strip ${states.length>7?'has-unknown':''}" aria-label="Filtrovať platby podľa stavu">${states.map(([id,label,count])=>`<button type="button" id="payment-state-${id||'all'}" class="payment-state-chip ${id?'state-'+id:''}" data-payment-state="${id}" aria-pressed="${state.paymentStatus===id}" aria-label="${label}: ${count}"><span class="payment-state-top"><strong>${count}</strong><small>${d.total?Math.round(count/d.total*100):0}%</small></span><span class="payment-state-name"><i aria-hidden="true"></i>${label}</span><progress class="payment-state-meter" max="${d.total||1}" value="${count}" aria-hidden="true"></progress></button>`).join('')}</nav>
     ${paymentMonitorDisclosure(d)}
     <section class="payment-attempts payment-workspace density-${paymentLayout.density}" aria-label="Platobné pokusy"><div class="payment-workspace-toolbar"><div class="payment-table-heading"><h2>Pokusy <span class="count-pill">${d.matchingTotal}</span></h2><span>${escape(filtered)}</span></div><div class="payment-table-tools"><label class="sr-only" for="payment-days">Obdobie pokusov</label><select id="payment-days">${options([['1','Posledných 24 hodín'],['7','Posledných 7 dní'],['30','Posledných 30 dní'],['all','Celé obdobie']],state.paymentDays)}</select>${paymentColumnSettings()}<button id="refresh-payments" type="button" class="button secondary" aria-label="Obnoviť platby"><span aria-hidden="true">↻</span> Obnoviť</button></div></div>
     ${d.rows.length?`<div class="table-wrap" id="payment-table-scroll" tabindex="0" role="region" aria-label="Tabuľka pokusov; pri väčšom počte stĺpcov posúvajte vodorovne"><table class="payment-table"><thead><tr>${visible.map(id=>`<th scope="col" data-column="${id}"><span class="payment-column-drag" draggable="true" data-payment-drag="${id}" title="Potiahnutím zmeníte poradie stĺpcov; poradie môžete meniť aj v nastaveniach Stĺpce">${paymentColumns[id]}</span></th>`).join('')}<th scope="col" class="payment-expand-cell"><span class="sr-only">Detail pokusu</span></th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Pre zvolené filtre zatiaľ nie sú žiadne pokusy.')}
-    <div class="payment-workspace-footer"><span>${d.matchingTotal} z ${d.total} pokusov · Bratislava</span><div class="payment-pager"><button type="button" class="button secondary" data-payment-page="-1" ${d.page<=1?'disabled':''} aria-label="Predchádzajúca strana">←</button><span>Strana ${d.page} / ${d.pages}</span><button type="button" class="button secondary" data-payment-page="1" ${d.page>=d.pages?'disabled':''} aria-label="Ďalšia strana">→</button></div></div></section>
+    <div class="payment-workspace-footer"><span role="status">Zobrazené ${d.rows.length} z ${d.matchingTotal} pokusov <small>· čas Bratislava</small></span><div class="payment-load-more">${paymentUI.loadError?`<span class="payment-append-error" role="alert">${escape(paymentUI.loadError)}</span>`:''}${d.hasMore?`<button type="button" class="button secondary" id="load-more-payments" ${paymentLoadingMore?'disabled':''}>${paymentLoadingMore?'Načítavam…':paymentUI.loadError?'Skúsiť znova':'Načítať ďalších 40'} <span aria-hidden="true">↓</span></button>`:'<span class="payment-list-end">Všetky pokusy načítané</span>'}</div></div></section>
     <details class="payment-log-disclosure" data-payment-panel="log"${paymentPanelOpen('log')}><summary id="payment-log-toggle"><span>Denník udalostí</span><small>${d.logs.length} záznamov${d.errors24?' · technické signály za 24 h: '+d.errors24:''}</small><span aria-hidden="true">⌄</span></summary><div class="payment-log-body"><div class="payment-log-heading"><p>Posledných 200 dostupných udalostí vo zvolenom období. Diagnostika sa uchováva 90 dní; hlásenie prehliadača ani časový limit nepotvrdzujú zlyhanie platby.</p><label>Udalosti<select id="payment-category">${options([['','Všetky udalosti'],['technical','Technické signály'],['bank','Odmietnutia bankou'],['validation','Oprava údajov'],['customer','Kroky zákazníka'],['lifecycle','Priebeh platby']],state.paymentCategory)}</select></label></div>${paymentLogTable(d.logs)}</div></details>`;
 }
-function paymentParams(){return new URLSearchParams({days:state.paymentDays,category:state.paymentCategory,status:state.paymentStatus,page:state.paymentPage});}
+function paymentParams(append=false){
+  const params=new URLSearchParams({days:state.paymentDays,category:state.paymentCategory,status:state.paymentStatus});
+  const sameScope=paymentData&&String(paymentData.days)===state.paymentDays&&(paymentData.attemptStatus||'')===state.paymentStatus;
+  if(sameScope){
+    if(append&&paymentData.nextCursor)params.set('cursor',paymentData.nextCursor);
+    else if(!append&&paymentData.refreshCursor)params.set('through',paymentData.refreshCursor);
+  }
+  return params;
+}
+async function loadMorePayments(){
+  if(currentView()!=='payments'||paymentLoadingMore||$('#view').getAttribute('aria-busy')==='true'||!paymentData?.hasMore)return;
+  const id=++loadingId,params=paymentParams(true);
+  paymentLoadingMore=true;paymentUI.loadError='';renderPaymentWorkspace();$('#view').setAttribute('aria-busy','true');
+  let firstNew=null;
+  try{
+    const data=await api('/api/admin/payments',params);if(id!==loadingId)return;
+    const rows=new Map(paymentData.rows.map(row=>[row.id,row]));
+    for(const row of data.rows){if(!rows.has(row.id)&&!firstNew)firstNew=row.id;rows.set(row.id,row);}
+    paymentData={...data,refreshCursor:data.refreshCursor||paymentData.refreshCursor,rows:[...rows.values()]};
+  }catch(error){if(id!==loadingId)return;paymentUI.loadError=error.message;}
+  finally{
+    if(id===loadingId){
+      paymentLoadingMore=false;$('#view').setAttribute('aria-busy','false');
+      const snapshot=capturePaymentUI();
+      // Continue keyboard reading at the new batch, without moving page scroll.
+      if(firstNew&&(document.activeElement===document.body||snapshot.focus==='load-more-payments'))snapshot.focusAttempt=firstNew;
+      renderPaymentWorkspace(snapshot);
+    }
+  }
+}
 async function refreshPaymentHealth(){
   if(!state.context||document.hidden||$('#view').getAttribute('aria-busy')==='true')return;
   const view=currentView();if(view==='payments'){void load();return;}if(view!=='dashboard')return;
@@ -231,6 +260,7 @@ function detail(data){
 }
 function currentView(){const hash=location.hash.slice(1);return ['customers','emails','events'].includes(hash)?'analytics':Object.hasOwn(titles,hash)?hash:'dashboard';}
 async function load(){
+  paymentLoadingMore=false;paymentUI.loadError='';
   const id=++loadingId,view=currentView();
   $('#page-title').textContent=titles[view][0];$('#page-description').textContent=titles[view][1];$('#breadcrumb').textContent=titles[view][0];
   document.body.classList.toggle('analysis-wide',view==='analytics'&&state.wide);
@@ -245,7 +275,7 @@ async function load(){
     const paymentSnapshot=view==='payments'?capturePaymentUI():null;
     if(view==='payments')paymentData=data;
     $('#view').innerHTML=({dashboard,orders,analytics,payments})[view](data);
-    if(view==='payments'){state.paymentPage=data.page;restorePaymentUI(paymentSnapshot);}else state.page=data.page||state.page;
+    if(view==='payments'){restorePaymentUI(paymentSnapshot);}else state.page=data.page||state.page;
     if(view==='dashboard'){
       $('#view').insertAdjacentHTML('afterbegin','<div id="payment-overview"></div>');
       const paymentData=await api('/api/admin/payments').catch(()=>null);
@@ -285,15 +315,15 @@ $('#view').addEventListener('change',e=>{
     paymentLayout.hidden=[...hidden];savePaymentLayout();renderPaymentWorkspace();return;
   }
   if(e.target.id==='payment-density'){paymentLayout.density=e.target.value==='comfortable'?'comfortable':'compact';savePaymentLayout();renderPaymentWorkspace();return;}
-  const paymentKeys={'payment-days':'paymentDays','payment-category':'paymentCategory'};if(paymentKeys[e.target.id]){state[paymentKeys[e.target.id]]=e.target.value;state.paymentPage=1;load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
+  const paymentKeys={'payment-days':'paymentDays','payment-category':'paymentCategory'};if(paymentKeys[e.target.id]){state[paymentKeys[e.target.id]]=e.target.value;load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
 $('#view').addEventListener('click',async e=>{
   if(e.target.closest('#refresh-payments')){load();return;}
-  const chip=e.target.closest('[data-payment-state]');if(chip){state.paymentStatus=chip.dataset.paymentState;state.paymentPage=1;$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
+  const chip=e.target.closest('[data-payment-state]');if(chip){state.paymentStatus=chip.dataset.paymentState;$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
   const expand=e.target.closest('[data-payment-expand]');if(expand){const id=expand.dataset.paymentExpand;if(paymentUI.expanded.has(id))paymentUI.expanded.delete(id);else paymentUI.expanded.add(id);renderPaymentWorkspace();return;}
   const move=e.target.closest('[data-payment-move]');if(move){movePaymentColumn(move.dataset.paymentMove,Number(move.dataset.step));return;}
   if(e.target.closest('#reset-payment-layout')){paymentLayout=defaultPaymentLayout();paymentUI.columnQuery='';savePaymentLayout();syncPaymentShell();renderPaymentWorkspace();return;}
   if(e.target.closest('#close-payment-columns')){closePaymentColumns();return;}
-  const paymentPager=e.target.closest('[data-payment-page]');if(paymentPager){state.paymentPage+=Number(paymentPager.dataset.paymentPage);$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
+  if(e.target.closest('#load-more-payments')){void loadMorePayments();return;}
   const pager=e.target.closest('[data-pagination]');if(pager){state.page+=Number(pager.dataset.pagination);load();return;}
   if(e.target.closest('#expand-analysis')){state.wide=!state.wide;document.body.classList.toggle('analysis-wide',state.wide);$('#view .journey-board').classList.toggle('is-wide',state.wide);const b=$('#expand-analysis');b.textContent=state.wide?'↙ Zmenšiť':'⛶ Rozšíriť na celú šírku';b.setAttribute('aria-pressed',String(state.wide));return;}
   const retry=e.target.closest('[data-retry]');if(retry){fetchInlineDetail(retry.dataset.retry);return;}

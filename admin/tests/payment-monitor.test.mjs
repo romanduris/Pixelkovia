@@ -211,17 +211,33 @@ test('success waits for signed verified webhook; duplicates and late failures ne
     assert.equal((await first(f.db,'SELECT count(*) n FROM payment_attempt_outcomes')).n,1);
   }finally{f.db.close();}
 });
-test('all attempts remain reachable with stable pagination, state filtering and unfiltered summaries',async()=>{
+test('40-row cursor batches survive concurrent arrivals, equal timestamps, refreshes and filters',async()=>{
   const f=fixture();try{
     const now=Date.now();
     for(let i=0;i<105;i++)await execute(f.db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at) VALUES(?,?,?,?,?,?)','page-'+String(i).padStart(3,'0'),'private'+i+'@example.invalid','','["episode-1"]',1499,now);
     await paymentLog(f.env,{type:'sdk_error',source:'browser',attemptId:'page-000'});
-    let report=await paymentReport(f.env,new URLSearchParams({days:'all'}),true);
-    assert.equal(report.total,105);assert.equal(report.rows.length,100);assert.equal(report.pages,2);assert.equal(report.attemptCounts.started,104);assert.equal(report.attemptCounts.error,1);
-    const ids=new Set(report.rows.map(r=>r.id));
-    report=await paymentReport(f.env,new URLSearchParams({days:'all',page:'2'}),true);assert.equal(report.rows.length,5);for(const r of report.rows)assert.ok(!ids.has(r.id));
-    report=await paymentReport(f.env,new URLSearchParams({status:'error',page:'2'}),true);assert.equal(report.page,1);assert.equal(report.matchingTotal,1);assert.equal(report.total,105);assert.equal(report.rows[0].id,'page-000');assert.equal(report.attemptCounts.started,104);
-    for(const params of [{status:'forged'},{page:'0'},{page:'NaN'}])await assert.rejects(()=>paymentReport(f.env,new URLSearchParams(params),true),e=>e.status===400);
+    const get=values=>paymentReport(f.env,new URLSearchParams({days:'all',...values}),true);
+    let report=await get({});
+    assert.equal(report.total,105);assert.equal(report.rows.length,40);assert.equal(report.pageSize,40);assert.equal(report.pages,3);assert.equal(report.hasMore,true);
+    assert.equal(report.attemptCounts.started,104);assert.equal(report.attemptCounts.error,1);
+    assert.equal((await get({page:'3'})).rows.length,25,'legacy page parameter remains compatible');
+    const ids=new Set(report.rows.map(r=>r.id)),firstCursor=report.nextCursor;
+    await execute(f.db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at) VALUES(?,?,?,?,?,?)','new-arrival','new@example.invalid','','["episode-1"]',1499,now+1);
+    report=await get({cursor:firstCursor});assert.equal(report.rows.length,40);assert.equal(report.rows[0].id,'page-040');
+    for(const r of report.rows){assert.ok(!ids.has(r.id));ids.add(r.id);}
+    const secondCursor=report.nextCursor;
+    const refreshed=await get({through:report.refreshCursor});assert.equal(refreshed.rows.length,81);assert.equal(refreshed.rows[0].id,'new-arrival');assert.equal(refreshed.rows.at(-1).id,'page-079');assert.equal(refreshed.hasMore,true);assert.equal(refreshed.total,106);
+    report=await get({cursor:secondCursor});assert.equal(report.rows.length,25);assert.equal(report.hasMore,false);assert.equal(report.nextCursor,null);
+    for(const r of report.rows){assert.ok(!ids.has(r.id));ids.add(r.id);}assert.equal(ids.size,105);
+    const all=await get({through:report.refreshCursor});assert.equal(all.rows.length,106);assert.equal(all.hasMore,false);
+    // A changed/deleted boundary still defines a stable range.
+    await execute(f.db,'DELETE FROM checkout_attempts WHERE id=?','page-079');
+    assert.equal((await get({through:secondCursor})).rows.length,80);
+    assert.equal((await get({cursor:secondCursor})).rows.length,25);
+    report=await get({status:'error',page:'2'});assert.equal(report.page,1);assert.equal(report.matchingTotal,1);assert.equal(report.rows[0].id,'page-000');assert.equal(report.attemptCounts.started,104);assert.equal(report.hasMore,false);
+    report=await get({status:'cancelled'});assert.equal(report.rows.length,0);assert.equal(report.refreshCursor,null);assert.equal(report.hasMore,false);
+    const forged=btoa(JSON.stringify([-1,'id']));
+    for(const params of [{status:'forged'},{page:'0'},{page:'NaN'},{cursor:'invalid'},{through:forged},{cursor:firstCursor,through:secondCursor},{cursor:firstCursor,page:'2'}])await assert.rejects(()=>get(params),e=>e.status===400);
     const response=await worker.fetch(new Request(origin+'/api/admin/payments?days=all'),f.env);
     assert.equal(response.status,403);assert.ok(!(await response.text()).includes('@example.invalid'));
   }finally{f.db.close();}

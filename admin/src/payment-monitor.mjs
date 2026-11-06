@@ -127,12 +127,27 @@ export async function prunePaymentLog(env){
   await execute(env.TQ_DB,'DELETE FROM payment_log WHERE created_at<?',Date.now()-90*86400000);
   await execute(env.TQ_DB,"DELETE FROM customer_login_attempts WHERE scope_key LIKE 'payment-log:%' AND window_start<?",Date.now()-86400000);
 }
+// Cursors contain only the ordering key; administrator authorization is unchanged.
+const attemptCursor=row=>btoa(JSON.stringify([row.createdAt,row.id])).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
+function readAttemptCursor(value){
+  if(!value)return null;
+  try{
+    if(value.length>300||!/^[A-Za-z0-9_-]+$/.test(value))throw Error();
+    const key=JSON.parse(atob(value.replaceAll('-','+').replaceAll('_','/')));
+    if(!Array.isArray(key)||key.length!==2||!Number.isSafeInteger(key[0])||key[0]<0||typeof key[1]!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(key[1]))throw Error();
+    return {createdAt:key[0],id:key[1]};
+  }catch{throw new HttpError(400,'Neplatná hranica pokusov.');}
+}
+// Matches SQLite's created_at DESC, id ASC order, including equal timestamps.
+const olderAttempt=(row,key)=>row.createdAt<key.createdAt||(row.createdAt===key.createdAt&&row.id>key.id);
 export async function paymentReport(env,params,ready){
   const days=params.get('days')==='all'?'all':Number(params.get('days')||1);if(![1,7,30,'all'].includes(days))throw new HttpError(400,'Neplatné obdobie.');
   const category=params.get('category')||'';if(category&&!['technical','bank','validation','customer','lifecycle'].includes(category))throw new HttpError(400,'Neplatný filter.');
   const attemptStatus=params.get('status')||'',attemptCounts={started:0,abandoned:0,cancelled:0,error:0,successful:0,declined:0,unknown:0};
   if(attemptStatus&&!Object.hasOwn(attemptCounts,attemptStatus))throw new HttpError(400,'Neplatný stav platby.');
   const requestedPage=Number(params.get('page')||1);if(!Number.isSafeInteger(requestedPage)||requestedPage<1)throw new HttpError(400,'Neplatná strana.');
+  const cursor=readAttemptCursor(params.get('cursor')),through=readAttemptCursor(params.get('through'));
+  if((cursor&&through)||((cursor||through)&&requestedPage!==1))throw new HttpError(400,'Neplatná kombinácia stránkovania.');
   const at=Date.now(),since=days==='all'?0:at-days*86400000,db=env.TQ_DB;
   // One row per existing checkout attempt, even before a Stripe Session exists.
   const attempts=await query(db,`WITH linked_orders AS (
@@ -172,7 +187,14 @@ export async function paymentReport(env,params,ready){
       delivery:{total:a.delivery_count,sent:a.sent_count,failed:a.failed_count,queued:a.queued_count,lastSentAt:a.sent_at||null}
     });
   }
-  const pageSize=100,pages=Math.max(1,Math.ceil(matching.length/pageSize)),page=Math.min(requestedPage,pages),rows=matching.slice((page-1)*pageSize,page*pageSize);
+  const pageSize=40,pages=Math.max(1,Math.ceil(matching.length/pageSize)),page=Math.min(requestedPage,pages);
+  // Append by key, rather than offset: concurrent arrivals cannot duplicate rows.
+  // Refresh the complete already-loaded prefix without discarding its older tail.
+  const candidates=cursor?matching.filter(row=>olderAttempt(row,cursor)):matching;
+  const rows=through?matching.filter(row=>!olderAttempt(row,through)):candidates.slice(cursor?0:(page-1)*pageSize,cursor?pageSize:page*pageSize);
+  const frontier=through||(rows.length?rows.at(-1):null);
+  const hasMore=!!frontier&&matching.some(row=>olderAttempt(row,frontier));
+  const refreshCursor=frontier?attemptCursor(frontier):null,nextCursor=hasMore?refreshCursor:null;
   const recent=await query(db,'SELECT category,source,count(*) count,count(DISTINCT attempt_id) attempts FROM payment_log WHERE created_at>=? GROUP BY category,source',since);
   const technical=recent.filter(r=>r.category==='technical').reduce((n,r)=>n+r.count,0);
   const errors24=await first(db,"SELECT count(*) count FROM payment_log WHERE category='technical' AND created_at>=?",at-86400000);
@@ -184,5 +206,5 @@ export async function paymentReport(env,params,ready){
   const logs=await query(db,`SELECT l.*,a.stripe_session_id FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id WHERE l.created_at>=? ${category?'AND l.category=?':''} ORDER BY l.created_at DESC,l.id LIMIT 200`,...category?[since,category]:[since]);
   const stale=checks.length<2||checks.some(c=>at-c.checked_at>1800000),badChecks=checks.some(c=>!c.ok);
   const needsAttention=!ready||badChecks||errors24.count>0||declines24.count>0||deliveries.failed>0||deliveries.delayed>0||fulfillment.count>0;
-  return {generatedAt:at,days,category,attemptStatus,attemptCounts,page,pages,pageSize,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
+  return {generatedAt:at,days,category,attemptStatus,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
 }

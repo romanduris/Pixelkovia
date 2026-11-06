@@ -11,7 +11,8 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   orderCount:method==='unknown'?0:method==='free'?2:1,expectedOrderCount:method==='free'?2:1,orderStates:method==='unknown'?[]:['paid'],delivery:{total:method==='unknown'?0:method==='free'?2:1,sent:method==='unknown'?0:method==='free'?2:1,failed:0,queued:0,lastSentAt:method==='unknown'?null:now}
 }));
 (async()=>{const browser=await browserType.launch({headless:true});try{
-  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false;const calls=[];
+  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null;const calls=[];
+  const manyRows=Array.from({length:123},(_,i)=>({...report.rows[i%5],id:'batch-'+String(i).padStart(3,'0'),createdAt:now-i,email:'batch'+i+'@example.invalid'}));
   page.on('pageerror',e=>errors.push(e.message));
   await context.addInitScript(()=>{const key='pixelkovia-admin-payments-layout-v1';if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({order:['date','email','products','amount','status','method','reason','reference'],hidden:['reason','reference'],density:'compact',navCollapsed:true}));});
   await context.route('**/*',async route=>{
@@ -20,7 +21,17 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
     if(url.pathname==='/api/admin/products')return route.fulfill({json:[]});
     if(url.pathname==='/api/admin/payments'){
       calls.push(url.searchParams.toString());if(fail)return route.fulfill({status:503,json:{error:'Dočasne nedostupné'}});
-      const data=structuredClone(report);if(url.searchParams.get('status'))data.rows=data.rows.filter(r=>r.status===url.searchParams.get('status'));if(url.searchParams.get('page')==='2')data.page=2;if(attention){Object.assign(data,{health:'attention',errors24:1,technical:1,deliveries:{failed:1,delayed:1}});data.logs=[{id:'error',source:'browser',type:'element_error',category:'technical',label:'Nepodarilo sa načítať údaje karty',code:'',method:'card',attempt_id:'test-attempt',stripe_session_id:'cs_test_admin_fixture',created_at:now}];}
+      const data=structuredClone(report);if(largeList)data.rows=structuredClone(manyRows);
+      data.days=url.searchParams.get('days')==='all'?'all':Number(url.searchParams.get('days')||1);data.attemptStatus=url.searchParams.get('status')||'';
+      data.total=data.rows.length;data.attemptCounts=Object.fromEntries(Object.keys(data.attemptCounts).map(status=>[status,data.rows.filter(r=>r.status===status).length]));
+      if(data.attemptStatus)data.rows=data.rows.filter(r=>r.status===data.attemptStatus);
+      data.matchingTotal=data.rows.length;data.pageSize=40;
+      const cursor=url.searchParams.get('cursor'),through=url.searchParams.get('through');
+      if(cursor&&appendGate){const gate=appendGate;appendGate=null;await gate;}
+      if(cursor&&failAppend)return route.fulfill({status:503,json:{error:'Dočasne nedostupné'}});
+      const start=cursor?data.rows.findIndex(r=>r.id===cursor)+1:0,end=through?data.rows.findIndex(r=>r.id===through)+1:start+40;
+      const all=data.rows;data.rows=all.slice(start,end);data.hasMore=end<all.length;data.refreshCursor=through||data.rows.at(-1)?.id||null;data.nextCursor=data.hasMore?data.refreshCursor:null;
+      if(attention){Object.assign(data,{health:'attention',errors24:1,technical:1,deliveries:{failed:1,delayed:1}});data.logs=[{id:'error',source:'browser',type:'element_error',category:'technical',label:'Nepodarilo sa načítať údaje karty',code:'',method:'card',attempt_id:'test-attempt',stripe_session_id:'cs_test_admin_fixture',created_at:now}];}
       return route.fulfill({json:data});
     }
     if(url.pathname==='/api/admin/dashboard')return route.fulfill({json:{metrics:{customers:1,paidOrders:1,revenueByCurrency:{EUR:1499},purchasedGames:1,unactivated:1,activated:0,playing:0,completed:0,meanCompletionMs:null,medianCompletionMs:null},charts:{purchases:[],activations:[],completions:[]},funnel:[],cohort:''}});
@@ -38,8 +49,9 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   assert.ok(await page.locator('body.payments-nav-collapsed').count());
   assert.deepEqual(await headers(),['date','email','products','amount','status','method']);
   const baselineTable=await page.locator('#payment-table-scroll').boundingBox();
-  assert.ok(baselineTable.y<320,'the table should start in the first screen: '+baselineTable.y);
-  assert.ok((await page.locator('.payment-status-strip').boundingBox()).height<60);
+  assert.ok(baselineTable.y<360,'the table should start in the first screen: '+baselineTable.y);
+  assert.ok((await page.locator('.payment-status-strip').boundingBox()).height<120);
+  const tile=page.locator('#payment-state-successful');assert.ok((await tile.locator('strong').boundingBox()).y<(await tile.locator('.payment-state-name').boundingBox()).y);
   assert.ok((await page.locator('.payment-monitor').boundingBox()).height<50);
   for(const method of ['Google Pay','Apple Pay','Karta','Zdarma','Neznáme'])assert.ok(await page.getByRole('cell',{name:method,exact:true}).first().isVisible());
   assert.ok(await page.getByRole('cell',{name:'private0@example.invalid',exact:true}).isVisible());
@@ -49,9 +61,8 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   assert.equal(await page.locator('#payment-state-started').getAttribute('aria-pressed'),'true');
   await page.locator('#payment-state-all').click();await ready();
   await page.locator('#payment-days').selectOption('7');await ready();assert.ok(calls.some(p=>p.includes('days=7')));
-  await page.locator('[data-payment-page="1"]').click();await ready();assert.ok(calls.some(p=>p.includes('page=2')));
-  assert.equal(await page.locator('.payment-pager span').innerText(),'Strana 2 / 2');
-  await page.locator('#payment-days').selectOption('all');await ready();assert.ok(calls.some(p=>p.includes('days=all')&&p.includes('page=1')));
+  assert.equal(await page.locator('#load-more-payments').count(),0);
+  await page.locator('#payment-days').selectOption('all');await ready();assert.ok(calls.some(p=>p.includes('days=all')&&!p.includes('cursor=')&&!p.includes('through=')));
 
   assert.equal(await page.locator('[data-attempt="method-3"] .attempt-successful').innerText(),'Dokončená zdarma');
   assert.ok((await page.locator('[data-attempt="method-3"] [data-column=products]').innerText()).includes('Atlas Pixelkov'));
@@ -115,7 +126,7 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.locator('#payment-nav-toggle').click();assert.equal(await page.locator('body.payments-nav-collapsed').count(),0);
   await page.locator('#payment-nav-toggle').click();assert.ok(await page.locator('body.payments-nav-collapsed').count());
 
-  report.rows.push(...['abandoned','cancelled','error','declined','unknown'].map((status,i)=>({...report.rows[0],id:'state-'+i,status,state:status==='abandoned'?'expired':'ready',reason:status==='error'?'Nepodarilo sa načítať Stripe formulár':'Neznáme',email:status==='unknown'?'<img src=x onerror=alert(1)>':'state@example.invalid'})));
+  report.rows.unshift(...['abandoned','cancelled','error','declined','unknown'].map((status,i)=>({...report.rows[0],id:'state-'+i,status,state:status==='abandoned'?'expired':'ready',reason:status==='error'?'Nepodarilo sa načítať Stripe formulár':'Neznáme',email:status==='unknown'?'<img src=x onerror=alert(1)>':'state@example.invalid'})));
   attention=true;await page.locator('#refresh-payments').click();await ready();
   assert.ok(await page.locator('.payment-monitor.attention').isVisible());
   assert.ok((await page.locator('.payment-monitor-body').innerText()).includes('Prístupové e-maily'));
@@ -124,20 +135,22 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   assert.equal(await page.locator('.payment-attempts td img[src=x]').count(),0);
   const errorColors=await page.locator('.payment-table .attempt-error').evaluate(e=>({background:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));
   assert.equal(errorColors.background,'rgb(183, 25, 50)');assert.equal(errorColors.color,'rgb(255, 255, 255)');
-  await page.locator('#payment-monitor-toggle').click();await page.locator('#payment-log-toggle').click();await page.locator('#payment-attempt-toggle-0').click();
+  await page.locator('#payment-monitor-toggle').click();await page.locator('#payment-log-toggle').click();await page.locator('[data-payment-expand="method-0"]').click();
   await page.screenshot({path:'/tmp/pixelkovia-payments-compact-attention.png',fullPage:true});
   await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-reason').check();await page.locator('#payment-column-reference').check();await page.keyboard.press('Escape');
   await page.setViewportSize({width:1024,height:650});
-  await page.locator('#payment-table-scroll').evaluate(e=>{e.scrollLeft=100;e.scrollTop=50;});
-  const scroll=await page.locator('#payment-table-scroll').evaluate(e=>({x:e.scrollLeft,y:e.scrollTop}));assert.ok(scroll.x>0);assert.ok(scroll.y>0);
-  await page.locator('#refresh-payments').click();await ready();
-  assert.deepEqual(await page.locator('#payment-table-scroll').evaluate(e=>({x:e.scrollLeft,y:e.scrollTop})),scroll);
+  await page.locator('#payment-table-scroll').evaluate(e=>{e.scrollLeft=100;});await page.evaluate(()=>window.scrollTo(0,150));
+  const scroll=await page.locator('#payment-table-scroll').evaluate(e=>({x:e.scrollLeft,y:window.scrollY}));assert.ok(scroll.x>0);assert.ok(scroll.y>0);
+  const scrollRefresh=page.waitForResponse(r=>r.url().includes('/api/admin/payments'));await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await scrollRefresh;await ready();
+  assert.deepEqual(await page.locator('#payment-table-scroll').evaluate(e=>({x:e.scrollLeft,y:window.scrollY})),scroll);
   await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();await page.keyboard.press('Escape');
   for(const width of [1144,390,320]){
     await page.setViewportSize({width,height:844});
+    await page.evaluate(()=>window.scrollTo(0,0));
+    assert.ok((await page.locator('.payment-status-strip').boundingBox()).height<300,'summary uses at most three rows');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow at '+width);
     assert.ok(await page.locator('#payment-table-scroll').isVisible());
-    if(width===1144){assert.ok((await page.locator('#payment-table-scroll').boundingBox()).y<350);await page.screenshot({path:'/tmp/pixelkovia-payments-compact-1144.png',fullPage:true});}
+    if(width===1144){const tableTop=(await page.locator('#payment-table-scroll').boundingBox()).y;assert.ok(tableTop<440,'table remains in first screen: '+tableTop);await page.screenshot({path:'/tmp/pixelkovia-payments-compact-1144.png',fullPage:true});}
     if(width===390){await page.screenshot({path:'/tmp/pixelkovia-payments-compact-mobile.png',fullPage:true});await page.locator('#payment-table-scroll').evaluate(e=>{e.scrollLeft=180;});await page.locator('#payment-attempt-toggle-0').click();assert.ok(await page.locator('#payment-attempt-detail-0').isVisible());
       const detailBox=await page.locator('#payment-attempt-detail-0 .payment-attempt-detail').boundingBox(),wrapBox=await page.locator('#payment-table-scroll').boundingBox();
       assert.ok(detailBox.x>=wrapBox.x-2&&detailBox.x+detailBox.width<=wrapBox.x+wrapBox.width+2,'expanded details stay readable after horizontal scrolling');await page.screenshot({path:'/tmp/pixelkovia-payments-compact-mobile-detail.png',fullPage:true});await page.locator('#payment-attempt-toggle-0').click();}
@@ -145,8 +158,41 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.setViewportSize({width:1512,height:1080});
   fail=true;await page.locator('#refresh-payments').click();await page.getByRole('heading',{name:'Stav platieb nie je overený'}).waitFor();assert.equal(await page.locator('.payment-monitor.observing').count(),0);
   fail=false;attention=false;await page.locator('#refresh-payments').click();await ready();await page.locator('.payment-monitor.observing').waitFor();
+  largeList=true;await page.reload();await ready();
+  assert.equal(await page.locator('.payment-attempt-row').count(),40);
+  await page.locator('[data-payment-expand="batch-000"]').click();
+  failAppend=true;await page.locator('#load-more-payments').click();await ready();
+  assert.equal(await page.locator('.payment-attempt-row').count(),40);assert.ok(await page.locator('.payment-append-error').isVisible());
+  failAppend=false;let releaseAppend;appendGate=new Promise(resolve=>{releaseAppend=resolve;});
+  const appending=page.waitForRequest(r=>r.url().includes('cursor='));
+  await page.locator('#load-more-payments').focus();await page.locator('#load-more-payments').click();await appending;
+  assert.ok(await page.locator('#load-more-payments').isDisabled());const callCount=calls.length;
+  await page.evaluate(()=>{document.querySelector('#load-more-payments').click();document.querySelector('#load-more-payments').click();});
+  assert.equal(calls.length,callCount,'repeated clicks never launch parallel batches');releaseAppend();await ready();
+  assert.equal(await page.locator('.payment-attempt-row').count(),80);assert.equal(await page.locator('[data-attempt="batch-000"]').evaluate(e=>e.nextElementSibling.hidden),false);
+  assert.equal(await page.evaluate(()=>document.activeElement.dataset.paymentExpand),'batch-040');
+  const beforeRefresh=await page.evaluate(()=>window.scrollY);
+  manyRows.unshift({...manyRows[0],id:'batch-new',email:'new@example.invalid'});
+  const refreshedBatch=page.waitForResponse(r=>r.url().includes('/api/admin/payments'));
+  await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await refreshedBatch;await ready();
+  assert.equal(await page.locator('.payment-attempt-row').count(),81);assert.equal(await page.evaluate(()=>window.scrollY),beforeRefresh);
+  assert.ok(calls.at(-1).includes('through=batch-079'));
+  await page.locator('#load-more-payments').click();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),121);
+  await page.locator('#load-more-payments').click();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),124);
+  assert.equal(await page.locator('#load-more-payments').count(),0);assert.equal(await page.locator('.payment-list-end').innerText(),'Všetky pokusy načítané');
+  const loadedIds=await page.locator('.payment-attempt-row').evaluateAll(rows=>rows.map(r=>r.dataset.attempt));assert.equal(new Set(loadedIds).size,124);
+  await page.locator('#payment-days').selectOption('30');await ready();assert.equal(await page.locator('.payment-attempt-row').count(),40);assert.ok(!calls.at(-1).includes('through='));
+  await page.locator('#payment-state-started').click();await ready();assert.ok(await page.locator('.payment-attempt-row').count()<40);assert.ok(!calls.at(-1).includes('through='));
+  await page.locator('#payment-state-all').click();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),40);
+  appendGate=new Promise(resolve=>{releaseAppend=resolve;});const lateRequest=page.waitForRequest(r=>r.url().includes('cursor='));
+  await page.locator('#load-more-payments').click();await lateRequest;
+  await page.locator('#payment-state-started').click();await ready();
+  const filteredIds=await page.locator('.payment-attempt-row').evaluateAll(rows=>rows.map(r=>r.dataset.attempt));
+  const lateResponse=page.waitForResponse(r=>r.url().includes('cursor='));releaseAppend();await (await lateResponse).finished();
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.deepEqual(await page.locator('.payment-attempt-row').evaluateAll(rows=>rows.map(r=>r.dataset.attempt)),filteredIds,'an old append cannot overwrite a new status filter');
   await page.locator('[data-page=dashboard]').click();await page.locator('#payment-overview .payment-health').waitFor();
   assert.equal(await page.locator('body.payments-view').count(),0);assert.ok(await page.locator('.product-tabs').isVisible());assert.ok(await page.locator('.page-heading p').isVisible());
   assert.ok(await page.getByRole('link',{name:'Otvoriť platby a chyby →'}).isVisible());
-  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, persistent column visibility/order/density, drag/drop, keyboard, refresh/scroll preservation, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
+  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, persistent column visibility/order/density, drag/drop, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
