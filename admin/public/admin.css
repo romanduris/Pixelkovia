@@ -12,6 +12,20 @@
 .payment-tools label,.payment-log-heading label{display:flex;flex-direction:column;gap:8px;font-size:12px;color:#b8c9df}
 .payment-tools select,.payment-log-heading select{min-height:44px;font-size:13px;max-width:100%;border:1px solid #3c4c6d;background:#19243d;color:#dae3f6;padding:8px 12px;border-radius:5px;color-scheme:dark}
 .payment-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+.payment-attempts .status{white-space:normal;line-height:1.6}
+.payment-attempts th{white-space:normal;line-height:1.6}
+.payment-attempts td{overflow-wrap:anywhere;white-space:normal;max-width:280px;vertical-align:top}
+.payment-attempts td:nth-child(1){min-width:100px}.payment-attempts td:nth-child(2){min-width:190px}
+.payment-attempts td:nth-child(3){min-width:125px}.payment-attempts td:nth-child(4){min-width:75px;white-space:nowrap}
+.payment-attempts td:nth-child(5){min-width:135px}.payment-attempts td:nth-child(6){min-width:95px}
+.payment-attempts td:nth-child(7){min-width:170px}.payment-attempts td:nth-child(8){min-width:150px}
+.payment-attempts .attempt-started{background:#193e70;color:#d5eaff}
+.payment-attempts .attempt-abandoned{background:#394355;color:#f2f4f8}
+.payment-attempts .attempt-cancelled,.payment-attempts .attempt-declined{background:#5d3919;color:#ffe1b1}
+.payment-attempts .attempt-error{background:#b71932;color:#fff;font-weight:800;border:2px solid #ff6c83}
+.payment-attempts .attempt-successful{background:#195b45;color:#caffdf}
+.payment-attempts .attempt-unknown{background:#394355;color:#f2f4f8}
+.payment-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0;font-size:12px;flex-wrap:wrap}
 .payment-checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:20px 0}
 .payment-checks>div{display:flex;flex-direction:column;gap:10px;padding:18px;background:#19273e;border:1px solid #405473;border-radius:7px;font-size:13px}
 .payment-checks small{font-size:11px;color:#a6bbd4}.payment-reference{display:block;max-width:260px;overflow-wrap:anywhere;white-space:normal;font-size:10px;line-height:1.6}

@@ -57,11 +57,29 @@ Migrácia `0010_checkout_requests.sql` pridáva atómový zámok aktívneho nák
 
 ## Spôsob úhrady v managemente
 
-V `/admin#payments` má prehľad nákupov stĺpec **Spôsob úhrady**: Google Pay, Apple Pay, Karta, Iná peňaženka, Zdarma alebo Zatiaľ nezistené. Údaj pochádza z overenej Stripe Session s rozbaleným `payment_intent.latest_charge.payment_method_details.card.wallet.type`; zoznam povolených metód ani hlásenie prehliadača neurčujú skutočnú úhradu. Stripe opisuje peňaženku v [údajoch konkrétnej úhrady](https://github.com/stripe/stripe-python/blob/master/stripe/_charge.py).
+V `/admin#payments` má prehľad nákupov stĺpec **Spôsob úhrady**: Google Pay, Apple Pay, Karta, Iná peňaženka, Zdarma alebo Neznáme. Údaj pochádza z overenej Stripe Session s rozbaleným `payment_intent.latest_charge.payment_method_details.card.wallet.type`; zoznam povolených metód ani hlásenie prehliadača neurčujú skutočnú úhradu. Stripe opisuje peňaženku v [údajoch konkrétnej úhrady](https://github.com/stripe/stripe-python/blob/master/stripe/_charge.py).
 
 Migrácia `0012_payment_methods.sql` uchováva iba pevné označenie metódy, väzbu na nákup a čas overenia. Neuchováva číslo karty, posledné číslice, odtlačok ani token peňaženky. Chýbajúce údaje nikdy neprepíšu už overenú metódu. Refund a premazanie 90-dňovej diagnostiky označenie zachovajú. Existujúca serverová kontrola postupne dopĺňa chýbajúcu metódu pri dokončených nákupoch z posledných siedmich dní. Staršie či nedostatočné údaje sa neodhadujú.
 
 V záznamoch priebehu zostáva oddelený pokus hlásený prehliadačom od úhrady overenej cez Stripe; neúspešný pokus cez peňaženku nesmie označiť neskoršiu platbu kartou. Získanie metódy je súčasťou diagnostiky a zlyhanie jej uloženia neblokuje nákup ani vytvorenie prístupu.
+
+## Platobné pokusy v managemente
+
+`/admin#payments` číta existujúce `checkout_attempts`, vrátane záznamov pred vytvorením Stripe Session. E-mail sa znova neukladá do diagnostiky; sprístupňuje sa iba cez existujúce autorizované administrátorské API s `Cache-Control: no-store`. Verejný checkout, produkty, ceny a vytváranie prístupov zostávajú pôvodné.
+
+Stavy: **Začatá**, **Opustená**, **Zrušená zákazníkom**, **Chyba platby**, **Úspešná**. **Odmietnutá bankou** je samostatný stav, aby sa bankové odmietnutie nevydávalo za technické zlyhanie. Ak Stripe potvrdí zlyhanie, ale neoznámi rozpoznanú príčinu, stav je **Neznáme** a dôvod zachová túto neistotu. Neúplné údaje, časový limit či chyba doručenia e-mailu samy osebe nemenia výsledok platby na technickú chybu.
+
+Úspech vyžaduje podpísaný `checkout.session.completed` alebo `checkout.session.async_payment_succeeded` a nové serverové overenie relácie. Samotné načítanie zaplatenej relácie cez stavové API ponechá pokus začatý s poznámkou o čakaní na webhook. Schválený `free` voucher vyžaduje pôvodné overenie dokončenej nulovej relácie. Historické vytvorené objednávky zachová migrácia ako už serverovo potvrdené. Následný refund sa zobrazuje pri úspešnom pokuse osobitne.
+
+Zrušenie vyžaduje overený PaymentIntent so `status=canceled` a `cancellation_reason=requested_by_customer`. `cancel` z prehliadača, návratová URL, `abandoned`, `automatic` ani expirácia nepotvrdzujú zákaznícke zrušenie. Stripe Checkout tento explicitný dôvod nemusí pri zatvorení peňaženky poskytnúť; preto môže počet zrušených pokusov zostať nulový. Štandardná Stripe relácia trvá 30 minút. Opustenie existujúcej relácie vyžaduje overenú expiráciu; bez vytvorenej relácie platí rovnaký časový limit. Potvrdená technická chyba má pred opustením prednosť.
+
+Migrácia `0013_payment_attempt_outcomes.sql` pridáva jeden trvalý súhrn k existujúcemu ID pokusu a preberá známe historické chyby z bezpečného denníka. Uchováva iba časy, pevné typy, povolené chybové kódy a označenie metódy. Diagnostika sa naďalej maže po 90 dňoch; zmazanie nemení výsledok pokusu. Metóda úspešnej platby má prednosť pred metódou neúspešného pokusu a hlásením prehliadača. Chýbajúce údaje sú „Neznáme“.
+
+Existujúci Stripe endpoint musí okrem pôvodných udalostí odoberať `checkout.session.expired` a `payment_intent.canceled`; URL ani podpisový secret sa nemenia. Zápis výsledku neúspešného webhooku predchádza jeho potvrdeniu v `payment_events`. Pri dočasnom výpadku sa webhook zopakuje s rovnakými identifikátormi, bez duplicitných nákupov. Staršie či oneskorené zlyhanie nezvráti webhookom potvrdený úspech.
+
+Filtre podporujú stav, obdobie 1/7/30 dní aj celé obdobie. Súhrny sa počítajú zo všetkých pokusov v období, tabuľka filtruje stav a stránkuje po 100 riadkoch. Darčekové dve objednávky zostávajú jedným platobným pokusom. Požiadavku, ktorá vôbec nedorazila na server, nemožno spätne spoľahlivo evidovať.
+
+`admin/tests/payment-monitor.test.mjs` testuje všetky stavy, bankové/technické/neznáme zlyhania, podpisy, duplicity, oneskorené udalosti, obnovu po výpadku databázy, migráciu a stránkovanie. `tests/payment-admin.test.cjs` kontroluje skutočné administrátorské UI vrátane filtrov, e-mailov, výrazného červeného stavu, escapovania HTML, desktopu a šírky 390 px.
 
 ## Druhá hra pre ďalšiu rodinu
 

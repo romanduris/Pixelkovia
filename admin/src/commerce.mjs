@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import {HttpError} from './auth.mjs';
-import {paymentLog,orderPaymentLog,paymentFailureKey,observePayment,monitorCheck,prunePaymentLog} from './payment-monitor.mjs';
+import {paymentLog,orderPaymentLog,paymentFailureKey,paymentFailureType,stripeFailureMethod,confirmPaymentWebhook,observePayment,monitorCheck,prunePaymentLog} from './payment-monitor.mjs';
 import {first,query,statement,execute,uuid,randomToken,hash} from './db.mjs';
 import {credentials,emailAddress} from './customer-auth.mjs';
 import {quote,product,offer} from './catalog.mjs';
@@ -31,7 +31,12 @@ function verifySession(env,session,attempt){
 const settledPaid=(session,attempt)=>session.status==='complete'&&(session.payment_status==='paid'||(attempt.voucher_code==='free'&&attempt.total_cents===0&&session.payment_status==='no_payment_required'));
 const safelyExpired=session=>session.status==='expired'&&['unpaid','no_payment_required'].includes(session.payment_status)&&(!session.payment_intent||['canceled','requires_payment_method'].includes(session.payment_intent.status));
 const canCloseUnpaid=(session,row)=>session.status==='open'&&(session.payment_status==='unpaid'||(row.total_cents===0&&row.voucher_code==='free'&&session.payment_status==='no_payment_required'))&&(!session.payment_intent||['requires_payment_method','canceled'].includes(session.payment_intent.status));
-async function readSession(env,attempt){const session=await stripe(env).checkout.sessions.retrieve(attempt.stripe_session_id,{expand:['payment_intent.latest_charge']});verifySession(env,session,attempt);return session;}
+async function readSession(env,attempt){
+  const session=await stripe(env).checkout.sessions.retrieve(attempt.stripe_session_id,{expand:['payment_intent.latest_charge']});verifySession(env,session,attempt);
+  const intentId=typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id;
+  if(intentId&&intentId!==attempt.payment_intent)await execute(env.TQ_DB,'UPDATE checkout_attempts SET payment_intent=? WHERE id=?',intentId,attempt.id);
+  return session;
+}
 // Reconcile a lost create response even after its original 30-minute window.
 // No replacement may open while a Stripe request can still create that Session.
 async function recoverLostSession(env,attempt){
@@ -229,22 +234,31 @@ export async function paymentWebhook(request,env,context){
   let event;try{event=await stripe(env).webhooks.constructEventAsync(bytes,request.headers.get('stripe-signature'),env.STRIPE_WEBHOOK_SECRET,undefined,Stripe.createSubtleCryptoProvider());}catch{throw new HttpError(400,'Neplatný podpis platobnej udalosti.');}
   if(await first(env.TQ_DB,'SELECT id FROM payment_events WHERE id=?',event.id))return {received:true};
   try{
-  if(['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)&&(event.data.object.payment_status==='paid'||(event.type==='checkout.session.completed'&&event.data.object.payment_status==='no_payment_required')))await fulfill(env,event.data.object.id);
+  if(['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)&&(event.data.object.payment_status==='paid'||(event.type==='checkout.session.completed'&&event.data.object.payment_status==='no_payment_required'))){
+    await fulfill(env,event.data.object.id);
+    const attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',event.data.object.id);
+    if(attempt&&settledPaid(await readSession(env,attempt),attempt))await confirmPaymentWebhook(env,attempt.id);
+  }
   if(event.type==='charge.refunded'&&event.data.object.refunded===true){await env.TQ_DB.batch([statement(env.TQ_DB,'INSERT OR IGNORE INTO payment_refunds VALUES(?,?)',event.data.object.payment_intent,Date.now()),statement(env.TQ_DB,"UPDATE orders SET status='refunded' WHERE external_reference IN(SELECT stripe_session_id FROM checkout_attempts WHERE payment_intent=?) OR id IN(SELECT co.order_id FROM checkout_orders co JOIN checkout_attempts a ON a.id=co.attempt_id WHERE a.payment_intent=?)",event.data.object.payment_intent,event.data.object.payment_intent)]);}
-  await execute(env.TQ_DB,'INSERT OR IGNORE INTO payment_events VALUES(?,?,?)',event.id,event.data.object.id,Date.now());
-  }catch(error){await paymentLog(env,{type:'webhook_error',source:'server',code:error.type,dedupe:event.id});throw error;}
   // Signed events are linked only to this application's Sessions, never another business.
-  try{
     const object=event.data.object;
     let attempt;
-    if(event.type==='payment_intent.payment_failed'){
+    if(['payment_intent.payment_failed','payment_intent.canceled'].includes(event.type)){
       attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE payment_intent=?',object.id);
       if(!attempt){const page=await stripe(env).checkout.sessions.list({payment_intent:object.id,limit:10});
         for(const session of page.data){attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',session.id);if(attempt){verifySession(env,session,attempt);break;}}}
-      if(attempt)await paymentLog(env,{type:'payment_failed',source:'stripe',attemptId:attempt.id,code:object.last_payment_error?.decline_code||object.last_payment_error?.code,dedupe:paymentFailureKey(object)});
+      if(attempt){
+        // The signed event must belong to the currently verified Session too.
+        const session=await readSession(env,attempt),intent=session.payment_intent;
+        if((typeof intent==='string'?intent:intent?.id)===object.id){
+          const at=Number.isFinite(event.created)?event.created*1000:Date.now();
+          if(event.type==='payment_intent.payment_failed')await paymentLog(env,{type:paymentFailureType(object),source:'stripe',attemptId:attempt.id,method:stripeFailureMethod(object),code:object.last_payment_error?.decline_code||object.last_payment_error?.code,dedupe:paymentFailureKey(object),at,strict:true});
+          else if(object.status==='canceled'&&object.cancellation_reason==='requested_by_customer'&&intent?.status==='canceled'&&intent.cancellation_reason==='requested_by_customer')await paymentLog(env,{type:'customer_cancelled',source:'stripe',attemptId:attempt.id,code:'requested_by_customer',dedupe:object.id,at,strict:true});
+        }
+      }
     }else if(event.type==='checkout.session.async_payment_failed'){
       attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',object.id);
-      if(attempt){await readSession(env,attempt);await paymentLog(env,{type:'payment_failed',source:'stripe',attemptId:attempt.id,dedupe:event.id});}
+      if(attempt){const session=await readSession(env,attempt);await paymentLog(env,{type:paymentFailureType(session.payment_intent),source:'stripe',attemptId:attempt.id,method:stripeFailureMethod(session.payment_intent),code:session.payment_intent?.last_payment_error?.decline_code||session.payment_intent?.last_payment_error?.code,dedupe:event.id,at:Number.isFinite(event.created)?event.created*1000:Date.now(),strict:true});}
     }else if(event.type==='charge.refunded'&&object.refunded===true){
       const attempts=await query(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE payment_intent=?',object.payment_intent);
       for(const a of attempts)await observePayment(env,a,'refunded');
@@ -252,7 +266,10 @@ export async function paymentWebhook(request,env,context){
       attempt=await first(env.TQ_DB,'SELECT * FROM checkout_attempts WHERE stripe_session_id=?',object.id);
       if(attempt)await verifiedCheckoutStatus(env,object.id);
     }
-  }catch{await paymentLog(env,{type:'status_error',source:'server',dedupe:event.id});}
+  // Acknowledge only after durable monitoring writes too. Stripe can retry a
+  // transient failure; the existing purchase/log IDs make those retries safe.
+  await execute(env.TQ_DB,'INSERT OR IGNORE INTO payment_events VALUES(?,?,?)',event.id,event.data.object.id,Date.now());
+  }catch(error){await paymentLog(env,{type:'webhook_error',source:'server',code:error.type,dedupe:event.id});throw error;}
   if(context?.waitUntil)context.waitUntil(sendPending(env));else await sendPending(env);
   return {received:true};
 }
@@ -264,7 +281,7 @@ export async function auditPayments(env){
   try{
     const hooks=await stripe(env).webhookEndpoints.list({limit:100});
     const hook=hooks.data.find(h=>h.url===ORIGIN+'/api/stripe/webhook'&&h.status==='enabled');
-    const required=['checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','payment_intent.payment_failed','charge.refunded'];
+    const required=['checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','checkout.session.expired','payment_intent.payment_failed','payment_intent.canceled','charge.refunded'];
     await monitorCheck(env,'webhook',!!hook&&(hook.enabled_events.includes('*')||required.every(e=>hook.enabled_events.includes(e))));
     await monitorCheck(env,'stripe',true);
   }catch{await monitorCheck(env,'stripe',false);}

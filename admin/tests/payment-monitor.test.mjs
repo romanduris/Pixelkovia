@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import Stripe from 'stripe';
-import {fresh} from './support.mjs';
+import fs from 'node:fs';
+import {fresh,LocalD1} from './support.mjs';
 import {first,execute,query} from '../src/db.mjs';
 import worker from '../src/worker.mjs';
 import {createCheckout,verifiedCheckoutStatus,paymentWebhook,fulfill,auditPayments} from '../src/commerce.mjs';
@@ -81,7 +82,9 @@ test('browser telemetry is bounded, deduplicated, private, and cannot report a s
 test('signed failed card and asynchronous events are logged once, without granting access',async()=>{
   const f=fixture();try{
     const session=await createCheckout(f.env,f.input);
-    const event=f.event('payment_intent.payment_failed',{id:'pi_monitor',last_payment_error:{code:'card_declined',decline_code:'insufficient_funds',charge:'ch_declined',message:'DO_NOT_STORE'}});
+    const intent={id:'pi_monitor',last_payment_error:{code:'card_declined',decline_code:'insufficient_funds',charge:'ch_declined',message:'DO_NOT_STORE'}};
+    f.sessions.get(session.sessionId).payment_intent=intent;
+    const event=f.event('payment_intent.payment_failed',intent);
     await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);
     const failure=await first(f.db,"SELECT * FROM payment_log WHERE type='payment_failed'");assert.equal(failure.source,'stripe');assert.equal(failure.code,'insufficient_funds');assert.ok(failure.attempt_id);
     assert.equal((await first(f.db,"SELECT count(*) n FROM payment_log WHERE type='payment_failed'")).n,1);
@@ -89,6 +92,138 @@ test('signed failed card and asynchronous events are logged once, without granti
     await paymentWebhook(f.event('checkout.session.async_payment_failed',f.sessions.get(session.sessionId),'evt_async_failure'),f.env);
     assert.equal((await first(f.db,"SELECT count(*) n FROM payment_log WHERE type='payment_failed'")).n,2);
     assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+  }finally{f.db.close();}
+});
+test('an attempt exists before Stripe creation; retries, early failures and recovery retain one ID',async()=>{
+  const f=fixture();try{
+    const create=f.env.STRIPE_CLIENT.checkout.sessions.create;
+    f.env.STRIPE_CLIENT.checkout.sessions.create=async()=>{
+      const report=await paymentReport(f.env,new URLSearchParams(),true);
+      assert.equal(report.total,1);assert.equal(report.rows[0].email,f.input.email);
+      assert.equal(report.rows[0].status,'started');assert.equal(report.rows[0].sessionId,null);
+      const error=Error('DO_NOT_STORE');error.type='StripeConnectionError';throw error;
+    };
+    const response=await worker.fetch(new Request(origin+'/api/checkout/session',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(f.input)}),f.env);
+    assert.equal(response.status,500);
+    let report=await paymentReport(f.env,new URLSearchParams(),true),id=report.rows[0].id;
+    assert.equal(report.rows[0].status,'error');assert.match(report.rows[0].reason,/StripeConnectionError/);
+    await execute(f.db,'UPDATE checkout_attempts SET created_at=?',Date.now()-1800001);
+    assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).rows[0].status,'error');
+    // Restore its original creation window for an idempotent retry.
+    await execute(f.db,'UPDATE checkout_attempts SET created_at=?',Date.now());
+    f.env.STRIPE_CLIENT.checkout.sessions.create=create;
+    const session=await createCheckout(f.env,f.input);await createCheckout(f.env,f.input);
+    report=await paymentReport(f.env,new URLSearchParams(),true);
+    assert.equal(report.total,1);assert.equal(report.rows[0].id,id);assert.equal(report.rows[0].status,'started');
+    assert.equal(report.rows[0].sessionId,session.sessionId);assert.equal(f.sessions.size,1);
+    await paymentLog(f.env,{type:'session_error',attemptId:id,code:'StripeConnectionError'});
+    assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).rows[0].status,'started','a duplicate old failure cannot undo recovery');
+  }finally{f.db.close();}
+});
+test('webhook monitoring storage failure retries safely instead of acknowledging a lost failure',async()=>{
+  const f=fixture();try{
+    const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);
+    s.payment_intent={id:'pi_retry',status:'requires_payment_method',last_payment_error:{code:'card_declined',charge:'ch_retry'}};
+    const event=f.event('payment_intent.payment_failed',s.payment_intent),prepare=f.db.prepare.bind(f.db);
+    f.db.prepare=sql=>{if(sql.startsWith('INSERT INTO payment_attempt_outcomes'))throw Error('Simulated transient D1 failure');return prepare(sql);};
+    await assert.rejects(()=>paymentWebhook(event.clone(),f.env),/Simulated transient/);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM payment_events')).n,0);
+    f.db.prepare=prepare;
+    await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);
+    const report=await paymentReport(f.env,new URLSearchParams(),true);
+    assert.equal(report.rows[0].status,'declined');assert.equal(report.logs.filter(l=>l.type==='payment_failed').length,1);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM payment_events')).n,1);assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+  }finally{f.db.close();}
+});
+test('abandonment, browser wallet dismissal, timeouts, technical failure and email failure are distinct',async()=>{
+  const f=fixture();try{
+    const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);
+    for(const type of ['wallet_cancelled','confirmation_timeout','wallet_wait_timeout','confirm_error','status_error','delivery_failed'])await paymentLog(f.env,{type,source:'browser',attemptId:s.client_reference_id});
+    let report=await paymentReport(f.env,new URLSearchParams(),true);
+    assert.equal(report.rows[0].status,'started');assert.equal(report.rows[0].reason,'Neznáme');
+    s.status='expired';await verifiedCheckoutStatus(f.env,s.id);
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].status,'abandoned');
+    assert.equal(report.attemptCounts.cancelled,0);assert.equal(report.attemptCounts.error,0);
+    await paymentLog(f.env,{type:'element_error',source:'browser',attemptId:s.client_reference_id});
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].status,'error');
+    assert.match(report.rows[0].reason,/načítať údaje karty/);
+    await execute(f.db,'UPDATE payment_log SET created_at=?',Date.now()-91*86400000);await prunePaymentLog(f.env);
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].status,'error');assert.equal(report.logs.length,0);
+    const next=await createCheckout(f.env,{...f.input,email:'no-session@example.invalid',attemptKey:crypto.randomUUID()});
+    await execute(f.db,'UPDATE checkout_attempts SET stripe_session_id=NULL,created_at=? WHERE stripe_session_id=?',Date.now()-1800001,next.sessionId);
+    assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).attemptCounts.abandoned,1);
+  }finally{f.db.close();}
+});
+test('only explicitly verified customer cancellation sets cancelled; signed duplicates are idempotent',async()=>{
+  for(const reason of ['requested_by_customer','abandoned','automatic','expired',undefined]){
+    const f=fixture();try{
+      const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);
+      s.payment_intent={id:'pi_cancelled',status:'canceled',cancellation_reason:reason};
+      const event=f.event('payment_intent.canceled',s.payment_intent);
+      await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);
+      let report=await paymentReport(f.env,new URLSearchParams(),true);
+      assert.equal(report.rows[0].status,reason==='requested_by_customer'?'cancelled':'started');
+      assert.equal(report.logs.filter(l=>l.type==='customer_cancelled').length,reason==='requested_by_customer'?1:0);
+      s.status='expired';await verifiedCheckoutStatus(f.env,s.id);
+      report=await paymentReport(f.env,new URLSearchParams(),true);
+      assert.equal(report.rows[0].status,reason==='requested_by_customer'?'cancelled':'abandoned');
+      assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+    }finally{f.db.close();}
+  }
+});
+test('bank refusal, provider processing failure and unknown failures retain only safe reasons and verified methods',async()=>{
+  for(const [error,status,kind] of [
+    [{code:'card_declined',decline_code:'insufficient_funds',type:'card_error'},'declined','bank'],
+    [{code:'processing_error',type:'api_error'},'error','technical'],
+    [{code:'NEW_UNKNOWN_CODE',type:'NEW_UNKNOWN_TYPE'},'unknown','unknown']
+  ]){
+    const f=fixture();try{
+      const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);
+      s.payment_intent={id:'pi_failure',status:'requires_payment_method',last_payment_error:{...error,charge:'ch_one',message:'DO_NOT_STORE',payment_method:{type:'card',card:{wallet:{type:'google_pay'},last4:'DO_NOT_STORE',fingerprint:'DO_NOT_STORE'}}}};
+      const event=f.event('payment_intent.payment_failed',s.payment_intent);
+      await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);await verifiedCheckoutStatus(f.env,s.id);
+      const report=await paymentReport(f.env,new URLSearchParams(),true);
+      assert.equal(report.rows[0].status,status);assert.equal(report.rows[0].failureKind,kind);assert.equal(report.rows[0].method,'google_pay');
+      assert.equal(report.logs.filter(l=>l.type.startsWith('payment_')).length,1);
+      const saved=JSON.stringify(await query(f.db,'SELECT * FROM payment_attempt_outcomes'))+JSON.stringify(report.logs);
+      for(const value of ['DO_NOT_STORE','NEW_UNKNOWN_CODE','NEW_UNKNOWN_TYPE'])assert.ok(!saved.includes(value));
+      assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+    }finally{f.db.close();}
+  }
+});
+test('success waits for signed verified webhook; duplicates and late failures never reverse it or duplicate a gift',async()=>{
+  const f=fixture();try{
+    const session=await createCheckout(f.env,{...f.input,giftGame:true}),s=f.sessions.get(session.sessionId);
+    s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_success',status:'succeeded'};
+    await verifiedCheckoutStatus(f.env,s.id);
+    let report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].status,'started');assert.equal(report.attemptCounts.successful,0);
+    const forged=new Request(origin+'/api/stripe/webhook',{method:'POST',body:JSON.stringify({type:'checkout.session.completed',data:{object:s}}),headers:{'stripe-signature':'forged'}});
+    await assert.rejects(()=>paymentWebhook(forged,f.env),e=>e.status===400);
+    f.env.RESEND_API_KEY='';
+    const paid=f.event('checkout.session.completed',s);
+    await paymentWebhook(paid.clone(),f.env);await paymentWebhook(paid.clone(),f.env);
+    await paymentWebhook(f.event('checkout.session.async_payment_succeeded',s,'evt_async_success'),f.env);
+    await paymentWebhook(f.event('payment_intent.payment_failed',{id:'pi_success',last_payment_error:{code:'card_declined',charge:'ch_old'}},'evt_late_failure'),f.env);
+    report=await paymentReport(f.env,new URLSearchParams(),true);
+    assert.equal(report.attemptCounts.successful,1);assert.equal(report.total,1);assert.equal(report.rows[0].status,'successful');assert.equal(report.rows[0].giftGame,true);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,2);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM access_deliveries')).n,2);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM payment_attempt_outcomes')).n,1);
+  }finally{f.db.close();}
+});
+test('all attempts remain reachable with stable pagination, state filtering and unfiltered summaries',async()=>{
+  const f=fixture();try{
+    const now=Date.now();
+    for(let i=0;i<105;i++)await execute(f.db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at) VALUES(?,?,?,?,?,?)','page-'+String(i).padStart(3,'0'),'private'+i+'@example.invalid','','["episode-1"]',1499,now);
+    await paymentLog(f.env,{type:'sdk_error',source:'browser',attemptId:'page-000'});
+    let report=await paymentReport(f.env,new URLSearchParams({days:'all'}),true);
+    assert.equal(report.total,105);assert.equal(report.rows.length,100);assert.equal(report.pages,2);assert.equal(report.attemptCounts.started,104);assert.equal(report.attemptCounts.error,1);
+    const ids=new Set(report.rows.map(r=>r.id));
+    report=await paymentReport(f.env,new URLSearchParams({days:'all',page:'2'}),true);assert.equal(report.rows.length,5);for(const r of report.rows)assert.ok(!ids.has(r.id));
+    report=await paymentReport(f.env,new URLSearchParams({status:'error',page:'2'}),true);assert.equal(report.page,1);assert.equal(report.matchingTotal,1);assert.equal(report.total,105);assert.equal(report.rows[0].id,'page-000');assert.equal(report.attemptCounts.started,104);
+    for(const params of [{status:'forged'},{page:'0'},{page:'NaN'}])await assert.rejects(()=>paymentReport(f.env,new URLSearchParams(params),true),e=>e.status===400);
+    const response=await worker.fetch(new Request(origin+'/api/admin/payments?days=all'),f.env);
+    assert.equal(response.status,403);assert.ok(!(await response.text()).includes('@example.invalid'));
   }finally{f.db.close();}
 });
 test('payment report counts a paid gift once, separates free and refund, and flags delayed access',async()=>{
@@ -134,4 +269,35 @@ test('server audit detects unpaid expiry without a browser, checks freshness, an
     assert.equal((await first(f.db,"SELECT count(*) n FROM payment_log WHERE type='sdk_error'")).n,0);
     assert.equal((await first(f.db,'SELECT count(*) n FROM checkout_attempts')).n,1);
   }finally{f.db.close();}
+});
+test('signed expiry is abandonment, and an unpaid completed event is never success',async()=>{
+  const f=fixture();try{
+    const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);
+    await paymentWebhook(f.event('checkout.session.completed',s,'evt_unpaid_complete'),f.env);
+    assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).rows[0].status,'started');
+    s.status='expired';const event=f.event('checkout.session.expired',s,'evt_expired');
+    await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);
+    const report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].status,'abandoned');
+    assert.equal(report.attemptCounts.successful,0);assert.equal(report.logs.filter(l=>l.type==='expired').length,1);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+  }finally{f.db.close();}
+});
+test('migration preserves historical successful purchases and classifies only known historical failures',async()=>{
+  const db=new LocalD1();try{
+    const folder=new URL('../migrations/',import.meta.url);
+    for(const file of fs.readdirSync(folder).filter(f=>f.endsWith('.sql')&&!f.startsWith('0013')).sort())db.sqlite.exec(fs.readFileSync(new URL(file,folder),'utf8'));
+    const now=Date.now(),env={TQ_DB:db};
+    for(const id of ['legacy-paid','legacy-bank','legacy-technical','legacy-timeout','legacy-unknown','legacy-recovered'])await execute(db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id) VALUES(?,?,?,?,?,?,?)',id,'private@example.invalid','','["episode-1"]',1499,now,'cs_test_'+id);
+    await execute(db,'INSERT INTO customers VALUES(?,?,?,?)','legacy-customer','private@example.invalid','',now);
+    await execute(db,"INSERT INTO orders VALUES(?,?,?,'paid',1499,'EUR',?,?)",'legacy-order','legacy-customer','cs_test_legacy-paid',now,now);
+    for(const [id,type,code,offset] of [
+      ['legacy-bank','payment_failed','insufficient_funds',0],['legacy-technical','payment_failed','processing_error',0],
+      ['legacy-timeout','confirmation_timeout','',0],['legacy-unknown','payment_failed','',0],
+      ['legacy-recovered','session_error','StripeConnectionError',-1000],['legacy-recovered','session_created','',0]
+    ])await execute(db,'INSERT INTO payment_log VALUES(?,?,?,?,?,?,?,?,?)',id+type,id,type==='session_created'?'server':'stripe',type,'technical',code,'unknown','',now+offset);
+    db.sqlite.exec(fs.readFileSync(new URL('0013_payment_attempt_outcomes.sql',folder),'utf8'));
+    const report=await paymentReport(env,new URLSearchParams(),true),statuses=Object.fromEntries(report.rows.map(r=>[r.id,r.status]));
+    assert.deepEqual(statuses,{'legacy-paid':'successful','legacy-bank':'declined','legacy-technical':'error','legacy-timeout':'started','legacy-unknown':'unknown','legacy-recovered':'started'});
+    assert.ok(!JSON.stringify(await query(db,'SELECT * FROM payment_attempt_outcomes')).includes('private@example.invalid'));
+  }finally{db.close();}
 });
