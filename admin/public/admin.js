@@ -7,7 +7,7 @@ const time=ms=>ms==null?'—':ms>=3600000?number(ms/3600000)+' h':ms>=60000?numb
 const stateNames={purchased:'Zakúpené, neaktivované',preparing:'Pripravuje hru',playing:'Rozhrané',completed:'Dokončené',expired:'Prístup vypršal',active:'Aktívna relácia',valid:'Platné',revoked:'Odňaté',pending:'Čaká na platbu','payment-pending':'Čaká na platbu',paid:'Zaplatené',refunded:'Vrátené',cancelled:'Zrušené',draft:'Koncept',blocked:'Blokované',queued:'Čaká na odoslanie',sent:'Odoslané',failed:'Chyba'};
 const badge=status=>`<span class="status ${escape(status)}">${escape(stateNames[status]||status)}</span>`;
 const titles={payments:['Platby a chyby','Overené úhrady, zlyhania formulára a doručenie prístupov.'],dashboard:['Overview','Zákazníci, tržby a priebeh hry na jednom mieste.'],orders:['Objednávky','Nákupy, produkty a platby zákazníkov Pixelkovia.'],analytics:['Herná analýza','Od prvého nákupu po poslednú stopu. Celý príbeh každého zákazníka.']};
-const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'1',paymentCategory:'',paymentStatus:''};
+const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'30',paymentCategory:'',paymentStatus:''};
 let loadingId=0,detailId=0,debounce;
 async function api(path,params){const response=await fetch(path+(params?.toString()?'?'+params:''),{credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/admin/login');throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
 function midnight(day){const utc=Date.parse(day+'T00:00:00Z');const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(utc).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const represented=Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));return new Date(utc-(represented-utc)).toISOString();}
@@ -48,27 +48,44 @@ const attemptStateNames={started:'Začatá',abandoned:'Opustená',cancelled:'Zru
 const paymentColumns={date:'Dátum a čas',email:'E-mail zákazníka',products:'Produkty',amount:'Cena',status:'Stav platby',method:'Spôsob úhrady',voucher:'Voucher',subtotal:'Suma pred zľavami',bundleDiscount:'Zľava na balík',voucherDiscount:'Zľava voucherom',orderStatus:'Stav objednávky',orderCount:'Počet objednávok',delivery:'Prístupové e-maily',fulfilledAt:'Vytvorenie objednávky',sentAt:'Posledný odoslaný e-mail',providerState:'Overený stav Stripe',checkedAt:'Posledné overenie',confirmedAt:'Potvrdenie webhookom',reason:'Dôvod zlyhania alebo zrušenia',reference:'ID pokusu / Stripe relácia'};
 const defaultPaymentColumns=['date','email','products','amount','status','method'];
 const paymentLayoutKey='pixelkovia-admin-payments-layout-v1';
-function defaultPaymentLayout(){return {order:Object.keys(paymentColumns),hidden:Object.keys(paymentColumns).filter(id=>!defaultPaymentColumns.includes(id)),density:'compact',navCollapsed:true};}
+function defaultPaymentLayout(){return {order:Object.keys(paymentColumns),hidden:Object.keys(paymentColumns).filter(id=>!defaultPaymentColumns.includes(id)),density:'compact',navCollapsed:true,days:'30',status:'',category:'',panels:[]};}
 function readPaymentLayout(){
-  const defaults=defaultPaymentLayout();
-  try{
-    const saved=JSON.parse(localStorage.getItem(paymentLayoutKey));
-    if(!saved||typeof saved!=='object')return defaults;
+  const defaults=defaultPaymentLayout(),sources=[];
+  // Prefer the admin-scoped cookie; migrate the existing browser preferences.
+  try{const cookie=document.cookie.split(';').map(value=>value.trim()).find(value=>value.startsWith(paymentLayoutKey+'='));if(cookie)sources.push(decodeURIComponent(cookie.slice(paymentLayoutKey.length+1)));}catch{}
+  try{sources.push(localStorage.getItem(paymentLayoutKey));}catch{}
+  for(const source of sources)try{
+    const saved=JSON.parse(source);
+    if(!saved||typeof saved!=='object'||Array.isArray(saved))continue;
     const order=Array.isArray(saved.order)?[...new Set(saved.order.filter(id=>typeof id==='string'&&Object.hasOwn(paymentColumns,id)))]:[];
     defaults.order=[...order,...defaults.order.filter(id=>!order.includes(id))];
     if(Array.isArray(saved.hidden))defaults.hidden=[...new Set([...saved.hidden.filter(id=>typeof id==='string'&&Object.hasOwn(paymentColumns,id)),...defaults.hidden.filter(id=>!order.includes(id))])];
     if(defaults.hidden.length===defaults.order.length)defaults.hidden=[];
     if(saved.density==='comfortable')defaults.density='comfortable';
     if(typeof saved.navCollapsed==='boolean')defaults.navCollapsed=saved.navCollapsed;
+    if(['1','7','30','all'].includes(saved.days))defaults.days=saved.days;
+    if(Object.hasOwn(attemptStateNames,saved.status))defaults.status=saved.status;
+    if(['technical','bank','validation','customer','lifecycle'].includes(saved.category))defaults.category=saved.category;
+    if(Array.isArray(saved.panels))defaults.panels=[...new Set(saved.panels.filter(id=>['monitor','log'].includes(id)))];
+    return defaults;
   }catch{}
   return defaults;
 }
 let paymentLayout=readPaymentLayout(),paymentData=null,paymentDragColumn=null,paymentLoadingMore=false;
-const paymentUI={panels:new Set(),expanded:new Set(),columnQuery:'',loadError:''};
+Object.assign(state,{paymentDays:paymentLayout.days,paymentStatus:paymentLayout.status,paymentCategory:paymentLayout.category});
+const paymentUI={panels:new Set(paymentLayout.panels),expanded:new Set(),columnQuery:'',loadError:''};
 function savePaymentLayout(){
-  // Presentation preferences only. Never persist emails, rows or event contents.
-  try{localStorage.setItem(paymentLayoutKey,JSON.stringify(paymentLayout));}catch{}
+  // Only display preferences: never emails, purchase IDs, rows or event contents.
+  Object.assign(paymentLayout,{days:state.paymentDays,status:state.paymentStatus,category:state.paymentCategory,panels:[...paymentUI.panels].filter(id=>['monitor','log'].includes(id))});
+  const value=JSON.stringify(paymentLayout),encoded=encodeURIComponent(value);
+  try{
+    document.cookie=paymentLayoutKey+'='+encoded+'; Max-Age=31536000; Path=/admin; SameSite=Strict; Secure';
+    if(document.cookie.split(';').some(cookie=>cookie.trim()===paymentLayoutKey+'='+encoded)){localStorage.removeItem(paymentLayoutKey);return;}
+  }catch{}
+  // Keep preferences usable when cookies are blocked by browser settings.
+  try{localStorage.setItem(paymentLayoutKey,value);}catch{}
 }
+savePaymentLayout();
 function syncPaymentShell(){
   const active=currentView()==='payments';
   document.body.classList.toggle('payments-view',active);
@@ -103,15 +120,21 @@ const paymentPanelOpen=id=>paymentUI.panels.has(id)?' open':'';
 function paymentStatus(row){
   const status=Object.hasOwn(attemptStateNames,row.status)?row.status:'unknown';
   const note=row.state==='refunded'?'Vrátená':row.state==='pending'?'Overuje sa':['paid','free'].includes(row.state)&&status!=='successful'?'Čaká na webhook':'';
-  const label=status==='successful'&&row.voucherCode==='free'&&row.totalCents===0?'Dokončená zdarma':attemptStateNames[status];
+  const label=status==='successful'&&row.voucherCode==='free'&&row.totalCents===0?'Úspešná · zdarma':attemptStateNames[status];
   return `<span class="status attempt-${status}" title="${escape(row.reason||'Neznáme')}">${escape(label)}</span>${note?`<small>${note}</small>`:''}`;
 }
 function paymentProducts(row){return [...row.products.map(id=>paymentProductNames[id]||'Neznáme'),...(row.giftGame?['Druhá hra pre ďalšiu rodinu']:[])].join(' · ')||'Neznáme';}
+function paymentProductSummary(row){
+  const shortNames={'episode-1':'Base','story-book-before':'Vznik','story-book-after':'Záblesk','atlas-pixelkov':'Atlas'};
+  const tags=row.products.map(id=>`<span class="payment-product-tag ${id==='episode-1'?'base':id==='atlas-pixelkov'?'atlas':'book'}" title="${escape(paymentProductNames[id]||'Neznáme')}">${escape(shortNames[id]||'Neznáme')}</span>`);
+  if(row.giftGame)tags.push('<span class="payment-product-tag gift" title="Druhá samostatná hra pre ďalšiu rodinu">+1 hra</span>');
+  return `<span class="payment-products" title="${escape(paymentProducts(row))}">${tags.join('')||'Neznáme'}</span>`;
+}
 function paymentCell(row,id){
   switch(id){
     case 'date':return row.createdAt==null?'Neznáme':date(row.createdAt);
     case 'email':return escape(row.email||'Neznáme');
-    case 'products':return `<span class="payment-products" title="${escape(paymentProducts(row))}">${escape(paymentProducts(row))}</span>`;
+    case 'products':return paymentProductSummary(row);
     case 'amount':return row.totalCents==null?'Neznáme':money(row.totalCents);
     case 'status':return paymentStatus(row);
     case 'method':return paymentMethodMark(row.method);
@@ -149,7 +172,7 @@ function paymentLogTable(logs){
   ]));
 }
 function paymentAttemptDetail(row,d){
-  const items=[...Object.entries(paymentColumns).map(([id,label])=>[label,paymentCell(row,id)]),['Posledné serverové overenie',row.checkedAt==null?'Neznáme':date(row.checkedAt)]];
+  const items=[...Object.entries(paymentColumns).map(([id,label])=>[label,id==='products'?escape(paymentProducts(row)):paymentCell(row,id)]),['Posledné serverové overenie',row.checkedAt==null?'Neznáme':date(row.checkedAt)]];
   const logs=d.logs.filter(l=>l.attempt_id===row.id);
   return `<div class="payment-attempt-detail"><dl>${items.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="payment-detail-events"><h3>Dostupné udalosti tohto pokusu</h3>${logs.length?paymentLogTable(logs):'<p>V dostupnom denníku pre toto obdobie nie sú ďalšie udalosti.</p>'}</div></div>`;
 }
@@ -307,6 +330,13 @@ $('#clear-filters').addEventListener('click',()=>{$('#filters').reset();Object.a
 window.addEventListener('hashchange',()=>{state.page=1;load();});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.wide){state.wide=false;document.body.classList.remove('analysis-wide');$('#view .journey-board')?.classList.remove('is-wide');const b=$('#expand-analysis');if(b){b.textContent='⛶ Rozšíriť na celú šírku';b.setAttribute('aria-pressed','false');b.focus();}}});
 $('#view').addEventListener('input',e=>{if(e.target.id==='payment-column-search'){paymentUI.columnQuery=e.target.value;document.querySelectorAll('[data-payment-column-option]').forEach(el=>{el.hidden=!paymentColumnMatches(el.dataset.paymentColumnOption);});return;}if(e.target.id==='customer-search'){state.q=e.target.value;state.page=1;clearTimeout(debounce);debounce=setTimeout(load,300);}});
+$('#view').addEventListener('toggle',e=>{
+  const panel=e.target.dataset?.paymentPanel;
+  if(!['monitor','log'].includes(panel))return;
+  if(e.target.open)paymentUI.panels.add(panel);else paymentUI.panels.delete(panel);
+  const panels=[...paymentUI.panels].filter(id=>['monitor','log'].includes(id));
+  if(panels.length!==paymentLayout.panels.length||panels.some(id=>!paymentLayout.panels.includes(id)))savePaymentLayout();
+},true);
 $('#view').addEventListener('change',e=>{
   const column=e.target.dataset.paymentColumn;
   if(column&&Object.hasOwn(paymentColumns,column)){
@@ -315,10 +345,10 @@ $('#view').addEventListener('change',e=>{
     paymentLayout.hidden=[...hidden];savePaymentLayout();renderPaymentWorkspace();return;
   }
   if(e.target.id==='payment-density'){paymentLayout.density=e.target.value==='comfortable'?'comfortable':'compact';savePaymentLayout();renderPaymentWorkspace();return;}
-  const paymentKeys={'payment-days':'paymentDays','payment-category':'paymentCategory'};if(paymentKeys[e.target.id]){state[paymentKeys[e.target.id]]=e.target.value;load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
+  const paymentKeys={'payment-days':'paymentDays','payment-category':'paymentCategory'};if(paymentKeys[e.target.id]){state[paymentKeys[e.target.id]]=e.target.value;savePaymentLayout();load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
 $('#view').addEventListener('click',async e=>{
   if(e.target.closest('#refresh-payments')){load();return;}
-  const chip=e.target.closest('[data-payment-state]');if(chip){state.paymentStatus=chip.dataset.paymentState;$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
+  const chip=e.target.closest('[data-payment-state]');if(chip){state.paymentStatus=chip.dataset.paymentState;savePaymentLayout();$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
   const expand=e.target.closest('[data-payment-expand]');if(expand){const id=expand.dataset.paymentExpand;if(paymentUI.expanded.has(id))paymentUI.expanded.delete(id);else paymentUI.expanded.add(id);renderPaymentWorkspace();return;}
   const move=e.target.closest('[data-payment-move]');if(move){movePaymentColumn(move.dataset.paymentMove,Number(move.dataset.step));return;}
   if(e.target.closest('#reset-payment-layout')){paymentLayout=defaultPaymentLayout();paymentUI.columnQuery='';savePaymentLayout();syncPaymentShell();renderPaymentWorkspace();return;}

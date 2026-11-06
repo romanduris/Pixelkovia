@@ -271,7 +271,9 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-workspace .payment-table td[data-column=date]{min-width:145px;color:#9eafc9;font-size:11px;font-variant-numeric:tabular-nums}
 .payment-workspace .payment-table td[data-column=email]{min-width:190px;color:#dae3f4}
 .payment-workspace .payment-table td[data-column=products]{min-width:150px}
-.payment-products{display:block;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.payment-products{display:flex;align-items:center;gap:4px;flex-wrap:wrap;max-width:260px;white-space:normal}
+.payment-product-tag{display:inline-flex;align-items:center;min-height:21px;border:1px solid #3e4e69;background:#1c2940;border-radius:4px;padding:1px 5px;font-size:10px;line-height:1.4;color:#bdcce2;white-space:nowrap}
+.payment-product-tag.base{font-weight:700;color:#e0e9f7;background:#25344e}.payment-product-tag.book{color:#d1c3f6;border-color:#554a70;background:#29243c}.payment-product-tag.atlas{color:#9ddcde;border-color:#345c65;background:#1b303a}.payment-product-tag.gift{color:#a8e3c3;border-color:#365e50;background:#1a302b}
 .payment-workspace .payment-table td[data-column=amount]{min-width:85px;font-variant-numeric:tabular-nums;text-align:right;color:#d5e3f4}
 .payment-workspace .payment-table th[data-column=amount]{text-align:right}
 .payment-workspace .payment-table td[data-column=status]{min-width:145px}
