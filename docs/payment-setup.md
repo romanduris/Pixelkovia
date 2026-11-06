@@ -77,6 +77,12 @@ Migrácia `0013_payment_attempt_outcomes.sql` pridáva jeden trvalý súhrn k ex
 
 Existujúci Stripe endpoint musí okrem pôvodných udalostí odoberať `checkout.session.expired` a `payment_intent.canceled`; URL ani podpisový secret sa nemenia. Zápis výsledku neúspešného webhooku predchádza jeho potvrdeniu v `payment_events`. Pri dočasnom výpadku sa webhook zopakuje s rovnakými identifikátormi, bez duplicitných nákupov. Staršie či oneskorené zlyhanie nezvráti webhookom potvrdený úspech.
 
+Overená dokončená relácia s voucherom `free` môže mať od Stripe `payment_status=paid` aj `no_payment_required` a nemusí mať PaymentIntent. Obe možnosti vyžadujú podpísaný webhook, nulovú sumu, správnu menu, účet a väzbu na serverový pokus s rovnakým schváleným voucherom. V prehľade sa po úspešnom spracovaní zobrazí **Dokončená zdarma** a zahrnie sa medzi úspešné pokusy.
+
+Menu **Stĺpce** umožňuje pridať voucher (`free`, `1e` alebo nepoužitý), cenu pred zľavami, zľavu na balík, zľavu voucherom, stav a počet objednávok, prístupové e-maily, časy vytvorenia a odoslania, overený stav Stripe a potvrdenie webhookom. ID pokusu a Stripe relácia sú predvolene skryté. Vyhľadávanie stĺpcov neukladá zákaznícke údaje. Nové voliteľné polia zostávajú skryté aj pri načítaní staršieho uloženého rozloženia.
+
+Migrácia `0014_checkout_price_snapshot.sql` uchováva presný cenový rozpis nových pokusov v čase začatia. Historické ceny a zľavy, ktoré neboli uložené, zostávajú „Neznáme“; nepočítajú sa z aktuálneho katalógu. Stav e-mailu znamená odovzdanie poskytovateľovi, nie potvrdené prijatie v schránke. Dve darčekové objednávky sa pri agregácii počítajú presne raz každá.
+
 Filtre podporujú stav, obdobie 1/7/30 dní aj celé obdobie. Súhrny sa počítajú zo všetkých pokusov v období, tabuľka filtruje stav a stránkuje po 100 riadkoch. Darčekové dve objednávky zostávajú jedným platobným pokusom. Požiadavku, ktorá vôbec nedorazila na server, nemožno spätne spoľahlivo evidovať.
 
 `admin/tests/payment-monitor.test.mjs` testuje všetky stavy, bankové/technické/neznáme zlyhania, podpisy, duplicity, oneskorené udalosti, obnovu po výpadku databázy, migráciu a stránkovanie. `tests/payment-admin.test.cjs` kontroluje skutočné administrátorské UI vrátane filtrov, e-mailov, výrazného červeného stavu, escapovania HTML, desktopu a šírky 390 px.
@@ -105,7 +111,7 @@ Prílohy do 15 MiB spolu sa prenesú vrátane vložených obrázkov. Pri väčš
 
 Pod tlačidlom kúpiť je odkaz „Mám zľavový kód“, ktorý otvorí dialóg. Schválený voucher `free` (bez ohľadu na veľkosť písmen a okolité medzery) zníži celú vybranú objednávku na 0 €. Platí pre hru, balík aj samostatné knihy. Neznámy kód server odmietne. Voucher sa neukladá do URL ani lokálneho úložiska.
 
-Server zapíše `voucher_code=free` a nulovú cenu do `checkout_attempts` a vytvorí nulové Stripe položky. Podľa [dokumentácie Stripe pre nulové objednávky](https://docs.stripe.com/payments/checkout/no-cost-orders?ui=checkout-form) formulár pri celkovej sume 0 nevyžaduje kartu. Prístup sa vytvorí až z podpísanej udalosti `checkout.session.completed` po načítaní relácie cez Stripe API: `status=complete`, `payment_status=no_payment_required`, suma 0, správna mena, režim účtu, väzba na serverový pokus a potvrdený voucher v metadata. Nulová relácia nemá PaymentIntent. Opakovaná udalosť nevytvorí ďalšiu objednávku; opakovaný samostatný nákup má vlastné heslo a šifrovaný doručovací záznam.
+Server zapíše `voucher_code=free` a nulovú cenu do `checkout_attempts` a vytvorí nulové Stripe položky. Podľa [dokumentácie Stripe pre nulové objednávky](https://docs.stripe.com/payments/checkout/no-cost-orders?ui=checkout-form) formulár pri celkovej sume 0 nevyžaduje kartu. Prístup sa vytvorí až z podpísanej udalosti `checkout.session.completed` po načítaní relácie cez Stripe API: `status=complete`, `payment_status=paid` alebo `no_payment_required`, suma 0, správna mena, režim účtu, väzba na serverový pokus a potvrdený voucher v metadata. Nulová relácia nemá PaymentIntent. Opakovaná udalosť nevytvorí ďalšiu objednávku; opakovaný samostatný nákup má vlastné heslo a šifrovaný doručovací záznam.
 
 Starý adaptér Payment Links a ručné doručovanie sa nepoužívajú. Voucher neobchádza kontrolu pripravenosti Stripe ani e-mailového odosielateľa.
 

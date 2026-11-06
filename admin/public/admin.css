@@ -244,6 +244,10 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-menu-heading{display:flex;align-items:center;justify-content:space-between;font-size:13px}
 .payment-menu-heading button,.payment-column-menu li button{border:1px solid #435473;border-radius:4px;background:#21314c;color:#d6e3f4;min-width:30px;min-height:30px;padding:0;font-size:14px;line-height:1}
 .payment-column-menu p{font-size:11px;color:#9db0cc;margin:6px 0 10px}
+#payment-column-search{width:100%;min-height:34px;padding:6px 9px;margin:0 0 8px;border:1px solid #435473;border-radius:5px;background:#111b2e;color:#d6e3f4;font-size:12px;color-scheme:dark}
+#payment-column-search::placeholder{color:#91a6c5}
+.payment-voucher{display:inline-block;padding:2px 7px;border:1px solid #4f627f;border-radius:4px;color:#c8dafa;font-size:11px}
+.payment-delivery-error{color:#ffacb8}.payment-delivery-state{color:#b9dccc}
 .payment-column-menu ul{list-style:none;margin:0 0 12px;padding:0}
 .payment-column-menu li{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px;padding:2px 0}
 .payment-column-menu li label{display:flex;align-items:center;gap:8px;min-height:32px;font-size:11px;cursor:pointer}
@@ -266,6 +270,9 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-workspace .payment-table th[data-column=amount]{text-align:right}
 .payment-workspace .payment-table td[data-column=status]{min-width:145px}
 .payment-workspace .payment-table td[data-column=method]{min-width:100px}
+.payment-workspace .payment-table td[data-column=voucher]{min-width:100px}
+.payment-workspace .payment-table td[data-column=delivery]{min-width:190px}
+.payment-workspace .payment-table td[data-column=subtotal],.payment-workspace .payment-table td[data-column=bundleDiscount],.payment-workspace .payment-table td[data-column=voucherDiscount]{text-align:right;font-variant-numeric:tabular-nums}
 .payment-workspace .payment-table td[data-column=reason]{min-width:200px;max-width:300px;white-space:normal}
 .payment-workspace .payment-table td[data-column=reference]{min-width:190px;max-width:240px;white-space:normal;overflow-wrap:anywhere}
 .payment-workspace .payment-table .status{font-size:10px;line-height:1.4;padding:3px 7px;white-space:nowrap}

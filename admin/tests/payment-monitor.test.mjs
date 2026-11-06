@@ -226,6 +226,70 @@ test('all attempts remain reachable with stable pagination, state filtering and 
     assert.equal(response.status,403);assert.ok(!(await response.text()).includes('@example.invalid'));
   }finally{f.db.close();}
 });
+test('completed free vouchers reported as paid or no_payment_required fulfill once and expose exact optional metadata',async()=>{
+  for(const paymentStatus of ['paid','no_payment_required'])for(const giftGame of [false,true]){
+    const f=fixture();try{
+      const checkout=await createCheckout(f.env,{...f.input,books:['story-book-before','story-book-after'],giftGame,voucherCode:' FREE ',subtotalCents:1,voucherDiscountCents:1}),session=f.sessions.get(checkout.sessionId);
+      session.status='complete';session.payment_status=paymentStatus;session.payment_intent=null;
+      await verifiedCheckoutStatus(f.env,session.id);
+      let row=(await paymentReport(f.env,new URLSearchParams(),true)).rows[0];
+      assert.equal(row.status,'started','a zero price alone never confirms the webhook');
+      assert.equal(row.voucherCode,'free');assert.equal(row.subtotalCents,giftGame?3496:2497);assert.equal(row.bundleDiscountCents,499);assert.equal(row.voucherDiscountCents,giftGame?2997:1998);
+      assert.equal(row.orderCount,0);assert.deepEqual(row.orderStates,[]);
+      f.env.RESEND_API_KEY='';
+      const event=f.event('checkout.session.completed',session);
+      await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);
+      await paymentWebhook(f.event('checkout.session.completed',session,'evt_free_retry'),f.env);
+      const report=await paymentReport(f.env,new URLSearchParams(),true);row=report.rows[0];
+      const count=giftGame?2:1;
+      assert.equal(row.status,'successful');assert.equal(row.state,'free');assert.equal(row.providerState,'free');assert.equal(row.method,'free');
+      assert.equal(report.attemptCounts.successful,1);assert.equal(report.total,1);
+      assert.equal(row.orderCount,count);assert.equal(row.expectedOrderCount,count);assert.deepEqual(row.orderStates,['paid']);
+      assert.deepEqual(row.delivery,{total:count,sent:0,failed:0,queued:count,lastSentAt:null});
+      assert.ok(row.webhookConfirmedAt>0);assert.ok(row.fulfilledAt>0);
+      assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,count);
+      assert.equal((await first(f.db,'SELECT count(*) n FROM customer_credentials')).n,count);
+      assert.ok(!JSON.stringify(report).includes('NEVER_STORE'));
+    }finally{f.db.close();}
+  }
+});
+test('voucher and order reporting separates no voucher, 1e, unknown historical pricing and partial delivery without duplicating linked orders',async()=>{
+  const f=fixture();try{
+    const normal=await createCheckout(f.env,f.input);
+    let row=(await paymentReport(f.env,new URLSearchParams(),true)).rows[0];
+    assert.equal(row.voucherCode,null);assert.equal(row.subtotalCents,1499);assert.equal(row.bundleDiscountCents,0);assert.equal(row.voucherDiscountCents,0);
+    const checkout=await createCheckout(f.env,{...f.input,email:'voucher@example.invalid',attemptKey:crypto.randomUUID(),books:['story-book-before','story-book-after'],giftGame:true,voucherCode:'1E'}),session=f.sessions.get(checkout.sessionId);
+    session.status='complete';session.payment_status='paid';session.payment_intent={id:'pi_voucher',status:'succeeded'};f.env.RESEND_API_KEY='';
+    await paymentWebhook(f.event('checkout.session.completed',session),f.env);
+    const deliveries=await query(f.db,'SELECT d.order_id FROM access_deliveries d JOIN checkout_orders co ON co.order_id=d.order_id WHERE co.attempt_id=?',session.client_reference_id),sentAt=Date.now();
+    await execute(f.db,"UPDATE access_deliveries SET status='sent',sent_at=? WHERE order_id=?",sentAt,deliveries[0].order_id);
+    await execute(f.db,"UPDATE access_deliveries SET status='failed' WHERE order_id=?",deliveries[1].order_id);
+    row=(await paymentReport(f.env,new URLSearchParams(),true)).rows.find(r=>r.sessionId===session.id);
+    assert.equal(row.voucherCode,'1e');assert.equal(row.subtotalCents,3496);assert.equal(row.bundleDiscountCents,499);assert.equal(row.voucherDiscountCents,2897);assert.equal(row.totalCents,100);
+    assert.equal(row.orderCount,2);assert.deepEqual(row.delivery,{total:2,sent:1,failed:1,queued:0,lastSentAt:sentAt});
+    await execute(f.db,'UPDATE checkout_attempts SET subtotal_cents=NULL,bundle_discount_cents=NULL,voucher_discount_cents=NULL WHERE stripe_session_id=?',normal.sessionId);
+    row=(await paymentReport(f.env,new URLSearchParams(),true)).rows.find(r=>r.sessionId===normal.sessionId);
+    assert.equal(row.subtotalCents,null);assert.equal(row.bundleDiscountCents,null);assert.equal(row.voucherDiscountCents,null);assert.equal(row.voucherCode,null);
+  }finally{f.db.close();}
+});
+test('a paid zero-cost result still requires the approved voucher, completion, matching currency and server attempt',async()=>{
+  for(const invalid of ['voucher','metadata','currency','completion','amount','mode','reference']){
+    const f=fixture();try{
+      const checkout=await createCheckout(f.env,{...f.input,voucherCode:'free'}),s=f.sessions.get(checkout.sessionId);
+      s.status='complete';s.payment_status='paid';
+      if(invalid==='voucher')await execute(f.db,'UPDATE checkout_attempts SET voucher_code=NULL WHERE stripe_session_id=?',s.id);
+      if(invalid==='metadata')s.metadata.voucher_code='not-approved';
+      if(invalid==='currency')s.currency='usd';
+      if(invalid==='completion')s.status='open';
+      if(invalid==='amount')s.amount_total=100;
+      if(invalid==='mode')s.mode='subscription';
+      if(invalid==='reference')s.client_reference_id='foreign-attempt';
+      await assert.rejects(()=>paymentWebhook(f.event('checkout.session.completed',s),f.env),e=>e.status===400);
+      assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,0);
+      assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).attemptCounts.successful,0);
+    }finally{f.db.close();}
+  }
+});
 test('payment report counts a paid gift once, separates free and refund, and flags delayed access',async()=>{
   const f=fixture();try{
     const gift=await createCheckout(f.env,{...f.input,giftGame:true}),s=f.sessions.get(gift.sessionId);

@@ -4,10 +4,16 @@ const browserType=process.env.QA_BROWSER==='webkit'?webkit:chromium;
 const origin='https://pixelkovia.rodulab.com';
 const now=Date.now();
 const report={generatedAt:now,days:1,category:'',enabled:true,health:'observing',counts:{paid:2,free:1,refunded:0,failed:0,pending:1,ready:3,expired:2,unknown:0},attemptCounts:{started:3,abandoned:2,cancelled:1,error:1,successful:2,declined:0,unknown:0},page:1,pages:2,matchingTotal:105,total:105,technical:0,errors24:0,recent:[],deliveries:{failed:0,delayed:0},fulfillmentDelayed:0,lastSuccessAt:now-10000,checks:[{id:'stripe',ok:1,checked_at:now},{id:'webhook',ok:1,checked_at:now}],rows:[{id:'test-attempt',sessionId:'cs_test_admin_fixture',totalCents:1499,createdAt:now,checkedAt:now,state:'paid',products:['episode-1']}],logs:[]};
-report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index)=>({...report.rows[0],id:'method-'+index,sessionId:'cs_test_admin_fixture'+index,state:method==='free'?'free':method==='unknown'?'ready':'paid',status:method==='unknown'?'started':'successful',email:'private'+index+'@example.invalid',reason:'Neznáme',method,totalCents:method==='free'?0:1499}));
+report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index)=>({...report.rows[0],id:'method-'+index,sessionId:'cs_test_admin_fixture'+index,state:method==='free'?'free':method==='unknown'?'ready':'paid',status:method==='unknown'?'started':'successful',email:'private'+index+'@example.invalid',reason:'Neznáme',method,totalCents:method==='free'?0:method==='card'?100:1499,
+  voucherCode:method==='free'?'free':method==='card'?'1e':null,subtotalCents:method==='free'?null:1499,bundleDiscountCents:method==='free'?null:0,voucherDiscountCents:method==='free'?null:method==='card'?1399:0,
+  giftGame:method==='free',products:method==='free'?['episode-1','story-book-before','story-book-after','atlas-pixelkov']:['episode-1'],
+  providerState:method==='free'?'free':method==='unknown'?'ready':'paid',webhookConfirmedAt:method==='unknown'?null:now,fulfilledAt:method==='unknown'?null:now,
+  orderCount:method==='unknown'?0:method==='free'?2:1,expectedOrderCount:method==='free'?2:1,orderStates:method==='unknown'?[]:['paid'],delivery:{total:method==='unknown'?0:method==='free'?2:1,sent:method==='unknown'?0:method==='free'?2:1,failed:0,queued:0,lastSentAt:method==='unknown'?null:now}
+}));
 (async()=>{const browser=await browserType.launch({headless:true});try{
   const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false;const calls=[];
   page.on('pageerror',e=>errors.push(e.message));
+  await context.addInitScript(()=>{const key='pixelkovia-admin-payments-layout-v1';if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({order:['date','email','products','amount','status','method','reason','reference'],hidden:['reason','reference'],density:'compact',navCollapsed:true}));});
   await context.route('**/*',async route=>{
     const url=new URL(route.request().url());if(url.origin!==origin)return route.abort();
     if(url.pathname==='/api/admin/context')return route.fulfill({json:{admin:'Správca',authMode:'password',environment:'production',webUrl:origin}});
@@ -47,6 +53,25 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   assert.equal(await page.locator('.payment-pager span').innerText(),'Strana 2 / 2');
   await page.locator('#payment-days').selectOption('all');await ready();assert.ok(calls.some(p=>p.includes('days=all')&&p.includes('page=1')));
 
+  assert.equal(await page.locator('[data-attempt="method-3"] .attempt-successful').innerText(),'Dokončená zdarma');
+  assert.ok((await page.locator('[data-attempt="method-3"] [data-column=products]').innerText()).includes('Atlas Pixelkov'));
+  await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-search').fill('voucher');
+  assert.equal(await page.locator('[data-payment-column-option]:not([hidden])').count(),2);
+  await page.locator('#payment-column-voucher').check();await page.locator('#payment-column-voucherDiscount').check();
+  assert.equal(await page.locator('[data-attempt="method-3"] [data-column=voucher]').innerText(),'free');
+  assert.equal(await page.locator('[data-attempt="method-2"] [data-column=voucher]').innerText(),'1e');
+  assert.equal(await page.locator('[data-attempt="method-0"] [data-column=voucher]').innerText(),'Nepoužitý');
+  assert.equal(await page.locator('[data-attempt="method-3"] [data-column=voucherDiscount]').innerText(),'Neznáme');
+  assert.ok((await page.locator('[data-attempt="method-2"] [data-column=voucherDiscount]').innerText()).includes('13,99'));
+  await page.locator('#payment-column-search').fill('');
+  for(const id of ['orderStatus','orderCount','delivery','providerState','confirmedAt'])await page.locator('#payment-column-'+id).check();
+  assert.equal(await page.locator('[data-attempt="method-3"] [data-column=orderStatus]').innerText(),'Potvrdená');
+  assert.equal(await page.locator('[data-attempt="method-3"] [data-column=orderCount]').innerText(),'2 / 2');
+  assert.equal(await page.locator('[data-attempt="method-3"] [data-column=delivery]').innerText(),'Odovzdané · 2 / 2');
+  assert.equal(await page.locator('[data-attempt="method-3"] [data-column=providerState]').innerText(),'Dokončená zdarma');
+  assert.equal(await page.locator('[data-attempt="method-4"] [data-column=confirmedAt]').innerText(),'Zatiaľ nepotvrdené');
+  await page.keyboard.press('Escape');await page.reload();await ready();assert.ok((await headers()).includes('voucher'));assert.ok(!(await headers()).includes('reference'));
+  await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();await page.keyboard.press('Escape');
   await page.locator('#payment-column-toggle').click();
   await page.locator('#payment-column-method').uncheck();
   assert.ok(!(await headers()).includes('method'));assert.ok(await page.locator('.payment-column-options').evaluate(e=>e.open));

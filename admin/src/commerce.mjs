@@ -137,7 +137,7 @@ export async function createCheckout(env,input){
       await closeCheckoutAttempt(env,active);
     }
     try{await env.TQ_DB.batch([
-      statement(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices,gift_game,gift_price_cents,fixed_total_voucher) VALUES(?,?,?,?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher==='free'?'free':null,JSON.stringify(prices),q.giftGame?1:0,q.giftTotalCents,q.voucher==='1e'?'1e':null),
+      statement(env.TQ_DB,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,voucher_code,item_prices,gift_game,gift_price_cents,fixed_total_voucher,subtotal_cents,bundle_discount_cents,voucher_discount_cents) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',id,email,name,JSON.stringify(ids),q.totalCents,at,q.voucher==='free'?'free':null,JSON.stringify(prices),q.giftGame?1:0,q.giftTotalCents,q.voucher==='1e'?'1e':null,q.subtotalCents,q.bundleDiscountCents,q.voucherDiscountCents),
       statement(env.TQ_DB,'INSERT INTO checkout_requests(request_key,email_key,payload_hash,attempt_id) VALUES(?,?,?,?)',requestKey,emailKey,payloadHash,id)
     ]);}catch(error){
       existing=await first(env.TQ_DB,'SELECT * FROM checkout_requests WHERE request_key=?',requestKey);
@@ -170,7 +170,9 @@ export async function fulfill(env,sessionId){
   const db=env.TQ_DB,previous=await first(db,'SELECT id FROM orders WHERE external_reference=?',sessionId);
   if(previous)return previous;
   const session=await stripe(env).checkout.sessions.retrieve(sessionId,{expand:['payment_intent.latest_charge']});
-  const completedFree=session.payment_status==='no_payment_required'&&session.status==='complete'&&session.amount_total===0;
+  // Stripe can mark a completed zero-cost Session either paid or
+  // no_payment_required. Both still require our approved free voucher below.
+  const completedFree=['paid','no_payment_required'].includes(session.payment_status)&&session.status==='complete'&&session.amount_total===0;
   if((session.payment_status!=='paid'&&!completedFree)||session.mode!=='payment')return null;
   const attempt=await first(db,'SELECT * FROM checkout_attempts WHERE id=? AND stripe_session_id=?',session.client_reference_id,session.id);
   if(!attempt||session.amount_total!==attempt.total_cents||session.currency!=='eur'||session.livemode!==env.STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_'))throw new HttpError(400,'Platbu sa nepodarilo priradiť k objednávke.');

@@ -135,13 +135,21 @@ export async function paymentReport(env,params,ready){
   const requestedPage=Number(params.get('page')||1);if(!Number.isSafeInteger(requestedPage)||requestedPage<1)throw new HttpError(400,'Neplatná strana.');
   const at=Date.now(),since=days==='all'?0:at-days*86400000,db=env.TQ_DB;
   // One row per existing checkout attempt, even before a Stripe Session exists.
-  const attempts=await query(db,`SELECT a.id,a.email,a.stripe_session_id,a.total_cents,a.created_at,a.selection,a.gift_game,p.state observed_state,p.checked_at,coalesce(m.method,s.problem_method) method,
+  const attempts=await query(db,`WITH linked_orders AS (
+      SELECT a.id attempt_id,o.id order_id FROM checkout_attempts a JOIN orders o ON o.external_reference=a.stripe_session_id
+      UNION SELECT attempt_id,order_id FROM checkout_orders
+    ), order_summary AS (
+      SELECT l.attempt_id,count(*) order_count,group_concat(DISTINCT o.status) order_states,
+        min(o.status='paid') orders_paid,max(o.status='refunded') has_refund,min(o.created_at) fulfilled_at,
+        sum(d.order_id IS NOT NULL) delivery_count,sum(d.status='sent') sent_count,sum(d.status='failed') failed_count,sum(d.status='queued') queued_count,max(d.sent_at) sent_at
+      FROM linked_orders l JOIN orders o ON o.id=l.order_id LEFT JOIN access_deliveries d ON d.order_id=o.id GROUP BY l.attempt_id
+    ) SELECT a.id,a.email,a.stripe_session_id,a.total_cents,a.created_at,a.selection,a.gift_game,a.voucher_code,a.fixed_total_voucher,
+    a.subtotal_cents,a.bundle_discount_cents,a.voucher_discount_cents,p.state observed_state,p.checked_at,coalesce(m.method,s.problem_method) method,
     s.webhook_confirmed_at,s.cancelled_at,s.problem_kind,s.problem_type,s.problem_code,
-    (SELECT count(*) FROM checkout_orders co WHERE co.attempt_id=a.id) order_count,
-    (SELECT min(o.status='paid') FROM orders o WHERE o.external_reference=a.stripe_session_id OR o.id IN(SELECT co.order_id FROM checkout_orders co WHERE co.attempt_id=a.id)) orders_paid,
-    (SELECT max(o.status='refunded') FROM orders o WHERE o.external_reference=a.stripe_session_id OR o.id IN(SELECT co.order_id FROM checkout_orders co WHERE co.attempt_id=a.id)) has_refund
+    coalesce(os.order_count,0) order_count,os.order_states,os.orders_paid,os.has_refund,os.fulfilled_at,
+    coalesce(os.delivery_count,0) delivery_count,coalesce(os.sent_count,0) sent_count,coalesce(os.failed_count,0) failed_count,coalesce(os.queued_count,0) queued_count,os.sent_at
     FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
-    LEFT JOIN payment_attempt_outcomes s ON s.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC,a.id`,since);
+    LEFT JOIN payment_attempt_outcomes s ON s.attempt_id=a.id LEFT JOIN order_summary os ON os.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC,a.id`,since);
   const counts={paid:0,free:0,refunded:0,failed:0,pending:0,ready:0,expired:0,unknown:0},matching=[];
   for(const a of attempts){
     const status=a.has_refund?'refunded':a.orders_paid===1?(a.total_cents===0?'free':'paid'):a.observed_state||'unknown';counts[status]++;
@@ -155,7 +163,14 @@ export async function paymentReport(env,params,ready){
     if(a.problem_code&&!a.cancelled_at)reason+=' · '+a.problem_code;
     if(a.webhook_confirmed_at&&status==='refunded')reason='Platba bola vrátená';
     else if(a.webhook_confirmed_at)reason=a.total_cents===0?'Potvrdená objednávka zdarma':'Neznáme';
-    if(!attemptStatus||monitorStatus===attemptStatus)matching.push({id:a.id,email:a.email||'Neznáme',sessionId:a.stripe_session_id,totalCents:a.total_cents,createdAt:a.created_at,checkedAt:a.checked_at,state:status,status:monitorStatus,reason,failureKind:a.problem_kind||null,method:a.method||'unknown',products:JSON.parse(a.selection),giftGame:!!a.gift_game});
+    if(!attemptStatus||monitorStatus===attemptStatus)matching.push({
+      id:a.id,email:a.email||'Neznáme',sessionId:a.stripe_session_id,totalCents:a.total_cents,createdAt:a.created_at,checkedAt:a.checked_at,state:status,status:monitorStatus,reason,failureKind:a.problem_kind||null,method:a.method||'unknown',products:JSON.parse(a.selection),giftGame:!!a.gift_game,
+      voucherCode:a.voucher_code||a.fixed_total_voucher||null,
+      subtotalCents:a.subtotal_cents,bundleDiscountCents:a.bundle_discount_cents,voucherDiscountCents:a.voucher_discount_cents,
+      providerState:a.observed_state||null,webhookConfirmedAt:a.webhook_confirmed_at||null,
+      orderCount:a.order_count,expectedOrderCount:a.gift_game?2:1,orderStates:a.order_states?a.order_states.split(',').sort():[],fulfilledAt:a.fulfilled_at||null,
+      delivery:{total:a.delivery_count,sent:a.sent_count,failed:a.failed_count,queued:a.queued_count,lastSentAt:a.sent_at||null}
+    });
   }
   const pageSize=100,pages=Math.max(1,Math.ceil(matching.length/pageSize)),page=Math.min(requestedPage,pages),rows=matching.slice((page-1)*pageSize,page*pageSize);
   const recent=await query(db,'SELECT category,source,count(*) count,count(DISTINCT attempt_id) attempts FROM payment_log WHERE created_at>=? GROUP BY category,source',since);
