@@ -10,6 +10,7 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   providerState:method==='free'?'free':method==='unknown'?'ready':'paid',webhookConfirmedAt:method==='unknown'?null:now,fulfilledAt:method==='unknown'?null:now,
   orderCount:method==='unknown'?0:method==='free'?2:1,expectedOrderCount:method==='free'?2:1,orderStates:method==='unknown'?[]:['paid'],delivery:{total:method==='unknown'?0:method==='free'?2:1,sent:method==='unknown'?0:method==='free'?2:1,failed:0,queued:0,lastSentAt:method==='unknown'?null:now}
 }));
+report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
 (async()=>{const browser=await browserType.launch({headless:true});try{
   const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null,richAttention=false;const calls=[];
   const manyRows=Array.from({length:123},(_,i)=>({...report.rows[i%5],id:'batch-'+String(i).padStart(3,'0'),createdAt:now-i,email:'batch'+i+'@example.invalid'}));
@@ -48,7 +49,26 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   });
   const ready=()=>page.waitForFunction(()=>document.querySelector('#view').getAttribute('aria-busy')==='false');
   const headers=()=>page.locator('.payment-table thead th[data-column]').evaluateAll(cells=>cells.map(c=>c.dataset.column));
+  const settledLayout=async()=>{
+    await page.waitForFunction(()=>!!document.querySelector('.payment-workspace')&&!!document.querySelector('.payment-mobile-table')===matchMedia('(max-width:750px)').matches);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  };
+  const mobileTable=async()=>{
+    await settledLayout();
+    await page.waitForFunction(()=>document.querySelector('.payment-mobile-table .payment-table thead th[data-column]'));
+    assert.deepEqual(new Set(await headers()),new Set(['date','email','amount','status','method']));
+    const wrap=await page.locator('#payment-table-scroll').boundingBox();
+    const visibleCells=await page.locator('.payment-attempt-row').first().locator('td[data-column]').evaluateAll(cells=>cells.map(c=>{const r=c.getBoundingClientRect();return {id:c.dataset.column,x:r.x,right:r.right};}));
+    for(const cell of visibleCells)assert.ok(cell.x>=wrap.x-1&&cell.right<=wrap.x+wrap.width+1,'mobile keeps '+cell.id+' inside the visible table');
+    assert.ok(await page.locator('#payment-table-scroll').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'no horizontal scrolling is needed for the five mobile fields');
+    const lines=await page.locator('.payment-attempt-row .payment-cell-line').evaluateAll(cells=>cells.map(c=>({height:c.getBoundingClientRect().height,scrollHeight:c.scrollHeight})));
+    assert.ok(lines.every(c=>c.height<=26&&c.scrollHeight<=26),'every mobile value stays on one line');
+    assert.equal(await page.locator('[data-attempt="method-0"] [data-column=date] .payment-date-short').innerText(),'6.11. 8:18');
+    const email=page.locator('[data-attempt="method-0"] [data-column=email] .payment-cell-line');
+    assert.equal(await email.getAttribute('title'),'private0@example.invalid');if(page.viewportSize().width<=390)assert.ok(await email.evaluate(el=>el.scrollWidth>el.clientWidth),'email truncates while retaining its full value');
+  };
   const compactSummary=async()=>{
+    await settledLayout();
     const positions=await page.locator('.payment-state-chip').evaluateAll(chips=>chips.map(c=>c.getBoundingClientRect().top));
     assert.ok(Math.max(...positions)-Math.min(...positions)<1,'all state tiles stay in one horizontal row');
     assert.ok((await page.locator('.payment-status-strip').boundingBox()).height<110,'state row remains compact');
@@ -135,6 +155,13 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');
   const stored=decodeURIComponent(preferenceCookie.value);
   assert.ok(!stored.includes('@'));assert.ok(!stored.includes('cs_test_'));assert.ok(!stored.includes('private0'));
+  const savedDesktopColumns=await headers(),beforeMobile=JSON.parse(stored);
+  for(const width of [640,390,320,280]){await page.setViewportSize({width,height:844});await mobileTable();}
+  await page.setViewportSize({width:1512,height:1080});await page.waitForFunction(()=>!document.querySelector('.payment-mobile-table'));
+  assert.deepEqual(await headers(),savedDesktopColumns,'mobile priority fields do not overwrite the desktop column choices');
+  preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');
+  assert.deepEqual(JSON.parse(decodeURIComponent(preferenceCookie.value)),beforeMobile,'responsive changes never overwrite the saved desktop layout');
+
   await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();
   assert.deepEqual(await headers(),['date','email','products','amount','status','method']);assert.ok(await page.locator('.density-compact').count());
   await page.locator('#close-payment-columns').click();
@@ -178,9 +205,23 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.locator('[data-payment-drag="date"]').dragTo(page.locator('[data-payment-drag="products"]'),{targetPosition:{x:8,y:12}});
   assert.deepEqual((await headers()).slice(0,3),['email','date','products'],'left half inserts before the target');
   assert.equal(await page.locator('.payment-drop-before,.payment-drop-after,.payment-column-dragging').count(),0);
+  const productsWidth=await columnWidth('products'),dateWidth=await columnWidth('date');
+  await page.locator('[data-payment-resize="products"]').focus();await page.keyboard.press('Home');
+  const tags=await page.locator('[data-attempt="method-3"] .payment-product-tag').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));
+  assert.ok(Math.max(...tags)-Math.min(...tags)<1,'all product tags stay on one line at an 80px column width');
+  assert.ok(await page.locator('[data-attempt="method-3"] .payment-products').evaluate(el=>el.scrollWidth>el.clientWidth&&getComputedStyle(el).textOverflow==='ellipsis'),'narrow product cells truncate instead of wrapping');
+  await resizeColumn('products',productsWidth-80);
+  await page.locator('[data-payment-resize="date"]').focus();await page.keyboard.press('Home');
+  assert.ok(await page.locator('[data-attempt="method-0"] .payment-date-short').isVisible(),'narrow desktop dates use the compact format');
+  assert.equal(await page.locator('[data-attempt="method-0"] [data-column=date]').getAttribute('aria-label'),await page.locator('[data-attempt="method-0"] [data-column=date] .payment-cell-line').getAttribute('title'));
+  await resizeColumn('date',dateWidth-80);
   await page.screenshot({path:'/tmp/pixelkovia-payments-resized-columns.png',fullPage:true});
   await page.locator('[data-payment-resize="email"]').focus();await page.keyboard.press('Home');assert.ok(Math.abs(await columnWidth('email')-80)<1);
   await page.keyboard.press('End');await page.keyboard.press('ArrowRight');assert.ok(Math.abs(await columnWidth('email')-800)<1);
+  await page.setViewportSize({width:320,height:844});await mobileTable();
+  await page.setViewportSize({width:1512,height:1080});await page.waitForFunction(()=>!document.querySelector('.payment-mobile-table'));
+  assert.ok(Math.abs(await columnWidth('email')-800)<1,'even an 800px desktop width is preserved after the mobile view');
+
   await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();await page.keyboard.press('Escape');
   assert.equal(await page.locator('.payment-table.has-column-widths').count(),0,'reset restores automatic widths');
   preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');assert.deepEqual(JSON.parse(decodeURIComponent(preferenceCookie.value)).widths,{});
@@ -307,5 +348,5 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.locator('[data-page=dashboard]').click();await page.locator('#payment-overview .payment-health').waitFor();
   assert.equal(await page.locator('body.payments-view').count(),0);assert.ok(await page.locator('.product-tabs').isVisible());assert.ok(await page.locator('.page-heading p').isVisible());
   assert.ok(await page.getByRole('link',{name:'Otvoriť platby a chyby →'}).isVisible());
-  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, one-row scrollable states plus one-row alert at 280–1512px, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked log focus, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
+  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, one-row scrollable states plus one-row alert at 280–1512px, single-line/truncated cells, five visible mobile fields, preserved desktop layout, compact dates, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked log focus, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

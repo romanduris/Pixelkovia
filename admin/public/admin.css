@@ -264,15 +264,15 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-menu-footer span{font-size:10px;color:#8ea3c2}
 .payment-menu-footer .link-button{font-size:11px;min-height:28px;padding:4px 0}
 .payment-workspace .table-wrap{border-radius:0;border-left:0;border-right:0;max-height:none;scrollbar-width:thin;scrollbar-color:#566584 #111b2e}
-.payment-workspace .payment-table{font-size:12px;table-layout:auto}
+.payment-workspace .payment-table{font-size:12px;table-layout:fixed;min-width:0}
 .payment-workspace .payment-table th{position:sticky;top:0;z-index:2;background:#1a2740;padding:10px 12px;font-size:10px;letter-spacing:.015em;text-transform:none;white-space:nowrap;line-height:1.4}
 .payment-workspace .payment-table td{padding:8px 12px;vertical-align:middle;white-space:nowrap;line-height:1.5;min-width:0;max-width:none;border-bottom:1px solid #26364e;overflow-wrap:normal}
 .payment-workspace .payment-table tbody>tr:last-child td{border-bottom:0}
 .payment-workspace .payment-table td[data-column=date]{min-width:145px;color:#9eafc9;font-size:11px;font-variant-numeric:tabular-nums}
 .payment-workspace .payment-table td[data-column=email]{min-width:190px;color:#dae3f4}
 .payment-workspace .payment-table td[data-column=products]{min-width:150px}
-.payment-products{display:flex;align-items:center;gap:4px;flex-wrap:wrap;max-width:260px;white-space:normal}
-.payment-product-tag{display:inline-flex;align-items:center;min-height:21px;border:1px solid #3e4e69;background:#1c2940;border-radius:4px;padding:1px 5px;font-size:10px;line-height:1.4;color:#bdcce2;white-space:nowrap}
+.payment-products{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.payment-product-tag{margin-right:4px;vertical-align:middle;display:inline-flex;align-items:center;min-height:21px;border:1px solid #3e4e69;background:#1c2940;border-radius:4px;padding:1px 5px;font-size:10px;line-height:1.4;color:#bdcce2;white-space:nowrap}
 .payment-product-tag.base{font-weight:700;color:#e0e9f7;background:#25344e}.payment-product-tag.book{color:#d1c3f6;border-color:#554a70;background:#29243c}.payment-product-tag.atlas{color:#9ddcde;border-color:#345c65;background:#1b303a}.payment-product-tag.gift{color:#a8e3c3;border-color:#365e50;background:#1a302b}
 .payment-workspace .payment-table td[data-column=amount]{min-width:85px;font-variant-numeric:tabular-nums;text-align:right;color:#d5e3f4}
 .payment-workspace .payment-table th[data-column=amount]{text-align:right}
@@ -376,3 +376,33 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-log-body [data-payment-log]:focus{outline:2px solid #ff7189;outline-offset:-2px}
 .payment-table-heading #clear-payment-issues{font-size:10px;white-space:nowrap;padding:2px 0}
 @media(max-width:640px){.payment-issue-event{align-items:start;flex-direction:column;gap:6px}.payment-attention-heading .button{width:100%}.payment-table-heading{flex-wrap:wrap}}
+
+/* A payment row is always one line; expanded details contain the full values. */
+.payment-workspace .payment-table .payment-attempt-row>td[data-column]{min-width:0;max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.payment-cell-line{display:block;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.payment-cell-line small,.payment-cell-line .payment-reference{display:inline;white-space:nowrap;overflow-wrap:normal;margin:0 0 0 5px}
+.payment-cell-line .payment-reference:first-child{margin-left:0}
+.payment-status-line{display:flex;align-items:center;gap:4px;min-width:0;max-width:100%;overflow:hidden;white-space:nowrap}
+.payment-status-line>.status{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+.payment-status-line>.payment-status-note{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+.payment-status-line>.payment-issue-badge{display:inline-flex;align-items:center;flex-shrink:0;margin:0;white-space:nowrap}
+.payment-status-short,.payment-date-short,.payment-money-short{display:none}
+.payment-date{display:block;container-type:inline-size;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.payment-date>span{white-space:nowrap}
+@container(max-width:125px){.payment-date .payment-date-full{display:none}.payment-date .payment-date-short{display:inline}}
+.payment-workspace.payment-mobile-table .payment-table .payment-attempt-row>td[data-column]{padding:5px 3px;font-size:10px;line-height:18px;min-width:0;max-width:none}
+.payment-workspace.payment-mobile-table .payment-table th[data-column]{padding:8px 3px;font-size:9px;cursor:default;min-width:0}
+.payment-mobile-table .payment-column-grip,.payment-mobile-table .payment-column-resize{display:none}
+.payment-mobile-table .payment-column-title{gap:0}.payment-mobile-table .payment-cell-line{line-height:18px}
+.payment-mobile-table .payment-date-full,.payment-mobile-table .payment-status-full,.payment-mobile-table .payment-money-full,.payment-mobile-table .payment-attempt-row .payment-status-note{display:none}
+.payment-mobile-table .payment-date-short,.payment-mobile-table .payment-status-short,.payment-mobile-table .payment-money-short{display:inline}
+.payment-mobile-table .payment-date{font-size:9px;letter-spacing:-.02em}
+.payment-mobile-table .payment-attempt-row .status{font-size:9px;padding:2px;line-height:14px;max-width:100%}
+.payment-mobile-table .payment-attempt-row .payment-status-line{gap:2px}
+.payment-mobile-table .payment-attempt-row .payment-issue-badge{display:none}
+.payment-workspace.payment-mobile-table .payment-table .payment-expand-cell{min-width:26px;width:26px;padding:3px 1px}
+.payment-mobile-table .payment-row-toggle{width:22px;height:26px;font-size:15px}
+.payment-mobile-table .payment-attempt-row .payment-method-mark{display:flex;width:100%;height:18px;justify-content:center}
+.payment-mobile-table .payment-attempt-row .payment-method-mark img{width:28px!important;height:18px!important;max-width:100%;object-fit:contain}
+.payment-mobile-table .payment-attempt-row td[data-column=method]{font-size:9px!important}
+.payment-mobile-table .payment-attempt-detail .payment-status-full{display:inline}.payment-mobile-table .payment-attempt-detail .payment-status-short{display:none}
