@@ -48,7 +48,10 @@ const attemptStateNames={started:'Začatá',abandoned:'Opustená',cancelled:'Zru
 const paymentColumns={date:'Dátum a čas',email:'E-mail zákazníka',products:'Produkty',amount:'Cena',status:'Stav platby',method:'Spôsob úhrady',voucher:'Voucher',subtotal:'Suma pred zľavami',bundleDiscount:'Zľava na balík',voucherDiscount:'Zľava voucherom',orderStatus:'Stav objednávky',orderCount:'Počet objednávok',delivery:'Prístupové e-maily',fulfilledAt:'Vytvorenie objednávky',sentAt:'Posledný odoslaný e-mail',providerState:'Overený stav Stripe',checkedAt:'Posledné overenie',confirmedAt:'Potvrdenie webhookom',reason:'Dôvod zlyhania alebo zrušenia',reference:'ID pokusu / Stripe relácia'};
 const defaultPaymentColumns=['date','email','products','amount','status','method'];
 const paymentLayoutKey='pixelkovia-admin-payments-layout-v1';
-function defaultPaymentLayout(){return {order:Object.keys(paymentColumns),hidden:Object.keys(paymentColumns).filter(id=>!defaultPaymentColumns.includes(id)),density:'compact',navCollapsed:true,days:'30',status:'',category:'',panels:[]};}
+const paymentColumnMin=80,paymentColumnMax=800;
+const paymentColumnWidth=value=>Math.max(paymentColumnMin,Math.min(paymentColumnMax,Math.round(value)));
+const paymentDefaultWidths={date:150,email:230,products:250,amount:95,status:160,method:110,voucher:100,reason:280,reference:250};
+function defaultPaymentLayout(){return {order:Object.keys(paymentColumns),hidden:Object.keys(paymentColumns).filter(id=>!defaultPaymentColumns.includes(id)),density:'compact',navCollapsed:true,days:'30',status:'',category:'',panels:[],widths:{}};}
 function readPaymentLayout(){
   const defaults=defaultPaymentLayout(),sources=[];
   // Prefer the admin-scoped cookie; migrate the existing browser preferences.
@@ -67,11 +70,12 @@ function readPaymentLayout(){
     if(Object.hasOwn(attemptStateNames,saved.status))defaults.status=saved.status;
     if(['technical','bank','validation','customer','lifecycle'].includes(saved.category))defaults.category=saved.category;
     if(Array.isArray(saved.panels))defaults.panels=[...new Set(saved.panels.filter(id=>['monitor','log'].includes(id)))];
+    if(saved.widths&&typeof saved.widths==='object'&&!Array.isArray(saved.widths))defaults.widths=Object.fromEntries(Object.entries(saved.widths).filter(([id,width])=>Object.hasOwn(paymentColumns,id)&&typeof width==='number'&&Number.isFinite(width)&&width>=paymentColumnMin&&width<=paymentColumnMax).map(([id,width])=>[id,Math.round(width)]));
     return defaults;
   }catch{}
   return defaults;
 }
-let paymentLayout=readPaymentLayout(),paymentData=null,paymentDragColumn=null,paymentLoadingMore=false;
+let paymentLayout=readPaymentLayout(),paymentData=null,paymentDragColumn=null,paymentLoadingMore=false,paymentResize=null,paymentDropPending=false;
 Object.assign(state,{paymentDays:paymentLayout.days,paymentStatus:paymentLayout.status,paymentCategory:paymentLayout.category});
 const paymentUI={panels:new Set(paymentLayout.panels),expanded:new Set(),columnQuery:'',loadError:''};
 function savePaymentLayout(){
@@ -114,7 +118,7 @@ function restorePaymentUI(snapshot){
 }
 function renderPaymentWorkspace(snapshot=capturePaymentUI()){
   if(!paymentData||currentView()!=='payments')return;
-  $('#view').innerHTML=payments(paymentData);restorePaymentUI(snapshot);
+  $('#view').innerHTML=payments(paymentData);applyPaymentColumnWidths();restorePaymentUI(snapshot);
 }
 const paymentPanelOpen=id=>paymentUI.panels.has(id)?' open':'';
 function paymentStatus(row){
@@ -207,7 +211,7 @@ function payments(d){
   return `<nav class="payment-status-strip ${states.length>7?'has-unknown':''}" aria-label="Filtrovať platby podľa stavu">${states.map(([id,label,count])=>`<button type="button" id="payment-state-${id||'all'}" class="payment-state-chip ${id?'state-'+id:''}" data-payment-state="${id}" aria-pressed="${state.paymentStatus===id}" aria-label="${label}: ${count}"><span class="payment-state-top"><strong>${count}</strong><small>${d.total?Math.round(count/d.total*100):0}%</small></span><span class="payment-state-name"><i aria-hidden="true"></i>${label}</span><progress class="payment-state-meter" max="${d.total||1}" value="${count}" aria-hidden="true"></progress></button>`).join('')}</nav>
     ${paymentMonitorDisclosure(d)}
     <section class="payment-attempts payment-workspace density-${paymentLayout.density}" aria-label="Platobné pokusy"><div class="payment-workspace-toolbar"><div class="payment-table-heading"><h2>Pokusy <span class="count-pill">${d.matchingTotal}</span></h2><span>${escape(filtered)}</span></div><div class="payment-table-tools"><label class="sr-only" for="payment-days">Obdobie pokusov</label><select id="payment-days">${options([['1','Posledných 24 hodín'],['7','Posledných 7 dní'],['30','Posledných 30 dní'],['all','Celé obdobie']],state.paymentDays)}</select>${paymentColumnSettings()}<button id="refresh-payments" type="button" class="button secondary" aria-label="Obnoviť platby"><span aria-hidden="true">↻</span> Obnoviť</button></div></div>
-    ${d.rows.length?`<div class="table-wrap" id="payment-table-scroll" tabindex="0" role="region" aria-label="Tabuľka pokusov; pri väčšom počte stĺpcov posúvajte vodorovne"><table class="payment-table"><thead><tr>${visible.map(id=>`<th scope="col" data-column="${id}"><span class="payment-column-drag" draggable="true" data-payment-drag="${id}" title="Potiahnutím zmeníte poradie stĺpcov; poradie môžete meniť aj v nastaveniach Stĺpce">${paymentColumns[id]}</span></th>`).join('')}<th scope="col" class="payment-expand-cell"><span class="sr-only">Detail pokusu</span></th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Pre zvolené filtre zatiaľ nie sú žiadne pokusy.')}
+    ${d.rows.length?`<div class="table-wrap" id="payment-table-scroll" tabindex="0" role="region" aria-label="Tabuľka pokusov; pri väčšom počte stĺpcov posúvajte vodorovne"><table class="payment-table"><colgroup>${visible.map(id=>`<col data-payment-width="${id}">`).join('')}<col class="payment-detail-column"></colgroup><thead><tr>${visible.map(id=>`<th scope="col" data-column="${id}" data-payment-drag="${id}" draggable="true" title="Chyťte hlavičku a potiahnite ju pred alebo za iný stĺpec"><span class="payment-column-title"><span class="payment-column-grip" aria-hidden="true">⠿</span><span class="payment-column-label">${paymentColumns[id]}</span></span><span class="payment-column-resize" id="payment-column-resize-${id}" data-payment-resize="${id}" draggable="false" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Šírka stĺpca ${paymentColumns[id]}" aria-valuemin="${paymentColumnMin}" aria-valuemax="${paymentColumnMax}" title="Potiahnutím zmeníte šírku; šípky ← → menia šírku klávesnicou"></span></th>`).join('')}<th scope="col" class="payment-expand-cell"><span class="sr-only">Detail pokusu</span></th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Pre zvolené filtre zatiaľ nie sú žiadne pokusy.')}
     <div class="payment-workspace-footer"><span role="status">Zobrazené ${d.rows.length} z ${d.matchingTotal} pokusov <small>· čas Bratislava</small></span><div class="payment-load-more">${paymentUI.loadError?`<span class="payment-append-error" role="alert">${escape(paymentUI.loadError)}</span>`:''}${d.hasMore?`<button type="button" class="button secondary" id="load-more-payments" ${paymentLoadingMore?'disabled':''}>${paymentLoadingMore?'Načítavam…':paymentUI.loadError?'Skúsiť znova':'Načítať ďalších 40'} <span aria-hidden="true">↓</span></button>`:'<span class="payment-list-end">Všetky pokusy načítané</span>'}</div></div></section>
     <details class="payment-log-disclosure" data-payment-panel="log"${paymentPanelOpen('log')}><summary id="payment-log-toggle"><span>Denník udalostí</span><small>${d.logs.length} záznamov${d.errors24?' · technické signály za 24 h: '+d.errors24:''}</small><span aria-hidden="true">⌄</span></summary><div class="payment-log-body"><div class="payment-log-heading"><p>Posledných 200 dostupných udalostí vo zvolenom období. Diagnostika sa uchováva 90 dní; hlásenie prehliadača ani časový limit nepotvrdzujú zlyhanie platby.</p><label>Udalosti<select id="payment-category">${options([['','Všetky udalosti'],['technical','Technické signály'],['bank','Odmietnutia bankou'],['validation','Oprava údajov'],['customer','Kroky zákazníka'],['lifecycle','Priebeh platby']],state.paymentCategory)}</select></label></div>${paymentLogTable(d.logs)}</div></details>`;
 }
@@ -242,7 +246,7 @@ async function loadMorePayments(){
   }
 }
 async function refreshPaymentHealth(){
-  if(!state.context||document.hidden||$('#view').getAttribute('aria-busy')==='true')return;
+  if(!state.context||document.hidden||paymentResize||paymentDragColumn||$('#view').getAttribute('aria-busy')==='true')return;
   const view=currentView();if(view==='payments'){void load();return;}if(view!=='dashboard')return;
   const id=loadingId;
   try{const d=await api('/api/admin/payments');if(id===loadingId&&currentView()==='dashboard')$('#payment-overview').innerHTML=paymentHealth(d,true);}
@@ -283,6 +287,7 @@ function detail(data){
 }
 function currentView(){const hash=location.hash.slice(1);return ['customers','emails','events'].includes(hash)?'analytics':Object.hasOwn(titles,hash)?hash:'dashboard';}
 async function load(){
+  finishPaymentColumnResize(true);clearPaymentColumnDrag();
   paymentLoadingMore=false;paymentUI.loadError='';
   const id=++loadingId,view=currentView();
   $('#page-title').textContent=titles[view][0];$('#page-description').textContent=titles[view][1];$('#breadcrumb').textContent=titles[view][0];
@@ -298,7 +303,7 @@ async function load(){
     const paymentSnapshot=view==='payments'?capturePaymentUI():null;
     if(view==='payments')paymentData=data;
     $('#view').innerHTML=({dashboard,orders,analytics,payments})[view](data);
-    if(view==='payments'){restorePaymentUI(paymentSnapshot);}else state.page=data.page||state.page;
+    if(view==='payments'){applyPaymentColumnWidths();restorePaymentUI(paymentSnapshot);}else state.page=data.page||state.page;
     if(view==='dashboard'){
       $('#view').insertAdjacentHTML('afterbegin','<div id="payment-overview"></div>');
       const paymentData=await api('/api/admin/payments').catch(()=>null);
@@ -378,18 +383,115 @@ function closePaymentColumns(){
   menu.open=false;paymentUI.panels.delete('columns');$('#payment-column-toggle').focus({preventScroll:true});
 }
 $('#payment-nav-toggle').addEventListener('click',()=>{paymentLayout.navCollapsed=!paymentLayout.navCollapsed;savePaymentLayout();syncPaymentShell();});
-$('#view').addEventListener('dragstart',e=>{
-  const column=e.target.closest('[data-payment-drag]');if(!column)return;
-  paymentDragColumn=column.dataset.paymentDrag;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',paymentDragColumn);
+function applyPaymentColumnWidths(){
+  const table=$('#payment-table-scroll>.payment-table');if(!table)return;
+  const fixed=Object.keys(paymentLayout.widths).length>0;
+  table.classList.toggle('has-column-widths',fixed);
+  let total=matchMedia('(max-width:750px)').matches?48:42;
+  table.querySelectorAll('col[data-payment-width]').forEach(col=>{
+    const id=col.dataset.paymentWidth,width=paymentLayout.widths[id]||paymentDefaultWidths[id]||180;
+    col.style.width=fixed?width+'px':'';total+=width;
+  });
+  table.querySelector('.payment-detail-column').style.width=fixed?(matchMedia('(max-width:750px)').matches?48:42)+'px':'';
+  table.style.width=fixed?total+'px':'';
+  table.querySelectorAll('[data-payment-resize]').forEach(handle=>{
+    const width=Math.round(handle.closest('th').getBoundingClientRect().width);
+    handle.setAttribute('aria-valuenow',width);handle.setAttribute('aria-valuetext',width+' pixelov');
+  });
+}
+window.addEventListener('resize',applyPaymentColumnWidths);
+function freezePaymentColumnWidths(){
+  // Freeze the current geometry once so resizing one column leaves its neighbours still.
+  document.querySelectorAll('#payment-table-scroll th[data-column]').forEach(th=>{paymentLayout.widths[th.dataset.column]=paymentColumnWidth(th.getBoundingClientRect().width);});
+}
+function finishPaymentColumnResize(cancel=false){
+  if(!paymentResize)return;
+  const resize=paymentResize;paymentResize=null;
+  if(cancel)paymentLayout.widths=resize.originalWidths;
+  document.body.classList.remove('payment-column-resizing');
+  resize.handle.closest('th').draggable=true;
+  if(resize.pointerId!==null&&resize.handle.hasPointerCapture(resize.pointerId))resize.handle.releasePointerCapture(resize.pointerId);
+  applyPaymentColumnWidths();
+  if(!cancel)savePaymentLayout();
+}
+function startPaymentColumnResize(e,handle,pointerId=null){
+  if(!handle||paymentResize||e.button!==0||$('#view').getAttribute('aria-busy')==='true')return;
+  e.preventDefault();e.stopPropagation();
+  clearPaymentColumnDrag();
+  const originalWidths={...paymentLayout.widths};freezePaymentColumnWidths();
+  const column=handle.dataset.paymentResize;
+  paymentResize={column,handle,pointerId,startX:e.clientX,startWidth:paymentLayout.widths[column],originalWidths};
+  // Safari can suppress mouse pointerdown after native column drag/drop. Mouse
+  // resizing uses its reliable mouse stream; touch/pen retain pointer capture.
+  handle.closest('th').draggable=false;
+  applyPaymentColumnWidths();handle.focus({preventScroll:true});
+  if(pointerId!==null)handle.setPointerCapture(pointerId);
+  document.body.classList.add('payment-column-resizing');
+}
+$('#view').addEventListener('mousedown',e=>startPaymentColumnResize(e,e.target.closest('[data-payment-resize]')));
+$('#view').addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&e.isPrimary)startPaymentColumnResize(e,e.target.closest('[data-payment-resize]'),e.pointerId);});
+document.addEventListener('mousemove',e=>{
+  if(!paymentResize||paymentResize.pointerId!==null)return;
+  if(e.buttons===0){finishPaymentColumnResize();return;}
+  paymentLayout.widths[paymentResize.column]=paymentColumnWidth(paymentResize.startWidth+e.clientX-paymentResize.startX);
+  applyPaymentColumnWidths();
 });
-$('#view').addEventListener('dragover',e=>{if(paymentDragColumn&&e.target.closest('th[data-column]')){e.preventDefault();e.dataTransfer.dropEffect='move';}});
+document.addEventListener('mouseup',()=>{if(paymentResize?.pointerId===null)finishPaymentColumnResize();});
+$('#view').addEventListener('pointermove',e=>{
+  if(!paymentResize||e.pointerId!==paymentResize.pointerId)return;
+  paymentLayout.widths[paymentResize.column]=paymentColumnWidth(paymentResize.startWidth+e.clientX-paymentResize.startX);
+  applyPaymentColumnWidths();
+});
+$('#view').addEventListener('pointerup',e=>{if(paymentResize?.pointerId===e.pointerId)finishPaymentColumnResize();});
+$('#view').addEventListener('pointercancel',e=>{if(paymentResize?.pointerId===e.pointerId)finishPaymentColumnResize(true);});
+$('#view').addEventListener('lostpointercapture',e=>{if(paymentResize?.pointerId===e.pointerId)finishPaymentColumnResize(true);});
+$('#view').addEventListener('keydown',e=>{
+  const handle=e.target.closest('[data-payment-resize]');
+  if(!handle||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)||paymentResize||$('#view').getAttribute('aria-busy')==='true')return;
+  e.preventDefault();freezePaymentColumnWidths();
+  const id=handle.dataset.paymentResize,step=e.shiftKey?40:10;
+  paymentLayout.widths[id]=e.key==='Home'?paymentColumnMin:e.key==='End'?paymentColumnMax:paymentColumnWidth(paymentLayout.widths[id]+(e.key==='ArrowLeft'?-step:step));
+  applyPaymentColumnWidths();savePaymentLayout();
+});
+function clearPaymentColumnDrag(){
+  paymentDragColumn=null;
+  document.querySelectorAll('.payment-column-dragging,.payment-drop-before,.payment-drop-after').forEach(th=>th.classList.remove('payment-column-dragging','payment-drop-before','payment-drop-after'));
+}
+$('#view').addEventListener('dragstart',e=>{
+  const column=e.target.closest('[data-payment-drag]');
+  if(!column)return;
+  if(paymentResize||e.target.closest('[data-payment-resize]')||$('#view').getAttribute('aria-busy')==='true'){e.preventDefault();return;}
+  paymentDragColumn=column.dataset.paymentDrag;column.classList.add('payment-column-dragging');
+  e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',paymentDragColumn);
+});
+function paymentDropSide(target,x){const box=target.getBoundingClientRect();return x<box.left+box.width/2?'before':'after';}
+$('#view').addEventListener('dragover',e=>{
+  const target=e.target.closest('th[data-column]');if(!paymentDragColumn||!target)return;
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.payment-drop-before,.payment-drop-after').forEach(th=>th.classList.remove('payment-drop-before','payment-drop-after'));
+  if(target.dataset.column!==paymentDragColumn)target.classList.add('payment-drop-'+paymentDropSide(target,e.clientX));
+  const wrap=$('#payment-table-scroll'),box=wrap.getBoundingClientRect();
+  if(e.clientX<box.left+28)wrap.scrollLeft-=16;else if(e.clientX>box.right-28)wrap.scrollLeft+=16;
+});
+$('#view').addEventListener('dragleave',e=>{
+  const target=e.target.closest('th[data-column]');if(target&&!target.contains(e.relatedTarget))target.classList.remove('payment-drop-before','payment-drop-after');
+});
 $('#view').addEventListener('drop',e=>{
   const target=e.target.closest('th[data-column]');if(!paymentDragColumn||!target)return;
-  e.preventDefault();const from=paymentLayout.order.indexOf(paymentDragColumn),to=paymentLayout.order.indexOf(target.dataset.column);
-  if(from>=0&&to>=0&&from!==to){paymentLayout.order.splice(from,1);paymentLayout.order.splice(to,0,paymentDragColumn);savePaymentLayout();renderPaymentWorkspace();}
-  paymentDragColumn=null;
+  e.preventDefault();const source=paymentDragColumn,toId=target.dataset.column,side=paymentDropSide(target,e.clientX);
+  clearPaymentColumnDrag();
+  if(source===toId)return;
+  const from=paymentLayout.order.indexOf(source);if(from<0)return;
+  paymentLayout.order.splice(from,1);
+  paymentLayout.order.splice(paymentLayout.order.indexOf(toId)+(side==='after'?1:0),0,source);
+  savePaymentLayout();paymentDropPending=true;
 });
-$('#view').addEventListener('dragend',()=>{paymentDragColumn=null;});
+$('#view').addEventListener('dragend',()=>{
+  clearPaymentColumnDrag();
+  if(paymentDropPending){paymentDropPending=false;renderPaymentWorkspace();}
+});
+window.addEventListener('blur',e=>{if(e.target===window){finishPaymentColumnResize(true);clearPaymentColumnDrag();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&paymentResize){e.preventDefault();finishPaymentColumnResize(true);}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('.payment-column-options')?.open){e.preventDefault();closePaymentColumns();}});
 document.addEventListener('click',e=>{const menu=$('.payment-column-options');if(menu?.open&&!e.target.closest('.payment-column-options')){menu.open=false;paymentUI.panels.delete('columns');}});
 $('#close-detail').addEventListener('click',()=>{detailId++;$('#detail').close();});

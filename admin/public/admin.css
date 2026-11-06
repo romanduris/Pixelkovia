@@ -285,8 +285,20 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-workspace .payment-table td[data-column=reference]{min-width:190px;max-width:240px;white-space:normal;overflow-wrap:anywhere}
 .payment-workspace .payment-table .status{font-size:10px;line-height:1.4;padding:3px 7px;white-space:nowrap}
 .payment-workspace .payment-table td small{font-size:10px;margin-top:2px}
-.payment-column-drag{cursor:grab;display:inline-block;padding:2px 0}
-.payment-column-drag:active{cursor:grabbing}
+.payment-workspace .payment-table th[data-payment-drag]{cursor:grab;padding-right:18px;user-select:none}
+.payment-column-title{display:flex;align-items:center;gap:5px;min-width:0}.payment-column-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.payment-column-grip{font-size:13px;line-height:1;color:#7c94b6;opacity:.6;flex-shrink:0}
+.payment-workspace .payment-table th[data-column=amount] .payment-column-title{justify-content:flex-end}
+.payment-workspace .payment-table th[data-payment-drag]:hover{background:#23334f}.payment-workspace .payment-table th[data-payment-drag]:hover .payment-column-grip{opacity:1}
+.payment-column-resize{position:absolute;right:0;top:0;bottom:0;width:10px;cursor:col-resize;touch-action:none;z-index:4;outline-offset:-2px}
+.payment-column-resize::after{content:"";position:absolute;right:4px;top:25%;bottom:25%;width:1px;background:#5c7395;opacity:.5}
+.payment-column-resize:hover::after,.payment-column-resize:focus-visible::after{background:var(--mint);opacity:1;width:2px}
+.payment-column-resize:focus-visible{outline:2px solid var(--mint)}
+.payment-column-resizing,.payment-column-resizing *{cursor:col-resize!important;user-select:none!important}
+.payment-workspace .payment-table .payment-column-dragging{opacity:.5;cursor:grabbing}
+.payment-workspace .payment-table .payment-drop-before{box-shadow:inset 3px 0 var(--mint)}.payment-workspace .payment-table .payment-drop-after{box-shadow:inset -3px 0 var(--mint)}
+.payment-workspace .payment-table.has-column-widths{table-layout:fixed;min-width:0;max-width:none}
+.payment-workspace .payment-table.has-column-widths td[data-column]{min-width:0;max-width:none;overflow:hidden;text-overflow:ellipsis}
+.payment-workspace .payment-table.has-column-widths .payment-products{max-width:100%}
 .payment-workspace .payment-method-mark{width:54px;height:24px}
 .payment-workspace .payment-method-mark img{width:40px;height:24px}
 .payment-workspace .payment-method-mark img[src$="/google-pay.svg"]{width:66px;height:44px}

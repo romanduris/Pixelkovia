@@ -116,8 +116,54 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();
   assert.deepEqual(await headers(),['date','email','products','amount','status','method']);assert.ok(await page.locator('.density-compact').count());
   await page.locator('#close-payment-columns').click();
-  await page.locator('[data-payment-drag="email"]').dragTo(page.locator('[data-payment-drag="date"]'));
+  await page.locator('[data-payment-drag="email"]').dragTo(page.locator('[data-payment-drag="date"]'),{targetPosition:{x:8,y:12}});
   assert.equal((await headers())[0],'email','native column dragging reorders columns');
+  const columnWidth=async id=>(await page.locator('.payment-table th[data-column="'+id+'"]').boundingBox()).width;
+  const resizeColumn=async(id,delta,cancel=false)=>{
+    const handle=page.locator('[data-payment-resize="'+id+'"]');await handle.scrollIntoViewIfNeeded();const box=await handle.boundingBox();
+    await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+    await page.mouse.move(box.x+box.width/2+delta,box.y+box.height/2,{steps:8});
+    if(cancel)await page.keyboard.press('Escape');await page.mouse.up();
+  };
+  const originalEmail=await columnWidth('email'),originalDate=await columnWidth('date');
+  await resizeColumn('email',96);
+  assert.ok(Math.abs(await columnWidth('email')-originalEmail-96)<2,'resize follows the pointer');
+  assert.ok(Math.abs(await columnWidth('date')-originalDate)<2,'neighbouring columns keep their width');
+  assert.equal(await page.locator('body.payment-column-resizing').count(),0);
+  const emailWidth=await columnWidth('email');
+  await resizeColumn('email',-60,true);assert.ok(Math.abs(await columnWidth('email')-emailWidth)<1,'Escape cancels an unfinished resize');
+  await page.locator('[data-payment-resize="email"]').focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('Shift+ArrowRight');
+  assert.ok(Math.abs(await columnWidth('email')-emailWidth-50)<2,'keyboard width changes remain available');
+  const savedEmailWidth=await columnWidth('email');
+  await page.locator('#refresh-payments').click();await ready();assert.ok(Math.abs(await columnWidth('email')-savedEmailWidth)<1);
+  await page.locator('[data-payment-resize="email"]').focus();const resizedRefresh=page.waitForResponse(r=>r.url().includes('/api/admin/payments'));
+  await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await resizedRefresh;await ready();assert.equal(await page.evaluate(()=>document.activeElement.id),'payment-column-resize-email');
+  await page.locator('[data-payment-expand="method-0"]').click();
+  await page.locator('#payment-table-scroll').evaluate(e=>{e.scrollLeft=90;});
+  const fixedDetail=await page.locator('#payment-attempt-detail-0 .payment-attempt-detail').boundingBox(),fixedWrap=await page.locator('#payment-table-scroll').boundingBox();
+  assert.ok(fixedDetail.x>=fixedWrap.x-2&&fixedDetail.x+fixedDetail.width<=fixedWrap.x+fixedWrap.width+2,'details stay readable with custom widths and horizontal scrolling');
+  await page.locator('[data-payment-expand="method-0"]').click();
+
+  await page.reload();await ready();assert.equal((await headers())[0],'email');assert.ok(Math.abs(await columnWidth('email')-savedEmailWidth)<1,'width survives reload');
+  preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');
+  assert.equal(JSON.parse(decodeURIComponent(preferenceCookie.value)).widths.email,Math.round(savedEmailWidth));
+  await page.evaluate(()=>document.addEventListener('dragover',()=>{const marker=document.querySelector('.payment-drop-before,.payment-drop-after');if(marker)window.paymentDropMarker={column:marker.dataset.column,side:marker.classList.contains('payment-drop-after')?'after':'before'};}));
+  let productsBox=await page.locator('[data-payment-drag="products"]').boundingBox();
+  await page.locator('[data-payment-drag="date"]').dragTo(page.locator('[data-payment-drag="products"]'),{targetPosition:{x:productsBox.width-12,y:12}});
+  assert.deepEqual((await headers()).slice(0,3),['email','products','date'],'right half inserts after the target');
+  assert.deepEqual(await page.evaluate(()=>window.paymentDropMarker),{column:'products',side:'after'});
+  assert.ok(Math.abs(await columnWidth('email')-savedEmailWidth)<1,'widths belong to column IDs after reordering');
+  await page.locator('[data-payment-drag="date"]').dragTo(page.locator('[data-payment-drag="products"]'),{targetPosition:{x:8,y:12}});
+  assert.deepEqual((await headers()).slice(0,3),['email','date','products'],'left half inserts before the target');
+  assert.equal(await page.locator('.payment-drop-before,.payment-drop-after,.payment-column-dragging').count(),0);
+  await page.screenshot({path:'/tmp/pixelkovia-payments-resized-columns.png',fullPage:true});
+  await page.locator('[data-payment-resize="email"]').focus();await page.keyboard.press('Home');assert.ok(Math.abs(await columnWidth('email')-80)<1);
+  await page.keyboard.press('End');await page.keyboard.press('ArrowRight');assert.ok(Math.abs(await columnWidth('email')-800)<1);
+  await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.payment-table.has-column-widths').count(),0,'reset restores automatic widths');
+  preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');assert.deepEqual(JSON.parse(decodeURIComponent(preferenceCookie.value)).widths,{});
+  await page.locator('[data-payment-drag="email"]').dragTo(page.locator('[data-payment-drag="date"]'),{targetPosition:{x:8,y:12}});
+
 
   await page.locator('#payment-attempt-toggle-0').click();
   assert.ok(await page.locator('#payment-attempt-detail-0').isVisible());
@@ -217,5 +263,5 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.locator('[data-page=dashboard]').click();await page.locator('#payment-overview .payment-health').waitFor();
   assert.equal(await page.locator('body.payments-view').count(),0);assert.ok(await page.locator('.product-tabs').isVisible());assert.ok(await page.locator('.page-heading p').isVisible());
   assert.ok(await page.getByRole('link',{name:'Otvoriť platby a chyby →'}).isVisible());
-  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, drag/drop, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
+  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
