@@ -4,7 +4,7 @@ const browserType=process.env.QA_BROWSER==='webkit'?webkit:chromium;
 const origin='https://pixelkovia.rodulab.com';
 const now=Date.now();
 const report={generatedAt:now,days:1,category:'',enabled:true,health:'observing',counts:{paid:2,free:1,refunded:0,failed:0,pending:1,ready:3,expired:2,unknown:0},attemptCounts:{started:3,abandoned:2,cancelled:1,error:1,successful:2,declined:0,unknown:0},page:1,pages:2,matchingTotal:105,total:105,technical:0,errors24:0,recent:[],deliveries:{failed:0,delayed:0},fulfillmentDelayed:0,lastSuccessAt:now-10000,checks:[{id:'stripe',ok:1,checked_at:now},{id:'webhook',ok:1,checked_at:now}],rows:[{id:'test-attempt',sessionId:'cs_test_admin_fixture',totalCents:1499,createdAt:now,checkedAt:now,state:'paid',products:['episode-1']}],logs:[]};
-report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index)=>({...report.rows[0],id:'method-'+index,sessionId:'cs_test_admin_fixture'+index,state:method==='free'?'free':method==='unknown'?'ready':'paid',status:method==='unknown'?'started':'successful',email:'private'+index+'@example.invalid',reason:'Neznáme',method,totalCents:method==='free'?0:method==='card'?100:1499,
+report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index)=>({...report.rows[0],id:'method-'+index,sessionId:'cs_test_admin_fixture'+index,state:method==='free'?'free':method==='unknown'?'ready':'paid',status:method==='unknown'?'abandoned':'successful',email:'private'+index+'@example.invalid',reason:'Neznáme',method,totalCents:method==='free'?0:method==='card'?100:1499,
   voucherCode:method==='free'?'free':method==='card'?'1e':null,subtotalCents:method==='free'?null:1499,bundleDiscountCents:method==='free'?null:0,voucherDiscountCents:method==='free'?null:method==='card'?1399:0,
   giftGame:method==='free',products:method==='free'?['episode-1','story-book-before','story-book-after','atlas-pixelkov']:['episode-1'],
   providerState:method==='free'?'free':method==='unknown'?'ready':'paid',webhookConfirmedAt:method==='unknown'?null:now,fulfilledAt:method==='unknown'?null:now,
@@ -12,10 +12,10 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
 }));
 report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
 (async()=>{const browser=await browserType.launch({headless:true});try{
-  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null,richAttention=false;const calls=[];
+  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null,richAttention=false,reviewFail=false,deliveryIssue=true;const reviews=new Map(),reviewCalls=[],extraEvents=[];const calls=[];
   const manyRows=Array.from({length:123},(_,i)=>({...report.rows[i%5],id:'batch-'+String(i).padStart(3,'0'),createdAt:now-i,email:'batch'+i+'@example.invalid'}));
   page.on('pageerror',e=>errors.push(e.message));
-  await context.addInitScript(()=>{const key='pixelkovia-admin-payments-layout-v1';if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({order:['date','email','products','amount','status','method','reason','reference'],hidden:['reason','reference'],density:'compact',navCollapsed:true}));});
+  await context.addInitScript(()=>{const key='pixelkovia-admin-payments-layout-v1';if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({order:['date','email','products','amount','status','method','reason','reference'],hidden:['reason','reference'],density:'compact',navCollapsed:true,category:'bank',panels:['log']}));});
   await context.route('**/*',async route=>{
     const url=new URL(route.request().url());if(url.origin!==origin)return route.abort();
     if(url.pathname==='/api/admin/context')return route.fulfill({json:{admin:'Správca',authMode:'password',environment:'production',webUrl:origin}});
@@ -25,9 +25,10 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
       const data=structuredClone(report);if(largeList)data.rows=structuredClone(manyRows);
       data.days=url.searchParams.get('days')==='all'?'all':Number(url.searchParams.get('days')||1);data.attemptStatus=url.searchParams.get('status')||'';
       if(richAttention){
-        data.rows=data.rows.filter(r=>data.days==='all'||r.createdAt>=now-data.days*86400000).map(r=>({...r,issues:r.id==='batch-090'?[{kind:'technical',label:'Technický signál za 24 h',count:1,at:now}]:r.id==='batch-003'?[{kind:'delivery',label:'Chyba odoslania prístupu',count:1,at:null}]:[]}));
-        const events=[{id:'linked-error',attempt_id:'batch-090',linked_attempt_id:'batch-090',type:'webhook_error',source:'server',category:'technical',label:'Chyba spracovania podpísanej Stripe udalosti',code:'',method:'unknown',created_at:now},{id:'global-error',attempt_id:null,linked_attempt_id:null,type:'webhook_error',source:'server',category:'technical',label:'Chyba bez uloženého prepojenia',code:'',method:'unknown',created_at:now}];
-        Object.assign(data,{health:'attention',errors24:2,deliveries:{failed:1,delayed:0},attention:{attemptsInPeriod:data.rows.filter(r=>r.issues.length).length,linkedAttempts24:1,unlinkedTechnical:1,eventTotal:2,events},logs:events.filter(l=>!url.searchParams.get('category')||url.searchParams.get('category')===l.category)});
+        const events=[{id:'linked-error',attempt_id:'batch-090',linked_attempt_id:'batch-090',type:'webhook_error',source:'server',category:'technical',label:'Chyba spracovania podpísanej Stripe udalosti',code:'',method:'unknown',created_at:now},{id:'global-error',attempt_id:null,linked_attempt_id:null,type:'webhook_error',source:'server',category:'technical',label:'Chyba bez uloženého prepojenia',code:'',method:'unknown',created_at:now},...extraEvents].map(e=>({...e,reviewed_at:reviews.get(e.id)||null,reviewed_by:reviews.has(e.id)?'Správca':null}));
+        const pending=events.filter(e=>!e.reviewed_at),linked=pending.filter(e=>e.linked_attempt_id);
+        data.rows=data.rows.filter(r=>data.days==='all'||r.createdAt>=now-data.days*86400000).map(r=>({...r,issues:r.id==='batch-090'&&linked.length?[{kind:'technical',label:'Technický signál za 24 h',count:linked.length,at:now}]:r.id==='batch-003'&&deliveryIssue?[{kind:'delivery',label:'Chyba odoslania prístupu',count:1,at:null}]:[]}));
+        Object.assign(data,{health:pending.length||deliveryIssue?'attention':'observing',errors24:pending.length,deliveries:{failed:deliveryIssue?1:0,delayed:0},attention:{attemptsInPeriod:data.rows.filter(r=>r.issues.length).length,linkedAttempts24:linked.length?1:0,unlinkedTechnical:pending.length-linked.length,eventTotal:pending.length,reviewedTotal:reviews.size,events},logs:events});
       }
       data.attentionOnly=url.searchParams.get('attention')==='1';data.attemptId=url.searchParams.get('attempt')||'';
       data.total=data.rows.length;data.attemptCounts=Object.fromEntries(Object.keys(data.attemptCounts).map(status=>[status,data.rows.filter(r=>r.status===status).length]));
@@ -37,10 +38,16 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
       const cursor=url.searchParams.get('cursor'),through=url.searchParams.get('through');
       if(cursor&&appendGate){const gate=appendGate;appendGate=null;await gate;}
       if(cursor&&failAppend)return route.fulfill({status:503,json:{error:'Dočasne nedostupné'}});
-      const start=cursor?data.rows.findIndex(r=>r.id===cursor)+1:0,end=through?data.rows.findIndex(r=>r.id===through)+1:start+40;
+      const start=cursor?data.rows.findIndex(r=>r.id===cursor)+1:0,end=through?(data.rows.findIndex(r=>r.id===through)+1||data.rows.length):start+40;
       const all=data.rows;data.rows=all.slice(start,end);data.hasMore=end<all.length;data.refreshCursor=through||data.rows.at(-1)?.id||null;data.nextCursor=data.hasMore?data.refreshCursor:null;
       if(attention){Object.assign(data,{health:'attention',errors24:1,technical:1,deliveries:{failed:1,delayed:1}});data.logs=[{id:'error',source:'browser',type:'element_error',category:'technical',label:'Nepodarilo sa načítať údaje karty',code:'',method:'card',attempt_id:'test-attempt',stripe_session_id:'cs_test_admin_fixture',created_at:now}];}
       return route.fulfill({json:data});
+    }
+    if(url.pathname==='/api/admin/payments/review'){
+      const input=route.request().postDataJSON();reviewCalls.push(input);
+      if(reviewFail)return route.fulfill({status:503,json:{error:'Dočasne nedostupné'}});
+      if(input.reviewed)reviews.set(input.eventId,now);else reviews.delete(input.eventId);
+      return route.fulfill({json:{eventId:input.eventId,reviewedAt:reviews.get(input.eventId)||null,reviewedBy:'Správca'}});
     }
     if(url.pathname==='/api/admin/dashboard')return route.fulfill({json:{metrics:{customers:1,paidOrders:1,revenueByCurrency:{EUR:1499},purchasedGames:1,unactivated:1,activated:0,playing:0,completed:0,meanCompletionMs:null,medianCompletionMs:null},charts:{purchases:[],activations:[],completions:[]},funnel:[],cohort:''}});
     if(url.pathname==='/api/admin/feedback')return route.fulfill({json:[]});
@@ -88,9 +95,9 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-admin-payments-layout-v1')),null,'old preferences migrate to the cookie');
   assert.equal(await page.locator('[data-attempt="method-0"] [data-column=products]').innerText(),'Base');
   assert.equal(await page.locator('[data-attempt="method-0"] [data-column=products] .payment-products').getAttribute('title'),'Hra Pixelkovia');
-  assert.equal(await page.locator('.payment-state-chip').count(),7);
+  assert.equal(await page.locator('.payment-state-chip').count(),6);assert.equal(await page.locator('#payment-state-started').count(),0);
   assert.equal(await page.locator('.payment-monitor').getAttribute('open'),null);
-  assert.equal(await page.locator('.payment-log-disclosure').getAttribute('open'),null);
+  assert.equal(await page.locator('.payment-log-disclosure,#payment-category,#payment-log-toggle').count(),0);assert.equal(JSON.parse(decodeURIComponent(preferenceCookie.value)).category,undefined);assert.deepEqual(JSON.parse(decodeURIComponent(preferenceCookie.value)).panels,[]);
   assert.ok(await page.locator('body.payments-nav-collapsed').count());
   assert.deepEqual(await headers(),['date','email','products','amount','status','method']);
   const baselineTable=await page.locator('#payment-table-scroll').boundingBox();
@@ -101,12 +108,37 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   for(const method of ['Google Pay','Apple Pay','Karta','Zdarma','Neznáme'])assert.ok(await page.getByRole('cell',{name:method,exact:true}).first().isVisible());
   assert.ok(await page.getByRole('cell',{name:'private0@example.invalid',exact:true}).isVisible());
   await page.screenshot({path:'/tmp/pixelkovia-payments-compact-desktop.png',fullPage:true});
+  const tileIds=()=>page.locator('[data-payment-tile]').evaluateAll(tiles=>tiles.map(t=>t.dataset.paymentTile));
+  const beforeTileRequests=calls.length;
+  await page.locator('#payment-state-successful').dragTo(page.locator('#payment-state-all'),{targetPosition:{x:8,y:25}});
+  assert.equal((await tileIds())[0],'successful','whole-tile dragging inserts before the target');
+  let targetTile=await page.locator('#payment-state-abandoned').boundingBox();
+  await page.locator('#payment-state-successful').dragTo(page.locator('#payment-state-abandoned'),{targetPosition:{x:targetTile.width-8,y:25}});
+  assert.deepEqual((await tileIds()).slice(0,3),['all','abandoned','successful'],'right half inserts after the target tile');
+  await page.locator('#payment-state-successful').focus();await page.keyboard.press('Alt+ArrowLeft');
+  assert.deepEqual((await tileIds()).slice(0,3),['all','successful','abandoned']);
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'payment-state-successful');
+  assert.equal(calls.length,beforeTileRequests,'reordering never filters payments or fetches new data');
+  assert.equal(await page.locator('#payment-state-all').getAttribute('aria-pressed'),'true');
+  const customTiles=await tileIds();await page.reload();await ready();assert.deepEqual(await tileIds(),customTiles,'tile order survives reload');
+  preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');
+  assert.deepEqual(JSON.parse(decodeURIComponent(preferenceCookie.value)).tileOrder.slice(0,6),customTiles);
   for(const width of [1280,1024,768,640,390,320,280]){await page.setViewportSize({width,height:844});await compactSummary();}
+  if(browserType===chromium){
+    await page.setViewportSize({width:390,height:844});await settledLayout();await page.locator('.payment-status-strip').evaluate(e=>{e.scrollLeft=0;});
+    const before=await tileIds(),source=await page.locator('.payment-state-chip').first().locator('[data-payment-tile-handle]').boundingBox(),target=await page.locator('.payment-state-chip').nth(1).boundingBox(),cdp=await context.newCDPSession(page);
+    const start={x:source.x+source.width/2,y:source.y+source.height/2},end={x:target.x+target.width-12,y:target.y+target.height/2};
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[start]});
+    for(let step=1;step<=8;step++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:start.x+(end.x-start.x)*step/8,y:start.y+(end.y-start.y)*step/8}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+    assert.deepEqual((await tileIds()).slice(0,2),[before[1],before[0]],'touch grip reorders mobile tiles');
+    assert.equal(await page.locator('#payment-state-all').getAttribute('aria-pressed'),'true','touch dragging does not filter');
+  }
   await page.setViewportSize({width:1512,height:1080});
 
-  await page.locator('#payment-state-started').click();await ready();
-  assert.equal(await page.locator('.payment-attempt-row').count(),1);assert.ok(calls.some(p=>p.includes('status=started')));
-  assert.equal(await page.locator('#payment-state-started').getAttribute('aria-pressed'),'true');
+  await page.locator('#payment-state-abandoned').click();await ready();
+  assert.equal(await page.locator('.payment-attempt-row').count(),1);assert.ok(calls.some(p=>p.includes('status=abandoned')));
+  assert.equal(await page.locator('#payment-state-abandoned').getAttribute('aria-pressed'),'true');
   await page.locator('#payment-state-all').click();await ready();
   await page.locator('#payment-days').selectOption('7');await ready();assert.ok(calls.some(p=>p.includes('days=7')));await page.reload();await ready();assert.equal(await page.locator('#payment-days').inputValue(),'7','chosen period survives a new page load');
   assert.equal(await page.locator('#load-more-payments').count(),0);
@@ -252,12 +284,11 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   attention=true;await page.locator('#refresh-payments').click();await ready();
   assert.ok(await page.locator('.payment-monitor.attention').isVisible());
   assert.ok((await page.locator('.payment-monitor-body').innerText()).includes('Prístupové e-maily'));
-  await page.locator('#payment-log-toggle').click();await page.locator('#payment-category').selectOption('technical');await ready();
-  assert.ok(await page.locator('.payment-log-disclosure').evaluate(e=>e.open));await page.locator('.payment-log-body .payment-category-technical').waitFor();
+  assert.equal(await page.locator('.payment-log-disclosure,#payment-category').count(),0);
   assert.equal(await page.locator('.payment-attempts td img[src=x]').count(),0);
   const errorColors=await page.locator('.payment-table .attempt-error').evaluate(e=>({background:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));
   assert.equal(errorColors.background,'rgb(183, 25, 50)');assert.equal(errorColors.color,'rgb(255, 255, 255)');
-  await page.locator('#payment-monitor-toggle').click();await page.locator('#payment-log-toggle').click();await page.locator('[data-payment-expand="method-0"]').click();
+  await page.locator('#payment-monitor-toggle').click();await page.locator('[data-payment-expand="method-0"]').click();
   await page.screenshot({path:'/tmp/pixelkovia-payments-compact-attention.png',fullPage:true});
   await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-reason').check();await page.locator('#payment-column-reference').check();await page.keyboard.press('Escape');
   await page.setViewportSize({width:1024,height:650});
@@ -304,24 +335,22 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   assert.equal(await page.locator('#load-more-payments').count(),0);assert.equal(await page.locator('.payment-list-end').innerText(),'Všetky pokusy načítané');
   const loadedIds=await page.locator('.payment-attempt-row').evaluateAll(rows=>rows.map(r=>r.dataset.attempt));assert.equal(new Set(loadedIds).size,124);
   await page.locator('#payment-days').selectOption('30');await ready();assert.equal(await page.locator('.payment-attempt-row').count(),40);assert.ok(!calls.at(-1).includes('through='));
-  await page.locator('#payment-state-started').click();await ready();assert.ok(await page.locator('.payment-attempt-row').count()<40);assert.ok(!calls.at(-1).includes('through='));
+  await page.locator('#payment-state-abandoned').click();await ready();assert.ok(await page.locator('.payment-attempt-row').count()<40);assert.ok(!calls.at(-1).includes('through='));
   await page.locator('#payment-state-all').click();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),40);
   appendGate=new Promise(resolve=>{releaseAppend=resolve;});const lateRequest=page.waitForRequest(r=>r.url().includes('cursor='));
   await page.locator('#load-more-payments').click();await lateRequest;
-  await page.locator('#payment-state-started').click();await ready();
+  await page.locator('#payment-state-abandoned').click();await ready();
   const filteredIds=await page.locator('.payment-attempt-row').evaluateAll(rows=>rows.map(r=>r.dataset.attempt));
   const lateResponse=page.waitForResponse(r=>r.url().includes('cursor='));releaseAppend();await (await lateResponse).finished();
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   assert.deepEqual(await page.locator('.payment-attempt-row').evaluateAll(rows=>rows.map(r=>r.dataset.attempt)),filteredIds,'an old append cannot overwrite a new status filter');
   if(!(await page.locator('.payment-monitor').evaluate(e=>e.open)))await page.locator('#payment-monitor-toggle').click();
-  if(!(await page.locator('.payment-log-disclosure').evaluate(e=>e.open)))await page.locator('#payment-log-toggle').click();
-  await page.locator('#payment-category').selectOption('bank');await ready();
   await page.locator('#payment-nav-toggle').click();await page.reload();await ready();
-  assert.equal(await page.locator('#payment-days').inputValue(),'30');assert.equal(await page.locator('#payment-state-started').getAttribute('aria-pressed'),'true');
-  assert.equal(await page.locator('#payment-category').inputValue(),'bank');assert.equal(await page.locator('.payment-monitor').evaluate(e=>e.open),true);assert.equal(await page.locator('.payment-log-disclosure').evaluate(e=>e.open),true);
+  assert.equal(await page.locator('#payment-days').inputValue(),'30');assert.equal(await page.locator('#payment-state-abandoned').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('.payment-monitor').evaluate(e=>e.open),true);assert.equal(await page.locator('.payment-log-disclosure').count(),0);
   assert.equal(await page.locator('body.payments-nav-collapsed').count(),0,'navigation preference survives reload');
   preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');
-  const cookieSettings=JSON.parse(decodeURIComponent(preferenceCookie.value));assert.deepEqual(cookieSettings.panels.sort(),['log','monitor']);
+  const cookieSettings=JSON.parse(decodeURIComponent(preferenceCookie.value));assert.deepEqual(cookieSettings.panels.sort(),['monitor']);
   assert.ok(!JSON.stringify(cookieSettings).includes('@'));assert.ok(!JSON.stringify(cookieSettings).includes('batch-'));assert.ok(!JSON.stringify(cookieSettings).includes('cs_test_'));
   richAttention=true;manyRows.find(r=>r.id==='batch-090').createdAt=now-40*86400000;
   await page.locator('#payment-state-all').click();await ready();
@@ -338,9 +367,29 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-status').uncheck();await page.keyboard.press('Escape');
   assert.ok(await page.locator('[data-attempt="batch-003"].has-payment-issues').count());assert.ok((await page.locator('[data-payment-expand="batch-003"]').getAttribute('aria-label')).includes('Vyžaduje pozornosť'));
   await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-status').check();await page.keyboard.press('Escape');
-  await page.locator('[data-payment-issue-log="global-error"]').click();await ready();
-  assert.ok(await page.locator('.payment-log-body [data-payment-log="global-error"].is-selected-log').isVisible());assert.equal(await page.locator('#payment-category').inputValue(),'technical');
+  assert.equal(await page.locator('[data-payment-issue-log]').count(),0,'unlinked signals stay directly in the alert without a standalone log');
+  assert.ok(await page.locator('.payment-issue-event').filter({hasText:'Chyba bez uloženého prepojenia'}).isVisible());
   assert.equal(await page.locator('.payment-attempt-row').count(),2,'an unlinked alert never creates a fake purchase row');
+  reviewFail=true;
+  await page.locator('#payment-review-monitor-linked-error').check();await page.locator('.payment-review-error').waitFor();
+  assert.equal(await page.locator('#payment-review-monitor-linked-error').isChecked(),false,'failed save rolls back the checkbox');
+  assert.ok(await page.locator('[data-attempt="batch-090"].has-payment-issues').count());
+  reviewFail=false;await page.locator('#payment-review-monitor-linked-error').check();
+  await page.waitForFunction(()=>document.querySelector('.payment-reviewed-events'));await ready();
+  assert.equal(await page.locator('[data-attempt="batch-090"].has-payment-issues').count(),0);assert.equal(await page.locator('.payment-review-error').count(),0);
+  assert.equal(await page.locator('.payment-attempt-row').count(),1,'reviewed event leaves the attention-only list');
+  assert.deepEqual(reviewCalls.at(-1),{eventId:'linked-error',reviewed:true});
+  await page.reload();await ready();await page.locator('.payment-reviewed-events>summary').click();
+  assert.ok(await page.locator('#payment-review-monitor-linked-error').isChecked());assert.ok((await page.locator('.payment-reviewed-events').innerText()).includes('Správca'));
+  await page.locator('#payment-review-monitor-linked-error').uncheck();
+  await page.waitForFunction(()=>document.querySelector('[data-attempt="batch-090"].has-payment-issues'));await ready();
+  await page.locator('#payment-review-monitor-linked-error').check();await page.waitForFunction(()=>!document.querySelector('[data-attempt="batch-090"]'));await ready();
+  await page.locator('#payment-review-monitor-global-error').check();await page.waitForFunction(()=>document.querySelectorAll('.payment-reviewed-events input:checked').length===2);await ready();
+  assert.ok(await page.locator('.payment-monitor.attention').count(),'real delivery issue still requires attention after event review');
+  deliveryIssue=false;await page.locator('#refresh-payments').click();await ready();assert.ok(await page.locator('.payment-monitor.observing').count());
+  extraEvents.push({id:'new-error',attempt_id:'batch-090',linked_attempt_id:'batch-090',type:'webhook_error',source:'server',category:'technical',label:'Nová technická udalosť',code:'',method:'unknown',created_at:now+1});
+  await page.locator('#refresh-payments').click();await ready();assert.ok(await page.locator('.payment-monitor.attention').count());assert.ok(await page.locator('[data-attempt="batch-090"].has-payment-issues').count());assert.equal(await page.locator('#payment-review-monitor-new-error').isChecked(),false);
+  assert.equal(await page.locator('.payment-log-disclosure').count(),0);
   preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');assert.ok(!decodeURIComponent(preferenceCookie.value).includes('batch-090'));assert.ok(!decodeURIComponent(preferenceCookie.value).includes('global-error'));
   await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'/tmp/pixelkovia-payment-linked-attention.png',fullPage:true});
   await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'attention panel fits mobile');
@@ -348,5 +397,5 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   await page.locator('[data-page=dashboard]').click();await page.locator('#payment-overview .payment-health').waitFor();
   assert.equal(await page.locator('body.payments-view').count(),0);assert.ok(await page.locator('.product-tabs').isVisible());assert.ok(await page.locator('.page-heading p').isVisible());
   assert.ok(await page.getByRole('link',{name:'Otvoriť platby a chyby →'}).isVisible());
-  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, one-row scrollable states plus one-row alert at 280–1512px, single-line/truncated cells, five visible mobile fields, preserved desktop layout, compact dates, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked log focus, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
+  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, one-row scrollable states plus one-row alert at 280–1512px, single-line/truncated cells, five visible mobile fields, preserved desktop layout, compact dates, state filters, alert disclosures without a standalone log, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persisted draggable tiles/native/keyboard/touch, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked inline events, persisted manual review/undo/failure/new events, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

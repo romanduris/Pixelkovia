@@ -51,6 +51,14 @@ test('password-only authentication works in actual Workers/D1 runtime and gates 
   assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
   const authenticated=await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}});assert.equal(authenticated.status,200);
   const paymentReport=await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments',{headers:{cookie}});assert.equal(paymentReport.status,200);assert.equal((await paymentReport.json()).health,'attention');
+  const eventId='b'.repeat(64);
+  await execute(db,"INSERT INTO payment_log VALUES(?,NULL,'server','sdk_error','technical','','unknown','',?)",eventId,Date.now());
+  const review=(session,origin='https://admin.example.invalid')=>mf.dispatchFetch('https://admin.example.invalid/api/admin/payments/review',{method:'POST',headers:{cookie:session,origin,'content-type':'application/json'},body:JSON.stringify({eventId,reviewed:true})});
+  assert.equal((await review('')).status,401);assert.equal((await review(cookie,'https://attacker.invalid')).status,403);
+  const reviewed=await review(cookie);assert.equal(reviewed.status,200);assert.equal((await reviewed.json()).reviewedBy,'Správca TreasureQuest');
+  const afterReview=await (await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments',{headers:{cookie}})).json();
+  assert.equal(afterReview.errors24,0);assert.equal(afterReview.attention.reviewedTotal,1);assert.equal(afterReview.health,'attention','unconfigured payments still require attention');
+  await execute(db,'DELETE FROM payment_log WHERE id=?',eventId);assert.equal(await first(db,'SELECT * FROM payment_event_reviews WHERE event_id=?',eventId),null);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/',{headers:{cookie}})).status,200);
   const logout=await mf.dispatchFetch('https://admin.example.invalid/api/admin/logout',{method:'POST',headers:{origin:'https://admin.example.invalid',cookie}});assert.equal(logout.status,200);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}})).status,401);

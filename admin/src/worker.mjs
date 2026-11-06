@@ -9,7 +9,7 @@ import {fakeCustomerCount} from './fake-customers.mjs';
 import {customerLogin,customerLogout,customerCookie} from './customer-auth.mjs';
 import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './customer-portal.mjs';
 import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,releaseCheckout,paymentWebhook,sendPending,auditPayments} from './commerce.mjs';
-import {browserPaymentEvent,paymentReport,paymentLog,attemptFor} from './payment-monitor.mjs';
+import {browserPaymentEvent,paymentReport,paymentLog,attemptFor,reviewPaymentEvent} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
@@ -111,6 +111,7 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
       throw error;
     }
     sameOrigin(request);
+    if(path==='/api/admin/payments/review'&&request.method==='POST')return json(await reviewPaymentEvent(env,await body(request),admin));
     if(request.method!=='GET'&&request.method!=='HEAD')throw new HttpError(405,'Administrátorské rozhranie je v tejto etape iba na čítanie.');
     if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',fakeCustomers:await fakeCustomerCount(env.TQ_DB),webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH_SECRET});
     if(path==='/api/admin/products')return json(await query(env.TQ_DB,'SELECT * FROM products ORDER BY id'));

@@ -127,6 +127,18 @@ export async function prunePaymentLog(env){
   await execute(env.TQ_DB,'DELETE FROM payment_log WHERE created_at<?',Date.now()-90*86400000);
   await execute(env.TQ_DB,"DELETE FROM customer_login_attempts WHERE scope_key LIKE 'payment-log:%' AND window_start<?",Date.now()-86400000);
 }
+export async function reviewPaymentEvent(env,input,admin){
+  if(typeof input.eventId!=='string'||!/^[a-f0-9]{64}$/.test(input.eventId)||typeof input.reviewed!=='boolean')throw new HttpError(400,'Neplatné potvrdenie udalosti.');
+  const event=await first(env.TQ_DB,'SELECT category,source FROM payment_log WHERE id=?',input.eventId);
+  if(!event)throw new HttpError(404,'Udalosť už nie je dostupná.');
+  if(event.category!=='technical'&&!(event.category==='bank'&&event.source==='stripe'))throw new HttpError(400,'Táto udalosť nevyžaduje ručnú kontrolu.');
+  const at=Date.now(),actor=admin.email;
+  await execute(env.TQ_DB,`INSERT INTO payment_event_reviews(event_id,reviewed_at,reviewed_by,updated_at,updated_by) VALUES(?,?,?,?,?)
+    ON CONFLICT(event_id) DO UPDATE SET reviewed_at=excluded.reviewed_at,reviewed_by=excluded.reviewed_by,updated_at=excluded.updated_at,updated_by=excluded.updated_by
+    WHERE (payment_event_reviews.reviewed_at IS NULL)<>(excluded.reviewed_at IS NULL)`,input.eventId,input.reviewed?at:null,actor,at,actor);
+  const saved=await first(env.TQ_DB,'SELECT reviewed_at,reviewed_by FROM payment_event_reviews WHERE event_id=?',input.eventId);
+  return {eventId:input.eventId,reviewedAt:saved.reviewed_at,reviewedBy:saved.reviewed_by};
+}
 // Cursors contain only the ordering key; administrator authorization is unchanged.
 const attemptCursor=row=>btoa(JSON.stringify([row.createdAt,row.id])).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
 function readAttemptCursor(value){
@@ -153,7 +165,8 @@ export async function paymentReport(env,params,ready){
   const at=Date.now(),since=days==='all'?0:at-days*86400000,db=env.TQ_DB;
   // Signal history is independent of the selected event category and row batch.
   const signalGroups=await query(db,`SELECT l.attempt_id,a.id linked_id,l.category,count(*) count,max(l.created_at) latest_at FROM payment_log l
-    LEFT JOIN checkout_attempts a ON a.id=l.attempt_id WHERE l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe')) GROUP BY l.attempt_id,l.category`,at-86400000);
+    LEFT JOIN checkout_attempts a ON a.id=l.attempt_id LEFT JOIN payment_event_reviews r ON r.event_id=l.id
+    WHERE r.reviewed_at IS NULL AND l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe')) GROUP BY l.attempt_id,l.category`,at-86400000);
   const signalMap=new Map();let unlinkedTechnical=0;
   for(const group of signalGroups){
     if(!group.linked_id){if(group.category==='technical')unlinkedTechnical+=group.count;continue;}
@@ -172,6 +185,7 @@ export async function paymentReport(env,params,ready){
     ) SELECT a.id,a.email,a.stripe_session_id,a.total_cents,a.created_at,a.selection,a.gift_game,a.voucher_code,a.fixed_total_voucher,
     a.subtotal_cents,a.bundle_discount_cents,a.voucher_discount_cents,p.state observed_state,p.checked_at,p.paid_at,coalesce(m.method,s.problem_method) method,
     s.webhook_confirmed_at,s.cancelled_at,s.problem_kind,s.problem_type,s.problem_code,
+    EXISTS(SELECT 1 FROM payment_log l JOIN payment_event_reviews r ON r.event_id=l.id WHERE l.attempt_id=a.id AND l.type=s.problem_type AND l.created_at=s.problem_at AND r.reviewed_at IS NOT NULL) problem_reviewed,
     coalesce(os.order_count,0) order_count,coalesce(os.delivery_errors,0) delivery_errors,coalesce(os.delivery_delays,0) delivery_delays,os.order_states,os.orders_paid,os.has_refund,os.fulfilled_at,
     coalesce(os.delivery_count,0) delivery_count,coalesce(os.sent_count,0) sent_count,coalesce(os.failed_count,0) failed_count,coalesce(os.queued_count,0) queued_count,os.sent_at
     FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
@@ -191,7 +205,7 @@ export async function paymentReport(env,params,ready){
     else if(a.webhook_confirmed_at)reason=a.total_cents===0?'Potvrdená objednávka zdarma':'Neznáme';
     const signals=signalMap.get(a.id)||{},issues=[];
     if(signals.technical)issues.push({kind:'technical',label:'Technický signál za 24 h',count:signals.technical.count,at:signals.technical.at});
-    if(a.problem_kind==='technical'&&!a.webhook_confirmed_at&&!signals.technical)issues.push({kind:'payment',label:'Potvrdená technická chyba',count:1,at:null});
+    if(a.problem_kind==='technical'&&!a.webhook_confirmed_at&&!signals.technical&&!a.problem_reviewed)issues.push({kind:'payment',label:'Potvrdená technická chyba',count:1,at:null});
     if(signals.bank)issues.push({kind:'bank',label:'Odmietnutie bankou za 24 h',count:signals.bank.count,at:signals.bank.at});
     if(a.delivery_errors)issues.push({kind:'delivery',label:'Chyba odoslania prístupu',count:a.delivery_errors,at:null});
     if(a.delivery_delays)issues.push({kind:'delivery',label:'Prístup čaká dlhšie než 10 minút',count:a.delivery_delays,at:null});
@@ -217,16 +231,17 @@ export async function paymentReport(env,params,ready){
   const refreshCursor=frontier?attemptCursor(frontier):null,nextCursor=hasMore?refreshCursor:null;
   const recent=await query(db,'SELECT category,source,count(*) count,count(DISTINCT attempt_id) attempts FROM payment_log WHERE created_at>=? GROUP BY category,source',since);
   const technical=recent.filter(r=>r.category==='technical').reduce((n,r)=>n+r.count,0);
-  const errors24=await first(db,"SELECT count(*) count FROM payment_log WHERE category='technical' AND created_at>=?",at-86400000);
-  const declines24=await first(db,"SELECT count(DISTINCT attempt_id) count FROM payment_log WHERE category='bank' AND source='stripe' AND created_at>=?",at-86400000);
+  const errors24=await first(db,"SELECT count(*) count FROM payment_log l LEFT JOIN payment_event_reviews r ON r.event_id=l.id WHERE r.reviewed_at IS NULL AND l.category='technical' AND l.created_at>=?",at-86400000);
+  const declines24=await first(db,"SELECT count(DISTINCT attempt_id) count FROM payment_log l LEFT JOIN payment_event_reviews r ON r.event_id=l.id WHERE r.reviewed_at IS NULL AND l.category='bank' AND l.source='stripe' AND l.created_at>=?",at-86400000);
   const deliveries=await first(db,`SELECT sum(d.status='failed') failed,sum(d.status<>'sent' AND o.created_at<?) delayed FROM access_deliveries d JOIN orders o ON o.id=d.order_id WHERE o.status='paid'`,at-600000);
   const fulfillment=await first(db,`SELECT count(*) count FROM payment_observations p JOIN checkout_attempts a ON a.id=p.attempt_id WHERE p.state IN('paid','free') AND p.paid_at<? AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.external_reference=a.stripe_session_id)`,at-120000);
   const checks=await query(db,'SELECT * FROM payment_monitor_checks');
   const lastSuccess=await first(db,`SELECT max(o.created_at) at FROM orders o JOIN checkout_attempts a ON a.stripe_session_id=o.external_reference WHERE o.status='paid' AND a.total_cents>0`);
-  const logs=await query(db,`SELECT l.*,a.stripe_session_id FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id WHERE l.created_at>=? ${category?'AND l.category=?':''} ORDER BY l.created_at DESC,l.id LIMIT 200`,...category?[since,category]:[since]);
-  const attentionEvents=await query(db,`SELECT l.*,a.id linked_attempt_id,a.stripe_session_id FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id
-    WHERE l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe')) ORDER BY l.created_at DESC,l.id LIMIT 200`,at-86400000);
-  const attention={attemptsInPeriod:attemptsWithIssues,linkedAttempts24:signalMap.size,unlinkedTechnical,eventTotal:signalGroups.reduce((sum,g)=>sum+g.count,0),events:attentionEvents.map(l=>({...l,label:paymentTypes[l.type]?.[1]||'Neznáme'}))};
+  const logs=await query(db,`SELECT l.*,a.stripe_session_id,r.reviewed_at,r.reviewed_by FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id LEFT JOIN payment_event_reviews r ON r.event_id=l.id WHERE l.created_at>=? ${category?'AND l.category=?':''} ORDER BY l.created_at DESC,l.id LIMIT 200`,...category?[since,category]:[since]);
+  const attentionEvents=await query(db,`SELECT l.*,a.id linked_attempt_id,a.stripe_session_id,r.reviewed_at,r.reviewed_by FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id LEFT JOIN payment_event_reviews r ON r.event_id=l.id
+    WHERE l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe')) ORDER BY (r.reviewed_at IS NOT NULL),l.created_at DESC,l.id LIMIT 200`,at-86400000);
+  const reviewed=await first(db,`SELECT count(*) count FROM payment_log l JOIN payment_event_reviews r ON r.event_id=l.id WHERE r.reviewed_at IS NOT NULL AND l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe'))`,at-86400000);
+  const attention={attemptsInPeriod:attemptsWithIssues,linkedAttempts24:signalMap.size,unlinkedTechnical,eventTotal:signalGroups.reduce((sum,g)=>sum+g.count,0),reviewedTotal:reviewed.count,events:attentionEvents.map(l=>({...l,label:paymentTypes[l.type]?.[1]||'Neznáme'}))};
   const stale=checks.length<2||checks.some(c=>at-c.checked_at>1800000),badChecks=checks.some(c=>!c.ok);
   const needsAttention=!ready||badChecks||errors24.count>0||declines24.count>0||deliveries.failed>0||deliveries.delayed>0||fulfillment.count>0;
   return {generatedAt:at,days,category,attemptStatus,attentionOnly,attemptId,attention,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};

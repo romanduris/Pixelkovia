@@ -424,3 +424,58 @@ test('migration preserves historical successful purchases and classifies only kn
     assert.ok(!JSON.stringify(await query(db,'SELECT * FROM payment_attempt_outcomes')).includes('private@example.invalid'));
   }finally{db.close();}
 });
+
+test('administrator reviews persist per event, survive duplicate webhooks, reopen, and never alter payment or fulfillment',async()=>{
+  const f=fixture();try{
+    const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_review',status:'succeeded'};f.env.RESEND_API_KEY='';
+    await paymentWebhook(f.event('checkout.session.completed',s,'evt_review_paid'),f.env);
+    await monitorCheck(f.env,'stripe',true);await monitorCheck(f.env,'webhook',true);
+    const id=(await first(f.db,'SELECT id FROM checkout_attempts')).id;
+    await paymentLog(f.env,{type:'webhook_error',attemptId:id,dedupe:'review-first'});
+    let report=await paymentReport(f.env,new URLSearchParams(),true);const event=report.attention.events[0];
+    const review=(eventId,reviewed,extra={})=>worker.fetch(new Request('http://localhost/api/admin/payments/review',{method:'POST',headers:{origin:'http://localhost','content-type':'application/json'},body:JSON.stringify({eventId,reviewed,...extra})}),{...f.env,ENVIRONMENT:'local'});
+    assert.equal(report.health,'attention');assert.equal(report.rows[0].status,'successful');assert.ok(report.rows[0].issues.length);
+    let response=await review(event.id,true,{reviewedBy:'FORGED_ACTOR'});assert.equal(response.status,200);const saved=await response.json();assert.equal(saved.reviewedBy,'lokalny-vyvojar');assert.ok(saved.reviewedAt);
+    assert.deepEqual(await (await review(event.id,true)).json(),saved,'same review is idempotent and retains its original audit time');
+    await paymentLog(f.env,{type:'webhook_error',attemptId:id,dedupe:'review-first'});
+    await paymentWebhook(f.event('checkout.session.completed',s,'evt_review_paid'),f.env);
+    report=await paymentReport(f.env,new URLSearchParams(),true);
+    assert.equal(report.health,'observing');assert.equal(report.errors24,0);assert.equal(report.attention.reviewedTotal,1);assert.equal(report.attention.eventTotal,0);assert.equal(report.attention.linkedAttempts24,0);assert.equal(report.rows[0].issues.length,0);assert.equal(report.rows[0].status,'successful');assert.equal(report.rows[0].orderCount,1);
+    assert.equal(report.logs.find(l=>l.id===event.id).reviewed_by,'lokalny-vyvojar');
+    assert.equal((await paymentReport(f.env,new URLSearchParams({attention:'1'}),true)).matchingTotal,0);
+    await paymentLog(f.env,{type:'webhook_error',attemptId:id,dedupe:'review-second'});
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.health,'attention');assert.equal(report.errors24,1);assert.equal(report.rows[0].issues[0].count,1,'a new event is never covered by an earlier review');
+    assert.equal((await review(event.id,false)).status,200);report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.errors24,2);assert.equal(report.attention.reviewedTotal,0);assert.equal(report.rows[0].issues[0].count,2);
+    assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,1);assert.equal((await first(f.db,'SELECT count(*) n FROM customer_credentials')).n,1);
+    for(const e of report.attention.events)assert.equal((await review(e.id,true)).status,200);
+    assert.equal((await paymentReport(f.env,new URLSearchParams(),false)).health,'attention','review cannot enable unconfigured payments');
+    await monitorCheck(f.env,'stripe',false);assert.equal((await paymentReport(f.env,new URLSearchParams(),true)).health,'attention','review cannot override a failed live server check');
+    await execute(f.db,'UPDATE payment_log SET created_at=? WHERE id=?',Date.now()-91*86400000,event.id);await prunePaymentLog(f.env);
+    assert.equal(await first(f.db,'SELECT * FROM payment_event_reviews WHERE event_id=?',event.id),null,'review follows existing diagnostic retention');
+  }finally{f.db.close();}
+});
+test('review endpoint requires an administrator, same origin, strict event and boolean inputs, and reviewable existing events',async()=>{
+  const f=fixture();try{
+    await paymentLog(f.env,{type:'sdk_error',dedupe:'unlinked-review'});await paymentLog(f.env,{type:'session_created',dedupe:'not-reviewable'});
+    const technical=await first(f.db,"SELECT id FROM payment_log WHERE type='sdk_error'"),lifecycle=await first(f.db,"SELECT id FROM payment_log WHERE type='session_created'");
+    const req=(base,input,originHeader=base)=>new Request(base+'/api/admin/payments/review',{method:'POST',headers:{origin:originHeader,'content-type':'application/json'},body:JSON.stringify(input)});
+    const value={eventId:technical.id,reviewed:true};
+    assert.equal((await worker.fetch(req(origin,value),{...f.env,ADMIN_AUTH_MODE:'password'})).status,401);
+    const local={...f.env,ENVIRONMENT:'local'};
+    assert.equal((await worker.fetch(req('http://localhost',value,'https://attacker.invalid'),local)).status,403);
+    for(const bad of [{...value,eventId:'invalid'},{...value,reviewed:'true'},{...value,eventId:lifecycle.id},{}])assert.equal((await worker.fetch(req('http://localhost',bad),local)).status,400);
+    assert.equal((await worker.fetch(req('http://localhost',{...value,eventId:'a'.repeat(64)}),local)).status,404);
+    assert.equal((await worker.fetch(req('http://localhost',value),local)).status,200);
+    let report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.attention.unlinkedTechnical,0);assert.equal(report.errors24,0);assert.equal(report.attention.reviewedTotal,1);
+    assert.equal((await worker.fetch(new Request('http://localhost/api/admin/products',{method:'POST',headers:{origin:'http://localhost'}}),local)).status,405,'the new endpoint does not enable other administrative writes');
+    const session=await createCheckout(f.env,f.input),a=await first(f.db,'SELECT id FROM checkout_attempts WHERE stripe_session_id=?',session.sessionId);
+    await paymentLog(f.env,{type:'sdk_error',attemptId:a.id,dedupe:'known-error'});const known=await first(f.db,"SELECT id FROM payment_log WHERE attempt_id=? AND type='sdk_error'",a.id);
+    assert.equal((await worker.fetch(req('http://localhost',{eventId:known.id,reviewed:true}),local)).status,200);
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.rows[0].status,'error','manual review does not relabel a technical failure as payment success');assert.equal(report.rows[0].issues.length,0,'reviewed event does not reappear as a fallback technical warning');
+    await paymentLog(f.env,{type:'payment_failed',source:'stripe',attemptId:a.id,dedupe:'bank-review'});
+    const bank=await first(f.db,"SELECT id FROM payment_log WHERE type='payment_failed'");
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.declines24,1);assert.ok(report.rows[0].issues.some(i=>i.kind==='bank'));
+    assert.equal((await worker.fetch(req('http://localhost',{eventId:bank.id,reviewed:true}),local)).status,200);
+    report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.declines24,0);assert.ok(!report.rows[0].issues.some(i=>i.kind==='bank'));assert.notEqual(report.rows[0].status,'successful');
+  }finally{f.db.close();}
+});
