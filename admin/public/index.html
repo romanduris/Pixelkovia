@@ -3,7 +3,7 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b1021"><title>Digital Product Administration</title><link rel="stylesheet" href="/admin/admin.css"><script type="module" src="/admin/admin.js"></script></head>
 <body>
 <a class="skip" href="#content">Preskočiť na obsah</a>
-<aside class="sidebar">
+<aside class="sidebar" id="admin-sidebar">
   <a class="identity" href="#dashboard"><span class="logo">›_</span><span>Digital Products<small>ADMINISTRATION</small></span></a>
   <div class="nav-caption">PIXELKOVIA / WORKSPACE</div>
   <nav aria-label="Administrácia Pixelkovia"><a href="#dashboard" data-page="dashboard">◈ <span>Overview</span></a><a href="#payments" data-page="payments">◉ <span>Platby a chyby</span></a><a href="#orders" data-page="orders">▤ <span>Objednávky</span></a><a href="#analytics" data-page="analytics">▥ <span>Herná analýza</span></a></nav>
@@ -16,7 +16,7 @@
     <div class="product-tabs" role="tablist" aria-label="Digitálne produkty"><button id="pixelkovia-tab" class="product-tab selected" type="button" role="tab" aria-selected="true" aria-controls="product-panel"><span class="product-mark">P</span>Pixelkovia <span class="product-live">Aktívny produkt</span></button></div>
     <div id="product-panel" role="tabpanel" aria-labelledby="pixelkovia-tab">
       <div id="environment-banner" class="banner" hidden></div>
-      <div class="page-heading"><div><span class="eyebrow">PIXELKOVIA <span>/</span> <span id="breadcrumb">Overview</span></span><h1 id="page-title">Overview</h1><p id="page-description">Zákazníci, tržby a priebeh hry na jednom mieste.</p></div><span class="heading-icon" aria-hidden="true">✦</span></div>
+      <div class="page-heading"><div><span class="eyebrow">PIXELKOVIA <span>/</span> <span id="breadcrumb">Overview</span></span><h1 id="page-title">Overview</h1><p id="page-description">Zákazníci, tržby a priebeh hry na jednom mieste.</p></div><button id="payment-nav-toggle" class="button secondary" type="button" aria-controls="admin-sidebar" aria-expanded="false" hidden>☰ Navigácia</button><span class="heading-icon" aria-hidden="true">✦</span></div>
       <form id="filters" class="filters"><label>Od nákupu<input type="date" id="from" name="from"></label><label>Do nákupu vrátane<input type="date" id="to" name="to"></label><label>Zakúpený produkt<select id="product" name="product"><option value="">Všetky produkty Pixelkovia</option></select></label><button type="submit" class="button">Použiť filtre →</button><button type="button" class="button secondary" id="clear-filters">Zrušiť</button><small>Kohorta podľa dátumu nákupu · Europe/Bratislava</small></form>
       <div id="notice" role="status" aria-live="polite"></div><section id="view" aria-busy="true"><p>Načítavam prehľad…</p></section>
     </div>
