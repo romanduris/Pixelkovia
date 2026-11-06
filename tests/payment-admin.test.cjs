@@ -48,6 +48,18 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   });
   const ready=()=>page.waitForFunction(()=>document.querySelector('#view').getAttribute('aria-busy')==='false');
   const headers=()=>page.locator('.payment-table thead th[data-column]').evaluateAll(cells=>cells.map(c=>c.dataset.column));
+  const compactSummary=async()=>{
+    const positions=await page.locator('.payment-state-chip').evaluateAll(chips=>chips.map(c=>c.getBoundingClientRect().top));
+    assert.ok(Math.max(...positions)-Math.min(...positions)<1,'all state tiles stay in one horizontal row');
+    assert.ok((await page.locator('.payment-status-strip').boundingBox()).height<110,'state row remains compact');
+    assert.ok((await page.locator('.payment-monitor>summary').boundingBox()).height<50,'alert stays in a single row');
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'the page never scrolls horizontally');
+    const strip=page.locator('.payment-status-strip');await strip.evaluate(el=>{el.scrollLeft=el.scrollWidth;});
+    const last=await page.locator('.payment-state-chip').last().boundingBox(),box=await strip.boundingBox();
+    assert.ok(last.x>=box.x-1&&last.x+last.width<=box.x+box.width+1,'last state remains reachable by horizontal scrolling');
+    await strip.evaluate(el=>{el.scrollLeft=0;});
+  };
+
   await page.goto(origin+'/admin#payments');await ready();
   assert.equal(await page.locator('#filters').isVisible(),false);
   assert.equal(await page.locator('#payment-days').inputValue(),'30');assert.ok(calls.at(-1).includes('days=30'));
@@ -69,6 +81,9 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   for(const method of ['Google Pay','Apple Pay','Karta','Zdarma','Neznáme'])assert.ok(await page.getByRole('cell',{name:method,exact:true}).first().isVisible());
   assert.ok(await page.getByRole('cell',{name:'private0@example.invalid',exact:true}).isVisible());
   await page.screenshot({path:'/tmp/pixelkovia-payments-compact-desktop.png',fullPage:true});
+  for(const width of [1280,1024,768,640,390,320,280]){await page.setViewportSize({width,height:844});await compactSummary();}
+  await page.setViewportSize({width:1512,height:1080});
+
   await page.locator('#payment-state-started').click();await ready();
   assert.equal(await page.locator('.payment-attempt-row').count(),1);assert.ok(calls.some(p=>p.includes('status=started')));
   assert.equal(await page.locator('#payment-state-started').getAttribute('aria-pressed'),'true');
@@ -210,14 +225,14 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   const scrollRefresh=page.waitForResponse(r=>r.url().includes('/api/admin/payments'));await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await scrollRefresh;await ready();
   assert.deepEqual(await page.locator('#payment-table-scroll').evaluate(e=>({x:e.scrollLeft,y:window.scrollY})),scroll);
   await page.locator('#payment-column-toggle').click();await page.locator('#reset-payment-layout').click();await page.keyboard.press('Escape');
-  for(const width of [1144,390,320]){
+  for(const width of [1144,768,390,320,280]){
     await page.setViewportSize({width,height:844});
     await page.evaluate(()=>window.scrollTo(0,0));
-    assert.ok((await page.locator('.payment-status-strip').boundingBox()).height<300,'summary uses at most three rows');
+    await compactSummary();
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow at '+width);
     assert.ok(await page.locator('#payment-table-scroll').isVisible());
     if(width===1144){const tableTop=(await page.locator('#payment-table-scroll').boundingBox()).y;assert.ok(tableTop<440,'table remains in first screen: '+tableTop);await page.screenshot({path:'/tmp/pixelkovia-payments-compact-1144.png',fullPage:true});}
-    if(width===390){await page.screenshot({path:'/tmp/pixelkovia-payments-compact-mobile.png',fullPage:true});await page.locator('#payment-table-scroll').evaluate(e=>{e.scrollLeft=180;});await page.locator('#payment-attempt-toggle-0').click();assert.ok(await page.locator('#payment-attempt-detail-0').isVisible());
+    if(width===390){await page.locator('.payment-state-chip').last().focus();await page.keyboard.press('Enter');await ready();assert.equal(await page.locator('#payment-state-unknown').getAttribute('aria-pressed'),'true','off-screen states stay operable by keyboard');await page.locator('#payment-state-all').click();await ready();await page.screenshot({path:'/tmp/pixelkovia-payments-compact-mobile.png',fullPage:true});await page.locator('#payment-table-scroll').evaluate(e=>{e.scrollLeft=180;});await page.locator('#payment-attempt-toggle-0').click();assert.ok(await page.locator('#payment-attempt-detail-0').isVisible());
       const detailBox=await page.locator('#payment-attempt-detail-0 .payment-attempt-detail').boundingBox(),wrapBox=await page.locator('#payment-table-scroll').boundingBox();
       assert.ok(detailBox.x>=wrapBox.x-2&&detailBox.x+detailBox.width<=wrapBox.x+wrapBox.width+2,'expanded details stay readable after horizontal scrolling');await page.screenshot({path:'/tmp/pixelkovia-payments-compact-mobile-detail.png',fullPage:true});await page.locator('#payment-attempt-toggle-0').click();}
   }
@@ -292,5 +307,5 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   await page.locator('[data-page=dashboard]').click();await page.locator('#payment-overview .payment-health').waitFor();
   assert.equal(await page.locator('body.payments-view').count(),0);assert.ok(await page.locator('.product-tabs').isVisible());assert.ok(await page.locator('.page-heading p').isVisible());
   assert.ok(await page.getByRole('link',{name:'Otvoriť platby a chyby →'}).isVisible());
-  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked log focus, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
+  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, one-row scrollable states plus one-row alert at 280–1512px, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked log focus, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
