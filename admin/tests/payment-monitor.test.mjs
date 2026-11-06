@@ -211,6 +211,49 @@ test('success waits for signed verified webhook; duplicates and late failures ne
     assert.equal((await first(f.db,'SELECT count(*) n FROM payment_attempt_outcomes')).n,1);
   }finally{f.db.close();}
 });
+test('signed webhook errors link exactly to an attempt and remain distinct from a later successful payment',async()=>{
+  const f=fixture();try{
+    const checkout=await createCheckout(f.env,f.input),session=f.sessions.get(checkout.sessionId),id=session.client_reference_id;
+    session.status='complete';session.payment_status='paid';
+    const retrieve=f.env.STRIPE_CLIENT.checkout.sessions.retrieve;
+    f.env.STRIPE_CLIENT.checkout.sessions.retrieve=async()=>{const e=Error('DO_NOT_STORE');e.type='StripeConnectionError';throw e;};
+    const event=f.event('checkout.session.completed',session,'evt_linked_retry');
+    await assert.rejects(()=>paymentWebhook(event.clone(),f.env),/DO_NOT_STORE/);
+    await assert.rejects(()=>paymentWebhook(event.clone(),f.env),/DO_NOT_STORE/);
+    let report=await paymentReport(f.env,new URLSearchParams({category:'bank'}),true);
+    assert.equal(report.errors24,1);assert.equal(report.attention.unlinkedTechnical,0);assert.equal(report.attention.linkedAttempts24,1);
+    assert.equal(report.attention.events[0].linked_attempt_id,id);assert.equal(report.attention.events[0].type,'webhook_error');
+    assert.equal(report.logs.length,0,'category filter cannot hide the alert evidence');assert.equal(report.rows[0].issues[0].kind,'technical');assert.equal(report.rows[0].status,'started');
+    assert.ok(!JSON.stringify(report).includes('DO_NOT_STORE'));
+    f.env.STRIPE_CLIENT.checkout.sessions.retrieve=retrieve;f.env.RESEND_API_KEY='';
+    await paymentWebhook(event.clone(),f.env);await paymentWebhook(event.clone(),f.env);
+    report=await paymentReport(f.env,new URLSearchParams({attention:'1'}),true);
+    assert.equal(report.rows.length,1);assert.equal(report.rows[0].status,'successful');assert.equal(report.attemptCounts.error,0);assert.equal(report.rows[0].issues[0].kind,'technical');
+    assert.equal(report.errors24,1);assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,1);
+    const invalid=new Request(origin+'/api/stripe/webhook',{method:'POST',body:'{}',headers:{'stripe-signature':'forged'}});await assert.rejects(()=>paymentWebhook(invalid,f.env),e=>e.status===400);
+    assert.equal((await first(f.db,"SELECT count(*) n FROM payment_log WHERE type='webhook_error'")).n,1);
+  }finally{f.db.close();}
+});
+test('attention filters reach old and later-batch attempts; unlinked and truncated logs never invent purchase links',async()=>{
+  const f=fixture();try{
+    const now=Date.now();
+    for(let i=0;i<45;i++)await execute(f.db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at) VALUES(?,?,?,?,?,?)','attention-'+i,'private@example.invalid','','["episode-1"]',1499,now-i*1000);
+    await execute(f.db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at) VALUES(?,?,?,?,?,?)','old-attention','private@example.invalid','','["episode-1"]',1499,now-40*86400000);
+    await paymentLog(f.env,{type:'status_error',attemptId:'attention-44'});
+    await paymentLog(f.env,{type:'webhook_error',attemptId:'old-attention'});
+    await paymentLog(f.env,{type:'webhook_error',dedupe:'unlinked'});
+    const get=params=>paymentReport(f.env,new URLSearchParams(params),true);
+    let report=await get({days:'30',category:'bank'});assert.equal(report.rows.length,40);assert.ok(!report.rows.some(r=>r.id==='attention-44'));
+    assert.equal(report.attention.linkedAttempts24,2);assert.equal(report.attention.unlinkedTechnical,1);assert.equal(report.attention.attemptsInPeriod,1);assert.equal(report.logs.length,0);
+    report=await get({days:'all',attention:'1'});assert.equal(report.rows.length,2);assert.equal(report.total,46);assert.equal(report.attentionOnly,true);
+    assert.deepEqual(new Set(report.rows.map(r=>r.id)),new Set(['attention-44','old-attention']));assert.equal(report.attemptCounts.error,0,'status_error and webhook_error do not prove failed payment');
+    report=await get({days:'all',attempt:'old-attention'});assert.equal(report.rows.length,1);assert.equal(report.attemptId,'old-attention');assert.ok(report.rows[0].issues.length);
+    for(let i=0;i<201;i++)await paymentLog(f.env,{type:'webhook_error',dedupe:'cap-'+i,at:now+1000+i});
+    report=await get({days:'all',attention:'1'});assert.equal(report.attention.events.length,200);assert.equal(report.attention.eventTotal,204);assert.equal(report.attention.unlinkedTechnical,202);assert.equal(report.rows.length,2,'row flags use all relevant signals, not just the last 200 events');
+    assert.ok(report.attention.events.every(l=>l.linked_attempt_id===null));
+    for(const params of [{attention:'forged'},{attempt:'bad/identifier'}])await assert.rejects(()=>get(params),e=>e.status===400);
+  }finally{f.db.close();}
+});
 test('40-row cursor batches survive concurrent arrivals, equal timestamps, refreshes and filters',async()=>{
   const f=fixture();try{
     const now=Date.now();
@@ -312,7 +355,7 @@ test('payment report counts a paid gift once, separates free and refund, and fla
     s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_monitor_paid',status:'succeeded'};
     await verifiedCheckoutStatus(f.env,s.id);
     await execute(f.db,'UPDATE payment_observations SET paid_at=?',Date.now()-180000);
-    let report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.fulfillmentDelayed,1);assert.equal(report.health,'attention');
+    let report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.fulfillmentDelayed,1);assert.equal(report.health,'attention');assert.ok(report.rows[0].issues.some(i=>i.kind==='fulfillment'));
     await fulfill(f.env,s.id);
     assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,2);
     const free=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),voucherCode:'free'}),z=f.sessions.get(free.sessionId);z.status='complete';z.payment_status='no_payment_required';

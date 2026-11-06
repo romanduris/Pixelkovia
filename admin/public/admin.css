@@ -356,3 +356,23 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-log-disclosure>summary{gap:8px;flex-wrap:wrap;font-size:11px}.payment-log-disclosure>summary small{font-size:10px}.payment-log-body{padding:10px}.payment-log-body .payment-log-heading{align-items:stretch}.payment-log-body .payment-log-heading select{width:100%}
 .payments-view .workspace footer{padding:12px;font-size:9px;gap:4px}.payment-load-error{align-items:start;flex-direction:column}
 }
+
+/* Payment outcome and operational attention stay distinct and directly linked. */
+.payment-workspace .has-payment-issues>td{background:#281d2b;border-bottom-color:#60323f}
+.payment-workspace .has-payment-issues>td:first-child{box-shadow:inset 3px 0 #ff7189}
+.payment-workspace .has-payment-issues .payment-expand-cell{background:#351e2b}
+.payment-workspace .has-payment-issues .payment-row-toggle{border-color:#e45e78;color:#ffd2db}
+.payment-issue-badge{display:block;margin-top:5px;padding:2px 6px;border:1px solid #d75871;border-radius:4px;background:#702238;color:#ffe1e7;font-size:10px;font-weight:650;line-height:1.4}
+.payment-issue-badge:hover{background:#982e49}
+.payment-row-issues{margin:0 0 18px;padding:12px;border:1px solid #b94b65;border-radius:6px;background:#351e2b;color:#ffd2db}
+.payment-row-issues h3{font-size:13px;margin:0 0 8px}.payment-row-issues ul{padding-left:18px;margin:0}.payment-row-issues li,.payment-row-issues p{font-size:11px;white-space:normal}.payment-row-issues p{margin:8px 0}.payment-row-issues .table-wrap{margin-top:12px;max-height:260px}
+.payment-attention-events{margin:14px 0;border-top:1px solid #ffffff20;padding-top:14px}
+.payment-attention-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
+.payment-attention-events .button{font-size:11px;min-height:32px;padding:5px 9px;color:#ffd2db;border-color:#a45367;white-space:nowrap}
+.payment-attention-events>ul{list-style:none;padding:0;margin:10px 0;max-height:300px;overflow:auto}
+.payment-issue-event{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #ffffff15}
+.payment-issue-event>span{min-width:0}.payment-issue-event strong{display:block;font-size:12px}.payment-issue-event small,.payment-attention-events>small{display:block;font-size:10px;color:#d6a9b7}
+.payment-log-body .is-selected-log>td{background:#4a2034;box-shadow:inset 0 2px #ff7189,inset 0 -2px #ff7189}
+.payment-log-body [data-payment-log]:focus{outline:2px solid #ff7189;outline-offset:-2px}
+.payment-table-heading #clear-payment-issues{font-size:10px;white-space:nowrap;padding:2px 0}
+@media(max-width:640px){.payment-issue-event{align-items:start;flex-direction:column;gap:6px}.payment-attention-heading .button{width:100%}.payment-table-heading{flex-wrap:wrap}}

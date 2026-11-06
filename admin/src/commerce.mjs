@@ -271,7 +271,17 @@ export async function paymentWebhook(request,env,context){
   // Acknowledge only after durable monitoring writes too. Stripe can retry a
   // transient failure; the existing purchase/log IDs make those retries safe.
   await execute(env.TQ_DB,'INSERT OR IGNORE INTO payment_events VALUES(?,?,?)',event.id,event.data.object.id,Date.now());
-  }catch(error){await paymentLog(env,{type:'webhook_error',source:'server',code:error.type,dedupe:event.id});throw error;}
+  }catch(error){
+    // The signature has already been verified. Link only an exact, unambiguous
+    // identifier from this application's database; lookup failure stays unlinked.
+    let attemptId=null;
+    try{
+      const object=event.data.object,intent=event.type.startsWith('payment_intent.')?object.id:typeof object.payment_intent==='string'?object.payment_intent:object.payment_intent?.id;
+      const matches=event.type.startsWith('checkout.session.')?await query(env.TQ_DB,'SELECT id FROM checkout_attempts WHERE stripe_session_id=? LIMIT 2',object.id):intent?await query(env.TQ_DB,'SELECT id FROM checkout_attempts WHERE payment_intent=? LIMIT 2',intent):[];
+      if(matches.length===1)attemptId=matches[0].id;
+    }catch{}
+    await paymentLog(env,{type:'webhook_error',source:'server',attemptId,code:error.type,dedupe:event.id});throw error;
+  }
   if(context?.waitUntil)context.waitUntil(sendPending(env));else await sendPending(env);
   return {received:true};
 }

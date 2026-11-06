@@ -11,7 +11,7 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   orderCount:method==='unknown'?0:method==='free'?2:1,expectedOrderCount:method==='free'?2:1,orderStates:method==='unknown'?[]:['paid'],delivery:{total:method==='unknown'?0:method==='free'?2:1,sent:method==='unknown'?0:method==='free'?2:1,failed:0,queued:0,lastSentAt:method==='unknown'?null:now}
 }));
 (async()=>{const browser=await browserType.launch({headless:true});try{
-  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null;const calls=[];
+  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null,richAttention=false;const calls=[];
   const manyRows=Array.from({length:123},(_,i)=>({...report.rows[i%5],id:'batch-'+String(i).padStart(3,'0'),createdAt:now-i,email:'batch'+i+'@example.invalid'}));
   page.on('pageerror',e=>errors.push(e.message));
   await context.addInitScript(()=>{const key='pixelkovia-admin-payments-layout-v1';if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({order:['date','email','products','amount','status','method','reason','reference'],hidden:['reason','reference'],density:'compact',navCollapsed:true}));});
@@ -23,8 +23,15 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
       calls.push(url.searchParams.toString());if(fail)return route.fulfill({status:503,json:{error:'Dočasne nedostupné'}});
       const data=structuredClone(report);if(largeList)data.rows=structuredClone(manyRows);
       data.days=url.searchParams.get('days')==='all'?'all':Number(url.searchParams.get('days')||1);data.attemptStatus=url.searchParams.get('status')||'';
+      if(richAttention){
+        data.rows=data.rows.filter(r=>data.days==='all'||r.createdAt>=now-data.days*86400000).map(r=>({...r,issues:r.id==='batch-090'?[{kind:'technical',label:'Technický signál za 24 h',count:1,at:now}]:r.id==='batch-003'?[{kind:'delivery',label:'Chyba odoslania prístupu',count:1,at:null}]:[]}));
+        const events=[{id:'linked-error',attempt_id:'batch-090',linked_attempt_id:'batch-090',type:'webhook_error',source:'server',category:'technical',label:'Chyba spracovania podpísanej Stripe udalosti',code:'',method:'unknown',created_at:now},{id:'global-error',attempt_id:null,linked_attempt_id:null,type:'webhook_error',source:'server',category:'technical',label:'Chyba bez uloženého prepojenia',code:'',method:'unknown',created_at:now}];
+        Object.assign(data,{health:'attention',errors24:2,deliveries:{failed:1,delayed:0},attention:{attemptsInPeriod:data.rows.filter(r=>r.issues.length).length,linkedAttempts24:1,unlinkedTechnical:1,eventTotal:2,events},logs:events.filter(l=>!url.searchParams.get('category')||url.searchParams.get('category')===l.category)});
+      }
+      data.attentionOnly=url.searchParams.get('attention')==='1';data.attemptId=url.searchParams.get('attempt')||'';
       data.total=data.rows.length;data.attemptCounts=Object.fromEntries(Object.keys(data.attemptCounts).map(status=>[status,data.rows.filter(r=>r.status===status).length]));
       if(data.attemptStatus)data.rows=data.rows.filter(r=>r.status===data.attemptStatus);
+      if(data.attentionOnly)data.rows=data.rows.filter(r=>r.issues?.length);if(data.attemptId)data.rows=data.rows.filter(r=>r.id===data.attemptId);
       data.matchingTotal=data.rows.length;data.pageSize=40;
       const cursor=url.searchParams.get('cursor'),through=url.searchParams.get('through');
       if(cursor&&appendGate){const gate=appendGate;appendGate=null;await gate;}
@@ -260,8 +267,30 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');
   const cookieSettings=JSON.parse(decodeURIComponent(preferenceCookie.value));assert.deepEqual(cookieSettings.panels.sort(),['log','monitor']);
   assert.ok(!JSON.stringify(cookieSettings).includes('@'));assert.ok(!JSON.stringify(cookieSettings).includes('batch-'));assert.ok(!JSON.stringify(cookieSettings).includes('cs_test_'));
+  richAttention=true;manyRows.find(r=>r.id==='batch-090').createdAt=now-40*86400000;
+  await page.locator('#payment-state-all').click();await ready();
+  assert.ok(await page.locator('[data-attempt="batch-003"].has-payment-issues').count());assert.equal(await page.locator('#payment-state-error strong').innerText(),'0');
+  assert.ok((await page.locator('.payment-monitor-brief').innerText()).includes('bez pokusu: 1'));
+  await page.locator('[data-payment-issue-attempt="batch-090"]').click();await ready();
+  assert.equal(await page.locator('.payment-attempt-row').count(),1);assert.ok(await page.locator('[data-attempt="batch-090"].has-payment-issues').count());
+  assert.equal(await page.locator('[data-attempt="batch-090"] .attempt-successful').innerText(),'Úspešná');assert.ok(await page.locator('.payment-row-issues').isVisible());assert.equal(await page.locator('.payment-attempt-detail [data-payment-log="linked-error"]').count(),1,'each signal appears once in the expanded attempt');
+  assert.ok(calls.at(-1).includes('days=all')&&calls.at(-1).includes('attempt=batch-090'),'direct link reaches an old attempt outside the first batch');
+  await page.locator('#clear-payment-issues').click();await ready();
+  await page.locator('#show-payment-issues').click();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),2);
+  await page.locator('[data-payment-issues="batch-003"]').click();assert.ok((await page.locator('[data-attempt="batch-003"]').evaluate(e=>e.nextElementSibling.innerText)).includes('Chyba odoslania prístupu'));
+  assert.equal(await page.locator('[data-attempt="batch-003"] .attempt-successful').innerText(),'Úspešná · zdarma');
+  await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-status').uncheck();await page.keyboard.press('Escape');
+  assert.ok(await page.locator('[data-attempt="batch-003"].has-payment-issues').count());assert.ok((await page.locator('[data-payment-expand="batch-003"]').getAttribute('aria-label')).includes('Vyžaduje pozornosť'));
+  await page.locator('#payment-column-toggle').click();await page.locator('#payment-column-status').check();await page.keyboard.press('Escape');
+  await page.locator('[data-payment-issue-log="global-error"]').click();await ready();
+  assert.ok(await page.locator('.payment-log-body [data-payment-log="global-error"].is-selected-log').isVisible());assert.equal(await page.locator('#payment-category').inputValue(),'technical');
+  assert.equal(await page.locator('.payment-attempt-row').count(),2,'an unlinked alert never creates a fake purchase row');
+  preferenceCookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-payments-layout-v1');assert.ok(!decodeURIComponent(preferenceCookie.value).includes('batch-090'));assert.ok(!decodeURIComponent(preferenceCookie.value).includes('global-error'));
+  await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'/tmp/pixelkovia-payment-linked-attention.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'attention panel fits mobile');
+  await page.locator('#clear-payment-issues').click();await ready();await page.setViewportSize({width:1512,height:1080});
   await page.locator('[data-page=dashboard]').click();await page.locator('#payment-overview .payment-health').waitFor();
   assert.equal(await page.locator('body.payments-view').count(),0);assert.ok(await page.locator('.product-tabs').isVisible());assert.ok(await page.locator('.page-heading p').isVisible());
   assert.ok(await page.getByRole('link',{name:'Otvoriť platby a chyby →'}).isVisible());
-  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
+  assert.deepEqual(errors,[]);await context.close();console.log('PASS: compact payments, first-screen table, state filters, alert/log disclosures, row details, 30-day default, migrated admin cookie preferences/filters/disclosures, compact product tags, verified free success, persistent column visibility/order/density, whole-header drag/drop before/after, pointer resize/cancel, width persistence and limits, keyboard, refresh/scroll preservation, 40-row append/retry/end, concurrent arrivals without duplicates, scope reset, linked attention rows/events, off-page direct links, successful delivery problems, unlinked log focus, safe rendering, sidebar and unchanged overview, 320/390/1024/1144/1512px.');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

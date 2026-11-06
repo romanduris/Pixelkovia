@@ -145,10 +145,20 @@ export async function paymentReport(env,params,ready){
   const category=params.get('category')||'';if(category&&!['technical','bank','validation','customer','lifecycle'].includes(category))throw new HttpError(400,'Neplatný filter.');
   const attemptStatus=params.get('status')||'',attemptCounts={started:0,abandoned:0,cancelled:0,error:0,successful:0,declined:0,unknown:0};
   if(attemptStatus&&!Object.hasOwn(attemptCounts,attemptStatus))throw new HttpError(400,'Neplatný stav platby.');
+  const attentionOnly=params.get('attention')==='1',attemptId=params.get('attempt')||'';
+  if(!['','0','1'].includes(params.get('attention')||'')||(attemptId&&!/^[A-Za-z0-9_-]{1,100}$/.test(attemptId)))throw new HttpError(400,'Neplatný filter problémov.');
   const requestedPage=Number(params.get('page')||1);if(!Number.isSafeInteger(requestedPage)||requestedPage<1)throw new HttpError(400,'Neplatná strana.');
   const cursor=readAttemptCursor(params.get('cursor')),through=readAttemptCursor(params.get('through'));
   if((cursor&&through)||((cursor||through)&&requestedPage!==1))throw new HttpError(400,'Neplatná kombinácia stránkovania.');
   const at=Date.now(),since=days==='all'?0:at-days*86400000,db=env.TQ_DB;
+  // Signal history is independent of the selected event category and row batch.
+  const signalGroups=await query(db,`SELECT l.attempt_id,a.id linked_id,l.category,count(*) count,max(l.created_at) latest_at FROM payment_log l
+    LEFT JOIN checkout_attempts a ON a.id=l.attempt_id WHERE l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe')) GROUP BY l.attempt_id,l.category`,at-86400000);
+  const signalMap=new Map();let unlinkedTechnical=0;
+  for(const group of signalGroups){
+    if(!group.linked_id){if(group.category==='technical')unlinkedTechnical+=group.count;continue;}
+    const signals=signalMap.get(group.linked_id)||{};signals[group.category]={count:group.count,at:group.latest_at};signalMap.set(group.linked_id,signals);
+  }
   // One row per existing checkout attempt, even before a Stripe Session exists.
   const attempts=await query(db,`WITH linked_orders AS (
       SELECT a.id attempt_id,o.id order_id FROM checkout_attempts a JOIN orders o ON o.external_reference=a.stripe_session_id
@@ -156,16 +166,17 @@ export async function paymentReport(env,params,ready){
     ), order_summary AS (
       SELECT l.attempt_id,count(*) order_count,group_concat(DISTINCT o.status) order_states,
         min(o.status='paid') orders_paid,max(o.status='refunded') has_refund,min(o.created_at) fulfilled_at,
+        sum(o.status='paid' AND d.status='failed') delivery_errors,sum(o.status='paid' AND d.status<>'sent' AND o.created_at<?) delivery_delays,
         sum(d.order_id IS NOT NULL) delivery_count,sum(d.status='sent') sent_count,sum(d.status='failed') failed_count,sum(d.status='queued') queued_count,max(d.sent_at) sent_at
       FROM linked_orders l JOIN orders o ON o.id=l.order_id LEFT JOIN access_deliveries d ON d.order_id=o.id GROUP BY l.attempt_id
     ) SELECT a.id,a.email,a.stripe_session_id,a.total_cents,a.created_at,a.selection,a.gift_game,a.voucher_code,a.fixed_total_voucher,
-    a.subtotal_cents,a.bundle_discount_cents,a.voucher_discount_cents,p.state observed_state,p.checked_at,coalesce(m.method,s.problem_method) method,
+    a.subtotal_cents,a.bundle_discount_cents,a.voucher_discount_cents,p.state observed_state,p.checked_at,p.paid_at,coalesce(m.method,s.problem_method) method,
     s.webhook_confirmed_at,s.cancelled_at,s.problem_kind,s.problem_type,s.problem_code,
-    coalesce(os.order_count,0) order_count,os.order_states,os.orders_paid,os.has_refund,os.fulfilled_at,
+    coalesce(os.order_count,0) order_count,coalesce(os.delivery_errors,0) delivery_errors,coalesce(os.delivery_delays,0) delivery_delays,os.order_states,os.orders_paid,os.has_refund,os.fulfilled_at,
     coalesce(os.delivery_count,0) delivery_count,coalesce(os.sent_count,0) sent_count,coalesce(os.failed_count,0) failed_count,coalesce(os.queued_count,0) queued_count,os.sent_at
     FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
-    LEFT JOIN payment_attempt_outcomes s ON s.attempt_id=a.id LEFT JOIN order_summary os ON os.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC,a.id`,since);
-  const counts={paid:0,free:0,refunded:0,failed:0,pending:0,ready:0,expired:0,unknown:0},matching=[];
+    LEFT JOIN payment_attempt_outcomes s ON s.attempt_id=a.id LEFT JOIN order_summary os ON os.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC,a.id`,at-600000,since);
+  const counts={paid:0,free:0,refunded:0,failed:0,pending:0,ready:0,expired:0,unknown:0},matching=[];let attemptsWithIssues=0;
   for(const a of attempts){
     const status=a.has_refund?'refunded':a.orders_paid===1?(a.total_cents===0?'free':'paid'):a.observed_state||'unknown';counts[status]++;
     // Reading a settled Session in the browser/status API never confirms success
@@ -178,7 +189,16 @@ export async function paymentReport(env,params,ready){
     if(a.problem_code&&!a.cancelled_at)reason+=' · '+a.problem_code;
     if(a.webhook_confirmed_at&&status==='refunded')reason='Platba bola vrátená';
     else if(a.webhook_confirmed_at)reason=a.total_cents===0?'Potvrdená objednávka zdarma':'Neznáme';
-    if(!attemptStatus||monitorStatus===attemptStatus)matching.push({
+    const signals=signalMap.get(a.id)||{},issues=[];
+    if(signals.technical)issues.push({kind:'technical',label:'Technický signál za 24 h',count:signals.technical.count,at:signals.technical.at});
+    if(a.problem_kind==='technical'&&!a.webhook_confirmed_at&&!signals.technical)issues.push({kind:'payment',label:'Potvrdená technická chyba',count:1,at:null});
+    if(signals.bank)issues.push({kind:'bank',label:'Odmietnutie bankou za 24 h',count:signals.bank.count,at:signals.bank.at});
+    if(a.delivery_errors)issues.push({kind:'delivery',label:'Chyba odoslania prístupu',count:a.delivery_errors,at:null});
+    if(a.delivery_delays)issues.push({kind:'delivery',label:'Prístup čaká dlhšie než 10 minút',count:a.delivery_delays,at:null});
+    if(['paid','free'].includes(a.observed_state)&&a.paid_at&&a.paid_at<at-120000&&!a.order_count)issues.push({kind:'fulfillment',label:'Potvrdená platba čaká na vytvorenie prístupu',count:1,at:a.paid_at});
+    if(issues.length)attemptsWithIssues++;
+    if((!attemptStatus||monitorStatus===attemptStatus)&&(!attentionOnly||issues.length)&&(!attemptId||a.id===attemptId))matching.push({
+      issues,
       id:a.id,email:a.email||'Neznáme',sessionId:a.stripe_session_id,totalCents:a.total_cents,createdAt:a.created_at,checkedAt:a.checked_at,state:status,status:monitorStatus,reason,failureKind:a.problem_kind||null,method:a.method||'unknown',products:JSON.parse(a.selection),giftGame:!!a.gift_game,
       voucherCode:a.voucher_code||a.fixed_total_voucher||null,
       subtotalCents:a.subtotal_cents,bundleDiscountCents:a.bundle_discount_cents,voucherDiscountCents:a.voucher_discount_cents,
@@ -204,7 +224,10 @@ export async function paymentReport(env,params,ready){
   const checks=await query(db,'SELECT * FROM payment_monitor_checks');
   const lastSuccess=await first(db,`SELECT max(o.created_at) at FROM orders o JOIN checkout_attempts a ON a.stripe_session_id=o.external_reference WHERE o.status='paid' AND a.total_cents>0`);
   const logs=await query(db,`SELECT l.*,a.stripe_session_id FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id WHERE l.created_at>=? ${category?'AND l.category=?':''} ORDER BY l.created_at DESC,l.id LIMIT 200`,...category?[since,category]:[since]);
+  const attentionEvents=await query(db,`SELECT l.*,a.id linked_attempt_id,a.stripe_session_id FROM payment_log l LEFT JOIN checkout_attempts a ON a.id=l.attempt_id
+    WHERE l.created_at>=? AND (l.category='technical' OR (l.category='bank' AND l.source='stripe')) ORDER BY l.created_at DESC,l.id LIMIT 200`,at-86400000);
+  const attention={attemptsInPeriod:attemptsWithIssues,linkedAttempts24:signalMap.size,unlinkedTechnical,eventTotal:signalGroups.reduce((sum,g)=>sum+g.count,0),events:attentionEvents.map(l=>({...l,label:paymentTypes[l.type]?.[1]||'Neznáme'}))};
   const stale=checks.length<2||checks.some(c=>at-c.checked_at>1800000),badChecks=checks.some(c=>!c.ok);
   const needsAttention=!ready||badChecks||errors24.count>0||declines24.count>0||deliveries.failed>0||deliveries.delayed>0||fulfillment.count>0;
-  return {generatedAt:at,days,category,attemptStatus,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
+  return {generatedAt:at,days,category,attemptStatus,attentionOnly,attemptId,attention,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
 }

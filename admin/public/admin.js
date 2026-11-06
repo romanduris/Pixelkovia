@@ -7,7 +7,7 @@ const time=ms=>ms==null?'—':ms>=3600000?number(ms/3600000)+' h':ms>=60000?numb
 const stateNames={purchased:'Zakúpené, neaktivované',preparing:'Pripravuje hru',playing:'Rozhrané',completed:'Dokončené',expired:'Prístup vypršal',active:'Aktívna relácia',valid:'Platné',revoked:'Odňaté',pending:'Čaká na platbu','payment-pending':'Čaká na platbu',paid:'Zaplatené',refunded:'Vrátené',cancelled:'Zrušené',draft:'Koncept',blocked:'Blokované',queued:'Čaká na odoslanie',sent:'Odoslané',failed:'Chyba'};
 const badge=status=>`<span class="status ${escape(status)}">${escape(stateNames[status]||status)}</span>`;
 const titles={payments:['Platby a chyby','Overené úhrady, zlyhania formulára a doručenie prístupov.'],dashboard:['Overview','Zákazníci, tržby a priebeh hry na jednom mieste.'],orders:['Objednávky','Nákupy, produkty a platby zákazníkov Pixelkovia.'],analytics:['Herná analýza','Od prvého nákupu po poslednú stopu. Celý príbeh každého zákazníka.']};
-const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'30',paymentCategory:'',paymentStatus:''};
+const state={page:1,q:'',status:'',sort:'purchase',direction:'desc',version:'',portal:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'30',paymentCategory:'',paymentStatus:'',paymentAttention:false,paymentAttempt:''};
 let loadingId=0,detailId=0,debounce;
 async function api(path,params){const response=await fetch(path+(params?.toString()?'?'+params:''),{credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/admin/login');throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
 function midnight(day){const utc=Date.parse(day+'T00:00:00Z');const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(utc).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const represented=Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));return new Date(utc-(represented-utc)).toISOString();}
@@ -36,6 +36,7 @@ function paymentHealth(d,compact=false){
   const notes=[];
   if(!d.enabled)notes.push('Platby sú vypnuté alebo chýba konfigurácia.');
   if(d.errors24)notes.push(`Technické signály za posledných 24 hodín: ${d.errors24}. Otvorte záznamy a skontrolujte príčinu.`);
+  if(d.attention?.unlinkedTechnical)notes.push(`${d.attention.unlinkedTechnical} technických udalostí nemá uložené prepojenie na nákupný pokus; konkrétne udalosti sú dostupné nižšie.`);
   if(d.declines24)notes.push(`Platby s neúspešným pokusom potvrdeným Stripe za posledných 24 hodín: ${d.declines24}. Niektoré mohli pri ďalšom pokuse prejsť; nemusí ísť o chybu stránky.`);
   if(d.deliveries.failed||d.deliveries.delayed)notes.push(`Prístupové e-maily: chyby odoslania ${d.deliveries.failed}; čakajúce dlhšie než 10 minút ${d.deliveries.delayed}.`);
   if(d.fulfillmentDelayed)notes.push(`${d.fulfillmentDelayed} potvrdených platieb čaká na vytvorenie prístupu dlhšie než 2 minúty.`);
@@ -51,7 +52,7 @@ const paymentLayoutKey='pixelkovia-admin-payments-layout-v1';
 const paymentColumnMin=80,paymentColumnMax=800;
 const paymentColumnWidth=value=>Math.max(paymentColumnMin,Math.min(paymentColumnMax,Math.round(value)));
 const paymentDefaultWidths={date:150,email:230,products:250,amount:95,status:160,method:110,voucher:100,reason:280,reference:250};
-function defaultPaymentLayout(){return {order:Object.keys(paymentColumns),hidden:Object.keys(paymentColumns).filter(id=>!defaultPaymentColumns.includes(id)),density:'compact',navCollapsed:true,days:'30',status:'',category:'',panels:[],widths:{}};}
+function defaultPaymentLayout(){return {order:Object.keys(paymentColumns),hidden:Object.keys(paymentColumns).filter(id=>!defaultPaymentColumns.includes(id)),density:'compact',navCollapsed:true,days:'30',status:'',category:'',panels:[],widths:{},attentionOnly:false};}
 function readPaymentLayout(){
   const defaults=defaultPaymentLayout(),sources=[];
   // Prefer the admin-scoped cookie; migrate the existing browser preferences.
@@ -65,6 +66,7 @@ function readPaymentLayout(){
     if(Array.isArray(saved.hidden))defaults.hidden=[...new Set([...saved.hidden.filter(id=>typeof id==='string'&&Object.hasOwn(paymentColumns,id)),...defaults.hidden.filter(id=>!order.includes(id))])];
     if(defaults.hidden.length===defaults.order.length)defaults.hidden=[];
     if(saved.density==='comfortable')defaults.density='comfortable';
+    if(typeof saved.attentionOnly==='boolean')defaults.attentionOnly=saved.attentionOnly;
     if(typeof saved.navCollapsed==='boolean')defaults.navCollapsed=saved.navCollapsed;
     if(['1','7','30','all'].includes(saved.days))defaults.days=saved.days;
     if(Object.hasOwn(attemptStateNames,saved.status))defaults.status=saved.status;
@@ -76,11 +78,11 @@ function readPaymentLayout(){
   return defaults;
 }
 let paymentLayout=readPaymentLayout(),paymentData=null,paymentDragColumn=null,paymentLoadingMore=false,paymentResize=null,paymentDropPending=false;
-Object.assign(state,{paymentDays:paymentLayout.days,paymentStatus:paymentLayout.status,paymentCategory:paymentLayout.category});
-const paymentUI={panels:new Set(paymentLayout.panels),expanded:new Set(),columnQuery:'',loadError:''};
+Object.assign(state,{paymentDays:paymentLayout.days,paymentStatus:paymentLayout.status,paymentCategory:paymentLayout.category,paymentAttention:paymentLayout.attentionOnly});
+const paymentUI={panels:new Set(paymentLayout.panels),expanded:new Set(),columnQuery:'',loadError:'',focusLog:''};
 function savePaymentLayout(){
   // Only display preferences: never emails, purchase IDs, rows or event contents.
-  Object.assign(paymentLayout,{days:state.paymentDays,status:state.paymentStatus,category:state.paymentCategory,panels:[...paymentUI.panels].filter(id=>['monitor','log'].includes(id))});
+  Object.assign(paymentLayout,{days:state.paymentDays,status:state.paymentStatus,category:state.paymentCategory,attentionOnly:state.paymentAttention,panels:[...paymentUI.panels].filter(id=>['monitor','log'].includes(id))});
   const value=JSON.stringify(paymentLayout),encoded=encodeURIComponent(value);
   try{
     document.cookie=paymentLayoutKey+'='+encoded+'; Max-Age=31536000; Path=/admin; SameSite=Strict; Secure';
@@ -125,7 +127,7 @@ function paymentStatus(row){
   const status=Object.hasOwn(attemptStateNames,row.status)?row.status:'unknown';
   const note=row.state==='refunded'?'Vrátená':row.state==='pending'?'Overuje sa':['paid','free'].includes(row.state)&&status!=='successful'?'Čaká na webhook':'';
   const label=status==='successful'&&row.voucherCode==='free'&&row.totalCents===0?'Úspešná · zdarma':attemptStateNames[status];
-  return `<span class="status attempt-${status}" title="${escape(row.reason||'Neznáme')}">${escape(label)}</span>${note?`<small>${note}</small>`:''}`;
+  return `<span class="status attempt-${status}" title="${escape(row.reason||'Neznáme')}">${escape(label)}</span>${note?`<small>${note}</small>`:''}${row.issues?.length?`<button type="button" class="payment-issue-badge" data-payment-issues="${escape(row.id)}" title="${escape(row.issues.map(i=>i.label).join(' · '))}">! Pozornosť</button>`:''}`;
 }
 function paymentProducts(row){return [...row.products.map(id=>paymentProductNames[id]||'Neznáme'),...(row.giftGame?['Druhá hra pre ďalšiu rodinu']:[])].join(' · ')||'Neznáme';}
 function paymentProductSummary(row){
@@ -168,17 +170,23 @@ function paymentDelivery(row){
 }
 function paymentColumnMatches(id){const normalize=value=>value.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();return normalize(paymentColumns[id]).includes(normalize(paymentUI.columnQuery.trim()));}
 function paymentLogTable(logs){
-  const source={stripe:'Stripe · overené',server:'Server',browser:'Prehliadač · hlásenie'};
-  return table(['Čas','Udalosť','Zdroj','Doplnenie','Platobná relácia'],logs.map(l=>[
+  const source={stripe:'Stripe · overené',server:'Server',browser:'Prehliadač · hlásenie'},headers=['Čas','Udalosť','Zdroj','Doplnenie','Platobná relácia'];
+  if(!logs.length)return empty('Pre zvolené filtre zatiaľ nie sú žiadne záznamy.');
+  return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${logs.map(l=>`<tr data-payment-log="${escape(l.id)}" tabindex="-1" class="${paymentUI.focusLog===l.id?'is-selected-log':''}">${[
     date(l.created_at),`<strong class="payment-category-${escape(l.category)}">${escape(l.label)}</strong>`,escape(source[l.source]||'Neznáme'),
     escape([l.code,l.method!=='unknown'?paymentMethodNames[l.method]:''].filter(Boolean).join(' · ')||'Neznáme'),
     `<code class="payment-reference">${escape(l.stripe_session_id||l.attempt_id||'Neznáme')}</code>`
-  ]));
+  ].map((cell,index)=>`<td data-label="${headers[index]}">${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+function paymentAttentionEvents(d){
+  const events=d.attention?.events||[],hasLinked=d.attention?.linkedAttempts24||d.deliveries.failed||d.deliveries.delayed||d.fulfillmentDelayed||d.attention?.attemptsInPeriod;
+  return `<section class="payment-attention-events" aria-label="Konkrétne problémy"><div class="payment-attention-heading"><strong>Konkrétne problémy</strong>${hasLinked?'<button class="button secondary" type="button" id="show-payment-issues">Zobraziť dotknuté pokusy</button>':''}</div><p>Príznak pozornosti v riadku odkazuje na technické signály alebo doručenie prístupu. Výsledok platby zostáva uvedený samostatne. Udalosti bez prepojenia sú v denníku.</p>${events.length?`<ul>${events.map(l=>`<li class="payment-issue-event"><span><strong>${escape(l.label)}</strong><small>${date(l.created_at)} · ${l.linked_attempt_id?'Prepojené s nákupným pokusom':'Bez prepojenia na nákupný pokus'}</small></span>${l.linked_attempt_id?`<button class="button secondary" type="button" data-payment-issue-attempt="${escape(l.linked_attempt_id)}">Otvoriť pokus →</button>`:`<button class="button secondary" type="button" data-payment-issue-log="${escape(l.id)}" data-issue-category="${escape(l.category)}">Otvoriť udalosť →</button>`}</li>`).join('')}</ul><small>Zobrazené ${events.length} z ${d.attention.eventTotal} udalostí za posledných 24 hodín.</small>`:'<p>Ďalšie informácie poskytujú kontroly nižšie a príznaky pri dotknutých pokusoch.</p>'}</section>`;
 }
 function paymentAttemptDetail(row,d){
   const items=[...Object.entries(paymentColumns).map(([id,label])=>[label,id==='products'?escape(paymentProducts(row)):paymentCell(row,id)]),['Posledné serverové overenie',row.checkedAt==null?'Neznáme':date(row.checkedAt)]];
-  const logs=d.logs.filter(l=>l.attempt_id===row.id);
-  return `<div class="payment-attempt-detail"><dl>${items.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="payment-detail-events"><h3>Dostupné udalosti tohto pokusu</h3>${logs.length?paymentLogTable(logs):'<p>V dostupnom denníku pre toto obdobie nie sú ďalšie udalosti.</p>'}</div></div>`;
+  const issues=row.issues||[],events=(d.attention?.events||[]).filter(l=>l.linked_attempt_id===row.id);
+  const logs=d.logs.filter(l=>l.attempt_id===row.id&&!events.some(event=>event.id===l.id));
+  return `<div class="payment-attempt-detail">${issues.length?`<section class="payment-row-issues" tabindex="-1"><h3>Vyžaduje pozornosť</h3><ul>${issues.map(i=>`<li>${escape(i.label)}${i.count>1?' · '+i.count:''}${i.at?' · '+date(i.at):''}</li>`).join('')}</ul><p>Stav platby: ${escape(attemptStateNames[row.status]||'Neznáme')}. Technický signál ani chyba doručenia nemenia potvrdený výsledok platby.</p>${events.length?paymentLogTable(events):''}</section>`:''}<dl>${items.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="payment-detail-events"><h3>Dostupné udalosti tohto pokusu</h3>${logs.length?paymentLogTable(logs):'<p>V dostupnom denníku pre toto obdobie nie sú ďalšie udalosti.</p>'}</div></div>`;
 }
 function paymentColumnSettings(){
   const visible=paymentLayout.order.filter(id=>!paymentLayout.hidden.includes(id));
@@ -189,6 +197,7 @@ function paymentMonitorDisclosure(d){
   const issues=[];
   if(!d.enabled)issues.push('príjem platieb je vypnutý');
   if(d.errors24)issues.push(`technické signály: ${d.errors24}`);
+  if(d.attention?.unlinkedTechnical)issues.push(`bez pokusu: ${d.attention.unlinkedTechnical}`);
   if(d.fulfillmentDelayed)issues.push(`prístupy čakajú: ${d.fulfillmentDelayed}`);
   if(d.deliveries.failed||d.deliveries.delayed)issues.push(`problémy s e-mailom: ${d.deliveries.failed+d.deliveries.delayed}`);
   if(d.declines24)issues.push(`odmietnutia bankou: ${d.declines24}`);
@@ -198,26 +207,27 @@ function paymentMonitorDisclosure(d){
     const c=d.checks.find(c=>c.id===id);
     return [id==='stripe'?'Spojenie so Stripe':'Stripe webhook',!c?'Zatiaľ neoverené':!c.ok?'Kontrola zlyhala':d.generatedAt-c.checked_at>1800000?'Neaktuálna kontrola':'Kontrola prešla',c?.checked_at];
   })];
-  return `<details class="payment-monitor ${attention?'attention':stale?'stale':'observing'}" data-payment-panel="monitor"${paymentPanelOpen('monitor')}><summary id="payment-monitor-toggle"><span class="payment-monitor-icon" aria-hidden="true">${attention?'!':stale?'◷':'✓'}</span><span class="payment-monitor-label">${label}</span><span class="payment-monitor-brief">${escape(issues.join(' · ')||'Stripe a doručenie prístupov')}</span><span class="payment-monitor-more">Podrobnosti <span aria-hidden="true">⌄</span></span></summary><div class="payment-monitor-body">${paymentHealth(d)}<div class="payment-checks">${checks.map(([label,status,at])=>`<div><strong>${label}</strong><span>${status}</span>${at?`<small>${date(at)}</small>`:''}</div>`).join('')}</div><p>Úspech vyžaduje podpísaný webhook a serverové overenie. Zatvorenie peňaženky nepotvrdzuje zrušenie. Relácia štandardne trvá 30 minút; opustenie overuje server. Potvrdená technická chyba má prednosť pred opustením. Darčekové dve objednávky tvoria jeden pokus. Kontroly prebiehajú každých 10 minút; otvorený prehľad sa obnovuje každých 30 sekúnd. Neznáme údaje sa neodhadujú.</p></div></details>`;
+  return `<details class="payment-monitor ${attention?'attention':stale?'stale':'observing'}" data-payment-panel="monitor"${paymentPanelOpen('monitor')}><summary id="payment-monitor-toggle"><span class="payment-monitor-icon" aria-hidden="true">${attention?'!':stale?'◷':'✓'}</span><span class="payment-monitor-label">${label}</span><span class="payment-monitor-brief">${escape(issues.join(' · ')||'Stripe a doručenie prístupov')}</span><span class="payment-monitor-more">Podrobnosti <span aria-hidden="true">⌄</span></span></summary><div class="payment-monitor-body">${paymentHealth(d)}${attention?paymentAttentionEvents(d):''}<div class="payment-checks">${checks.map(([label,status,at])=>`<div><strong>${label}</strong><span>${status}</span>${at?`<small>${date(at)}</small>`:''}</div>`).join('')}</div><p>Úspech vyžaduje podpísaný webhook a serverové overenie. Zatvorenie peňaženky nepotvrdzuje zrušenie. Relácia štandardne trvá 30 minút; opustenie overuje server. Potvrdená technická chyba má prednosť pred opustením. Darčekové dve objednávky tvoria jeden pokus. Kontroly prebiehajú každých 10 minút; otvorený prehľad sa obnovuje každých 30 sekúnd. Neznáme údaje sa neodhadujú.</p></div></details>`;
 }
 function payments(d){
   const visible=paymentLayout.order.filter(id=>!paymentLayout.hidden.includes(id));
   const states=[['','Všetky',d.total],...Object.entries(attemptStateNames).filter(([id])=>id!=='unknown'||d.attemptCounts.unknown>0||state.paymentStatus==='unknown').map(([id,label])=>[id,label,d.attemptCounts[id]])];
   const rows=d.rows.map((row,index)=>{
     const expanded=paymentUI.expanded.has(row.id),detailId='payment-attempt-detail-'+index;
-    return `<tr class="payment-attempt-row ${expanded?'is-expanded':''}" data-attempt="${escape(row.id)}">${visible.map(id=>`<td data-column="${id}" data-label="${paymentColumns[id]}">${paymentCell(row,id)}</td>`).join('')}<td class="payment-expand-cell"><button type="button" id="payment-attempt-toggle-${index}" class="payment-row-toggle" data-payment-expand="${escape(row.id)}" aria-label="Detail pokusu ${escape(row.email||row.id)}" aria-expanded="${expanded}" aria-controls="${detailId}"><span aria-hidden="true">${expanded?'−':'+'}</span></button></td></tr><tr class="payment-attempt-detail-row" id="${detailId}" ${expanded?'':'hidden'}><td colspan="${visible.length+1}">${expanded?paymentAttemptDetail(row,d):''}</td></tr>`;
+    return `<tr class="payment-attempt-row ${expanded?'is-expanded':''} ${row.issues?.length?'has-payment-issues':''}" data-attempt="${escape(row.id)}">${visible.map(id=>`<td data-column="${id}" data-label="${paymentColumns[id]}">${paymentCell(row,id)}</td>`).join('')}<td class="payment-expand-cell"><button type="button" id="payment-attempt-toggle-${index}" class="payment-row-toggle" data-payment-expand="${escape(row.id)}" aria-label="${row.issues?.length?'Vyžaduje pozornosť · ':''}Detail pokusu ${escape(row.email||row.id)}" aria-expanded="${expanded}" aria-controls="${detailId}"><span aria-hidden="true">${expanded?'−':'+'}</span></button></td></tr><tr class="payment-attempt-detail-row" id="${detailId}" ${expanded?'':'hidden'}><td colspan="${visible.length+1}">${expanded?paymentAttemptDetail(row,d):''}</td></tr>`;
   }).join('');
-  const filtered=attemptStateNames[state.paymentStatus]||'Všetky stavy';
+  const filtered=state.paymentAttempt?'Vybraný pokus':state.paymentAttention?'Vyžadujú pozornosť':attemptStateNames[state.paymentStatus]||'Všetky stavy';
   return `<nav class="payment-status-strip ${states.length>7?'has-unknown':''}" aria-label="Filtrovať platby podľa stavu">${states.map(([id,label,count])=>`<button type="button" id="payment-state-${id||'all'}" class="payment-state-chip ${id?'state-'+id:''}" data-payment-state="${id}" aria-pressed="${state.paymentStatus===id}" aria-label="${label}: ${count}"><span class="payment-state-top"><strong>${count}</strong><small>${d.total?Math.round(count/d.total*100):0}%</small></span><span class="payment-state-name"><i aria-hidden="true"></i>${label}</span><progress class="payment-state-meter" max="${d.total||1}" value="${count}" aria-hidden="true"></progress></button>`).join('')}</nav>
     ${paymentMonitorDisclosure(d)}
-    <section class="payment-attempts payment-workspace density-${paymentLayout.density}" aria-label="Platobné pokusy"><div class="payment-workspace-toolbar"><div class="payment-table-heading"><h2>Pokusy <span class="count-pill">${d.matchingTotal}</span></h2><span>${escape(filtered)}</span></div><div class="payment-table-tools"><label class="sr-only" for="payment-days">Obdobie pokusov</label><select id="payment-days">${options([['1','Posledných 24 hodín'],['7','Posledných 7 dní'],['30','Posledných 30 dní'],['all','Celé obdobie']],state.paymentDays)}</select>${paymentColumnSettings()}<button id="refresh-payments" type="button" class="button secondary" aria-label="Obnoviť platby"><span aria-hidden="true">↻</span> Obnoviť</button></div></div>
+    <section class="payment-attempts payment-workspace density-${paymentLayout.density}" aria-label="Platobné pokusy"><div class="payment-workspace-toolbar"><div class="payment-table-heading"><h2>Pokusy <span class="count-pill">${d.matchingTotal}</span></h2><span>${escape(filtered)}</span>${state.paymentAttention||state.paymentAttempt?'<button class="link-button" type="button" id="clear-payment-issues">Všetky pokusy ×</button>':''}</div><div class="payment-table-tools"><label class="sr-only" for="payment-days">Obdobie pokusov</label><select id="payment-days">${options([['1','Posledných 24 hodín'],['7','Posledných 7 dní'],['30','Posledných 30 dní'],['all','Celé obdobie']],state.paymentDays)}</select>${paymentColumnSettings()}<button id="refresh-payments" type="button" class="button secondary" aria-label="Obnoviť platby"><span aria-hidden="true">↻</span> Obnoviť</button></div></div>
     ${d.rows.length?`<div class="table-wrap" id="payment-table-scroll" tabindex="0" role="region" aria-label="Tabuľka pokusov; pri väčšom počte stĺpcov posúvajte vodorovne"><table class="payment-table"><colgroup>${visible.map(id=>`<col data-payment-width="${id}">`).join('')}<col class="payment-detail-column"></colgroup><thead><tr>${visible.map(id=>`<th scope="col" data-column="${id}" data-payment-drag="${id}" draggable="true" title="Chyťte hlavičku a potiahnite ju pred alebo za iný stĺpec"><span class="payment-column-title"><span class="payment-column-grip" aria-hidden="true">⠿</span><span class="payment-column-label">${paymentColumns[id]}</span></span><span class="payment-column-resize" id="payment-column-resize-${id}" data-payment-resize="${id}" draggable="false" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Šírka stĺpca ${paymentColumns[id]}" aria-valuemin="${paymentColumnMin}" aria-valuemax="${paymentColumnMax}" title="Potiahnutím zmeníte šírku; šípky ← → menia šírku klávesnicou"></span></th>`).join('')}<th scope="col" class="payment-expand-cell"><span class="sr-only">Detail pokusu</span></th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Pre zvolené filtre zatiaľ nie sú žiadne pokusy.')}
     <div class="payment-workspace-footer"><span role="status">Zobrazené ${d.rows.length} z ${d.matchingTotal} pokusov <small>· čas Bratislava</small></span><div class="payment-load-more">${paymentUI.loadError?`<span class="payment-append-error" role="alert">${escape(paymentUI.loadError)}</span>`:''}${d.hasMore?`<button type="button" class="button secondary" id="load-more-payments" ${paymentLoadingMore?'disabled':''}>${paymentLoadingMore?'Načítavam…':paymentUI.loadError?'Skúsiť znova':'Načítať ďalších 40'} <span aria-hidden="true">↓</span></button>`:'<span class="payment-list-end">Všetky pokusy načítané</span>'}</div></div></section>
     <details class="payment-log-disclosure" data-payment-panel="log"${paymentPanelOpen('log')}><summary id="payment-log-toggle"><span>Denník udalostí</span><small>${d.logs.length} záznamov${d.errors24?' · technické signály za 24 h: '+d.errors24:''}</small><span aria-hidden="true">⌄</span></summary><div class="payment-log-body"><div class="payment-log-heading"><p>Posledných 200 dostupných udalostí vo zvolenom období. Diagnostika sa uchováva 90 dní; hlásenie prehliadača ani časový limit nepotvrdzujú zlyhanie platby.</p><label>Udalosti<select id="payment-category">${options([['','Všetky udalosti'],['technical','Technické signály'],['bank','Odmietnutia bankou'],['validation','Oprava údajov'],['customer','Kroky zákazníka'],['lifecycle','Priebeh platby']],state.paymentCategory)}</select></label></div>${paymentLogTable(d.logs)}</div></details>`;
 }
 function paymentParams(append=false){
   const params=new URLSearchParams({days:state.paymentDays,category:state.paymentCategory,status:state.paymentStatus});
-  const sameScope=paymentData&&String(paymentData.days)===state.paymentDays&&(paymentData.attemptStatus||'')===state.paymentStatus;
+  if(state.paymentAttention)params.set('attention','1');if(state.paymentAttempt)params.set('attempt',state.paymentAttempt);
+  const sameScope=paymentData&&String(paymentData.days)===state.paymentDays&&(paymentData.attemptStatus||'')===state.paymentStatus&&!!paymentData.attentionOnly===state.paymentAttention&&(paymentData.attemptId||'')===state.paymentAttempt;
   if(sameScope){
     if(append&&paymentData.nextCursor)params.set('cursor',paymentData.nextCursor);
     else if(!append&&paymentData.refreshCursor)params.set('through',paymentData.refreshCursor);
@@ -350,10 +360,26 @@ $('#view').addEventListener('change',e=>{
     paymentLayout.hidden=[...hidden];savePaymentLayout();renderPaymentWorkspace();return;
   }
   if(e.target.id==='payment-density'){paymentLayout.density=e.target.value==='comfortable'?'comfortable':'compact';savePaymentLayout();renderPaymentWorkspace();return;}
-  const paymentKeys={'payment-days':'paymentDays','payment-category':'paymentCategory'};if(paymentKeys[e.target.id]){state[paymentKeys[e.target.id]]=e.target.value;savePaymentLayout();load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
+  const paymentKeys={'payment-days':'paymentDays','payment-category':'paymentCategory'};if(paymentKeys[e.target.id]){state[paymentKeys[e.target.id]]=e.target.value;if(e.target.id==='payment-days')state.paymentAttempt='';savePaymentLayout();load();return;}const keys={'customer-state':'status','customer-sort':'sort','customer-version':'version','customer-portal':'portal'};if(keys[e.target.id]){clearTimeout(debounce);state[keys[e.target.id]]=e.target.value;state.page=1;load();}});
 $('#view').addEventListener('click',async e=>{
   if(e.target.closest('#refresh-payments')){load();return;}
-  const chip=e.target.closest('[data-payment-state]');if(chip){state.paymentStatus=chip.dataset.paymentState;savePaymentLayout();$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
+  const issueAttempt=e.target.closest('[data-payment-issue-attempt]');
+  if(issueAttempt){
+    const id=issueAttempt.dataset.paymentIssueAttempt;
+    Object.assign(state,{paymentDays:'all',paymentStatus:'',paymentAttention:false,paymentAttempt:id});paymentUI.expanded.add(id);savePaymentLayout();
+    await load();if(state.paymentAttempt===id)focusPaymentIssues(id);return;
+  }
+  const issueLog=e.target.closest('[data-payment-issue-log]');
+  if(issueLog){
+    const id=issueLog.dataset.paymentIssueLog;paymentUI.focusLog=id;paymentUI.panels.add('log');
+    state.paymentDays='all';state.paymentCategory=issueLog.dataset.issueCategory;savePaymentLayout();await load();
+    const row=[...document.querySelectorAll('.payment-log-body [data-payment-log]')].find(el=>el.dataset.paymentLog===id);
+    if(row){row.focus({preventScroll:true});row.scrollIntoView({block:'center'});}return;
+  }
+  if(e.target.closest('#show-payment-issues')){Object.assign(state,{paymentDays:'all',paymentStatus:'',paymentAttention:true,paymentAttempt:''});savePaymentLayout();await load();$('.payment-workspace')?.scrollIntoView({block:'start'});return;}
+  if(e.target.closest('#clear-payment-issues')){state.paymentAttention=false;state.paymentAttempt='';savePaymentLayout();load();return;}
+  const issue=e.target.closest('[data-payment-issues]');if(issue){paymentUI.expanded.add(issue.dataset.paymentIssues);renderPaymentWorkspace();focusPaymentIssues(issue.dataset.paymentIssues);return;}
+  const chip=e.target.closest('[data-payment-state]');if(chip){state.paymentStatus=chip.dataset.paymentState;state.paymentAttention=false;state.paymentAttempt='';savePaymentLayout();$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
   const expand=e.target.closest('[data-payment-expand]');if(expand){const id=expand.dataset.paymentExpand;if(paymentUI.expanded.has(id))paymentUI.expanded.delete(id);else paymentUI.expanded.add(id);renderPaymentWorkspace();return;}
   const move=e.target.closest('[data-payment-move]');if(move){movePaymentColumn(move.dataset.paymentMove,Number(move.dataset.step));return;}
   if(e.target.closest('#reset-payment-layout')){paymentLayout=defaultPaymentLayout();paymentUI.columnQuery='';savePaymentLayout();syncPaymentShell();renderPaymentWorkspace();return;}
@@ -372,6 +398,10 @@ $('#view').addEventListener('click',async e=>{
   const id=++detailId;$('#detail-content').innerHTML='<h2 id="detail-title">Detail zákazníka</h2><p>Načítavam…</p>';$('#detail').showModal();
   try{const data=await api('/api/admin/customers/'+encodeURIComponent(button.dataset.customer));if(id===detailId)$('#detail-content').innerHTML='<h2 id="detail-title">Detail zákazníka</h2>'+detail(data);}catch(error){if(id===detailId)$('#detail-content').innerHTML='<h2 id="detail-title">Detail zákazníka</h2>'+empty(error.message);}
 });
+function focusPaymentIssues(id){
+  const row=[...document.querySelectorAll('[data-attempt]')].find(el=>el.dataset.attempt===id),detail=row?.nextElementSibling?.querySelector('.payment-row-issues');
+  if(detail){detail.focus({preventScroll:true});detail.scrollIntoView({block:'nearest'});}
+}
 function movePaymentColumn(id,step){
   const from=paymentLayout.order.indexOf(id),to=from+step;
   if(from<0||to<0||to>=paymentLayout.order.length)return;
