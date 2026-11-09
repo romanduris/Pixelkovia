@@ -58,7 +58,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   // Guardy's separate close action still saves without finishing the whole game.
   const finishRequests=[];page.on('request',r=>{if(new URL(r.url()).pathname==='/api/customer/finish')finishRequests.push(r.url());});
   const stubClose=()=>page.evaluate(()=>{window.__closeCalls=0;window.close=()=>window.__closeCalls++;});
-  await page.goto(server.url+'/hra?signal=guardy');await page.locator('#answer').fill('5817264');await page.locator('.answer-form button').tap();await page.locator('.guardy-result').waitFor();
+  await page.goto(server.url+'/hra?signal=guardy');await page.locator('#answer').fill('3615724');await page.locator('.answer-form button').tap();await page.locator('.guardy-result').waitFor();
   await stubClose();
   await page.route('**/api/customer/sync',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Dočasný výpadok ukladania.'})}));
   await page.locator('[data-action="close-window"]').tap();await page.getByRole('button',{name:/Dočasný výpadok ukladania/}).waitFor();

@@ -4,7 +4,7 @@ for(const key of ['before','after']){
  const bytes=fs.readFileSync('books-content/'+key+'.json');assert.equal(hash(bytes),manifest.books[key].contentSha256,'unaltered full authored text');const b=JSON.parse(bytes);
  assert.equal(b.stories.length,3);assert.deepEqual(b.stories.map(s=>s.paragraphs.length),manifest.books[key].paragraphs);
  assert.ok(b.intro.length>=2);assert.ok(b.stories.every(s=>s.paragraphs.length>=15));
- for(const s of b.stories)assert(!/741296|5817264|\bSVETLO\b|signal=|QR kód|nájdite.*(?:gauč|chladničk)/.test(s.paragraphs.join(' ')),'no actual puzzle instructions/answers');
+ for(const s of b.stories)assert(!/741296|3615724|5817264|\bSVETLO\b|signal=|QR kód|nájdite.*(?:gauč|chladničk)/.test(s.paragraphs.join(' ')),'no actual puzzle instructions/answers');
  const publicHtml=fs.readFileSync('dist/funnel/book-'+key+'-sample.html','utf8');
  for(const s of b.stories)for(const p of s.paragraphs.slice(2))assert.ok(!publicHtml.includes(p),'sample is not the full story');
  assert.ok(!fs.existsSync('dist/funnel/book-'+key+'.html'));for(let i=1;i<=3;i++)assert.ok(!fs.existsSync(`dist/funnel/assets/books/${key}-${i}.webp`));

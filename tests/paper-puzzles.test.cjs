@@ -29,19 +29,22 @@ assert.equal(destination,'CHLADNIČKA');
 assert.equal(game.stages[5].answer.length,0,'P5 no longer verifies any phone answer');assert.ok(game.stages[5].solution.includes(destination));assert.match(sheets.p6,/guardy-qr.svg/);
 assert.ok(!sheets.p5.includes('CHLADNIČKA')&&!sheets.p5.includes('class="maze"'),'paper requires phone rewards instead of printing the answer or old maze');
 assert.match(game.stages[6].parent,/chladničky/);assert.match(game.stages[7].parent,/pod gauč/);
-// Match repairs by coverage, then independently decode their printed digits.
+// Match repairs by coverage, then read the repair numbers in row order.
 const seals=game.paperPuzzles.seals,solved=[],rejected=[];
 for(const row of seals.rows){
  const choices=seals.repairs.flatMap((mask,index)=>Array.from(mask).every((bit,i)=>Number(bit)+Number(row.mask[i])===1)?[index]:[]);
  assert.ok(choices.length<=1,'a seal must have at most one exact repair');
- if(choices.length)solved.push([choices[0],row.digit]);else rejected.push(row);
+ if(choices.length)solved.push(choices[0]+1);else rejected.push(seals.rows.indexOf(row)+1);
 }
 assert.equal(rejected.length,2);assert.equal(solved.length,7);
-assert.equal(solved.map(row=>row[1]).join(''),'5817264','valid messages directly form the code from top to bottom');
-assert.notDeepEqual(solved.map(row=>row[0]),[0,1,2,3,4,5,6],'repair numbers identify matches without dictating the reading order');
+assert.equal(solved.join(''),'3615724','written repair numbers form the code from top to bottom');
+assert.deepEqual(rejected,[3,7],'only the third and seventh signals cannot be repaired');
+assert.match(sheets.p6,/POZOR: Dva signály sa nepodarí opraviť/);
+assert.doesNotMatch(sheets.p6,/seal-digit|ČÍSLICA|Číslice pri opravených/,'no competing preprinted digits');
 assert.doesNotMatch(sheets.p6,/peča[ťt]|pečat|seal-code-slot|seal-code-boxes/i,'no seal terminology or result transcription on the player sheet');
-assert.equal(new Set(solved.map(row=>row[0])).size,7,'every repair is used exactly once');
-assert.ok(game.stages[6].answer.includes('5817264'));
+assert.equal(new Set(solved).size,7,'every repair is used exactly once');
+assert.equal(game.stages[6].answer[0],solved.join(''));
+assert.ok(game.stages[6].answer.includes('5817264'),'previously printed worksheets remain playable');
 assert.ok(!sheets.p6.includes('POD GAUČ'),'the hiding place is only revealed after verification');
 assert.equal((sheets.p6.match(/class="seal-row"/g)||[]).length,9);
 // Independently decode the ordered pairs into the single final return sign.
@@ -61,4 +64,4 @@ assert.equal(game.stages[6].reward,'');assert.equal(game.stages[7].finalLetter,'
 assert.equal(game.stages[7].answer[0],'SVETLO');
 assert.deepEqual([...Array.from(game.stages.slice(1,6),s=>s.reward),game.stages[7].finalLetter],['S','V','E','T','L','O']);
 assert.equal(Object.keys(sheets).join(','),'p1,p2,p3,p4,p5,p6,p7,diplom');
-console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, nine messages read top to bottom → 5817264, one 9x9 pair grid → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');
+console.log('PASS: 12 repairs and unique 14-bridge delivery route → POSTELI, no phone check on P4, bed clue with QR, seven repair numbers → 3615724, two rejected signals, legacy worksheet compatibility, one 9x9 pair grid → O, collected letters → SVETLO, seven paper sheets and preserved rewards.');

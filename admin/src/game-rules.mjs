@@ -64,12 +64,13 @@ export const stages = [
     "stage": 6,
     "title": "Guardy – Poškodené správy",
     "answers": [
+      "3615724",
       "5817264"
     ],
     "digital": false,
     "hints": [
-      "Čierne políčka opravy presne zaplnia biele políčka poškodenej správy. Vzory neotáčajte; dve správy nemajú vhodnú opravu.",
-      "Prvú správu s číslicou 5 doplní oprava 3. Správy s 9 a 0 prečiarknite. Zostávajúce číslice čítajte zhora nadol; nič neprepisujte ani nepreskupujte."
+      "Čierne políčka opravy musia presne zaplniť biele políčka signálu. Vzory neotáčajte. POZOR: Dva signály sa nepodarí opraviť — prečiarknite ich.",
+      "Prvý signál doplní oprava 3: do políčka napíšte 3. Tretí a siedmy signál prečiarknite. Dopísané čísla opráv čítajte zhora nadol — to je kód."
     ]
   },
   {

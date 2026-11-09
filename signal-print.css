@@ -471,9 +471,10 @@
 .seal-section-heading>span{font:9px monospace;color:#526b83}
 .seal-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .seal-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border:1px solid #a7b9cd;background:#fff;break-inside:avoid}
-.seal-digit-block,.seal-order-block{display:flex;flex-direction:column;align-items:center;gap:4px}
+.seal-order-block{display:flex;flex-direction:column;align-items:center;gap:4px}
 .seal-row small{font:7px monospace;color:#526b83;letter-spacing:.2px}
-.seal-digit{font:700 22px monospace;color:#172e4d}
+.seal-match-arrow{font-size:20px;color:#526b83}
+.seal-warning{border-left:3px solid #234c71;padding:6px 8px;background:#edf3fa}
 .seal-order{display:block;width:25px;height:25px;border:1px solid #536b78;background:white}
 .seal-answer{display:flex;align-items:center;justify-content:space-between;gap:15px;border:1px solid #a7b9cd;padding:12px}
 .seal-party-scene,.final-party-scene{min-width:0;margin:0;align-self:start}
@@ -509,8 +510,7 @@
  #p6 .seal-list{gap:2mm}
  #p6 .seal-row{padding:2mm;gap:2mm}
  #p6 .seal-row small{font-size:5.5pt}
- #p6 .seal-digit-block,#p6 .seal-order-block{gap:1mm}
- #p6 .seal-digit{font-size:14pt}
+ #p6 .seal-order-block{gap:1mm}
  #p6 .seal-order{width:6mm;height:6mm}
  #p6 .seal-section-heading>span{font-size:6pt}
  #p6 .seal-answer{padding:2mm 3mm;margin:2mm 0}

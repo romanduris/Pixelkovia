@@ -22,7 +22,7 @@ const engines={chromium,webkit};
    }
    async function solve(page){
     await page.goto(BASE+'/game.html?signal=guardy');
-    await page.locator('#answer').fill('5817264');
+    await page.locator('#answer').fill('3615724');
     await page.locator('button[type="submit"]').tap();
     await page.locator('.signal-stage-result').waitFor();
    }
@@ -38,7 +38,7 @@ const engines={chromium,webkit};
    assert.deepEqual(Buffer.from(await media.body()),fs.readFileSync('assets/Guardy.mp3'),'browser receives the actual new recording');
    await p.locator('#answer').fill('000000');await p.locator('button[type="submit"]').tap();
    assert.ok(await p.locator('#guardy-audio').evaluate(a=>a.paused&&a.currentTime===0),'preloading never plays the message before a correct code');
-   await p.locator('#answer').fill('5817264');await p.locator('button[type="submit"]').tap();
+   await p.locator('#answer').fill('3615724');await p.locator('button[type="submit"]').tap();
    await playing(p,.2);
    assert.equal(await p.locator('[data-action="guardy-audio-toggle"]').innerText(),'Ⅱ Pozastaviť');
    await p.screenshot({path:`/tmp/guardy-audio-${engine}.png`});
@@ -79,7 +79,7 @@ const engines={chromium,webkit};
     document.addEventListener('submit',()=>window.guardySubmitted=performance.now(),{capture:true,once:true});
     preloadedGuardy.addEventListener('playing',()=>window.guardyStartMs=performance.now()-window.guardySubmitted,{once:true});
    });
-   await warm.page.locator('#answer').fill('5817264');await warm.page.locator('button[type="submit"]').tap();
+   await warm.page.locator('#answer').fill('3615724');await warm.page.locator('button[type="submit"]').tap();
    await playing(warm.page,.1);
    const startup=await warm.page.evaluate(()=>({ms:window.guardyStartMs,samePlayer:window.preloadedGuardy===document.querySelector('audio')}));
    assert.ok(startup.samePlayer,'the buffered player survives the screen transition');

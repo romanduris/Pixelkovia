@@ -301,17 +301,18 @@ window.GAME = {
       ],
       "reward": "",
       "answer": [
+        "3615724",
         "5817264"
       ],
       "placeholder": "Sedemmiestny kód",
       "action": "Nájdite v chladničke indíciu označenú Úloha 6. Naskenujte QR na nájdenom liste.",
-      "task": "Opravte správy pomocou kľúča na papieri. Dve správy bez vhodnej opravy prečiarknite. Číslice pri opravených správach prečítajte zhora nadol a vzniknutý sedemmiestny kód zadajte do telefónu.",
-      "materials": "Úloha 6: sedem očíslovaných opráv a deväť správ s číslicami pod sebou. Dve správy sa nedajú opraviť. Kód vznikne čítaním číslic pri opravených správach zhora nadol, bez prepisovania. Posledná indícia je samostatne pod gaučom; miesto prezradí až správa po overení.",
-      "mobile": "Overí kód 5817264 na číselnej klávesnici. Potom správa ochrancu prezradí úkryt pod gaučom. Nahovorenie je pripravené; kým nahrávka nie je dodaná, je dostupný jej text.",
-      "solution": "Opravy presne dopĺňajú biele políčka bez prekrývania. Správy s 9 a 0 sa nedajú opraviť a prečiarknu sa. Číslice pri opravených správach zhora nadol: 5, 8, 1, 7, 2, 6, 4 → 5817264. Úkryt POD GAUČ prezradí až správa po overení.",
+      "task": "Ku každému signálu nájdite opravu a dopíšte jej číslo do políčka. POZOR: Dva signály sa nepodarí opraviť — prečiarknite ich. Vyplnené políčka čítajte zhora nadol a sedemmiestny kód zadajte do telefónu.",
+      "materials": "Úloha 6: sedem očíslovaných opráv a deväť poškodených signálov. Deti dopíšu čísla opráv do políčok, dva neopraviteľné signály prečiarknu. Dopísané čísla čítajú zhora nadol. Posledná indícia je pod gaučom; miesto prezradí až správa po overení.",
+      "mobile": "Overí kód 3615724 z čísel použitých opráv. Potom správa ochrancu prezradí úkryt pod gaučom. Pre staršie vytlačené listy prijíma aj pôvodný kód 5817264.",
+      "solution": "Opravy presne dopĺňajú biele políčka bez prekrývania. Zhora nadol dopíšte čísla opráv: 3, 6, prečiarknuť, 1, 5, 7, prečiarknuť, 2, 4. Tretí a siedmy signál sa nedajú opraviť. Vyplnené políčka tvoria kód 3615724. Úkryt POD GAUČ prezradí až správa po overení.",
       "hints": [
-        "Čierne políčka opravy presne zaplnia biele políčka poškodenej správy. Vzory neotáčajte; dve správy nemajú vhodnú opravu.",
-        "Prvú správu s číslicou 5 doplní oprava 3. Správy s 9 a 0 prečiarknite. Zostávajúce číslice čítajte zhora nadol; nič neprepisujte ani nepreskupujte."
+        "Čierne políčka opravy musia presne zaplniť biele políčka signálu. Vzory neotáčajte. POZOR: Dva signály sa nepodarí opraviť — prečiarknite ich.",
+        "Prvý signál doplní oprava 3: do políčka napíšte 3. Tretí a siedmy signál prečiarknite. Dopísané čísla opráv čítajte zhora nadol — to je kód."
       ],
       "parent": "Vytlačenú indíciu k úlohe 6 dajte do chladničky na miesto, kam deti ľahko dosiahnu. Označte Úloha 6. Vytlačenú indíciu k úlohe 7 ukryte samostatne pod gauč na dosah ruky.",
       "transition": "Správny číselný kód obnoví bezpečnú cestu. Správa ochrancu pošle deti pod gauč po poslednú indíciu.",
@@ -321,8 +322,7 @@ window.GAME = {
       "narrative": {
         "before": [
           "Ahojte! Som ochranný štít. Strážim cestu medzi obrazovkami a chránim kamarátov, aby sa všetci bezpečne dostali domov.",
-          "Konečne počujem celú partiu! Cestu domov otvorí overovací kód. Správy s kódom sa však pri výpadku poškodili.",
-          "Ku každej správe nájdite opravu. Dve bez opravy prečiarknite. Číslice pri opravených správach čítajte zhora nadol. Ich kód otvorí cestu domov."
+          "Konečne počujem celú partiu! Cestu domov otvorí overovací kód. Správy s kódom sa však pri výpadku poškodili."
         ],
         "after": [
           "Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!",
@@ -1122,40 +1122,31 @@ window.GAME = {
       ],
       "rows": [
         {
-          "mask": "111000",
-          "digit": "5"
+          "mask": "111000"
         },
         {
-          "mask": "000111",
-          "digit": "8"
+          "mask": "000111"
         },
         {
-          "mask": "011010",
-          "digit": "9"
+          "mask": "011010"
         },
         {
-          "mask": "101100",
-          "digit": "1"
+          "mask": "101100"
         },
         {
-          "mask": "010011",
-          "digit": "7"
+          "mask": "010011"
         },
         {
-          "mask": "110010",
-          "digit": "2"
+          "mask": "110010"
         },
         {
-          "mask": "101001",
-          "digit": "0"
+          "mask": "101001"
         },
         {
-          "mask": "001101",
-          "digit": "6"
+          "mask": "001101"
         },
         {
-          "mask": "100101",
-          "digit": "4"
+          "mask": "100101"
         }
       ]
     }

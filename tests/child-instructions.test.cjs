@@ -14,7 +14,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8080',KEY='zahada-v1-progress
   assert.doesNotMatch(await page.locator('.signal-content').innerText(),/pod gauč/i,'the hiding place is secret before verification');
   await page.locator('#answer').fill('1111111');await page.locator('.answer-form button').tap();
   assert.equal(await page.locator('.guardy-message').count(),0,'a wrong code does not reveal the message');
-  await page.locator('#answer').fill('5817264');await page.locator('.answer-form button').tap();
+  await page.locator('#answer').fill('3615724');await page.locator('.answer-form button').tap();
   assert.equal(await page.locator('.signal-reward').count(),0,'the last letter belongs to task 7');
   assert.doesNotMatch(await page.locator('.signal-content').innerText(),/pod gauč/i,'the closed message does not reveal the hiding place');
   await page.locator('.guardy-message summary').tap();
