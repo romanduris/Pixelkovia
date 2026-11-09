@@ -11,7 +11,7 @@ Rodičovský portál označuje prípravnú časť „Príprava na hru“. Po spu
 
 Spustenie novej hry otvorí skrátenú úvodnú správu (61 namiesto 87 slov). Pôvodné video sa počas čítania potichu načíta a spustí sa ťuknutím na „Prehrať Pikovu správu“. Úvod neprepína dokument na celú obrazovku ani na pozadí neotvára kúpeľňový kód. Prehratie, návrat do portálu a obnovenie stránky zachovajú nedokončený úvod; prvú úlohu otvorí až QR z pracovného listu. Ovládanie videa rozlišuje načítavanie, prehrávanie, pauzu, opakovanie a chybu s možnosťou opätovného načítania. Obnovenie stránky samo nespúšťa zvuk.
 
-Tlačidlo „Koniec hry“ v závere uloží ukončenie a otvorí hodnotenie v rodičovskom portáli aj pri chýbajúcom zázname úlohy alebo chybe synchronizácie. Počet vyriešených úloh vychádza zo skutočne uložených záznamov; ukončenie nedopĺňa chýbajúce riešenia. Chyba samotného ukončenia ponechá možnosť skúsiť ho znova. Zatvorenie okna po jednotlivej úlohe iba uloží postup. Autorizácia nákupu a herného telefónu zostáva povinná.
+Dohratie záverečného videa automaticky uloží dokončenie hry a označí „Cieľ“ v administrácii. Rozlúčka zostane otvorená; tlačidlo „Koniec hry“ potom otvorí hodnotenie v rodičovskom portáli. Odchod pred koncom videa nechá hru aktívnu. Posledný herný postup sa odošle spolu s dokončením aj pri výpadku samostatnej synchronizácie. Neúspešný zápis zostane uložený na opakovanie pri návrate internetu alebo obnovení stránky; prehratie videa znova neposúva čas dokončenia ani opakovania. Chýbajúce vyriešené úlohy sa nevymýšľajú. Autorizácia nákupu a herného telefónu zostáva povinná.
 
 ## Zostavenie a nasadenie
 
@@ -69,7 +69,7 @@ Mobilný test portálu overuje dotykové ovládanie pri 320/360/390/430 px, desk
 
 Predvolené testy používajú Chromium; `QA_BROWSER=webkit` volí WebKit. Dňa 28. 10. 2026 prešla celá cesta aj platobné scenáre v oboch prehliadačoch. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Checkout kontroluje šírky 360, 390, 430 a 1360 px, ceny, návrat k objednávke a chybové stavy s riadenou náhradou Stripe SDK. Testy nevytvárajú produkčných zákazníkov ani platby; neoverujú fyzické zariadenie, banku ani doručenie skutočného e-mailu. Prístupové údaje fixture zostávajú v testovacom procese.
 
-Dňa 2. 11. 2026 v Chromium prešli `customer-journey`, `finale-recovery`, `cipko-mobile-fit` a `supervisor-mobile`, vrátane mobilných obrazoviek a výpadkov pri ukončení hry. Opätovné overenie vo WebKit 27.2 (Playwright 1.64.1) v tomto Codespace zablokoval pád stránky, reprodukovaný aj na `data:text/html,<h1>ok</h1>` bez kódu aplikácie. Tieto kontroly preto nepotvrdzujú aktuálny výsledok na iPhone/Safari.
+Dňa 9. 11. 2026 prešlo všetkých 82 backendových testov, `finale-recovery` v mobilnom Chromium aj WebKit a `customer-journey` v Chromium. Kontroly používajú skutočné záverečné MP4 a overujú automatické dokončenie po dohraní, odchod pred koncom, výpadok zápisu, opakovanie po obnovení stránky, stav v administrácii a nemenný čas dokončenia pri opakovanom prehratí.
 
 ## QR a tlač
 

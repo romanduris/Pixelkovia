@@ -32,7 +32,10 @@ export async function syncRun(db,run,input){
   await db.batch(batch);
   return publicRun(db,run.id);
 }
-export async function finishRun(db,run){return gameEvent(db,run,{type:'complete',eventId:'finish-'+run.id});}
+export async function finishRun(db,run,input={}){
+  if(run.status==='active'&&input.progress!==undefined)await syncRun(db,run,{progress:input.progress,visible:false});
+  return gameEvent(db,run,{type:'complete',eventId:'finish-'+run.id});
+}
 export async function feedback(db,customerId,input){
   if(!Number.isInteger(input.stars)||input.stars<1||input.stars>5||typeof input.comment!=='string'||input.comment.length>2000)throw new HttpError(400,'Vyberte 1 až 5 hviezdičiek a najviac 2 000 znakov.');
   const run=await first(db,`SELECT r.id FROM game_runs r JOIN entitlements e ON e.id=r.entitlement_id WHERE r.id=? AND e.customer_id=? AND r.status='completed'`,input.runId,customerId);

@@ -10,7 +10,7 @@ Existujúci Worker `treasurequest-admin` spravuje pôvodnú produkčnú D1 `trea
 - `/api/customer/login` a `/logout`: prihlasovanie e-mailom a heslom daného nákupu. Opakované nákupy jedného e-mailu majú nezávislé zákaznícke ID a heslá.
 - `/api/customer/portal`, `/library`, `/checklist`: materiály, oprávnenia, knižnica a tri kroky prípravy. Zobrazenie portálu ani stiahnutie PDF hru neaktivujú.
 - `/api/customer/activate`, `/launch-context`: vedomý štart na hernom telefóne, kontrola prípravy a serverového tokenu zariadenia.
-- `/api/customer/sync`, `/finish`, `/feedback`: postup z pôvodného hráča, ukončenie hry a hviezdičky s komentárom. Ukončenie toleruje chýbajúce záznamy úloh a nedopĺňa im vyriešenie; opakované ukončenie nepredlžuje čas opakovania. Telemetria nevytvára nákupné oprávnenia.
+- `/api/customer/sync`, `/finish`, `/feedback`: postup z hráča, automatické dokončenie po dohraní záverečného videa a hviezdičky s komentárom. Endpoint `/finish` prijíma aj posledný validovaný herný postup, aby sa posledná úloha nestratila pri výpadku samostatnej synchronizácie. Ukončenie toleruje chýbajúce záznamy úloh a nedopĺňa im vyriešenie; opakované ukončenie nepredlžuje čas opakovania. Telemetria nevytvára nákupné oprávnenia.
 - `/api/checkout/config`, `/session`, `/status`: serverom nacenený vložený Stripe Checkout s povinným e-mailom a overeným stavom objednávky.
 - `/api/stripe/webhook`: podpis Stripe, overenie zaplatenej relácie, idempotentné vytvorenie prístupu a doručovacia fronta.
 

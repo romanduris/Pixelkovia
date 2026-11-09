@@ -75,6 +75,7 @@
   function bindFinaleVideo(autoplay=false){
     const video=app.querySelector('#finale-video'),button=app.querySelector('[data-action="finale-video-toggle"]'),status=app.querySelector('#finale-video-status');
     if(!video||!button||!status)return;
+    updateFinaleCompletion();
     const events=new AbortController();video.finaleEvents=events;
     const listen=(name,handler)=>video.addEventListener(name,handler,{signal:events.signal});
     const endTitle=app.querySelector('.finale-end-title'),frame=video.parentElement;
@@ -87,6 +88,7 @@
     listen('waiting',()=>{status.textContent='Video sa načítava…';});
     listen('pause',()=>{if(!video.finaleStarting&&!video.ended&&!video.error){playback('paused','▶');button.textContent='▶ Pokračovať v rozlúčke';status.textContent='Video je pozastavené.';}});
     listen('ended',()=>{playback('ended','↻');button.textContent='↻ Prehrať rozlúčku znova';status.textContent='Video dohralo. Môžete si ho prehrať znova.';
+      if(!preview){save();window.PIXELKOVIA_COMPLETE?.().catch(()=>{});}
       hideEnd();
       finaleEndTimer=setTimeout(()=>{finaleEndTimer=null;if(video.isConnected&&video.ended&&!video.error&&endTitle)endTitle.hidden=false;},1000);
     });
@@ -123,6 +125,14 @@
       },1000);
     }
   }
+  function updateFinaleCompletion(){
+    const button=app.querySelector('.finale-exit'),completion=window.PIXELKOVIA_COMPLETION;
+    if(!button||!completion||preview)return;
+    button.disabled=completion.status==='saving';
+    button.textContent=completion.status==='saving'?'Ukladám dokončenie…':completion.status==='failed'?completion.error+' · Skúsiť znova':'Koniec hry';
+    button.setAttribute('aria-live','polite');
+  }
+  window.addEventListener('pixelkovia-completion',updateFinaleCompletion);
   function atlasInvitation(t){return `<section class="atlas-invitation">${sprite('piko')}<span class="section-kicker">PIKOV DARČEK PRE VÁŠ TÍM</span>${t.invitation.map(line=>line==='[OBJAVIŤ TAJNÝ SVET PIXELKOV]'?'<a class="btn atlas-cta" href="atlas.html" target="_blank" rel="noopener">OBJAVIŤ TAJNÝ SVET PIXELKOV ↗</a>':lineHTML(line)).join('')}</section>`;}
   function landing(){return SITE_CONTENT.sales({sprite});}
   const checklist = PREP_STORE.steps;

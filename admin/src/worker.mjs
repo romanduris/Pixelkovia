@@ -53,7 +53,7 @@ async function customerApi(request,env,path){
   const runId=params.get('run')||input?.runId,token=request.headers.get('cookie')?.match(/(?:^|;\s*)__Host-tq-run=([a-f0-9]{64})(?:;|$)/)?.[1];
   const run=await requireRun(db,id,runId,token);
   if(path==='/api/customer/sync'&&request.method==='POST')return json(await syncRun(db,run,input));
-  if(path==='/api/customer/finish'&&request.method==='POST')return json(await finishRun(db,run));
+  if(path==='/api/customer/finish'&&request.method==='POST')return json(await finishRun(db,run,input));
   if(path==='/api/customer/progress'&&request.method==='GET')return json(await publicRun(db,run.id));
   if(path==='/api/customer/events'&&request.method==='POST'){
     if(!['opened','heartbeat','hint'].includes(input.type))throw new HttpError(400,'Tento výsledok môže potvrdiť iba server.');
