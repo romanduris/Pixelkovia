@@ -135,7 +135,7 @@ body[data-environment="sales"]>.site-footer{max-width:1320px;padding:22px 56px;b
 .review-identity{min-width:0}.funnel-section .review-author{font:700 14px/1.4 Manrope,sans-serif;color:#f4f1e9;margin:0}.review-origin{display:block;color:#9fb7bd;font:11px/1.5 'DM Sans',sans-serif}
 .review-stars{display:block;width:fit-content;margin-top:13px;font-size:19px;letter-spacing:1px;color:#edcf8c;line-height:1.2;white-space:nowrap}
 .review-card blockquote{margin:12px 0 0}.funnel-section .review-card blockquote p{font-size:14px;line-height:1.7;color:#e4ebe7;margin:0}
-.funnel-reviews .review-context{font-size:14px;line-height:1.6;color:#b7c6d8;margin:12px 0 0}
+.funnel-reviews .review-context{font-size:14px;line-height:1.6;color:#b7c6d8;margin:12px auto 0;text-align:center}
 .review-counter{font:12px/1.5 Manrope,sans-serif;color:#bedccb;min-width:62px;text-align:center}
 .review-gallery .family-gallery-controls{margin-top:12px}
 .review-gallery-track:focus-visible{outline:2px solid #cab5f4;outline-offset:3px}
