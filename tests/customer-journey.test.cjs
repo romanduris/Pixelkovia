@@ -35,7 +35,12 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
     for(const width of [320,390]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Guardy code entry fits '+width+'px');await page.screenshot({path:'/tmp/guardy-repair-entry-'+engine.name()+'-'+width+'.png'});}
     await page.locator('#answer').fill('1111111');await page.locator('.answer-form button').click();await page.locator('.feedback:not(:empty)').waitFor();assert.equal(await page.locator('.guardy-result').count(),0,'a wrong repair code keeps the message locked');
     await page.locator('#answer').fill('3615724');await page.locator('.answer-form button').click();await page.locator('.guardy-result').waitFor();
-    await page.goto(server.url+'/hra?signal=navrat');await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').click();await page.locator('.finale-exit').waitFor();
+    await page.goto(server.url+'/hra?signal=navrat');
+    const password=page.locator('#answer');assert.equal(await password.getAttribute('autocapitalize'),'characters');assert.equal(await password.getAttribute('autocorrect'),'off');
+    await password.pressSequentially('sveo');await password.evaluate(el=>el.setSelectionRange(3,3));await password.pressSequentially('tl');assert.equal(await password.inputValue(),'SVETLO','lowercase typing and editing in the middle stay uppercase without moving the cursor');
+    await password.fill('sVeTlO');assert.equal(await password.inputValue(),'SVETLO','replacement text is normalized too');
+    await page.screenshot({path:'/tmp/return-uppercase-'+engine.name()+'.png'});
+    await page.locator('.answer-form button').click();await page.locator('.finale-exit').waitFor();
     await page.locator('.finale-exit').click();await page.waitForURL('**/Supervisor#hodnotenie');await page.locator('#game-feedback').waitFor();assert.equal(await page.locator('.task-progress .done').count(),7);
     await page.locator('[name="stars"][value="5"]').check({force:true});await page.locator('#feedback-comment').fill('Výborné spoločné dobrodružstvo.');await page.locator('#game-feedback button').click();await page.getByText('✓ Ďakujeme za vaše hodnotenie!').waitFor();
     await page.goto(server.url+'/admin');await page.waitForURL('**/admin/login');await page.locator('#password').fill(server.adminPassword);await page.locator('#login-button').click();await page.waitForURL('**/admin');await page.locator('#view[aria-busy="false"]').waitFor();assert.equal(await page.locator('#notice').textContent(),'');
