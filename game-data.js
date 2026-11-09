@@ -87,8 +87,8 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Miky, malý mikrofón zo sveta Pixelkov. Mikrofón zachytáva zvuky, aj také tiché, ktoré si ostatní nevšimnú. Počúvam signály a dávam kamarátom vedieť, keď niekto potrebuje pomoc.",
-          "Dnes však obrazovky zablikali a spojenie sa prerušilo. Prestal som počuť ostatných a Piko ma nepočuje. Našťastie sa mi podarilo zachrániť šesť záznamov posledného signálu. Na každom zostal dátum, čas a jedna číslica.",
+          "Ahojte! Ja som Miky, malý mikrofón zo sveta Pixelkov. Zachytávam aj tiché zvuky, ktoré si ostatní nevšimnú. Kamarátom dávam vedieť, keď niekto potrebuje pomoc.",
+          "Obrazovky zablikali a spojenie sa prerušilo. Nepočujem kamarátov ani oni mňa. Zachránil som šesť záznamov posledného signálu. Na každom je dátum, čas a číslica.",
           "Pomôžete mi obnoviť spojenie?"
         ],
         "after": [
@@ -138,9 +138,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Pixi, malý svietiaci pixel. Obrázky na televízore, tablete aj telefóne sa skladajú z miliónov maličkých svetielok. Hovoríme im pixely a práve o ne sa starám ja!",
-          "Po záhadnom bliknutí niektoré svetielka zhasli. Už som však zachytila správu, že Miky našiel Pika. Pri hľadaní ostatných som objavila odkaz od Plugyho, ktorý spája naše digitálne cestičky. Pri výpadku sa všetky písmená posunuli a správe nerozumiem.",
-          "Pomôže nám môj dekódovací stroj! Pomocou kruhov rozlúštite správu a choďte podľa nej hľadať ďalšiu indíciu."
+          "Ahojte! Ja som Pixi, malý svietiaci pixel. Obrázky na televízore, tablete aj telefóne tvoria milióny svetielok — pixelov. Práve o ne sa starám!",
+          "Po záhadnom bliknutí niektoré svetielka zhasli. Už viem, že Miky našiel Pika. Objavila som odkaz od Plugyho, ktorý spája digitálne cestičky. Pri výpadku sa však písmená posunuli a správe nerozumiem.",
+          "Pomôže nám môj dekódovací stroj! Pomocou kruhov rozlúštite správu a nájdite ďalšiu indíciu."
         ],
         "after": []
       },
@@ -181,8 +181,8 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Plugy, malý živý konektor. Mám krátke káblikové ruky a spájam digitálne cestičky, po ktorých putujú zvuky, obrázky a odkazy. Keď sa spojenie preruší, pomáham ho opraviť.",
-          "Dnes sa po záhadnom bliknutí zamkol náš najdôležitejší digitálny most. Bez neho sa nedostanem ku kamarátom. Už počujem Mikyho signál a vidím, že Pixi rozsvietila cestu. Teraz potrebujem odomknúť most!",
+          "Ahojte! Ja som Plugy, malý živý konektor. Káblikovými rukami spájam digitálne cestičky pre zvuky, obrázky a odkazy. Prerušené spojenia pomáham opraviť.",
+          "Po záhadnom bliknutí sa zamkol náš najdôležitejší most. Bez neho sa nedostanem ku kamarátom. Už počujem Mikyho signál a Pixi rozsvietila cestu. Teraz potrebujem odomknúť most!",
           "Na zámku svietia trojuholník, kruh a štvorec. Kamaráti, pomôžte nám odomknúť zámok!"
         ],
         "after": [
@@ -229,7 +229,7 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Pingy, malý posol správ. Cez svetelné uzly prenášam odkazy, aby sa naši kamaráti v digitálnom svete nestratili. Keď ste opravili most, konečne som vás začul aj ja! Pri výpadku však na niektorých mostíkoch zhasli značky a môj posledný odkaz zostal uväznený uprostred siete. Práve on nám má prezradiť, kde čaká kamarát, ktorý pozná cestu k návratovej bráne. Chcem, aby sme k nemu dorazili všetci spolu. Opravíte poškodené spojenia a pomôžete mi odkaz doručiť? Tentoraz budem cestovať spolu s vami."
+          "Ahojte! Ja som Pingy, malý posol správ. Cez svetelné uzly prenášam odkazy, aby sa kamaráti nestratili. Po oprave mosta som vás konečne začul! Pri výpadku na mostíkoch zhasli značky a odkaz uviazol v sieti. Prezradí nám, kde čaká kamarát, ktorý pozná cestu k návratovej bráne. Dorazíme k nemu všetci spolu. Opravíte spojenia a pomôžete mi odkaz doručiť? Budem cestovať s vami."
         ],
         "after": []
       },
@@ -280,8 +280,8 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Pomáham kamarátom nájsť bezpečné cesty medzi obrazovkami. Váš doručený odkaz ku mne konečne dorazil! Už viem, že sme sa po výpadku opäť našli. Pred nami je však posledný úsek k návratovej bráne, pri ktorej čaká náš ochranca.",
-          "Na ceste zostali rozhádzané pixely, pomiešané dieliky a prerušené potrubia. Pripravil som štyri malé opravy. Keď ich zvládneme, budeme môcť pokračovať všetci spolu a nikto nezablúdi."
+          "Pomáham kamarátom nájsť bezpečné cesty medzi obrazovkami. Váš odkaz konečne dorazil! Opäť sme sa našli. Čaká nás posledný úsek k návratovej bráne, kde stojí náš ochranca.",
+          "Na ceste zostali rozhádzané pixely, pomiešané dieliky a prerušené potrubia. Pripravil som štyri opravy. Potom pôjdeme spolu a nikto nezablúdi."
         ],
         "after": [
           "Štyri hry sú hotové! Získali ste číslice 7, 2, 9, 4.",
@@ -320,9 +320,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte! Som ochranný štít. Strážim bezpečnú cestu medzi obrazovkami a chránim kamarátov, aby sa každý dostal domov v poriadku.",
-          "Konečne počujem celú partiu! Na otvorenie bezpečnej cesty domov potrebujem overovací kód. Pri prerušení spojenia sa poškodili správy s overovacím kódom.",
-          "Ku každej správe nájdite vhodnú opravu. Dve sa opraviť nedajú — tie prečiarknite. Číslice pri opravených správach čítajte zhora nadol. Tak získate kód, ktorý nám otvorí bezpečnú cestu."
+          "Ahojte! Som ochranný štít. Strážim cestu medzi obrazovkami a chránim kamarátov, aby sa všetci bezpečne dostali domov.",
+          "Konečne počujem celú partiu! Cestu domov otvorí overovací kód. Správy s kódom sa však pri výpadku poškodili.",
+          "Ku každej správe nájdite opravu. Dve bez opravy prečiarknite. Číslice pri opravených správach čítajte zhora nadol. Ich kód otvorí cestu domov."
         ],
         "after": [
           "Podarilo sa! Správy sú opäť čitateľné a ochranné pole už rozpoznáva celú našu partiu!",
@@ -364,9 +364,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Pred nami sa konečne rozžiarila návratová brána. Za ňou už vidíme náš domov! Celá partia sa zhromaždila pri jej prahu. Tentoraz nikoho nenecháme za sebou.",
-          "Znaky, ktoré ste cestou pozbierali, však ešte netvoria celé heslo. Chýba nám posledný návratový znak! Brána ho ukryla do mozaiky symbolov a na svojom ráme nám nechala kľúč.",
-          "Pomôžete nám odhaliť jej tajomstvo? Keď nájdeme posledný znak, pridáme ho k ostatným a spoločne otvoríme cestu domov. Už sme tak blízko!"
+          "Rozžiarila sa návratová brána a za ňou vidíme domov! Celá partia stojí pri jej prahu. Nikoho nenecháme za sebou.",
+          "Pozbierané znaky ešte netvoria celé heslo. Chýba posledný návratový znak! Brána ho ukryla do mozaiky symbolov a na ráme nechala kľúč.",
+          "Pomôžete nám odhaliť tajomstvo? Posledný znak pridáme k ostatným a spoločne otvoríme cestu domov. Už sme tak blízko!"
         ],
         "after": [
           "SVETLO! Návratová brána sa otvorila. Všetci sa môžeme bezpečne vrátiť domov.",

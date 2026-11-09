@@ -347,7 +347,7 @@
 }
 
 /* Shared text roles: equivalent information keeps the same size on every player sheet. */
-.miky-sheet,.story-sheet{--sheet-copy:13px;--sheet-secondary:11px;--sheet-caption:10px;--sheet-title:29px;--sheet-qr:121px}
+.miky-sheet,.story-sheet{--sheet-copy:13px;--sheet-secondary:11px;--sheet-caption:10px;--sheet-title:29px;--sheet-qr:139px}
 .miky-sheet .quest-story p,.story-sheet .quest-story p,
 .miky-print-mission li,.worksheet-mission p,.miky-print-controls p,
 .equation-result p,.maze-phone-panel p,.paper-reward p{font-size:var(--sheet-copy);line-height:1.42}
@@ -358,7 +358,7 @@
 .miky-sheet .qr-mockup small,.story-sheet .worksheet-entry-qr small{font:10px/1.35 Arial,sans-serif;letter-spacing:0;text-align:center}
 .plugy-phone-panel{grid-template-columns:minmax(0,1fr) var(--sheet-qr)}
 @media print{
- .miky-sheet,.story-sheet{--sheet-copy:9pt;--sheet-secondary:8pt;--sheet-caption:7pt;--sheet-title:21pt;--sheet-qr:32mm}
+ .miky-sheet,.story-sheet{--sheet-copy:9pt;--sheet-secondary:8pt;--sheet-caption:7pt;--sheet-title:21pt;--sheet-qr:36.8mm}
  .miky-sheet .miky-print-controls h3,.story-sheet .worksheet-mission h3,.story-sheet .worksheet-next h3,.story-sheet .equation-result h3,.story-sheet .worksheet-answer h3,.delivery-repair-key h3{font-size:9pt}
  .miky-sheet .miky-print-story h3,.story-sheet .worksheet-story h3{font-size:10pt}
  .cutouts-heading strong{font-size:9pt}
