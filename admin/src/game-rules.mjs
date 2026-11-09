@@ -44,8 +44,8 @@ export const stages = [
     ],
     "digital": false,
     "hints": [
-      "Uzol je veľký kruh a mostík je cesta medzi kruhmi. V prázdnom rámiku mostíka svieti jeden z troch bodov. V servisnom kľúči nájdite rovnakú polohu a na bodkovanú čiaru dokreslite symbol.",
-      "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte písmená z prejdených kruhov. Kruh bez písmena do odpovede nič nepridá."
+      "V každom prázdnom rámiku je jeden z troch bodov čierny. V kľúči nájdite rovnakú polohu a na bodkovanú čiaru dopíšte symbol.",
+      "Po doplnení všetkých symbolov vyrazte zo ŠTARTU. V kruhu je △? Pokračujte po šípke označenej △. Písmená z kruhov zapisujte po poradí. Kruh bez písmena len prejdite."
     ]
   },
   {
