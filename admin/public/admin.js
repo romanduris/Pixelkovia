@@ -1,4 +1,4 @@
-import {marketing,marketingParams,bindMarketing} from './marketing.js';
+import {marketing,marketingParams,bindMarketing,rememberMarketing} from './marketing.js';
 const $=s=>document.querySelector(s);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const date=value=>value==null?'—':new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(value);
@@ -316,6 +316,8 @@ async function load(){
   syncPaymentShell();
   document.querySelectorAll('[data-page]').forEach(a=>{a.classList.toggle('active',a.dataset.page===view);if(a.dataset.page===view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   document.body.classList.toggle('analytics-view',view==='analytics');
+  document.body.classList.toggle('marketing-view',view==='marketing');
+  if(view==='marketing')rememberMarketing();
   $('#notice').textContent='';$('#view').setAttribute('aria-busy','true');
   try{
     const p=view==='payments'?paymentParams():view==='marketing'?marketingParams():new URLSearchParams();if(view==='analytics'){p.set('view','journey');for(const [key,value] of Object.entries({page:state.page,email:state.q,attempt:state.analysisAttempt,state:state.status}))p.set(key,value);}

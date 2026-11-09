@@ -2,6 +2,12 @@
 
 Záložka: https://pixelkovia.rodulab.com/admin#marketing. Rovnaké prihlásenie, Worker `treasurequest-admin` a produkčná D1; žiadna externá analytická databáza.
 
+## Používanie prehľadu
+
+Kompaktný prehľad zobrazuje štyri KPI, návštevný funnel, päť zdrojov s najvyššou nameranou návštevnosťou a obchodný aj prevádzkový súhrn. Kliknutie alebo Enter na KPI a súhrnnej metrike rozbalí pôvodnú definíciu; metodika, dostupnosť a diagnostika sú v samostatných rozbaľovacích sekciách. Stav rozbalenia, triedenie a zobrazenie zdrojov sa zachovajú počas obnovy a zmeny filtrov v aktuálnej návšteve administrácie.
+
+Obdobie je v hornej lište, ďalšie filtre pod tlačidlom **Filtre**; aktívny filter možno odobrať samostatne alebo resetovať na predvolených 14 dní. Vlastný rozsah otvorí dátumové polia. Tabuľka triedi iba existujúce hodnoty, chýbajúce hodnoty nezamieňa za nuly a zdroje nespája. **Všetky zdroje** sprístupní všetky kategórie; **Úhrady v období** pridá samostatný stĺpec s dátumom platby. Na mobile sa zdroje skladajú do čitateľných blokov. Zmena sa týka iba prezentácie, bez zásahu do API, zberu a výpočtov.
+
 ## Údaje a metodika
 
 - **Návštevy**: prvostranné udalosti z `/` a `/checkout`, aktuálne bez panela a bez podmienky súhlasu podľa pokynu vlastníka. Náhodné identifikátory zostávajú iba v `sessionStorage` aktuálnej karty; po 30 minútach medzi otvoreniami stránky sa obnovia. Refresh a prechod na checkout návštevu nezdvojujú; nová karta môže vytvoriť samostatnú reláciu. Celkový počet návštev bez JS, s blokovačom alebo nedostupným úložiskom nepoznáme.
