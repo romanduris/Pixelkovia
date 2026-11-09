@@ -53,7 +53,7 @@ export async function prepareFunnel(output){
   const assets=[
     'favicon.ico','assets/brand/piko-32.png','assets/brand/piko-192.png','assets/brand/piko-180.png',
     'assets/pixelkovia-room-desktop.webp','assets/pixelkovia-room-mobile.webp',
-    ...['play-phone','play-paper','play-story','prepare-portal'].flatMap(scene=>['','-medium','-small'].map(size=>`assets/sales/real-play/${scene}${size}.webp`)),
+    ...['play-phone','play-paper','play-team','play-story','prepare-portal'].flatMap(scene=>['','-medium','-small'].map(size=>`assets/sales/real-play/${scene}${size}.webp`)),
     'assets/sales/game-lock-partial.webp','assets/fonts/Caveat.ttf',
     'assets/books/before-cover.webp','assets/books/after-cover.webp',
     ...['before','after'].flatMap(key=>[1,2].map(i=>`assets/sales/books/${key}-page-${i}.webp`)),

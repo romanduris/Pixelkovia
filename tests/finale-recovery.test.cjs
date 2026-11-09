@@ -25,6 +25,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 
   const openFinale=async()=>{await page.goto(server.url+'/hra?signal=navrat');await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();await page.locator('.finale-exit').waitFor();};
   await openFinale();
+  assert.equal(await page.locator('.finale-exit').innerText(),'Ohodnotiť hru');
   await page.evaluate(()=>PIXELKOVIA_SAVE());
   assert.equal((await first(server.db,'SELECT COUNT(*) count FROM game_stage_progress WHERE run_id=? AND completed_at IS NOT NULL',runId)).count,6);
   assert.equal((await first(server.db,'SELECT status FROM game_runs WHERE id=?',runId)).status,'active','solving task seven does not yet finish the game');
@@ -48,7 +49,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const completed=await first(server.db,'SELECT completed_at FROM game_runs WHERE id=?',runId);
   const {customers}=await import('../admin/src/analytics.mjs');
   const analysis=await customers(server.db,new URLSearchParams({q:server.email}));
-  assert.equal(analysis.rows[0].state,'completed');assert.equal(analysis.rows[0].completed_at,completed.completed_at,'admin goal is checked without pressing the exit button');
+  assert.equal(analysis.rows[0].state,'completed');assert.equal(analysis.rows[0].completed_at,completed.completed_at,'admin completion time exists without pressing the exit button');
   // Watching the finale again must reuse the existing completion.
   await page.locator('#answer').fill('SVETLO');await page.locator('.answer-form button').tap();await page.locator('.finale-exit').waitFor();
   await page.waitForFunction(()=>{const v=document.querySelector('#finale-video');return v&&!v.paused&&v.currentTime>.1;});await page.locator('#finale-video').evaluate(v=>{v.playbackRate=8;});await page.waitForFunction(()=>document.querySelector('#finale-video').ended);
@@ -67,6 +68,6 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await page.locator('[name="stars"][value="4"]').check({force:true});await page.locator('#feedback-comment').fill('Dokončené aj pri chýbajúcom zázname.');await page.locator('#game-feedback button').tap();await page.getByText('✓ Ďakujeme za vaše hodnotenie!').waitFor();
   await page.screenshot({path:`/tmp/finale-recovery-${engine.name()}.png`,fullPage:true});
   assert.deepEqual(errors,[]);await context.close();
-  console.log(`PASS ${engine.name()}: automatic video-end completion, early exit, failed sync/finish, retry and reload, device authorization, admin goal, honest statistics, replay, feedback and library.`);
+  console.log(`PASS ${engine.name()}: automatic video-end completion, early exit, failed sync/finish, retry and reload, device authorization, admin completion time, honest statistics, replay, feedback and library.`);
  }finally{await browser.close();await server.mf.dispose();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

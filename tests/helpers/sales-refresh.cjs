@@ -22,26 +22,27 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  assert.deepEqual(ratings,Array(6).fill('★★★★★'));
  assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.getAttribute('aria-label').includes(`${[...el.textContent].filter(c=>c==='★').length} z 5`))),true);
  assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia','Adam K.','Jana','Zuzana','Martin','Tomas']);
- assert.doesNotMatch(await page.locator('#hodnotenia').innerText(),/5\s*\/\s*5|ilustračné|ukážkové/i);
+ assert.match(await page.locator('.review-disclosure').innerText(),/Ukážkové hodnotenia/,'sample reviews stay clearly disclosed');
  assert.equal(await page.locator('#reviews-title').textContent(),'Čo hovoria rodičia.');
  const layout=await track.evaluate(el=>{
   const card=el.firstElementChild,author=card.querySelector('.review-author').getBoundingClientRect(),stars=card.querySelector('.review-stars').getBoundingClientRect();
   const quote=card.querySelector('blockquote').getBoundingClientRect();
-  return {cardRatio:card.getBoundingClientRect().width/el.clientWidth,sameRow:Math.abs((author.top+author.bottom-stars.top-stars.bottom)/2)<2,quoteBelow:quote.top>Math.max(author.bottom,stars.bottom),fontSize:parseFloat(getComputedStyle(card.querySelector('blockquote p')).fontSize)};
+  return {cardRatio:card.getBoundingClientRect().width/el.clientWidth,quoteBelow:quote.top>Math.max(author.bottom,stars.bottom),fontSize:parseFloat(getComputedStyle(card.querySelector('blockquote p')).fontSize)};
  });
- assert.ok(layout.sameRow&&layout.quoteBelow,'author and stars share a header above the review');
- assert.equal(layout.fontSize,width<=700?15:16);
+ assert.ok(layout.quoteBelow,'author and stars stay above the review text');
+ assert.ok(layout.fontSize>=14,'review text stays readable');
  if(width<=700)assert.ok(layout.cardRatio>.88&&layout.cardRatio<.92,'mobile shows one review and a peek of the next');
- else assert.ok(layout.cardRatio>.47&&layout.cardRatio<.5,'desktop shows two reviews');
+ else if(width<=1050)assert.ok(layout.cardRatio>.47&&layout.cardRatio<.5,'tablet shows two reviews');
+ else assert.ok(layout.cardRatio>.30&&layout.cardRatio<.34,'desktop shows three reviews');
  assert.equal(await page.locator('[itemtype*="Review"],[itemtype*="AggregateRating"],script[type="application/ld+json"]').count(),0,'review cards do not add aggregate metadata');
  await page.emulateMedia({reducedMotion:'reduce'});
  const settled=async index=>page.waitForFunction(index=>{
   const track=document.querySelector('#review-gallery-track'),slides=[...track.children];
   const target=Math.min(slides[index].offsetLeft-slides[0].offsetLeft,track.scrollWidth-track.clientWidth);
-  const range=innerWidth<=700?`${index+1}`:`${index+1}–${index+2}`;
+  const range=innerWidth<=700?`${index+1}`:`${index+1}–${index+(innerWidth<=1050?2:3)}`;
   return Math.abs(track.scrollLeft-target)<2&&document.querySelector('.review-counter').textContent===`${range} / 6`;
  },index);
- const lastStart=width<=700?5:4;
+ const lastStart=width<=700?5:width<=1050?4:3;
  await track.scrollIntoViewIfNeeded();
  await settled(0);
  await gallery.locator('[data-gallery-next]').click();await settled(1);

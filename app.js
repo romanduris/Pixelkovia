@@ -129,7 +129,7 @@
     const button=app.querySelector('.finale-exit'),completion=window.PIXELKOVIA_COMPLETION;
     if(!button||!completion||preview)return;
     button.disabled=completion.status==='saving';
-    button.textContent=completion.status==='saving'?'Ukladám dokončenie…':completion.status==='failed'?completion.error+' · Skúsiť znova':'Koniec hry';
+    button.textContent=completion.status==='saving'?'Ukladám dokončenie…':completion.status==='failed'?completion.error+' · Skúsiť znova':'Ohodnotiť hru';
     button.setAttribute('aria-live','polite');
   }
   window.addEventListener('pixelkovia-completion',updateFinaleCompletion);
@@ -161,7 +161,7 @@
   }
   function finaleScreen(){
     app.classList.add('signal-mode');
-    return `<section class="finale finale-screen" aria-labelledby="finale-title"><h1 id="finale-title" tabindex="-1">NÁVRATOVÝ SIGNÁL PRIJATÝ</h1>${finaleMediaHTML()}<button class="btn finale-exit" data-action="end-game">Koniec hry</button></section>`;
+    return `<section class="finale finale-screen" aria-labelledby="finale-title"><h1 id="finale-title" tabindex="-1">NÁVRATOVÝ SIGNÁL PRIJATÝ</h1>${finaleMediaHTML()}<button class="btn finale-exit" data-action="end-game">Ohodnotiť hru</button></section>`;
   }
   function cipkoScreen(){
     app.classList.add('signal-mode');

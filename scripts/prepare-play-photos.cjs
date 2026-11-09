@@ -5,8 +5,8 @@ const sharp=require(process.env.SHARP_MODULE||'sharp');
 const root=path.resolve(__dirname,'..');
 const photos=[
  {name:'play-phone',source:'20261108_193537.jpg',crop:{left:270,top:210,width:390,height:487.5},brightness:1.08},
- {name:'play-paper',source:'20261108_193739.jpg',crop:{left:200,top:285,width:480,height:600},brightness:1.08,
-  redact:[[[470,357],[635,333],[648,395],[480,420]],[[476,477],[508,470],[515,501],[480,514]],[[438,516],[484,507],[494,550],[447,560]]]},
+ {name:'play-paper',source:'20261108_190754.jpg',crop:{left:0,top:310,width:900,height:1125},brightness:1.10},
+ {name:'play-team',source:'20261108_193034.jpg',crop:{left:50,top:0,width:580,height:725},brightness:1.13},
  {name:'play-story',source:'20261108_195955.jpg',crop:{left:0,top:0,width:580,height:725},brightness:1.12},
  {name:'prepare-portal',source:'20261107_100223 1.jpg',crop:{left:235,top:125,width:640,height:480},brightness:1.08,
   paperBelow:270,phone:[[609,168],[880,317],[494,862],[217,704]]}

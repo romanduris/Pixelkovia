@@ -40,7 +40,7 @@ export async function customerDetail(db,id){
     query(db,'SELECT * FROM entitlements WHERE customer_id=?',id),
     query(db,'SELECT * FROM portal_sessions WHERE customer_id=? ORDER BY started_at',id),
     query(db,'SELECT cp.* FROM checklist_progress cp JOIN entitlements e ON e.id=cp.entitlement_id WHERE e.customer_id=?',id),
-    query(db,'SELECT r.id,r.entitlement_id,r.run_number,r.status,r.current_stage,r.started_at,r.last_at,r.completed_at FROM game_runs r JOIN entitlements e ON e.id=r.entitlement_id WHERE e.customer_id=? ORDER BY r.started_at',id),
+    query(db,'SELECT r.id,r.entitlement_id,r.run_number,r.status,r.current_stage,r.started_at,r.last_at,r.completed_at,f.stars feedback_stars,f.comment feedback_comment,f.created_at feedback_at FROM game_runs r LEFT JOIN game_feedback f ON f.run_id=r.id JOIN entitlements e ON e.id=r.entitlement_id WHERE e.customer_id=? ORDER BY r.started_at',id),
     query(db,'SELECT g.id,g.run_id,g.stage,g.type,g.occurred_at FROM game_events g JOIN game_runs r ON r.id=g.run_id JOIN entitlements e ON e.id=r.entitlement_id WHERE e.customer_id=? ORDER BY occurred_at DESC LIMIT 200',id),
     query(db,'SELECT * FROM email_events WHERE customer_id=? ORDER BY created_at DESC',id)
   ]);
@@ -58,6 +58,8 @@ export async function customers(db,params){
     e.id entitlement_id,e.status entitlement_status,e.expires_at,e.activated_at,e.first_completed_at,
     (SELECT MIN(started_at) FROM portal_sessions WHERE customer_id=c.id) portal_opened_at,
     r.id run_id,r.status run_status,r.current_stage,r.started_at,r.completed_at,r.last_at last_activity,
+    (SELECT created_at FROM game_feedback WHERE run_id=r.id) feedback_at,
+    (SELECT stars FROM game_feedback WHERE run_id=r.id) feedback_stars,
     EXISTS(SELECT 1 FROM checklist_progress cp WHERE cp.entitlement_id=e.id AND cp.completed=1) preparing
     FROM customers c
     LEFT JOIN entitlements e ON e.id=(SELECT e2.id FROM entitlements e2 JOIN products p ON p.id=e2.product_id JOIN order_items i ON i.id=e2.order_item_id JOIN orders o ON o.id=i.order_id WHERE e2.customer_id=c.id AND o.status='paid' AND p.episode_id='episode-1' ORDER BY EXISTS(SELECT 1 FROM game_runs a WHERE a.entitlement_id=e2.id AND a.status='active') DESC,e2.granted_at DESC,e2.id LIMIT 1)
@@ -71,6 +73,9 @@ export async function customers(db,params){
     const state=c.run_status==='active'?'playing':c.first_completed_at!=null||c.run_status==='completed'?'completed':c.entitlement_status==='revoked'||(c.expires_at!=null&&c.expires_at<=now)?'expired':c.portal_opened_at!=null||c.preparing?'preparing':c.purchase_at!=null?'purchased':'payment-pending';
     return {...c,state,has_base:owned.includes('episode-1'),extension_count:extensionIds.length,extension_ids:extensionIds};
   });
+  const summary={total:customers.filter(c=>c.has_base).length,playing:customers.filter(c=>c.has_base&&c.state==='playing').length,completed:customers.filter(c=>c.has_base&&c.state==='completed').length,unstarted:customers.filter(c=>c.has_base&&c.started_at==null).length};
+  const email=(params.get('email')||'').slice(0,254);if(email)customers=customers.filter(c=>c.email.toLowerCase()===email.toLowerCase());
+  const attempt=(params.get('attempt')||'').slice(0,100);if(attempt){const linked=await query(db,`SELECT DISTINCT o.customer_id FROM orders o WHERE o.external_reference=(SELECT stripe_session_id FROM checkout_attempts WHERE id=?) OR o.id IN (SELECT order_id FROM checkout_orders WHERE attempt_id=?)`,attempt,attempt);const ids=new Set(linked.map(o=>o.customer_id));customers=customers.filter(c=>ids.has(c.customer_id));}
   const status=params.get('state')||'',version=params.get('version')||'',portal=params.get('portal')||'';
   if(status)customers=customers.filter(c=>status==='active'?['purchased','preparing','playing'].includes(c.state):c.state===status);
   if(version)customers=customers.filter(c=>version==='base'?c.has_base&&c.extension_count===0:version==='extensions'?c.extension_count>0:version==='full'?c.extension_count===extensions.length:true);
@@ -84,5 +89,5 @@ export async function customers(db,params){
   const pageSize=20,total=customers.length,page=Math.max(1,Math.min(Math.ceil(total/pageSize)||1,Number.parseInt(params.get('page')||'1')||1));
   const selected=customers.slice((page-1)*pageSize,page*pageSize),runIds=selected.map(c=>c.run_id).filter(Boolean);
   const progress=runIds.length?await query(db,`SELECT * FROM game_stage_progress WHERE run_id IN (${runIds.map(()=>'?').join(',')})`,...runIds):[];
-  return {rows:selected.map(c=>({...c,stages:stages.map(rule=>({stage:rule.stage,title:rule.title,...progress.find(p=>p.run_id===c.run_id&&p.stage===rule.stage)}))})),total,page,pageSize,stages:stages.map(({stage,title})=>({stage,title}))};
+  return {rows:selected.map(c=>({...c,stages:stages.map(rule=>({stage:rule.stage,title:rule.title,...progress.find(p=>p.run_id===c.run_id&&p.stage===rule.stage)}))})),summary,total,page,pageSize,stages:stages.map(({stage,title})=>({stage,title}))};
 }

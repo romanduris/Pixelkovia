@@ -61,3 +61,31 @@ test('journey pagination clamps the page after filtering and uses global orderin
     assert.equal((await customers(db,params({page:'99',q:'c22@'}))).page,1);
   }finally{db.close();}
 });
+
+test('journey keeps game totals across filters, separates feedback from completion and links exact purchase emails',async()=>{
+ const db=fresh();try{
+  await seedDemo(db,{local:true});
+  const all=await customers(db,params()),finished=all.rows.find(c=>c.state==='completed');
+  assert.equal(all.summary.total,all.rows.filter(c=>c.has_base).length);
+  assert.equal(all.summary.playing,all.rows.filter(c=>c.state==='playing'&&c.has_base).length);
+  assert.equal(all.summary.completed,6);
+  assert.equal(all.summary.unstarted,all.rows.filter(c=>c.has_base&&c.started_at==null).length);
+  assert.equal(finished.feedback_at,null,'completed video does not invent feedback');
+  const at=Date.now();await execute(db,'INSERT INTO game_feedback VALUES(?,?,?,?,?)',finished.run_id,finished.customer_id,4,'Skvelé papierové šifry.',at);
+  const selected=await customers(db,params({email:finished.email.toUpperCase(),state:'completed'}));
+  assert.equal(selected.total,1);assert.equal(selected.rows[0].customer_id,finished.customer_id);assert.equal(selected.rows[0].feedback_at,at);assert.equal(selected.rows[0].feedback_stars,4);
+  assert.deepEqual(selected.summary,all.summary,'tiles count the full list, not just the selected player');
+  assert.equal((await customers(db,params({email:finished.email+'.other'}))).total,0,'payment links match an exact email');
+  assert.equal((await customerDetail(db,finished.customer_id)).runs.find(r=>r.id===finished.run_id).feedback_comment,'Skvelé papierové šifry.');
+ }finally{db.close();}
+});
+
+test('a payment link selects only its independent purchase, even with a reused buyer email',async()=>{
+ const db=fresh(),at=Date.now();try{
+  for(const id of ['first','repeat']){await execute(db,'INSERT INTO customers VALUES(?,?,?,?)',id,'same@example.invalid',id,at);await createOrder(db,{customerId:id,productId:'episode-1',externalReference:'session-'+id});}
+  await execute(db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id) VALUES(?,?,?,?,?,?,?)','purchase-first','same@example.invalid','','["episode-1"]',1499,at,'session-first');
+  assert.equal((await customers(db,params({email:'same@example.invalid'}))).total,2);
+  const selected=await customers(db,params({email:'same@example.invalid',attempt:'purchase-first'}));assert.equal(selected.total,1);assert.equal(selected.rows[0].customer_id,'first');assert.equal(selected.summary.total,2);
+  assert.equal((await customers(db,params({attempt:'unknown'}))).total,0);
+ }finally{db.close();}
+});

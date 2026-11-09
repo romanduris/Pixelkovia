@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const BASE=(process.env.BASE_URL||'http://127.0.0.1:8081').replace(/\/$/,'');
+let BASE=(process.env.BASE_URL||'').replace(/\/$/,'');
 const root='dist/funnel';
 const forbidden=['game.html','parent.html','library-read.html','storyboard.html','book-before.html','book-after.html','books-preview.html','books-content/before.json','books-content/after.json','printables.html','game-data.js','story-text.js','app.js','site-config.js','print-materials.js','prep-store.js','cipko-game.js','admin','assets/printables/p1.pdf','assets/printables/vsetky-materialy.pdf','assets/Miky.mp3','assets/PicoVideo.mp4','assets/miky-sheet-preview.webp'];
 for(const file of forbidden)assert.ok(!fs.existsSync(path.join(root,file)),'public artifact excludes '+file);
@@ -23,10 +23,12 @@ for(let mask=0;mask<4;mask++){
 }
 assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled.window.SITE_CONFIG.management,undefined);
 (async()=>{
+ const {workerServer}=await import('./helpers/worker-server.mjs');
+ const server=BASE?null:await workerServer();if(server)BASE=server.url;
  const browser=await chromium.launch();
  try{
   for(const [width,height]of [[320,568],[360,640],[390,844],[430,932],[768,1024],[1366,768],[1440,900]]){
-   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,isMobile:width<600,hasTouch:width<600});
+   const context=await browser.newContext({ignoreHTTPSErrors:BASE.startsWith('https://localhost:'),viewport:{width,height},deviceScaleFactor:1,isMobile:width<600,hasTouch:width<600});
    const page=await context.newPage(),errors=[],missing=[],outgoing=[];
    await page.route('**/api/checkout/config',route=>route.fulfill({json:{enabled:false,publishableKey:null}}));
    page.on('pageerror',e=>errors.push(e.message));
@@ -90,10 +92,10 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    if(width===390)await page.screenshot({path:'/tmp/pixelkovia-public-checkout.png',fullPage:true});
    await context.close();
   }
-  const page=await browser.newPage();
+  const page=await browser.newPage({ignoreHTTPSErrors:BASE.startsWith('https://localhost:')});
   for(const route of [...forbidden,'admin/api/customers','_protected/game.html','_protected/game-data.js','assets/printables/p2-preview.webp','missing-page']){
    const response=await page.request.get(BASE+'/'+route,{maxRedirects:0});assert.equal(response.status(),route==='admin'?303:404,'private routes require authorization: '+route);
   }
-  console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, three-scene swipe/keyboard gallery, preview, sticky CTA, all price combinations, inactive purchase, no submissions and unchanged game progress.');
- }finally{await browser.close()}
+  console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, four-photo swipe/keyboard gallery, preview, sticky CTA, all price combinations, inactive purchase, no submissions and unchanged game progress.');
+ }finally{await browser.close();if(server)await server.mf.dispose();}
 })().catch(e=>{console.error(e);process.exitCode=1});

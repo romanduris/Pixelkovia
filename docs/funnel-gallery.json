@@ -1,5 +1,5 @@
 {
-  "mode": "Original family-test photographs; deterministic cropping, exposure and local spoiler blur",
+  "mode": "Original family-test photographs; deterministic physical crops and exposure, with parent-guide spoiler blur",
   "date": "2026-11-09",
   "sources": "assets/Photo/ (repository authoring sources only; never deployed)",
   "authoringCommand": "SHARP_MODULE=/workspaces/Pixelkovia/admin/node_modules/sharp node scripts/prepare-play-photos.cjs",
@@ -18,9 +18,15 @@
     },
     {
       "asset": "play-paper",
-      "source": "20261108_193739.jpg",
-      "purpose": "Children solving and writing together",
-      "privacy": "Physical crop plus baked blur on filled digits, decoded word and return sign."
+      "source": "20261108_190754.jpg",
+      "purpose": "Hands solving a physical paper cipher together",
+      "privacy": "Physical crop of separate paper wheels; no worksheet solution or return sign. No blur."
+    },
+    {
+      "asset": "play-team",
+      "source": "20261108_193034.jpg",
+      "purpose": "Children reading and discussing a paper clue without a phone",
+      "privacy": "Physical crop excludes the solved worksheet and its return strip below. No blur."
     },
     {
       "asset": "play-story",
