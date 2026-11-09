@@ -469,7 +469,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .finale-video-frame[data-playback="error"] #finale-video-status{width:auto;height:auto;inset:20% 12px auto;overflow:visible;clip-path:none;white-space:normal;padding:12px;background:#080d1de6;color:white;font-size:14px;line-height:1.5;pointer-events:none}
 .finale-end-title{z-index:1}
 
-.cipko-finish-exit{width:100%;min-height:54px;margin-top:20px}
 
 .finale-video-frame[data-playback="starting"]{background:#080d1d url("assets/finale-production/start-a.png") center/contain no-repeat}
 .finale-video-frame[data-playback="starting"] video,.finale-video-frame[data-playback="starting"] .finale-video-toggle{opacity:0;pointer-events:none}
@@ -501,7 +500,7 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .cipko-slot,.cipko-tile{min-width:44px;min-height:44px}
  .cipko-pipe-board{box-sizing:border-box;width:min(100%,calc(100dvh - 320px));min-width:202px;max-width:344px;margin:32px auto 10px}
  .cipko-prize{font-size:52px;margin:10px}
- .cipko-win .btn,.cipko-finish-exit{min-height:44px;margin-top:10px}
+ .cipko-win .btn{min-height:44px;margin-top:10px}
  .cipko-screen .cipko-paper-handoff{padding:10px;font-size:15px;margin:12px 0}
  .cipko-screen .task-completion-note{font-size:12px;margin-top:10px}
 }

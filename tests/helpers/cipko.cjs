@@ -32,6 +32,6 @@ module.exports=async function solveCipko(page,{touch=true}={}){
  }
  await page.locator('.cipko-finished').waitFor();
  assert.deepEqual(await page.locator('.cipko-digits strong').allTextContents(),['7','2','9','4']);
- assert.equal(await page.locator('#answer,.answer-form,[data-action="next"],[data-kind="next"]').count(),0,'no phone answer or extra step after last game');
+ assert.equal(await page.locator('#answer,.answer-form,[data-action="next"],[data-kind="next"],[data-action="close-window"]').count(),0,'no phone answer, extra step or close-window button after last game');
  const message=await page.locator('.cipko-finished').innerText();assert.match(message,/pokračujte na papieri/);assert.ok(!message.includes('CHLADNIČKA'),'the paper reveals the hiding place');
 };

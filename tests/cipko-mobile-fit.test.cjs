@@ -10,7 +10,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(server.url+'/Supervisor');await page.locator('#login-email').fill(server.email);await page.locator('#login-password').fill(server.customerPassword);await page.locator('#customer-login button').tap();await page.locator('#start-game').waitFor();
   for(const id of ['printed','placed','device-understood']){await page.locator(`[data-preparation="${id}"]`).check();await page.waitForFunction(()=>!document.querySelector('[data-preparation="printed"]').disabled);}
-  await page.locator('#start-game').tap();await page.waitForURL('**/hra');await page.waitForLoadState('networkidle');await page.goto(server.url+'/hra?signal=cipko');await page.locator('.cipko-pixels').waitFor();
+  await page.locator('#start-game').tap();await page.waitForURL('**/hra');await page.goto(server.url+'/hra?signal=cipko');await page.locator('.cipko-pixels').waitFor();
   const seed=await page.evaluate(()=>JSON.parse(localStorage.getItem('pixelkovia-run-'+PIXELKOVIA_RUN.run.id)));
   const settle=async()=>{await page.waitForTimeout(350);await page.waitForLoadState('networkidle');};
   const reset=async(round,won=false)=>{
@@ -54,9 +54,11 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   // The complete touch flow checks all mechanics after resizing, including wrong answers.
   await require('./helpers/cipko.cjs')(page);await fits('completed touch flow');
   await settle();await page.reload();assert.equal(await page.locator('.cipko-finished').count(),1,'completion survives reload');
-  // Closing a task saves it but must never call the whole-game finish endpoint.
+  const portal=await page.evaluate(()=>fetch('/api/customer/portal').then(r=>r.json()));assert.equal(portal.run.status,'active');assert.ok(portal.run.stages.some(s=>s.stage===5&&s.completed_at!==null),'Čipko completion saves without a close-window button');
+  // Guardy's separate close action still saves without finishing the whole game.
   const finishRequests=[];page.on('request',r=>{if(new URL(r.url()).pathname==='/api/customer/finish')finishRequests.push(r.url());});
   const stubClose=()=>page.evaluate(()=>{window.__closeCalls=0;window.close=()=>window.__closeCalls++;});
+  await page.goto(server.url+'/hra?signal=guardy');await page.locator('#answer').fill('5817264');await page.locator('.answer-form button').tap();await page.locator('.guardy-result').waitFor();
   await stubClose();
   await page.route('**/api/customer/sync',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Dočasný výpadok ukladania.'})}));
   await page.locator('[data-action="close-window"]').tap();await page.getByRole('button',{name:/Dočasný výpadok ukladania/}).waitFor();
@@ -64,10 +66,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.equal(await page.evaluate(()=>!!localStorage.getItem('pixelkovia-pending-'+PIXELKOVIA_RUN.run.id)),true,'failed sync retains pending progress');
   await page.unroute('**/api/customer/sync');await page.locator('[data-action="close-window"]').tap();
   await page.waitForFunction(()=>window.__closeCalls===1);await page.getByRole('button',{name:'Okno môžete zavrieť.',exact:true}).waitFor();
-  const portal=await page.evaluate(()=>fetch('/api/customer/portal').then(r=>r.json()));assert.equal(portal.run.status,'active');assert.ok(portal.run.stages.some(s=>s.stage===5&&s.completed_at!==null));
-  await page.goto(server.url+'/hra?signal=guardy');await page.locator('#answer').fill('5817264');await page.locator('.answer-form button').tap();await page.locator('.guardy-result').waitFor();await stubClose();
-  await page.locator('[data-action="close-window"]').tap();await page.waitForFunction(()=>window.__closeCalls===1);await page.getByRole('button',{name:'Okno môžete zavrieť.',exact:true}).waitFor();
-  assert.deepEqual(finishRequests,[],'closing Čipko or Guardy never finishes the whole game');
+  assert.deepEqual(finishRequests,[],'closing Guardy never finishes the whole game');
   assert.deepEqual(errors,[]);await context.close();
   console.log(`PASS ${engine.name()}: four boards, result screens and paper handoff fit 320x480–430x932; touch controls, complete gameplay, saved progress and task closing/retry preserved.`);
  }finally{await browser.close();await server.mf.dispose();}
