@@ -321,7 +321,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-list-end{font-size:10px;color:#8297b6}
 .payment-load-error{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px;background:#321f2a;border:1px solid #81404e;border-radius:6px;color:#ffd0d8}
 .payment-load-error h2{font-size:14px;margin:0}.payment-load-error p{font-size:12px;margin:4px 0 0}
-.payment-workspace.density-comfortable .payment-table td{padding-top:15px;padding-bottom:15px}
+.payment-workspace.density-comfortable .payment-table .payment-attempt-row>td{padding-top:15px;padding-bottom:15px}
 @media(max-width:1000px){.payment-workspace-toolbar{align-items:start;flex-direction:column;gap:8px}.payment-table-tools{width:100%}.payment-table-tools>select{margin-right:auto}.payment-table-heading>span{display:none}.payment-monitor-brief{font-size:11px}}
 @media(max-width:750px){
 .payments-view .sidebar{position:static;width:auto;padding:6px 12px;border-bottom:1px solid #2a3654;display:flex;flex-direction:row;align-items:center;gap:12px;overflow:auto}
@@ -384,8 +384,8 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-mobile-table .payment-attempt-row .status{font-size:9px;padding:2px;line-height:14px;max-width:100%}
 .payment-mobile-table .payment-attempt-row .payment-status-line{gap:2px}
 .payment-mobile-table .payment-attempt-row .payment-issue-badge{display:none}
-.payment-workspace.payment-mobile-table .payment-table .payment-expand-cell{min-width:26px;width:26px;padding:3px 1px}
-.payment-mobile-table .payment-row-toggle{width:22px;height:26px;font-size:15px}
+.payment-workspace.payment-mobile-table .payment-table .payment-expand-cell{min-width:44px;width:44px;padding:0}
+.payment-mobile-table .payment-row-toggle{width:44px;height:44px;font-size:20px}
 .payment-mobile-table .payment-attempt-row .payment-method-mark{display:flex;width:100%;height:18px;justify-content:center}
 .payment-mobile-table .payment-attempt-row .payment-method-mark img{width:28px!important;height:18px!important;max-width:100%;object-fit:contain}
 .payment-mobile-table .payment-attempt-row td[data-column=method]{font-size:9px!important}
@@ -424,3 +424,38 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-kpi>strong.is-unavailable{font-size:clamp(16px,4vw,22px);white-space:nowrap;letter-spacing:-.04em}.marketing-freshness{font-size:12px;line-height:1.7}.marketing-freshness[role=alert]{font-weight:750;color:#fff0c7}.marketing-scroll-hint{display:none}@media(max-width:750px){.marketing-scroll-hint{display:block}}
 .marketing-empty{padding:20px;background:#192b44;border:1px solid #5a7896;border-radius:8px;color:#d1e1f1;font-size:13px;line-height:1.8}.marketing-empty strong{font-size:15px;color:#e8f5ff}.marketing-empty a{color:#a3eed6;text-decoration:underline}.marketing-quality>p{font-size:12px;line-height:1.7;margin:10px 0}.marketing-quality details{color:inherit}.marketing-quality summary{color:inherit;font-size:12px}
 .marketing-period-note{margin:0;color:#b9cde3;font-size:12px;line-height:1.7}
+
+/* Expanded purchases expose complete values, independently of compact table cells. */
+.payment-detail-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.payment-detail-heading>div{min-width:0}
+.payment-detail-heading h3{margin:0;font-size:16px;color:#edf5ff;scroll-margin-top:16px}
+.payment-detail-heading p{margin:4px 0 0;font-size:13px;color:#c4d7ec;overflow-wrap:anywhere;white-space:normal}
+.payment-detail-heading .button{flex-shrink:0;min-height:44px;font-size:12px}
+.payment-detail-heading .button>span{font-size:20px;line-height:1}
+.payment-attempt-detail dl>div{min-width:0;padding-bottom:12px;border-bottom:1px solid #ffffff12}
+.payment-attempt-detail dt{font-size:12px;color:#b5c9e2}
+.payment-attempt-detail dd{font-size:14px;line-height:1.65;color:#eef4ff}
+.payment-attempt-detail .payment-reference{max-width:100%;font-size:12px;overflow-wrap:anywhere}
+.payment-workspace .payment-attempt-detail dd small{font-size:12px;white-space:normal;overflow-wrap:anywhere}
+.payment-attempt-detail .payment-status-line{flex-wrap:wrap;overflow:visible;white-space:normal}
+.payment-workspace .payment-attempt-detail .status{font-size:12px;white-space:normal;overflow:visible}
+.payment-attempt-detail .payment-voucher{font-size:12px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.payment-detail-events h3,.payment-row-issues h3{font-size:14px}
+.payment-detail-events p,.payment-row-issues li,.payment-row-issues p{font-size:13px;line-height:1.65}
+.payment-workspace .payment-attempt-detail .table-wrap td{min-width:0;white-space:normal;overflow-wrap:anywhere;font-size:13px}
+.payment-attempt-detail .payment-review-control{min-width:0;min-height:44px;font-size:12px}
+.payment-attempt-detail .payment-review-control>span{min-width:0;overflow-wrap:anywhere}
+@media(max-width:750px){
+  .payment-attempt-detail{padding:18px 14px}
+  .payment-detail-heading{gap:10px;flex-wrap:wrap}
+  .payment-detail-heading p{font-size:14px}
+  .payment-attempt-detail dl{gap:14px}
+  .payment-attempt-detail .table-wrap{max-height:none;overflow:visible;border:0;background:transparent}
+  .payment-attempt-detail .table-wrap table,.payment-attempt-detail .table-wrap tbody{display:block;width:100%;min-width:0;white-space:normal}
+  .payment-attempt-detail .table-wrap thead{display:none}
+  .payment-attempt-detail .table-wrap tr{display:block;margin:12px 0;padding:12px;border:1px solid #4a5f7d;border-radius:7px;background:#111c31}
+  .payment-workspace .payment-attempt-detail .table-wrap td{display:block;padding:8px 0;border:0;font-size:14px;text-align:left}
+  .payment-attempt-detail .table-wrap td::before{content:attr(data-label);display:block;margin-bottom:3px;font-size:12px;font-weight:600;color:#b5c9e2}
+  .payment-workspace .payment-attempt-detail .table-wrap td strong{font-size:14px}
+  .payment-attempt-detail .payment-reference,.payment-attempt-detail .payment-review-control{font-size:13px}
+}

@@ -197,7 +197,7 @@ function paymentAttemptDetail(row,d){
   const items=[...Object.entries(paymentColumns).map(([id,label])=>[label,id==='products'?escape(paymentProducts(row)):paymentCell(row,id)]),['Posledné serverové overenie',row.checkedAt==null?'Neznáme':date(row.checkedAt)]];
   const issues=row.issues||[],allEvents=(d.attention?.events||[]).filter(l=>l.linked_attempt_id===row.id),events=allEvents.filter(l=>!l.reviewed_at);
   const logs=[...allEvents.filter(l=>l.reviewed_at),...d.logs.filter(l=>l.attempt_id===row.id&&!allEvents.some(event=>event.id===l.id))];
-  return `<div class="payment-attempt-detail">${issues.length?`<section class="payment-row-issues" tabindex="-1"><h3>Vyžaduje pozornosť</h3><ul>${issues.map(i=>`<li>${escape(i.label)}${i.count>1?' · '+i.count:''}${i.at?' · '+date(i.at):''}</li>`).join('')}</ul><p>Stav platby: ${escape(attemptStateNames[row.status]||'Neznáme')}. Technický signál ani chyba doručenia nemenia potvrdený výsledok platby.</p>${events.length?paymentLogTable(events):''}</section>`:''}<dl>${items.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="payment-detail-events"><h3>Dostupné udalosti tohto pokusu</h3>${logs.length?paymentLogTable(logs):'<p>Pre toto obdobie nie sú dostupné ďalšie udalosti.</p>'}</div></div>`;
+  return `<div class="payment-attempt-detail" role="region" aria-label="Detail pokusu ${escape(row.email||row.id)}"><header class="payment-detail-heading"><div><h3 id="payment-detail-heading-${escape(row.id)}" tabindex="-1">Detail pokusu</h3><p>${escape(row.email||row.id)}</p></div><button type="button" class="button secondary" data-payment-collapse="${escape(row.id)}" aria-label="Zbaliť detail pokusu ${escape(row.email||row.id)}"><span aria-hidden="true">×</span> Zbaliť</button></header>${issues.length?`<section class="payment-row-issues" tabindex="-1"><h3>Vyžaduje pozornosť</h3><ul>${issues.map(i=>`<li>${escape(i.label)}${i.count>1?' · '+i.count:''}${i.at?' · '+date(i.at):''}</li>`).join('')}</ul><p>Stav platby: ${escape(attemptStateNames[row.status]||'Neznáme')}. Technický signál ani chyba doručenia nemenia potvrdený výsledok platby.</p>${events.length?paymentLogTable(events):''}</section>`:''}<dl>${items.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="payment-detail-events"><h3>Dostupné udalosti tohto pokusu</h3>${logs.length?paymentLogTable(logs):'<p>Pre toto obdobie nie sú dostupné ďalšie udalosti.</p>'}</div></div>`;
 }
 function paymentColumnSettings(){
   const visible=paymentLayout.order.filter(id=>!paymentLayout.hidden.includes(id));
@@ -375,7 +375,16 @@ $('#view').addEventListener('click',async e=>{
   if(e.target.closest('#clear-payment-issues')){state.paymentAttention=false;state.paymentAttempt='';savePaymentLayout();load();return;}
   const issue=e.target.closest('[data-payment-issues]');if(issue){paymentUI.expanded.add(issue.dataset.paymentIssues);renderPaymentWorkspace();focusPaymentIssues(issue.dataset.paymentIssues);return;}
   const chip=e.target.closest('[data-payment-state]');if(chip){if(e.target.closest('[data-payment-tile-handle]'))return;state.paymentStatus=chip.dataset.paymentState;state.paymentAttention=false;state.paymentAttempt='';savePaymentLayout();$('#payment-table-scroll')?.scrollTo({top:0});load();return;}
-  const expand=e.target.closest('[data-payment-expand]');if(expand){const id=expand.dataset.paymentExpand;if(paymentUI.expanded.has(id))paymentUI.expanded.delete(id);else paymentUI.expanded.add(id);renderPaymentWorkspace();return;}
+  const expand=e.target.closest('[data-payment-expand],[data-payment-collapse]');if(expand){
+    const id=expand.dataset.paymentExpand||expand.dataset.paymentCollapse,opening=!paymentUI.expanded.has(id);
+    if(opening)paymentUI.expanded.add(id);else paymentUI.expanded.delete(id);
+    renderPaymentWorkspace();
+    if(opening){
+      const heading=document.getElementById('payment-detail-heading-'+id);
+      if(heading){heading.focus({preventScroll:true});const box=heading.getBoundingClientRect();if(paymentMobile||box.top<0||box.bottom>innerHeight-160)heading.scrollIntoView({block:'start',inline:'nearest'});}
+    }else [...document.querySelectorAll('[data-payment-expand]')].find(button=>button.dataset.paymentExpand===id)?.focus({preventScroll:true});
+    return;
+  }
   const move=e.target.closest('[data-payment-move]');if(move){movePaymentColumn(move.dataset.paymentMove,Number(move.dataset.step));return;}
   if(e.target.closest('#reset-payment-layout')){paymentLayout=defaultPaymentLayout();paymentUI.columnQuery='';savePaymentLayout();syncPaymentShell();renderPaymentWorkspace();return;}
   if(e.target.closest('#close-payment-columns')){closePaymentColumns();return;}
@@ -428,7 +437,7 @@ function applyPaymentColumnWidths(){
   const wrap=$('#payment-table-scroll'),table=wrap?.querySelector(':scope>.payment-table');if(!table)return;
   const mobile=table.closest('.payment-mobile-table')!==null,fixed=Object.keys(paymentLayout.widths).length>0;
   table.classList.toggle('has-column-widths',fixed);
-  const cols=[...table.querySelectorAll('col[data-payment-width]')],detailWidth=mobile?26:42,available=wrap.clientWidth;
+  const cols=[...table.querySelectorAll('col[data-payment-width]')],detailWidth=mobile?44:42,available=wrap.clientWidth;
   const bases=cols.map(col=>paymentLayout.widths[col.dataset.paymentWidth]||paymentDefaultWidths[col.dataset.paymentWidth]||180);
   const scale=fixed?1:Math.max(1,(available-detailWidth)/bases.reduce((sum,width)=>sum+width,0));
   const shares={date:.24,email:.25,amount:.18,status:.21,method:.12};

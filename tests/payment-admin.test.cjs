@@ -11,8 +11,8 @@ report.rows=['google_pay','apple_pay','card','free','unknown'].map((method,index
   orderCount:method==='unknown'?0:method==='free'?2:1,expectedOrderCount:method==='free'?2:1,orderStates:method==='unknown'?[]:['paid'],delivery:{total:method==='unknown'?0:method==='free'?2:1,sent:method==='unknown'?0:method==='free'?2:1,failed:0,queued:0,lastSentAt:method==='unknown'?null:now}
 }));
 report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
-(async()=>{const browser=await browserType.launch({headless:true});try{
-  const context=await browser.newContext({viewport:{width:1512,height:1080}}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null,richAttention=false,reviewFail=false,deliveryIssue=true;const reviews=new Map(),reviewCalls=[],extraEvents=[];const calls=[];
+(async()=>{const browser=await browserType.launch({headless:process.env.QA_HEADED!=='1'});try{
+  const context=await browser.newContext({viewport:{width:1512,height:1080},hasTouch:true}),page=await context.newPage(),errors=[];let fail=false,attention=false,largeList=false,failAppend=false,appendGate=null,richAttention=false,reviewFail=false,deliveryIssue=true;const reviews=new Map(),reviewCalls=[],extraEvents=[];const calls=[];
   const manyRows=Array.from({length:123},(_,i)=>({...report.rows[i%5],id:'batch-'+String(i).padStart(3,'0'),createdAt:now-i,email:'batch'+i+'@example.invalid'}));
   page.on('pageerror',e=>errors.push(e.message));
   await context.addInitScript(()=>{const key='pixelkovia-admin-payments-layout-v1';if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({order:['date','email','products','amount','status','method','reason','reference'],hidden:['reason','reference'],density:'compact',navCollapsed:true,category:'bank',panels:['log']}));});
@@ -308,6 +308,30 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
       const detailBox=await page.locator('#payment-attempt-detail-0 .payment-attempt-detail').boundingBox(),wrapBox=await page.locator('#payment-table-scroll').boundingBox();
       assert.ok(detailBox.x>=wrapBox.x-2&&detailBox.x+detailBox.width<=wrapBox.x+wrapBox.width+2,'expanded details stay readable after horizontal scrolling');await page.screenshot({path:'/tmp/pixelkovia-payments-compact-mobile-detail.png',fullPage:true});await page.locator('#payment-attempt-toggle-0').click();}
   }
+  // Expanded values and events remain complete on narrow phones, including long identifiers.
+  attention=false;
+  const detailRow=report.rows.find(row=>row.id==='method-0'),originalFirst=structuredClone(detailRow);
+  Object.assign(detailRow,{email:'velmi.dlhy.identifikator.zakaznika.pre.overenie@example.invalid',sessionId:'cs_test_'+ 'longreference'.repeat(12),reason:'Platobný formulár sa nepodarilo načítať. '+ 'Podrobná správa pre správcu. '.repeat(6)});
+  report.logs=[{id:'detail-mobile-event',attempt_id:'method-0',stripe_session_id:detailRow.sessionId,source:'server',category:'technical',label:'Podrobná technická udalosť s úplným popisom pre správcu',code:'dlhy-technicky-identifikator-'.repeat(8),method:'card',created_at:now}];
+  for(const width of [320,390,768,1512]){
+    await page.setViewportSize({width,height:844});await page.locator('#refresh-payments').click();await ready();
+    const toggle=page.locator('[data-payment-expand="method-0"]');if(await toggle.getAttribute('aria-expanded')!=='true'){if(width<=390)await toggle.tap();else await toggle.click();}
+    const detail=page.locator('[data-attempt="method-0"] + .payment-attempt-detail-row .payment-attempt-detail');
+    assert.ok(await detail.isVisible());assert.ok((await detail.innerText()).includes(detailRow.email));assert.ok((await detail.innerText()).includes(detailRow.sessionId));
+    const bounds=await detail.boundingBox(),wrap=await page.locator('#payment-table-scroll').boundingBox();assert.ok(bounds.x>=wrap.x-2&&bounds.x+bounds.width<=wrap.x+wrap.width+2);
+    assert.ok(await detail.evaluate(el=>el.scrollWidth<=el.clientWidth+1),'detail has no horizontal overflow at '+width);
+    const values=await detail.locator('dd').evaluateAll(els=>els.map(el=>({size:parseFloat(getComputedStyle(el).fontSize),clipped:el.scrollWidth>el.clientWidth+1})));assert.ok(values.every(v=>v.size>=14&&!v.clipped),'complete readable values at '+width);
+    if(width<=390){
+      assert.ok((await toggle.boundingBox()).width>=44);assert.ok((await toggle.boundingBox()).height>=44);
+      const heading=await detail.locator('h3').first().boundingBox();if(width===320)assert.ok(heading.y>=0&&heading.y<100,'opening brings the detail into view');
+      const cells=detail.locator('[data-payment-log="detail-mobile-event"] td');assert.equal(await cells.count(),6);
+      assert.ok(await cells.evaluateAll(els=>els.every(el=>getComputedStyle(el).display==='block'&&parseFloat(getComputedStyle(el).fontSize)>=14&&el.scrollWidth<=el.clientWidth+1)),'events are readable stacked fields');
+      await detail.locator('.payment-detail-heading').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/pixelkovia-payment-detail-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
+      await detail.locator('.payment-detail-events').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/pixelkovia-payment-detail-events-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
+    }
+    await detail.locator('[data-payment-collapse]').click();assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert.equal(await toggle.evaluate(el=>document.activeElement===el),true);
+  }
+  Object.assign(detailRow,originalFirst);report.logs=[];
   await page.setViewportSize({width:1512,height:1080});
   fail=true;await page.locator('#refresh-payments').click();await page.getByRole('heading',{name:'Stav platieb nie je overený'}).waitFor();assert.equal(await page.locator('.payment-monitor.observing').count(),0);
   fail=false;attention=false;await page.locator('#refresh-payments').click();await ready();await page.locator('.payment-monitor.observing').waitFor();
