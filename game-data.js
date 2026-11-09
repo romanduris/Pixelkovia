@@ -212,24 +212,24 @@ window.GAME = {
         "POSTELI"
       ],
       "placeholder": "Miesto z doručenej správy",
-      "action": "Nájdite pracovný list pri topánkach. Uzol je veľký kruh, mostík je cesta so šípkou medzi kruhmi. Najprv opravte 12 poškodených mostíkov podľa servisného kľúča. Potom od uzla ŠTART sledujte svetelnú cestu.",
-      "task": "Uzol je veľký kruh. Mostík je cesta so šípkou medzi kruhmi. Opravte 12 mostíkov. Bodky na mostíku porovnajte s kľúčom. Dopíšte symbol na bodkovanú čiaru. Nájdite cestu. Od ŠTARTU sledujte šípky. Vyberajte mostík s rovnakým symbolom, aký má kruh, a cestu vyfarbujte. Prečítajte odkaz. Písmená z prejdených kruhov zapisujte po poradí do políčok. Kruhy bez písmena len prejdite.",
-      "materials": "Úloha 4: servisný kľúč, 12 prerušených mostíkov, sieť 24 svetelných uzlov, sedem políčok a kartička návratového znaku T. List k úlohe 5 ukryte pod vankúš v detskej posteli.",
+      "action": "Nájdite pracovný list pri topánkach. Podľa kľúča doplňte symboly do 12 prázdnych rámikov. Potom vyrazte zo ŠTARTU, sledujte šípky so zhodnými symbolmi a zapisujte písmená.",
+      "task": "Doplňte chýbajúce symboly. Porovnajte bodky s kľúčom a dopíšte symbol na bodkovanú čiaru vo všetkých 12 prázdnych rámikoch. Vyrazte zo ŠTARTU. Z každého kruhu pokračujte po šípke označenej rovnakým symbolom, aký má kruh. Cestu vyfarbujte. Zbierajte písmená. Zapisujte ich po poradí do políčok. Kruhy bez písmena len prejdite.",
+      "materials": "Úloha 4: kľúč na doplnenie symbolov, 12 prázdnych rámikov, mapa 24 kruhov, sedem políčok a kartička návratového znaku T. List k úlohe 5 ukryte pod vankúš v detskej posteli.",
       "mobile": "Iba papier. Žiadny QR kód ani overovanie odpovede v telefóne. Telefón odložte až po nájdenie listu k úlohe 5; jeho QR otvorí úlohu 5.",
-      "solution": "Servisný kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 mostíkov. Od ŠTARTU sledujte šípky a zhodný symbol uzla a mostíka; prejdená cesta má 14 mostíkov. Písmená na správnej ceste dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Návratový znak: T.",
+      "solution": "Kľúč: ľavý rozsvietený bod → ○, prostredný → △, pravý → □. Doplňte všetkých 12 rámikov. Od ŠTARTU vyberajte šípku označenú rovnakým symbolom ako kruh; správna cesta má 14 šípok. Písmená na nej dajú P → O → S → T → E → L → I. Ďalšia indícia sa skrýva v tvojej POSTELI. Návratový znak: T.",
       "hints": [
-        "Uzol je veľký kruh a mostík je cesta medzi kruhmi. V prázdnom rámiku mostíka svieti jeden z troch bodov. V servisnom kľúči nájdite rovnakú polohu a na bodkovanú čiaru dokreslite symbol.",
-        "Až po oprave vyrazte od ŠTARTU. Symbol svetelného uzla určuje mostík. Zapisujte písmená z prejdených kruhov. Kruh bez písmena do odpovede nič nepridá."
+        "V každom prázdnom rámiku je jeden z troch bodov čierny. V kľúči nájdite rovnakú polohu a na bodkovanú čiaru dopíšte symbol.",
+        "Po doplnení všetkých symbolov vyrazte zo ŠTARTU. V kruhu je △? Pokračujte po šípke označenej △. Písmená z kruhov zapisujte po poradí. Kruh bez písmena len prejdite."
       ],
-      "parent": "Celý list k úlohe 4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. List k úlohe 5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. List k úlohe 4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv opravia všetkých 12 mostíkov podľa trojbodového kľúča, potom vyfarbia cestu a zapisujú písmená z prejdených kruhov.",
-      "transition": "Opravené svetelné uzly doručia správu POSTELI. Kartičku s návratovým znakom T si odložte. V detskej posteli pod vankúšom nájdite ďalšiu indíciu a jej QR kódom otvorte ďalšiu úlohu.",
+      "parent": "Celý list k úlohe 4 bez strihania vložte do obálky (indície) 3 a ukryte do čistej suchej topánky. List k úlohe 5 ukryte pod vankúš v posteli, kde dieťa spáva. Ak hrá viac detí, vyberte jednu z ich postelí; môžu prehľadať všetky. List k úlohe 4 nemá QR a nič sa neoveruje v telefóne. Pripravte ceruzku alebo pastelku; celý list sa nestrihá. Deti najprv podľa trojbodového kľúča doplnia symboly do všetkých 12 rámikov. Potom z každého kruhu vyberú šípku so zhodným symbolom, vyfarbia cestu a zapisujú písmená.",
+      "transition": "Doručená správa prezradí POSTELI. Kartičku s návratovým znakom T si odložte. V detskej posteli pod vankúšom nájdite ďalšiu indíciu a jej QR kódom otvorte ďalšiu úlohu.",
       "character": "pingy",
       "dramaturgy": [
         "Postavička hovorí v prvej osobe. Deti pomáhajú kamarátom postupne sa nájsť; každý pridá vlastnú schopnosť a domov sa vrátia spolu."
       ],
       "narrative": {
         "before": [
-          "Ahojte! Ja som Pingy, malý posol správ. Cez svetelné uzly prenášam odkazy, aby sa kamaráti nestratili. Po oprave mosta som vás konečne začul! Pri výpadku na mostíkoch zhasli značky a odkaz uviazol v sieti. Prezradí nám, kde čaká kamarát, ktorý pozná cestu k návratovej bráne. Dorazíme k nemu všetci spolu. Opravíte spojenia a pomôžete mi odkaz doručiť? Budem cestovať s vami."
+          "Ahojte! Ja som Pingy, malý posol správ. Cez svetelné cestičky prenášam odkazy, aby sa kamaráti nestratili. Po oprave mosta som vás konečne začul! Pri výpadku zhasli značky a odkaz uviazol v sieti. Prezradí nám, kde čaká kamarát, ktorý pozná cestu k návratovej bráne. Dorazíme k nemu všetci spolu. Opravíte spojenia a pomôžete mi odkaz doručiť? Budem cestovať s vami."
         ],
         "after": []
       },
@@ -237,16 +237,16 @@ window.GAME = {
       "paperAnswer": "POSTELI",
       "paperInstructions": [
         {
-          "title": "Opravte 12 mostíkov.",
-          "text": "Bodky na mostíku porovnajte s kľúčom. Dopíšte symbol na bodkovanú čiaru."
+          "title": "Doplňte chýbajúce symboly.",
+          "text": "Porovnajte bodky s kľúčom a dopíšte symbol na bodkovanú čiaru vo všetkých 12 prázdnych rámikoch."
         },
         {
-          "title": "Nájdite cestu.",
-          "text": "Od ŠTARTU sledujte šípky. Vyberajte mostík s rovnakým symbolom, aký má kruh, a cestu vyfarbujte."
+          "title": "Vyrazte zo ŠTARTU.",
+          "text": "Z každého kruhu pokračujte po šípke označenej rovnakým symbolom, aký má kruh. Cestu vyfarbujte."
         },
         {
-          "title": "Prečítajte odkaz.",
-          "text": "Písmená z prejdených kruhov zapisujte po poradí do políčok. Kruhy bez písmena len prejdite."
+          "title": "Zbierajte písmená.",
+          "text": "Zapisujte ich po poradí do políčok. Kruhy bez písmena len prejdite."
         }
       ]
     },

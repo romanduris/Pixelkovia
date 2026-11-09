@@ -67,7 +67,7 @@
     p1:{file:'p1-miky-piko',caption:'Hľadáme spoločné spojenie.',alt:'Piko volá cez komunikátor a Miky načúva slabému signálu.'},
     p2:{file:'p2-pixi',caption:'Posvietim nám na ďalšiu stopu.',alt:'Pixi svieti na dekódovací stroj a Piko s Mikym jej pomáhajú.'},
     p3:{file:'p3-plugy',caption:'Spojíme most, aby sme mohli ísť spolu.',alt:'Plugy obnovuje spojenie digitálneho mosta s pomocou Pika, Mikyho a Pixi.'},
-    p4:{file:'p4-svetelne-uzly',caption:'Spolu obnovíme svetelné uzly.',alt:'Piko, Miky, Pixi, Plugy a Pingy spolu opravujú prerušené mostíky medzi svetelnými uzlami.'},
+    p4:{file:'p4-svetelne-uzly',caption:'Spolu doručíme stratený odkaz.',alt:'Piko, Miky, Pixi, Plugy a Pingy spolu dopĺňajú chýbajúce značky na svetelnej ceste.'},
     p5:{file:'p5-cipko-guardy-portrait',caption:'Opravujeme cestu až k Guardyho bráne.',alt:'Čipko s piatimi kamarátmi opravuje cestu a na jej konci sa ozýva Guardy.'}
   };
   function speakerPortrait(stageId) {
@@ -88,12 +88,12 @@
   function repairLights(slot,x=0,y=0) {
     return [0,1,2].map(i=>`<circle cx="${x+(i-1)*8}" cy="${y}" r="2.7" fill="${i===slot?'#172e4d':'white'}" stroke="#172e4d" stroke-width=".8"/>`).join('');
   }
-  function deliveryTerms() {
-    return `<span class="delivery-terms" role="group" aria-label="Čo je čo na mape"><span><strong>UZOL</strong> = veľký kruh <svg width="24" height="24" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Uzol: veľký kruh so symbolom"><circle cx="19" cy="19" r="16" fill="white" stroke="#284c60" stroke-width="2"/><text x="19" y="24" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#172e4d">△</text></svg></span><span><strong>MOSTÍK</strong> = cesta medzi kruhmi <svg width="66" height="26" viewBox="0 0 100 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mostík: spojenie so šípkou medzi dvoma kruhmi. Symbol dopíšte na bodkovanú čiaru v rámiku."><circle cx="10" cy="19" r="8" fill="white" stroke="#284c60" stroke-width="1.5"/><circle cx="90" cy="19" r="8" fill="white" stroke="#284c60" stroke-width="1.5"/><path d="M18 19h64m-6-4 6 4-6 4" fill="none" stroke="#284c60" stroke-width="1.5"/><rect x="36" y="3" width="28" height="32" rx="3" fill="white" stroke="#3e6475"/>${repairLights(0,50,10)}<path d="M40 29h20" stroke="#536b78" stroke-dasharray="2 2"/></svg></span></span>`;
+  function deliveryRouteExample() {
+    return `<div class="delivery-route-example"><svg width="150" height="42" viewBox="0 0 150 42" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kruh s trojuholníkom a šípka označená trojuholníkom"><circle cx="21" cy="21" r="18" fill="white" stroke="#284c60" stroke-width="1.5"/><text x="21" y="23" class="route-symbol">△</text><path d="M39 21h106m-6-5 6 5-6 5" fill="none" stroke="#284c60" stroke-width="1.5"/><rect x="72" y="7" width="28" height="28" rx="3" fill="white" stroke="#647b88"/><text x="86" y="23" class="route-symbol">△</text></svg><span>V kruhu je <strong>△</strong> → pokračujte cez <strong>△</strong>.</span></div>`;
   }
   function deliveryGuide(illustration) {
     const steps=window.GAME.stages.find(stage=>stage.id==='cipher').paperInstructions;
-    return `<section class="worksheet-mission delivery-guide" aria-labelledby="delivery-guide-title"><h3 id="delivery-guide-title">AKO NA TO</h3>${deliveryTerms()}<div class="delivery-guide-body"><ol>${steps.map((step,i)=>`<li><strong>${esc(step.title)}</strong> ${esc(step.text)}${i===0?deliveryRepairKey():''}</li>`).join('')}</ol>${illustration}</div></section>`;
+    return `<section class="worksheet-mission delivery-guide" aria-labelledby="delivery-guide-title"><h3 id="delivery-guide-title">AKO NA TO</h3><div class="delivery-guide-body"><ol>${steps.map((step,i)=>`<li><strong>${esc(step.title)}</strong> ${esc(step.text)}${i===0?deliveryRepairKey():i===1?deliveryRouteExample():''}</li>`).join('')}</ol>${illustration}</div></section>`;
   }
   function deliveryRepairKey() {
     const key=window.GAME.paperPuzzles.delivery.repairKey;
@@ -112,7 +112,7 @@
       const [x,y]=xy(i);
       return `<g class="light-node" data-node="${i}"><circle cx="${x}" cy="${y}" r="25" fill="white" stroke="#284c60" stroke-width="2"/><text x="${x}" y="${n.letter?y-11:y+1}" class="route-symbol">${n.symbol}</text>${n.letter?`<text x="${x}" y="${y+16}" class="route-letter">${n.letter}</text>`:''}${i===p.start||i===p.finish?`<text x="${x}" y="${i===p.finish?y+43:y-35}" class="route-label">${i===p.start?'ŠTART':'CIEĽ'}</text>`:''}</g>`;
     }).join('');
-    return `<svg class="delivery-map" viewBox="0 0 825 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Poškodená sieť 24 svetelných uzlov: opravte 12 mostíkov, sledujte symboly a šípky a zapisujte písmená z prejdených kruhov"><defs><marker id="delivery-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#284c60"/></marker></defs>${links}${nodes}</svg>`;
+    return `<svg class="delivery-map" viewBox="0 0 825 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mapa 24 kruhov: doplňte 12 chýbajúcich symbolov, sledujte šípky so zhodnými symbolmi a zapisujte písmená z kruhov"><defs><marker id="delivery-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#284c60"/></marker></defs>${links}${nodes}</svg>`;
   }
   function sealPattern(mask) {
     return `<svg class="seal-pattern" viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vzor správy: ${mask}">${Array.from(mask,(bit,i)=>`<rect x="${i%3*12}" y="${Math.floor(i/3)*12}" width="12" height="12" fill="${bit==='1'?'#172e4d':'white'}" stroke="#73818c" stroke-width=".7"/>`).join('')}</svg>`;
@@ -156,7 +156,7 @@
     envelope:bathroom,
     document:{label:'Úloha pri okne',placement:'Vytlačenú indíciu položte k zatvorenému oknu. Kruhy strihajú až deti.',hint:'Vonkajšie D nastavte oproti vnútornému A.'},
     symbols:{label:'Úloha pod stoličkou',placement:'Vytlačenú indíciu prilepte pod sedadlo stoličky.',hint:'Dopočítajte tvary; v telefóne označte všetky políčka s ich hodnotami.'},
-    cipher:{label:'Úloha pri topánkach',placement:'Vytlačenú indíciu ukryte do čistej suchej topánky.',hint:'Opravte mostíky, potom sledujte zhodné symboly a zbierajte písmená.'},
+    cipher:{label:'Úloha pri topánkach',placement:'Vytlačenú indíciu ukryte do čistej suchej topánky.',hint:'Doplňte symboly. Z každého kruhu pokračujte po šípke so zhodným symbolom a zapisujte písmená.'},
     maze:{label:'Úloha v posteli',placement:'Vytlačenú indíciu dajte pod vankúš v detskej posteli.',hint:'Číslice z hier vymeňte podľa papierového kľúča za časti slova.'},
     search:{label:'Úloha v chladničke',placement:'Vytlačenú indíciu dajte do chladničky na miesto, kam deti ľahko dosiahnu.',hint:'Oprava presne doplní biele políčka správy. Dve bez opravy prečiarknite. Číslice pri opravených správach čítajte zhora nadol; nič neprepisujte ani nepreskupujte.'},
     code:{label:'Úloha pod gaučom',placement:'Vytlačenú indíciu ukryte pod gauč na dosah ruky.',hint:'Vyfarbite presne ○★, △□ a +◇. Poradie symbolov platí; objaví sa návratový znak O.'},

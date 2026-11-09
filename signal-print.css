@@ -375,10 +375,10 @@
 }
 
 /* The names refer to the same shapes used in the map immediately below. */
-.delivery-terms{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-bottom:5px}
-.delivery-terms>span{display:inline-flex;align-items:center;gap:4px}
-.delivery-terms svg{display:block;flex-shrink:0}
-@media print{.delivery-terms{gap:1mm 3mm;margin-bottom:1mm}.delivery-terms>span{gap:1mm}}
+.delivery-route-example{display:flex;align-items:center;flex-wrap:wrap;gap:5px 10px;margin-top:6px;padding:5px 8px;border:1px solid #c5d1dc;border-radius:5px;background:white}
+.delivery-route-example svg{display:block;width:120px;height:auto;flex-shrink:0}
+.delivery-route-example .route-symbol{font-size:22px}
+@media print{.delivery-route-example{gap:1mm 2mm;margin-top:1.5mm;padding:1mm 2mm}.delivery-route-example svg{width:30mm}}
 
 /* One guide: definitions, repair key and ordered actions stay together. */
 #p4 .delivery-guide{margin:12px 0;padding:12px 15px;break-inside:avoid}
@@ -386,7 +386,6 @@
 .delivery-guide ol{margin:0;padding-left:20px}
 .delivery-guide li{padding-left:2px;margin:0 0 8px;font-size:var(--sheet-copy);line-height:1.4}
 .delivery-guide li:last-child{margin-bottom:0}
-.delivery-guide .delivery-terms{margin-bottom:8px}
 .delivery-guide .delivery-repair-key{border:0;padding:0;margin:6px 0 0;background:none}
 .delivery-guide .delivery-repair-key>div{gap:6px}
 .delivery-guide .worksheet-scene{border:0;padding:0;background:none}
@@ -398,7 +397,6 @@
  .delivery-guide-body{gap:3mm}
  .delivery-guide ol{padding-left:4mm}
  .delivery-guide li{margin-bottom:2mm}
- .delivery-guide .delivery-terms{margin-bottom:2mm}
  .delivery-guide .delivery-repair-key{margin:1.5mm 0 0}
  .delivery-guide .delivery-repair-key svg{height:7mm}
  #p4 .delivery-guide .worksheet-scene img{height:33mm;aspect-ratio:4/5}
@@ -454,7 +452,6 @@
  #p4 .delivery-guide>h3{margin-bottom:1mm}
  #p4 .delivery-guide li{margin-bottom:1.5mm}
  #p4 .delivery-guide li:last-child{margin-bottom:0}
- #p4 .delivery-guide .delivery-terms{margin-bottom:1.5mm}
  #p5 .worksheet-visual-row{margin-block:1mm}
  #p5 .worksheet-scene{padding:1.5mm}
  #p5 .cipko-workbook{margin-block:2.5mm}
