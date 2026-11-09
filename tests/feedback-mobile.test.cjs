@@ -15,10 +15,18 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await saveChecklist(server.db,'qa-family',e.id,Object.fromEntries(checklist.map(s=>[s.id,true])));
   const session=await activate(server.db,'qa-family',e.id,'feedback-mobile-test',{at:Date.now()-74*60000});
   const run=await requireRun(server.db,'qa-family',session.runId,session.deviceToken);
+  // A portal already open during play scrolls to feedback on completion too.
+  const watching=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:390,height:844},isMobile:true,hasTouch:true}),parent=await watching.newPage();
+  await parent.goto(server.url+'/Supervisor');await parent.locator('#login-email').fill(server.email);await parent.locator('#login-password').fill(server.customerPassword);await parent.locator('#customer-login button').tap();await parent.locator('#start-game').waitFor();
   await finishRun(server.db,run,{progress:{stage:7,completed:[1,2,3,4,5,6,7]}});
+  await parent.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+  await parent.waitForFunction(()=>{const r=document.querySelector('#hodnotenie')?.getBoundingClientRect();return scrollY>100&&r&&r.top>=0&&r.top<=20;});
+  assert.equal(new URL(parent.url()).hash,'','completion also scrolls an already open portal without a fragment');await watching.close();
   const login=async page=>{await page.goto(server.url+'/Supervisor');await page.locator('#login-email').fill(server.email);await page.locator('#login-password').fill(server.customerPassword);await page.locator('#customer-login button').tap();await page.locator('#hodnotenie').waitFor();};
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));await login(page);
+  await page.goto(server.url+'/Supervisor#hodnotenie');await page.locator('#game-feedback').waitFor();
+  await page.waitForFunction(()=>{const r=document.querySelector('#hodnotenie')?.getBoundingClientRect();return scrollY>100&&r&&r.top>=0&&r.top<=20;});
   assert.equal(await page.locator('.rating-stars .is-filled').count(),0);
   assert.deepEqual(await page.locator('.run-statistics dt').allTextContents(),['Celkový čas','Vyriešené úlohy']);
   assert.deepEqual(await page.locator('.run-statistics dd').allTextContents(),['74 min','7 / 7']);

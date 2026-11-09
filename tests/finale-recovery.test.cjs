@@ -55,6 +55,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await page.waitForFunction(()=>{const v=document.querySelector('#finale-video');return v&&!v.paused&&v.currentTime>.1;});await page.locator('#finale-video').evaluate(v=>{v.playbackRate=8;});await page.waitForFunction(()=>document.querySelector('#finale-video').ended);
   assert.equal((await first(server.db,'SELECT completed_at FROM game_runs WHERE id=?',runId)).completed_at,completed.completed_at);
   await page.locator('.finale-exit').tap();await page.waitForURL('**/Supervisor#hodnotenie');await page.locator('#game-feedback').waitFor();
+  await page.waitForFunction(()=>{const card=document.querySelector('#hodnotenie')?.getBoundingClientRect();return scrollY>100&&card&&card.top>=0&&card.top<=20;});
   assert.equal(await page.locator('.task-progress .done').count(),6);assert.equal(await page.locator('.progress-heading strong').innerText(),'6 zo 7');
   assert.equal(await page.locator('.run-statistics div').filter({has:page.locator('dt',{hasText:'Vyriešené úlohy'})}).locator('dd').innerText(),'6 / 7');
   assert.equal(await page.locator('.current-task').innerText(),'✓ Hra je ukončená.');
