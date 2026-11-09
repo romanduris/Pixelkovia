@@ -26,7 +26,7 @@
   let configuration,configurationPromise,embedded,stripeLoading,preparing=false,creating=false,completed=false,checking=false,recoveringPayment=false;
   function persistPurchase(){try{if(purchase)localStorage.setItem(purchaseStorage,JSON.stringify(purchase));else localStorage.removeItem(purchaseStorage);}catch{}}
   async function api(url,options={}){const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(15000),...options});const data=await response.json();if(!response.ok){const error=Error(data.error||pendingMessage);error.status=response.status;error.code=data.code;throw error;}return data;}
-  const post=(url,input)=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)});
+  const post=(url,input)=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(url==='/api/checkout/session'?{...input,...window.PixelkoviaMarketing?.context()}:input)});
   // No payment awaits diagnostics. Send fixed event names only, without Stripe
   // errors, field values, card data, email, URL or payment client secrets.
   function diagnostic(type,method='unknown',code=''){

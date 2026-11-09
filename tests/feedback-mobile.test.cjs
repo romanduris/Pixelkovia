@@ -58,7 +58,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await login(laterPage);await laterPage.getByText('✓ Ďakujeme za vaše hodnotenie!').waitFor();assert.equal(await laterPage.locator('.saved-rating').getAttribute('aria-label'),'3 z 5 hviezdičiek');await later.close();
   const admin=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1440,height:900}}),management=await admin.newPage();management.on('pageerror',e=>errors.push(e.message));
   await management.goto(server.url+'/admin');await management.locator('#password').fill(server.adminPassword);await management.locator('#login-button').click();await management.waitForURL('**/admin');await management.locator('.payment-workspace').waitFor();
-  assert.equal(await management.locator('[data-page]').count(),2);assert.equal(await management.locator('[data-page=orders],[data-page=dashboard],#filters').count(),0);
+  assert.equal(await management.locator('[data-page]').count(),3);assert.equal(await management.locator('[data-page=orders],[data-page=dashboard],#filters').count(),0);
   await management.locator('[data-page=analytics]').click();await management.locator('[data-row]').waitFor();
   assert.equal(await management.locator('.analysis-summary article').count(),4);assert.equal(await management.locator('#view select').count(),1);
   assert.match(await management.locator('.customer-status').innerText(),/1 h 14 min/);

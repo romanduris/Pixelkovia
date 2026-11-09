@@ -46,10 +46,15 @@ test('password-only authentication works in actual Workers/D1 runtime and gates 
   const unauth=await mf.dispatchFetch('https://admin.example.invalid/',{redirect:'manual'});assert.equal(unauth.status,303);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/customers')).status,401);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments')).status,401);
+  assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing')).status,401);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/login')).status,200);
   const login=await mf.dispatchFetch('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify({password})});
   assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
   const authenticated=await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}});assert.equal(authenticated.status,200);
+  const marketing=await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing',{headers:{cookie}});assert.equal(marketing.status,200);assert.equal((await marketing.json()).metrics.visits,null);
+  const event={consent:true,type:'checkout',visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'influencer',campaign:'runtime-campaign',device:'mobile'};
+  const record=await mf.dispatchFetch('https://admin.example.invalid/api/marketing/event',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify(event)});assert.equal(record.status,200);
+  const measured=await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing',{headers:{cookie}});assert.equal(measured.status,200);const funnel=await measured.json();assert.equal(funnel.metrics.visits,1);assert.equal(funnel.metrics.checkouts,1);assert.equal(funnel.rows.find(r=>r.source==='influencer').visits,1);
   const paymentReport=await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments',{headers:{cookie}});assert.equal(paymentReport.status,200);assert.equal((await paymentReport.json()).health,'attention');
   const eventId='b'.repeat(64);
   await execute(db,"INSERT INTO payment_log VALUES(?,NULL,'server','sdk_error','technical','','unknown','',?)",eventId,Date.now());

@@ -11,6 +11,7 @@ import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './custome
 import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,releaseCheckout,paymentWebhook,sendPending,auditPayments} from './commerce.mjs';
 import {browserPaymentEvent,paymentReport,paymentLog,attemptFor,reviewPaymentEvent} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
+import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
 async function body(request){
@@ -63,11 +64,12 @@ async function customerApi(request,env,path){
   if(path==='/api/customer/complete'&&request.method==='POST')return json(await gameEvent(db,run,{...input,type:'complete'}));
   throw new HttpError(404,'Endpoint neexistuje.');
 }
-export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env)]);},async fetch(request,env,context){
+export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env),pruneMarketing(env)]);},async fetch(request,env,context){
   let paymentInput;
   try{
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
+    if(path==='/api/marketing/event'&&request.method==='POST'){sameOrigin(request);return json(await marketingEvent(request,env,await body(request)));}
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){
       const session=url.searchParams.get('session_id'),checkoutId=url.searchParams.get('checkout_id');
@@ -75,7 +77,13 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
       return json(await verifiedCheckoutStatus(env,session,checkoutId));
     }
     if(path==='/api/checkout/diagnostic'&&request.method==='POST'){sameOrigin(request);return json(await browserPaymentEvent(request,env,await body(request)));}
-    if(path==='/api/checkout/session'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await createCheckout(env,{...paymentInput,__ip:request.headers.get('CF-Connecting-IP')||'unknown'}));}
+    if(path==='/api/checkout/session'&&request.method==='POST'){
+      sameOrigin(request);paymentInput=await body(request);
+      const result=await createCheckout(env,{...paymentInput,__ip:request.headers.get('CF-Connecting-IP')||'unknown'});
+      const link=linkMarketingAttempt(env,paymentInput).catch(()=>console.error('marketing_attribution_failed'));
+      if(context?.waitUntil)context.waitUntil(link);else await link;
+      return json(result);
+    }
     if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await releaseCheckout(env,paymentInput));}
     if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env,context));
     if(path==='/api/support/webhook'&&request.method==='POST')return json(await supportWebhook(request,env));
@@ -115,6 +123,7 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(request.method!=='GET'&&request.method!=='HEAD')throw new HttpError(405,'Administrátorské rozhranie je v tejto etape iba na čítanie.');
     if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',fakeCustomers:await fakeCustomerCount(env.TQ_DB),webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH_SECRET});
     if(path==='/api/admin/products')return json(await query(env.TQ_DB,'SELECT * FROM products ORDER BY id'));
+    if(path==='/api/admin/marketing')return json(await marketingReport(env,url.searchParams));
     if(path==='/api/admin/payments'){
       const report=await paymentReport(env,url.searchParams,commerceReady(env));
       if(context?.waitUntil&&(!report.checks.length||report.checks.some(c=>Date.now()-c.checked_at>600000)))context.waitUntil(auditPayments(env));

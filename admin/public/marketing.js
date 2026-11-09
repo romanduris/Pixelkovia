@@ -1,0 +1,59 @@
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-SK',{maximumFractionDigits:1}).format(value);
+const pct=value=>value==null?'Nedostupné':num(value*100)+' %';
+const money=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-SK',{style:'currency',currency:'EUR'}).format(value/100);
+const date=value=>value==null?'Zatiaľ nezaznamenané':new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(value);
+const sourceNames={facebook_ads:'Facebook reklama',instagram_ads:'Instagram reklama',meta:'Meta (UTM)',facebook:'Facebook (UTM)',instagram:'Instagram (UTM)',influencer:'Influencer',direct:'Priame návštevy',organic:'Organic',unknown:'Ostatné / neznáme'};
+let selected={period:'14'};
+export const marketingParams=()=>new URLSearchParams(selected);
+const options=(items,value)=>Object.entries(items).map(([id,label])=>`<option value="${esc(id)}"${id===value?' selected':''}>${esc(label)}</option>`).join('');
+const card=(label,value,note)=>`<article class="marketing-kpi"><span>${esc(label)}</span><strong${value==='Nedostupné'?' class="is-unavailable"':''}>${esc(value)}</strong><small>${esc(note)}</small></article>`;
+export function marketing(d){
+  const m=d.metrics,f=d.filters;
+  const stages=[['Návšteva',m.visits,'Namerané návštevy'],['Checkout',m.checkouts,'Unikátne prehliadače'],['Platobný pokus',d.cohort.attempts,'Unikátne pripravené Stripe relácie'],['Úspešný nákup',d.cohort.purchases,'Overené platené transakcie']];
+  const step=(value,previous)=>value==null||previous==null||!previous?null:value/previous;
+  return `<div class="marketing-dashboard">
+    <form id="marketing-filters" class="marketing-filters" aria-label="Filtre predajného funnelu">
+      <label>Obdobie<select name="period">${options({today:'Dnes','7':'7 dní','14':'14 dní','30':'30 dní',custom:'Vlastný rozsah'},f.period)}</select></label>
+      <label>Od<input type="date" name="from" value="${esc(f.from)}" required ${f.period==='custom'?'':'disabled'}></label><label>Do<input type="date" name="to" value="${esc(f.to)}" required ${f.period==='custom'?'':'disabled'}></label>
+      <label>Zdroj<select name="source">${options({'':'Všetky zdroje',...sourceNames},f.source)}</select></label>
+      <label>Kampaň<select name="campaign">${options({'':'Všetky kampane',...Object.fromEntries([...new Set([...d.campaigns,...f.campaign?[f.campaign]:[]])].map(c=>[c,c]))},f.campaign)}</select></label>
+      <label>Zariadenie<select name="device">${options({'':'Všetky zariadenia',mobile:'Mobil',desktop:'Desktop',tablet:'Tablet',unknown:'Neznáme'},f.device)}</select></label>
+      <label>Produkt<select name="product">${options({'':'Všetky produkty',game:'Hra',books:'Knihy',combination:'Hra + knihy'},f.product)}</select></label>
+      <button class="button" type="submit">Použiť filtre</button><button class="button secondary" type="button" id="refresh-marketing">Obnoviť</button>
+    </form>
+    <section class="marketing-quality" aria-label="Kvalita merania"><strong>Neúplné pokrytie návštevnosti</strong><ul>${d.warnings.map(w=>`<li>${esc(w)}</li>`).join('')}</ul><small>Začiatok zberu: ${date(d.startedAt)} · Posledná prijatá udalosť: ${date(d.lastEventAt)}<br>Posledná úspešná aktualizácia prehľadu: ${date(d.generatedAt)} · Časy Europe/Bratislava</small><p class="marketing-freshness" data-generated="${d.generatedAt}">Obnovu údajov spustíte tlačidlom Obnoviť.</p></section>
+    <div class="marketing-kpis" aria-label="Hlavné metriky">
+      ${card('Návštevy',num(m.visits),'Namerané návštevy so súhlasom; 30 minút medzi otvoreniami stránky začína novú návštevu.')}
+      ${card('Checkout',num(m.checkouts),'Unikátne prehliadače s otvorením checkoutu v návštevnej kohorte.')}
+      ${card('Nákupy',num(m.purchases),'Serverom overené platené transakcie podľa dátumu úhrady. Darček sa počíta raz.')}
+      ${card('Konverzia',pct(m.conversion),d.conversionReason||'Platené nákupy priradené návštevnej kohorte / namerané návštevy tejto kohorty.')}
+    </div>
+    <section class="panel"><h2>Cesta k nákupu</h2><p class="caption">Kohorta návštev začatých vo zvolenom období. Neskoršie nákupy tejto kohorty sa dopĺňajú až do času aktualizácie.</p>
+      <ol class="marketing-stages">${stages.map(([label,count,note],i)=>`<li><span>${i+1}. ${label}</span><strong>${num(count)}</strong><small>${note}</small><b>${i?pct(step(count,stages[i-1][1]))+' z predchádzajúceho kroku':'Východiskový počet'}</b></li>`).join('')}</ol>
+      <p class="caption">Jednotky sa líšia: návštevy → prehliadače → nákupné pokusy → transakcie. Jeden prehliadač môže mať viac návštev a platobných pokusov, preto prechody nie sú čistým percentom odchodu a môžu prekročiť 100 %. Platobný pokus tu znamená vytvorenú Stripe reláciu, nie zadanie karty ani potvrdenie bankou.</p>
+    </section>
+    <section class="panel"><h2>Návštevnosť podľa zdroja</h2><p class="caption">Skutočné namerané údaje. Nákupy a konverzia patria k návštevnej kohorte; posledný stĺpec ukazuje všetky úhrady prijaté v období.</p><p class="caption marketing-scroll-hint">Ďalšie stĺpce zobrazíte posunutím tabuľky do strany →</p>
+      <div class="marketing-table-wrap" tabindex="0" role="region" aria-label="Návštevnosť podľa zdroja"><table><thead><tr><th scope="col">Zdroj</th><th scope="col">Návštevy</th><th scope="col">Nákupy z návštev</th><th scope="col">Konverzia</th><th scope="col">Úhrady v období</th></tr></thead><tbody>${d.rows.map(r=>`<tr><th scope="row">${esc(r.label)}</th><td>${num(r.visits)}</td><td>${num(r.purchases)}</td><td>${pct(r.conversion)}</td><td>${num(r.periodPurchases)}</td></tr>`).join('')}</tbody></table></div>
+      <p class="caption">Konverzia = nákupy priradené návštevám daného zdroja / namerané návštevy zdroja. ${esc(d.conversionReason||'Pri nulovom menovateli sa konverzia nepočíta.')} Nepriradené a historické platby zostávajú v „Ostatné / neznáme“ v stĺpci úhrad; nevytvárajú fiktívne návštevy. Pri filtri produktu sú návštevy nedostupné, pretože zámer návštevníka pred checkoutom nepoznáme.</p>
+    </section>
+    <div class="marketing-secondary">
+      ${card('Tržby z overených platieb',money(m.revenueCents),'Hrubé inkaso v EUR pred refundáciami a poplatkami; rovnaký rozsah ako Nákupy.')}
+      ${card('Reklamné náklady','Nedostupné',d.costReason)}
+      ${card('CAC','Nedostupné','Náklady / pripísané platené nákupy. Chýbajú overené náklady; filter zariadenia a produktu by navyše vyžadoval ich rozdelenie.')}
+      ${card('Technické chyby platieb',d.technicalComplete?num(m.technicalSignals):'Nedostupné',`${m.technicalSignals} zaznamenaných deduplikovaných signálov; ${m.technicalAttempts} unikátnych priradených pokusov. Nejde o presný počet porúch. Logy sa uchovávajú 90 dní.`)}
+      ${card('Objednávky s problémom prístupu',num(m.accessIssueOrders),`${m.accessIssues} dotknutých platených transakcií. Chýbajúca objednávka > 2 min., chyba e-mailu alebo čakanie > 10 min. Odovzdanie poskytovateľovi nepotvrdzuje doručenie do schránky.`)}
+      ${card('Knižné doplnky pri platbe',num(d.addons.books),`Z ${num(d.addons.attempts)} unikátnych pripravených platieb. Druhá hra: ${num(d.addons.gifts)}; Atlas: ${num(d.addons.atlas)}. ${d.addonReason}`)}
+    </div>
+    <section class="panel"><h2>Jednotky a dostupnosť dát</h2><div class="marketing-unit-grid"><p><strong>${num(m.purchases)}</strong> platených transakcií</p><p><strong>${num(m.orders)}</strong> vytvorených objednávok</p><p><strong>${num(m.gameAccesses)}</strong> platných herných prístupov</p><p><strong>${num(m.refunds)}</strong> transakcií s refundáciou</p></div>
+      <ul class="marketing-source-status"><li><strong>Návštevy a UTM:</strong> ${d.lastEventAt?'Prijímané udalosti so súhlasom.':'Nedostupné — zber ešte nie je potvrdený.'} Identifikátory prehliadača nerozlišujú fyzické osoby ani zariadenia jedného človeka.</li><li><strong>Platby a prístupy:</strong> existujúci serverový monitoring a D1; prvý zaznamenaný nákupný pokus ${date(d.paymentStartedAt)}. Pripísané platby v období: ${num(m.attributedPurchases)} z ${num(m.purchases)}.</li><li><strong>Kontroly Stripe:</strong> ${d.checks.length?d.checks.map(c=>`${esc(c.id)}: ${c.ok?'úspešná':'zlyhala'} (${date(c.checked_at)})`).join('; '):'Nedostupné — chýba kontrola.'}</li><li><strong>Reklamné náklady / Meta Ads:</strong> ${esc(d.costReason)}</li><li><strong>Podiel meraných návštev:</strong> Nedostupné — chýba nezávislý a porovnateľný počet všetkých návštev.</li></ul>
+      <details><summary>Metodika a obmedzenia</summary><p>Návšteva zahŕňa predajný web / aj /checkout. Po 30 minútach medzi zaznamenanými otvoreniami stránky začína nová návšteva. Zdroj a kampaň sa zachovajú z prvého otvorenia v tejto návšteve. Facebook/Instagram reklamu určujú explicitné UTM zdroja a plateného média; influencer musí byť označený v UTM. Direct znamená otvorenie bez UTM a referrera; iné chýbajúce zdroje neodhadujeme. Organic používa explicitné UTM alebo referrer známeho vyhľadávača. Kampaň musí byť technický názov bez osobných údajov.</p><p>Konverzia používa iba nákupy bezpečne priradené nameraným návštevám. KPI Nákupy a tržby používajú dátum serverom overenej úhrady a zahŕňajú aj nepriradené platby. Preto sa počty môžu líšiť. Objednávky zdarma nevstupujú do platených nákupov. Úspešná platba ostáva historickým nákupom aj po refundácii; refundácie sú uvedené samostatne. Meranie v prehliadači môžu obmedziť blokovače, výpadky a chýbajúci súhlas. Neprítomná udalosť nepreukazuje odchod ani technickú chybu.</p></details>
+    </section>
+  </div>`;
+}
+export function bindMarketing(refresh){
+  const form=document.querySelector('#marketing-filters');
+  form.addEventListener('change',e=>{if(e.target.name==='period')for(const name of ['from','to'])form.elements[name].disabled=e.target.value!=='custom';});
+  form.addEventListener('submit',e=>{e.preventDefault();if(!form.reportValidity())return;selected=Object.fromEntries(new FormData(form));refresh();});
+  document.querySelector('#refresh-marketing').addEventListener('click',()=>form.requestSubmit());
+}
