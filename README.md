@@ -9,6 +9,8 @@ Jediná aktívna aplikácia: **https://pixelkovia.rodulab.com**.
 
 Rodičovský portál označuje prípravnú časť „Príprava na hru“. Po spustení hry je príprava zbalená nad tlačidlom „Spustiť hru“ a priebehom tímu; tlačidlo pokračuje v existujúcej relácii.
 
+Spustenie novej hry otvorí skrátenú úvodnú správu (61 namiesto 87 slov). Pôvodné video sa počas čítania potichu načíta a spustí sa ťuknutím na „Prehrať Pikovu správu“. Úvod neprepína dokument na celú obrazovku ani na pozadí neotvára kúpeľňový kód. Prehratie, návrat do portálu a obnovenie stránky zachovajú nedokončený úvod; prvú úlohu otvorí až QR z pracovného listu. Ovládanie videa rozlišuje načítavanie, prehrávanie, pauzu, opakovanie a chybu s možnosťou opätovného načítania. Obnovenie stránky samo nespúšťa zvuk.
+
 Tlačidlo „Koniec hry“ v závere uloží ukončenie a otvorí hodnotenie v rodičovskom portáli aj pri chýbajúcom zázname úlohy alebo chybe synchronizácie. Počet vyriešených úloh vychádza zo skutočne uložených záznamov; ukončenie nedopĺňa chýbajúce riešenia. Chyba samotného ukončenia ponechá možnosť skúsiť ho znova. Zatvorenie okna po jednotlivej úlohe iba uloží postup. Autorizácia nákupu a herného telefónu zostáva povinná.
 
 ## Zostavenie a nasadenie
@@ -50,6 +52,7 @@ PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/supervisor-mobile.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/supervisor-mobile.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/customer-journey.test.cjs
+PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/intro-start.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/finale-recovery.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright QA_BROWSER=webkit node tests/finale-recovery.test.cjs
 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/checkout-payment.test.cjs
@@ -61,6 +64,8 @@ node tests/paper-puzzles.test.cjs
 ```
 
 Mobilný test portálu overuje dotykové ovládanie pri 320/360/390/430 px, desktop pri 1280 px, rozbalenie úkrytov a vysvetlenia telefónu, individuálne aj spoločné potvrdenie, obnovu po chybe ukladania a prepnutie medzi dvoma nákupmi s rovnakým e-mailom.
+
+`intro-start` používa mobilné Chromium a WebKit s bežnými pravidlami automatického prehrávania, skutočný MP4, prihlásenie, herný token a izolovanú D1. Overuje spustenie aj návrat z portálu, viditeľnosť videa, tiché načítanie a zachovanie prehrávača, dotykové ovládanie, pomalé načítanie, zablokované prehrávanie, chybu siete a opakovanie, obnovenie stránky, staršie uložené úvody a pokračovanie cez QR. Rozloženie videa kontroluje pri 320 × 568, 390 × 844 a 844 × 390 px. Automatizovaný test nenahrádza skúšku na fyzickom telefóne.
 
 Predvolené testy používajú Chromium; `QA_BROWSER=webkit` volí WebKit. Dňa 28. 10. 2026 prešla celá cesta aj platobné scenáre v oboch prehliadačoch. Test celej cesty používa izolované Workers a D1, skutočné prihlasovacie relácie, prípravu, všetkých sedem pôvodných úloh, návrat do portálu, hodnotenie, druhý telefón a administráciu. Checkout kontroluje šírky 360, 390, 430 a 1360 px, ceny, návrat k objednávke a chybové stavy s riadenou náhradou Stripe SDK. Testy nevytvárajú produkčných zákazníkov ani platby; neoverujú fyzické zariadenie, banku ani doručenie skutočného e-mailu. Prístupové údaje fixture zostávajú v testovacom procese.
 

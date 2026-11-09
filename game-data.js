@@ -46,9 +46,9 @@ window.GAME = {
       ],
       "narrative": {
         "before": [
-          "Ahojte, ja som Piko! Som malý Pixelko zo sveta ukrytého za vašimi obrazovkami. Žije nás tam sedem kamarátov. Každý sa stará o niečo iné. Ja dávam pozor, aby sme spolupracovali a aby medzi nami fungovalo spojenie.",
-          "Lenže dnes všetky obrazovky naraz zablikali. Naše svetelné cestičky zhasli a ja som stratil kontakt s kamarátmi. Neviem, kde sú ani čo sa stalo. Našťastie som sa dokázal spojiť s vaším telefónom.",
-          "Potrebujem vašu pomoc! Pomôžete mi nájsť kamarátov a obnoviť spojenie? Pozrite si moju krátku videosprávu. Prezradím vám, kde začať."
+          "Ahojte, ja som Piko! Za vašimi obrazovkami žijeme siedmi kamaráti. Každý má svoju úlohu. Ja dávam pozor, aby sme spolupracovali a zostali v spojení.",
+          "Dnes však obrazovky zablikali a naše svetelné cestičky zhasli. Stratil som kontakt s kamarátmi. Neviem, kde sú. Našťastie sa mi podarilo spojiť s vaším telefónom.",
+          "Pomôžete mi nájsť kamarátov? Pozrite si moju videosprávu. Prezradím vám, kde začať."
         ],
         "after": [
           "Ďakujem, že mi chcete pomôcť! Prvú indíciu nájdete podľa videosprávy. Ja sa zatiaľ pokúsim zachytiť ďalší signál."

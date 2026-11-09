@@ -22,7 +22,7 @@ const KEY='zahada-v1-progress';
   assert.equal(afterVideo.stage,0);assert.equal(afterVideo.callDone,false);
   await page.locator('[data-action="back-to-message"]').click();
   assert.equal(await page.locator('.quest-story').innerText(),intro);
-  assert.equal(await page.locator('dialog video').count(),0);
+  assert.equal(await page.locator('dialog video:visible').count(),0);
   assert.ok(await page.evaluate(()=>window.previousPikoVideo.paused));
   assert.equal(await page.locator('.signal-restore').count(),0);
   assert.equal(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).callDone,KEY),false);
