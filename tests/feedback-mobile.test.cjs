@@ -23,13 +23,16 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.deepEqual(await page.locator('.run-statistics dt').allTextContents(),['Celkový čas','Vyriešené úlohy']);
   assert.deepEqual(await page.locator('.run-statistics dd').allTextContents(),['74 min','7 / 7']);
   for(const [width,height]of [[320,568],[360,640],[390,844],[430,932],[1440,900]]){
-   await page.setViewportSize({width,height});await page.evaluate(()=>scrollTo(0,0));
+   await page.setViewportSize({width,height});
+   const placement=await page.locator('#hodnotenie').evaluate(el=>{const game=document.querySelector('#vasa-hra');return {after:game.nextElementSibling===el,aligned:Math.abs(game.getBoundingClientRect().left-el.getBoundingClientRect().left)<1,width:Math.abs(game.getBoundingClientRect().width-el.getBoundingClientRect().width)<1};});assert.deepEqual(placement,{after:true,aligned:true,width:true});
+   if(width===1440){await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`/tmp/feedback-below-game-${engine.name()}.png`,fullPage:true});}
+   await page.locator('#hodnotenie').evaluate(el=>el.scrollIntoView({block:'start'}));
    const fit=await page.locator('#hodnotenie').evaluate(el=>({top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom,viewport:innerHeight,overflow:document.documentElement.scrollWidth>innerWidth,textarea:el.querySelector('textarea').getBoundingClientRect().height}));
 
    assert.ok(fit.top>=0&&fit.bottom<=fit.viewport,`feedback fits ${width}x${height}: ${JSON.stringify(fit)}`);
    assert.equal(fit.overflow,false);assert.ok(fit.textarea>=110);
   }
-  await page.setViewportSize({width:390,height:844});await page.screenshot({path:`/tmp/feedback-${engine.name()}.png`});
+  await page.setViewportSize({width:390,height:844});await page.locator('#hodnotenie').evaluate(el=>el.scrollIntoView({block:'start'}));await page.screenshot({path:`/tmp/feedback-${engine.name()}.png`});
   await page.locator('[name=stars][value="4"]').tap();assert.equal(await page.locator('.rating-stars .is-filled').count(),4);
   await page.locator('[name=stars][value="3"]').tap();assert.equal(await page.locator('.rating-stars .is-filled').count(),3);
   await page.keyboard.press('ArrowRight');assert.equal(await page.locator('.rating-stars .is-filled').count(),4);await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('.rating-stars .is-filled').count(),3);
