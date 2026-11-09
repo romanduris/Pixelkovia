@@ -229,7 +229,7 @@
         <figure class="guide-portal-qr"><strong>Rodičovský portál</strong><a href="https://pixelkovia.rodulab.com/Supervisor" aria-label="Otvoriť rodičovský portál"><img src="assets/supervisor-qr.svg" width="128" height="128" alt="QR kód na rodičovský portál"></a><figcaption><a href="https://pixelkovia.rodulab.com/Supervisor">pixelkovia.rodulab.com/<wbr>Supervisor</a></figcaption></figure>
         <section class="guide-ready"><h3><span>4.</span><svg class="guide-prep-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg> Hra sa môže začať!</h3><p>V portáli ťuknite na <strong>Spustiť hru</strong>. Deti už povedie príbeh.</p></section>
       </div>
-      <div class="guide-tools"><p><strong>Deti potrebujú:</strong> detské nožnice, ceruzku, tmavú pastelku a telefón s internetom.</p></div>
+      <div class="guide-tools"><p><strong>Deti potrebujú:</strong> detské nožnice, ceruzku, tmavú pastelku a telefón s internetom.</p><p><strong>Pred hrou deťom pripomeňte:</strong> Návratové znaky si priebežne zapisujte alebo zapamätajte. Budete ich potrebovať vo finále hry.</p></div>
       <div class="guide-section-label"><span>ÚVOD · ÚKRYTY · RIEŠENIA · NÁVRATOVÉ ZNAKY</span></div><div class="guide-stages"><div class="guide-column">${guideCards.slice(0,4).join('')}</div><div class="guide-column">${guideCards.slice(4).join('')}</div></div><footer class="footer"><span>PIXELKOVIA · ŤAHÁK PRE RODIČA</span><span>Riešenia a návratové znaky si nechajte pre seba.</span></footer></section>`;
   }
   window.PRINT_MATERIALS={sheets,bathroom,parentInstructions,summary,adultHelp,stageSolution,gameMasterInstructions,bathroomSolution,bathroomInstructions,parentGuide};

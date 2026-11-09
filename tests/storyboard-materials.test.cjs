@@ -29,7 +29,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.equal(await guide.locator('.guide-stage .guide-setup').count(),8);assert.equal(await guide.locator('.guide-stage .gm-solution').count(),8);assert.equal(await guide.locator('.guide-reward').count(),6);
   assert.ok(await guide.locator('.guide-piko').evaluate(img=>img.naturalWidth>0),'Piko loads in the guide header');
   assert.equal(await guide.locator('.guide-intro>section').count(),4,'four short preparation steps');
-  assert.equal(await guide.locator('.guide-safety').count(),0);assert.equal(await guide.locator('.guide-tools p').count(),1);
+  assert.equal(await guide.locator('.guide-safety').count(),0);assert.equal(await guide.locator('.guide-tools p').count(),2);
   assert.match(await guide.locator('.guide-portal-step').innerText(),/Prihlasovacie údaje nájdete v e-maile/);
   assert.ok((await guide.locator('.guide-portal-qr a').evaluateAll(links=>links.map(a=>a.href))).every(url=>url==='https://pixelkovia.rodulab.com/Supervisor'));
   assert.ok(await guide.locator('.guide-portal-qr img').evaluate(img=>img.naturalWidth>0),'the portal QR loads through the real authorization boundary');
