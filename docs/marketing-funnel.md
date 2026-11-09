@@ -41,7 +41,7 @@ Prijatie marketingu samo osebe nepovoľuje vlastnú analytiku a naopak. Historic
 
 ### Meta Pixel a nákup
 
-Pixel ID: `1141555698571585` (verejné ID, nie tajný token). Po marketingovom súhlase sa na predajnej stránke a checkoute odošlú `PageView`, pri otvorení checkoutu `InitiateCheckout` a pri potvrdenej platenej transakcii `Purchase`. Hra, herné výsledky a administrácia marketingový skript nenačítavajú. Automatická konfigurácia Pixelu je vypnutá; neposielame automatické rozšírené párovanie, e-mail, heslo ani údaje platobných polí.
+Pixel ID: `1120983200688486` (verejné ID, nie tajný token), potvrdené inštalačným kódom vytvoreného datasetu Pixelkovia – web. Reklamný účet má samostatné ID `1141555698571585`; nepoužíva sa pri inicializácii Pixelu. Po marketingovom súhlase sa na predajnej stránke a checkoute odošlú `PageView`, pri otvorení checkoutu `InitiateCheckout` a pri potvrdenej platenej transakcii `Purchase`. Hra, herné výsledky a administrácia marketingový skript nenačítavajú. Automatická konfigurácia Pixelu je vypnutá; neposielame automatické rozšírené párovanie, e-mail, heslo ani údaje platobných polí.
 
 Meta SDK beží iba v skrytom dokumente `/assets/meta-pixel` bez query parametrov a s prázdnym referrerom. Rodičovská stránka posiela iba povolenú cestu `/` alebo `/checkout` a overené parametre udalosti. Platobné `session_id`, `client_secret`, ľubovoľné URL parametre ani obsah formulára nevstupujú do našich Meta payloadov. Pri skutočnom reklamnom `fbclid` sa až po súhlase môže vytvoriť `_fbc`; click ID nikdy nevymýšľame. Odvolanie súhlasu zruší rámec a odstráni hostiteľské `_fbp` a `_fbc`.
 

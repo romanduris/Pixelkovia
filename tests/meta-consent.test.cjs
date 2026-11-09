@@ -48,7 +48,7 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
   const pixel=()=>page.frames().find(f=>f.url().endsWith('/assets/meta-pixel'));
   await page.waitForFunction(()=>document.querySelector('iframe[src="/assets/meta-pixel"]'));
   await page.waitForFunction(()=>{try{return document.querySelector('iframe[src="/assets/meta-pixel"]')?.contentWindow.__metaCalls?.some(c=>c[0]==='track'&&c[1]==='PageView');}catch{return false;}});
-  const calls=await pixel().evaluate(()=>window.__metaCalls);assert.ok(calls.some(c=>c[0]==='init'&&c[1]==='1141555698571585'));assert.ok(calls.some(c=>c[0]==='set'&&c[1]==='autoConfig'&&c[2]===false));
+  const calls=await pixel().evaluate(()=>window.__metaCalls);assert.ok(calls.some(c=>c[0]==='init'&&c[1]==='1120983200688486'));assert.ok(calls.some(c=>c[0]==='set'&&c[1]==='autoConfig'&&c[2]===false));
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
   const at=Date.now();
   await server.db.prepare('INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id,gift_game) VALUES(?,?,?,?,?,?,?,?)').bind(id,'secret@example.invalid','Secret','["episode-1","atlas-pixelkov"]',2498,at,sessionId,1).run();

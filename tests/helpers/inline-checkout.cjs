@@ -38,7 +38,7 @@ async function open(browser,options={}){
  await context.addInitScript(({purchase,denyStorage})=>{if(denyStorage){Object.defineProperty(window,'localStorage',{get(){throw Error('Storage unavailable');}});Object.defineProperty(window,'sessionStorage',{get(){throw Error('Storage unavailable');}});}else if(purchase)localStorage.setItem('pixelkovia-checkout-attempt',JSON.stringify(purchase));},{purchase:options.purchase,denyStorage:options.denyStorage});
  await context.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());if(url.origin!==origin)return route.abort();
-  if(url.pathname==='/api/privacy/consent')return route.fulfill({json:{choice:{version:'2026-11-09',analytics:false,marketing:false,createdAt:Date.now(),expiresAt:Date.now()+86400000},pixelId:'1141555698571585'}});
+  if(url.pathname==='/api/privacy/consent')return route.fulfill({json:{choice:{version:'2026-11-09',analytics:false,marketing:false,createdAt:Date.now(),expiresAt:Date.now()+86400000},pixelId:'1120983200688486'}});
   if(backend&&url.pathname.startsWith('/api/checkout/')){
    if(url.pathname==='/api/checkout/session')f.posts.push(req.postDataJSON());
    const response=await backend(req),data=await response.json();
