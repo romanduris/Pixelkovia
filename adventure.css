@@ -427,7 +427,6 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 
 .guardy-result .quest-party{width:100%}
 .guardy-transcript-link{display:block;margin:16px auto;min-height:44px}
-.guardy-result [data-action="close-window"]{width:100%;min-height:54px}
 
 /* Matching compact QR entries for the code and final password. */
 .signal-screen.code-check-screen{padding:10px max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
