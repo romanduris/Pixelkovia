@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  const width=page.viewportSize().width;
- assert.deepEqual(await page.locator('.hero-format strong').allTextContents(),['45–60 min','7–13 rokov','Jeden tím']);
+ assert.deepEqual(await page.locator('.hero-format strong').allTextContents(),['60–90 min','7–13 rokov','Jeden tím']);
  assert.match(await page.locator('.hero-format').innerText(),/2–5 hráčov/);
  assert.match(await page.locator('.evidence-family>img').first().getAttribute('src'),/family-code-mobile/);
  assert.match(await page.locator('.evidence-family>img').last().getAttribute('src'),/family-opening-mobile/);

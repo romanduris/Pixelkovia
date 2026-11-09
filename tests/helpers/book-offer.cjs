@@ -17,7 +17,7 @@ exports.checkout=async page=>{
  assert.equal(await page.locator('[name="book-bundle"]').count(),1);
  assert.equal(await page.locator('[name="book"]').count(),0);
  assert.equal(await page.locator('.book-pair .offer-book-cover').count(),2);
- assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad · 45–60 minút spoločnej zábavy');
+ assert.equal(await page.locator('.base-product li').first().innerText(),'7 záhad · 60–90 minút spoločnej zábavy');
  assert.equal(await page.locator('[data-summary-base-price]').innerText(),'14,99 €');
  assert.equal(await page.locator('#summary-early-discount').count(),0);
  assert.ok(await page.locator('#price-calculation').isHidden());

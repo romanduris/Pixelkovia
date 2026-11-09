@@ -27,7 +27,7 @@ Ide iba o návrhy. Web na tieto súbory neodkazuje a príprava neobsahuje žiadn
 
 - `cover-A.png`: hlavná predajná verzia. Pôvodný Piko pred detailom schválenej obývačky, slogan „VÁŠ DOMOV. ICH DOBRODRUŽSTVO.“ a podtext „Interaktívna rodinná hra plná záhad“.
 - `cover-B.png`: pôvodná spoločná scéna všetkých siedmich Pixelkov v obývačke, rovnomerne zmenšená na 50 % a premiestnená nad profilovku. Slogan „OBJAVTE TAJNÝ SVET PIXELKOV“ a podtext „Dobrodružstvo sa začína u vás doma.“ Text je odsadený viac od ľavého okraja. Pozadie zostáva súvislé aj pri použití obrázka bez profilovky.
-- `cover-C.png`: tri detaily z dvoch schválených ilustrácií rodinného hrania: indície, spoločné riešenie pracovného listu a partia Pixelkov na telefóne. Slogan „DOBRODRUŽSTVO U VÁS DOMA“ a podtext „7 záhad • 45–60 minút • Pre deti 7–13 rokov“. Nejde o zákaznícke fotografie ani dokumentárny záber z hry.
+- `cover-C.png`: tri detaily z dvoch schválených ilustrácií rodinného hrania: indície, spoločné riešenie pracovného listu a partia Pixelkov na telefóne. Slogan „DOBRODRUŽSTVO U VÁS DOMA“ a podtext „7 záhad • 60–90 minút • Pre deti 7–13 rokov“. Nejde o zákaznícke fotografie ani dokumentárny záber z hry.
 
 Každý cover je samostatný nepriehľadný PNG, presne **1640 × 720 px**, s profilom sRGB. Ide výhradne o kompozície pôvodných podkladov, bez nového generovania obrázkov, dopĺňania postáv alebo retuše ich identity. Vo variante A sa Piko rovnomerne zmenšuje na 60 %; vo variante B spoločná scéna na 50 %. Ostatné operácie sú výrezy, typografia a kontrastné prechody za textom. Vo variante B sa zjemňujú iba okraje prostredia spoločnej scény; všetky hlavy zostávajú nepriehľadné a ich farby sa neupravujú.
 

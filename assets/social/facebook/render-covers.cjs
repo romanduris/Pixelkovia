@@ -106,7 +106,7 @@ async function coverC() {
   await addText(layers,'C','PIXELKOVIA · STRATENÝ SIGNÁL',302,88,22,palette.green,'body');
   await addText(layers,'C','DOBRODRUŽSTVO',300,142,72,palette.navy);
   await addText(layers,'C','U VÁS DOMA',300,232,72,palette.green);
-  await addText(layers,'C','7 záhad • 45–60 minút • Pre deti 7–13 rokov',302,332,28,palette.green,'body');
+  await addText(layers,'C','7 záhad • 60–90 minút • Pre deti 7–13 rokov',302,332,28,palette.green,'body');
   await save('C',layers,palette.paper);
 }
 
