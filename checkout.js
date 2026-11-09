@@ -168,6 +168,7 @@
         if(value.labels&&(form.classList.contains('bank-return')||!purchase))showSummary(value);
         if(value.paid){
           if(freshVisit&&!embedded?.inFlight){freshOrder();return;}
+          window.PixelkoviaMeta?.purchase(sessionId);
           completed=true;update();document.querySelector('#payment-heading').textContent='Ďakujeme za objednávku';
           embedded?.verifiedPaid();
           const confirmed=value.noPaymentRequired?'✓ Objednávka s voucherom je potvrdená.':'✓ Platba je potvrdená.';

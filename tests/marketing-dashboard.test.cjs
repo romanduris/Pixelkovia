@@ -14,7 +14,7 @@ const origin='https://pixelkovia.rodulab.com';
     if(url.pathname==='/api/admin/marketing'&&fail)return route.fulfill({status:503,json:{error:'Dočasný výpadok'}});
     if(url.pathname==='/api/admin/marketing')calls.push(url.searchParams.toString());
     if(url.pathname==='/api/marketing/event')events.push(request.postDataJSON());
-    const headers={...request.headers(),origin:'http://127.0.0.1'};
+    const headers={...await request.allHeaders(),origin:'http://127.0.0.1'};
     const response=await worker.fetch(new Request('http://127.0.0.1'+url.pathname+url.search,{method:request.method(),headers,...(['GET','HEAD'].includes(request.method())?{}:{body:request.postData()})}),env);
     return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:Buffer.from(await response.arrayBuffer())});
    }
@@ -31,23 +31,33 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('#marketing-filter-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);
   assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),5);await page.locator('#marketing-all-sources').click();assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),9);await page.locator('#marketing-all-sources').click();
   assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('420'));
-  // Fresh visitor: no stored consent and no banner, but the collector records the real page opens.
+  // A fresh visitor is unmeasured until explicit analytics consent; marketing stays off.
   let ids;
   for(const path of ['/?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch-2026','/checkout']){
    const recorded=page.waitForResponse(r=>r.url().includes('/api/marketing/event'));
-   await page.goto(origin+path);assert.equal((await recorded).status(),200);
-   assert.equal(await page.locator('.analytics-consent,.analytics-consent-panel,.analytics-consent-settings').count(),0);
+   await page.goto(origin+path);
+   if(!ids){
+    await page.locator('.privacy-panel').waitFor({state:'visible'});
+    assert.equal(events.length,0);assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),{});
+    assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
+    await page.locator('[data-privacy="settings"]').click();
+    await page.locator('[name="privacy-analytics"]').check();
+    await page.locator('[data-privacy="save"]').click();
+   }
+   assert.equal((await recorded).status(),200);
+   await page.waitForFunction(()=>window.PixelkoviaConsent?.allows('analytics'));
+   assert.equal(await page.evaluate(()=>window.PixelkoviaConsent.allows('marketing')),false);
+   assert.equal(await page.locator('.privacy-panel').isVisible(),false);
    const current=await page.evaluate(()=>window.PixelkoviaMarketing.context());
    if(ids)assert.deepEqual(current,ids);else ids=current;
    assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-marketing-visitor-v1')),null);
-   assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-analytics-consent-v1')),null);
    assert.ok(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')));
-   assert.equal(events.at(-1).mode,'session');assert.equal(Object.hasOwn(events.at(-1),'consent'),false);
+   assert.equal(events.at(-1).mode,'session');
    assert.equal(events.at(-1).source,'facebook_ads');assert.equal(events.at(-1).campaign,'launch-2026');
    const refreshed=page.waitForResponse(r=>r.url().includes('/api/marketing/event'));await page.reload();assert.equal((await refreshed).status(),200);
    assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),ids);
    assert.equal((await first(db,'SELECT count(*) n FROM marketing_visits')).n,1);
-   for(const width of [1440,390,320]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'/tmp/pixelkovia-no-consent-'+(path.startsWith('/checkout')?'checkout':'sales')+'-'+width+'.png'});}
+   for(const width of [1440,390,320]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
   }
   await page.setViewportSize({width:1512,height:1080});
   // A real server-observed paid Session, with no fabricated visits/purchases in UI.
@@ -123,6 +133,6 @@ const origin='https://pixelkovia.rodulab.com';
   const count=events.length;await page.goto(origin+'/checkout');assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),{});assert.equal(events.length,count);
   assert.ok(await page.locator('main').isVisible());
   assert.deepEqual(errors,[]);
-  console.log('PASS marketing: real API/D1 aggregation, unavailable data, automatic session collection without consent state or UI, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom dates, keyboard disclosures and state restoration, sorting and top five/all sources, period-payment column, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
+  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom dates, keyboard disclosures and state restoration, sorting and top five/all sources, period-payment column, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
  }finally{await context.close();await browser.close();db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

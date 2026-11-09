@@ -103,7 +103,7 @@ export async function marketingReport(env,params,at=Date.now()){
   const warnings=[];
   if(!collectionEnabled)warnings.push('Zber návštev v prehliadači je vypnutý. Zachované návštevy a checkouty sú historické záznamy; nové pribúdať nebudú. Serverové platby a nákupy sa sledujú naďalej.');
   if(f.start<state.started_at)warnings.push('Návštevy, návštevný funnel a konverzia pokrývajú iba nameranú časť obdobia od začiatku zberu. Staršiu návštevnosť nepoznáme; Nákupy a tržby zahŕňajú celé zvolené obdobie.');
-  warnings.push('Zbierame krátke návštevné relácie bez panela súhlasu; doplnenie súhlasu je v backlogu. Relácie nie sú unikátni ľudia. Celkovú návštevnosť ani podiel meraných návštev nepoznáme.');
+  warnings.push('Nové návštevné relácie zbierame iba po analytickom súhlase. Staršie záznamy vznikli pred zavedením panela. Relácie nie sú unikátni ľudia; celkovú návštevnosť ani podiel meraných návštev nepoznáme.');
   warnings.push('Počas dočasného vypnutia zberu sa návštevy nemerali; chýbajúce udalosti spätne nedopĺňame.');
   if(!state.last_event_at)warnings.push('Zatiaľ nebola prijatá žiadna analytická udalosť; zber návštev ešte nie je potvrdený.');
   else if(at-state.last_event_at>day)warnings.push('Viac než 24 hodín neprišla analytická udalosť. Môže ísť aj o nulovú návštevnosť, blokovanie merania alebo výpadok.');

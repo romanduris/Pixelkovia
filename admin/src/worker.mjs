@@ -12,6 +12,8 @@ import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,relea
 import {browserPaymentEvent,paymentReport,paymentLog,attemptFor,reviewPaymentEvent} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
 import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
+import {consentState,saveConsent,readConsent,prunePrivacy} from './privacy.mjs';
+import {claimMetaPurchase} from './meta-purchase.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
 async function body(request){
@@ -64,12 +66,21 @@ async function customerApi(request,env,path){
   if(path==='/api/customer/complete'&&request.method==='POST')return json(await gameEvent(db,run,{...input,type:'complete'}));
   throw new HttpError(404,'Endpoint neexistuje.');
 }
-export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env),pruneMarketing(env)]);},async fetch(request,env,context){
+export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env),pruneMarketing(env),prunePrivacy(env)]);},async fetch(request,env,context){
   let paymentInput;
   try{
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
-    if(path==='/api/marketing/event'&&request.method==='POST'){sameOrigin(request);if(env.MARKETING_COLLECTION_ENABLED!=='true')throw new HttpError(410,'Zber návštev v prehliadači je vypnutý.');return json(await marketingEvent(request,env,await body(request)));}
+    if(path==='/api/privacy/consent'&&request.method==='GET')return json(await consentState(request,env));
+    if(path==='/api/privacy/consent'&&request.method==='POST'){
+      sameOrigin(request);const saved=await saveConsent(request,env,await body(request));const response=json(saved.state);response.headers.set('Set-Cookie',saved.cookie);return response;
+    }
+    if(path==='/api/marketing/purchase'&&request.method==='POST'){sameOrigin(request);return json(await claimMetaPurchase(request,env,await body(request)));}
+    if(path==='/api/marketing/event'&&request.method==='POST'){
+      sameOrigin(request);if(env.MARKETING_COLLECTION_ENABLED!=='true')throw new HttpError(410,'Zber návštev v prehliadači je vypnutý.');
+      if(!(await readConsent(request,env))?.analytics)throw new HttpError(403,'Analytické meranie nie je povolené.');
+      return json(await marketingEvent(request,env,await body(request)));
+    }
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){
       const session=url.searchParams.get('session_id'),checkoutId=url.searchParams.get('checkout_id');
@@ -80,8 +91,8 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(path==='/api/checkout/session'&&request.method==='POST'){
       sameOrigin(request);paymentInput=await body(request);
       const result=await createCheckout(env,{...paymentInput,__ip:request.headers.get('CF-Connecting-IP')||'unknown'});
-      if(env.MARKETING_COLLECTION_ENABLED==='true'){
-        const link=linkMarketingAttempt(env,paymentInput).catch(()=>console.error('marketing_attribution_failed'));
+      if(env.MARKETING_COLLECTION_ENABLED==='true'&&paymentInput.marketingVisitId){
+        const link=(async()=>{if((await readConsent(request,env))?.analytics)await linkMarketingAttempt(env,paymentInput);})().catch(()=>console.error('marketing_attribution_failed'));
         if(context?.waitUntil)context.waitUntil(link);else await link;
       }
       return json(result);

@@ -1,5 +1,5 @@
-/* First-party session measurements. No consent state is recorded or inferred.
-   Short-lived IDs stay in sessionStorage; no advertising SDK or persistent visitor ID. */
+/* First-party session measurements, collected only after explicit analytics consent.
+   Short-lived IDs stay in sessionStorage; advertising has its own independent choice. */
 (()=>{
   'use strict';
   if(!['/','/index.html','/checkout','/checkout.html'].includes(location.pathname))return;
@@ -27,6 +27,7 @@
     v.lastAt=at;if(!write(visitKey,v))return null;return v;
   }
   function collect(){
+    if(!window.PixelkoviaConsent?.allows('analytics')){current=null;if(window.PixelkoviaConsent&&!window.PixelkoviaConsent.pending)try{sessionStorage.removeItem(visitKey);}catch{}return;}
     try{current=visit();}catch{current=null;}if(!current)return;
     const {visitId,visitorId,source,campaign,device}=current;
     const payload={visitId,visitorId,source,campaign,device,type:location.pathname.startsWith('/checkout')?'checkout':'visit',mode:'session'};
@@ -34,9 +35,12 @@
     try{void fetch('/api/marketing/event',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true,signal:AbortSignal.timeout(4000)}).catch(()=>{});}catch{}
   }
   window.PixelkoviaMarketing={context(){
+    if(!window.PixelkoviaConsent?.allows('analytics'))return {};
     if(!current||Date.now()-current.lastAt>1800000)collect();
     return current?{marketingVisitId:current.visitId,marketingVisitorId:current.visitorId}:{};
   }};
+  document.addEventListener('pixelkovia:consent',collect);
+  void window.PixelkoviaConsent?.ready.then(collect);
   collect();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)collect();});
 })();

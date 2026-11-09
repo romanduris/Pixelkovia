@@ -38,6 +38,8 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))outgoing.push(r.url())});
    await page.addInitScript(()=>localStorage.setItem('zahada-v1-progress','{"progressVersion":2,"stage":3,"started":true}'));
    await page.goto(BASE+'/');await page.evaluate(()=>document.fonts.ready);
+   await page.locator('.privacy-panel').waitFor({state:'visible'});
+   await page.locator('[data-privacy="reject"]').click();await page.locator('.privacy-panel').waitFor({state:'hidden'});
    assert.equal(await page.locator('#app>section').count(),11);assert.equal(await page.locator('.faq-item').count(),19);
    assert.equal(await page.locator('.character-card').count(),7);
    assert.equal(await page.locator('.evidence-screen img[src="assets/sales/game-lock-partial.webp"]').count(),1);
@@ -87,7 +89,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await require('./helpers/checkout-voucher.cjs')(page,{standalone:width===390,screenshotPrefix:width===390?'/tmp/pixelkovia-voucher-public':undefined});
    assert.equal(await page.locator('[name="name"]').count(),0);await page.locator('#customer-email').fill('test@example.com');
    await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
-   assert.ok(outgoing.some(url=>new URL(url).pathname==='/api/marketing/event'),'session collection is active');assert.deepEqual(outgoing.filter(url=>new URL(url).pathname!=='/api/marketing/event'),[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);
+   assert.equal(outgoing.some(url=>new URL(url).pathname==='/api/marketing/event'),false,'declining consent prevents optional analytics');assert.deepEqual(outgoing.filter(url=>new URL(url).pathname!=='/api/privacy/consent'),[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);
    assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"progressVersion":2,"stage":3,"started":true}');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);
