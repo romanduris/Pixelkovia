@@ -27,10 +27,19 @@ const origin='https://pixelkovia.rodulab.com';
   await page.goto(origin+'/admin#marketing');await ready();
   assert.equal(await page.locator('[data-page]').count(),3);assert.equal(await page.locator('#page-title').innerText(),'Predajný funnel');
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
+  assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-stages').count(),0);
+  assert.ok(await page.locator('.marketing-kpis').evaluate(el=>el.getBoundingClientRect().top<document.querySelector('#marketing-filters').getBoundingClientRect().top),'KPIs precede the filters');
   assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),9);
   assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('420'));
   await page.goto(origin+'/?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch-2026');
   assert.equal(events.length,0);assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-marketing-visitor-v1')),null);
+  for(const [width,height] of [[1440,900],[390,844],[320,568]]){
+   await page.setViewportSize({width,height});await page.evaluate(()=>scrollTo(0,0));
+   for(const choice of ['yes','no']){const box=await page.locator(`[data-choice=${choice}]`).boundingBox();assert.ok(box&&box.y>=0&&box.y+box.height<=height&&box.x>=0&&box.x+box.width<=width,'consent choice visible without scrolling at '+width);}
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'consent fits '+width);
+   await page.screenshot({path:'/tmp/pixelkovia-consent-visible-'+width+'.png'});
+  }
+  await page.setViewportSize({width:1512,height:1080});
   await page.locator('[data-choice=no]').click();await page.reload();assert.equal(events.length,0);
   await page.locator('.analytics-consent-settings').click();const granted=page.waitForResponse(r=>r.url().includes('/api/marketing/event'));await page.locator('[data-choice=yes]').click();
   await granted;
@@ -62,7 +71,7 @@ const origin='https://pixelkovia.rodulab.com';
    if(width===390)await page.screenshot({path:'/tmp/pixelkovia-marketing-mobile-viewport.png'});
   }
   await page.locator('[name=period]').selectOption('custom');assert.equal(await page.locator('[name=from]').isEnabled(),true);
-  await page.locator('[name=from]').fill('2026-10-01');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(3).innerText(),'Nedostupné');
+  await page.locator('[name=from]').fill('2026-10-01');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(3).innerText(),'100 %');assert.match(await page.locator('.marketing-kpis .marketing-kpi').nth(3).innerText(),/Iba nameraná časť obdobia/);
   fail=true;await page.getByRole('button',{name:'Obnoviť',exact:true}).click();await ready();assert.ok((await page.locator('#notice').innerText()).includes('Dočasný výpadok'));fail=false;
   await page.goto(origin+'/checkout');await page.waitForFunction(()=>!!window.PixelkoviaMarketing);
   await page.locator('.analytics-consent-settings').click();await page.locator('[data-choice=no]').click();

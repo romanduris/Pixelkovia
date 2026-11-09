@@ -43,7 +43,8 @@
   }};
   const host=document.createElement('div');host.className='analytics-consent';host.setAttribute('aria-label','Nastavenie analytiky');
   const panel=document.createElement('div');panel.className='analytics-consent-panel';panel.id='analytics-consent-panel';
-  panel.innerHTML='<strong>Pomôžete nám zlepšiť nákup?</strong><p>S vaším súhlasom meriame návštevy, zdroj kampane a prechod k nákupu. Používame náhodné identifikátory v tomto prehliadači; nečítame platobné údaje. Dáta zostávajú v našej analytike, najviac 366 dní. Súhlas je dobrovoľný a môžete ho tu odvolať.</p><div><button type="button" data-choice="yes">Povoliť analytiku</button><button type="button" data-choice="no">Odmietnuť</button></div>';
+  panel.setAttribute('role','region');panel.setAttribute('aria-label','Súhlas s analytikou');
+  panel.innerHTML='<strong>Pomôžete nám zlepšiť nákup?</strong><p>S vaším súhlasom meriame návštevy, zdroj kampane a cestu k nákupu. Používame náhodné ID prehliadača, bez údajov platobnej karty.</p><details><summary>Podrobnosti o meraní</summary><p>Dáta zostávajú v našej analytike, najviac 366 dní. Súhlas je dobrovoľný a môžete ho kedykoľvek odvolať cez Nastavenie analytiky v päte stránky. Nákup funguje aj bez súhlasu.</p></details><div><button type="button" data-choice="yes">Povoliť analytiku</button><button type="button" data-choice="no">Odmietnuť</button></div>';
   const settings=document.createElement('button');settings.type='button';settings.className='analytics-consent-settings';settings.textContent='Nastavenie analytiky';settings.setAttribute('aria-controls',panel.id);
   const saved=read(consentKey);panel.hidden=!!saved&&Date.now()-saved.at<ttl;settings.setAttribute('aria-expanded',String(!panel.hidden));
   settings.addEventListener('click',()=>{panel.hidden=!panel.hidden;settings.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)panel.querySelector('button').focus();});

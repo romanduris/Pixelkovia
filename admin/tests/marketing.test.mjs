@@ -65,8 +65,10 @@ test('calendar payments and visitor cohorts remain separate, including late paym
   await attempt(db,{visitId:yesterday.visitId,created:at-day,paid:at-1000});
   const today=await marketingReport(env,new URLSearchParams({period:'today'}),at);assert.equal(today.metrics.purchases,1);assert.equal(today.cohort.purchases,0);assert.equal(today.metrics.visits,0);assert.equal(today.metrics.conversion,null);
   const past=await marketingReport(env,new URLSearchParams({period:'custom',from:'2026-11-09',to:'2026-11-09'}),at);assert.equal(past.metrics.purchases,0);assert.equal(past.cohort.purchases,1);assert.equal(past.metrics.conversion,1);
-  await execute(db,'UPDATE marketing_state SET started_at=?',at-1000);const partial=await marketingReport(env,new URLSearchParams({period:'today'}),at);assert.equal(partial.metrics.conversion,null);assert.match(partial.conversionReason,/začiatkom/);
+  await execute(db,'UPDATE marketing_state SET started_at=?',at-1000);const partial=await marketingReport(env,new URLSearchParams({period:'today'}),at);assert.equal(partial.metrics.conversion,null);assert.equal(partial.metrics.visits,0);
   const unmeasured=await marketingReport(env,new URLSearchParams({period:'custom',from:'2026-11-09',to:'2026-11-09'}),at);assert.equal(unmeasured.metrics.visits,null);assert.equal(unmeasured.metrics.checkouts,null);assert.equal(unmeasured.cohort.attempts,null);
+  const recent=input();await marketingEvent(req(),env,{...recent,type:'checkout'},at-800);await attempt(db,{visitId:recent.visitId,created:at-500,paid:at-100});
+  const observed=await marketingReport(env,new URLSearchParams({period:'14'}),at);assert.equal(observed.partialPeriod,true);assert.equal(observed.observedStart,at-1000);assert.equal(observed.metrics.visits,1);assert.equal(observed.metrics.purchases,2);assert.equal(observed.cohort.purchases,1);assert.equal(observed.metrics.conversion,1);
  }finally{db.close();}
 });
 test('verified payment with missing fulfillment and gift email failure count once per transaction',async()=>{
