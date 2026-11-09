@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const inventory=JSON.parse(fs.readFileSync('dist/deployment-inventory.json','utf8')),root='dist/funnel';
+assert.ok([...inventory.public,...Object.keys(inventory.protected)].every(route=>!route.startsWith('/assets/Photo/')&&!/^\/assets\/sales\/family-.*mobile/.test(route)),'uncropped source photographs and retired family scenes stay outside the deployment');
 const routes=JSON.parse(fs.readFileSync(root+'/_routes.json','utf8'));assert.deepEqual(routes.include,['/*']);assert.deepEqual(routes.exclude,[]);
 let versioned=0;
 for(const route of inventory.public){

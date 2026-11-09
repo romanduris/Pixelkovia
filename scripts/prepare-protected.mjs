@@ -22,6 +22,8 @@ export async function prepareProtected(output){
   await add('/signal-print.css','signal-print.css','game');
   for(const [route,file,role]of documents)await add(route,file,role,true);
   for(const file of await files(path.join(root,'assets'))){
+    // Previous lifestyle illustrations remain sources for existing social covers only.
+    if(/^sales\/family-.*\.webp$/.test(file))continue;
     if(!/\.(?:webp|png|svg|mp3|mp4|pdf|ttf|ico)$/.test(file))continue;
     const relative='assets/'+file;if(publicFiles.includes('/'+relative))continue;
     const role=/^books\/(before|after)-[123]\.webp$/.test(file)?'book-'+file.split('/')[1].split('-')[0]:file.startsWith('finale-production/')&&!file.endsWith('start-a.png')?'admin':'game';

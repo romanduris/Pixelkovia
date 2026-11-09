@@ -8,7 +8,7 @@ module.exports=async function checkFamilyGallery(page,{swipe=false}={}){
   const frame=el.getBoundingClientRect(),first=el.children[0].getBoundingClientRect(),second=el.children[1].getBoundingClientRect();
   return {large:first.width/frame.width,peek:frame.right-second.left};
  });
- assert.ok(shape.large>=.88&&shape.large<=.92,'large uncropped scene');
+ assert.ok(shape.large>=.88&&shape.large<=.92,'large photograph within the gallery');
  assert.ok(shape.peek>=14,'next photo visibly peeks into the gallery');
  for(const button of await gallery.locator('button').all()){
   const r=await button.boundingBox();assert.ok(r.width>=44&&r.height>=44,'comfortable touch target');
