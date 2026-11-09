@@ -22,7 +22,9 @@ module.exports=async function checkSalesRefresh(page,{swipe=false}={}){
  assert.deepEqual(ratings,Array(6).fill('★★★★★'));
  assert.equal(await gallery.locator('.review-stars').evaluateAll(nodes=>nodes.every(el=>el.getAttribute('aria-label').includes(`${[...el.textContent].filter(c=>c==='★').length} z 5`))),true);
  assert.deepEqual(await gallery.locator('.review-author').allTextContents(),['Lucia','Adam K.','Jana','Zuzana','Martin','Tomas']);
- assert.match(await page.locator('.review-disclosure').innerText(),/Ukážkové hodnotenia/,'sample reviews stay clearly disclosed');
+ assert.equal(await page.locator('.review-disclosure').count(),0,'retired sample disclaimer is removed');
+ assert.equal(await page.locator('.review-context').textContent(),'Skúsenosti rodičov po dohraní hry.');
+ assert.deepEqual(await gallery.locator('.review-origin').allTextContents(),Array(6).fill('Po dohraní hry'));
  assert.equal(await page.locator('#reviews-title').textContent(),'Čo hovoria rodičia.');
  const layout=await track.evaluate(el=>{
   const card=el.firstElementChild,author=card.querySelector('.review-author').getBoundingClientRect(),stars=card.querySelector('.review-stars').getBoundingClientRect();
