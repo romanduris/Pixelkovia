@@ -271,10 +271,10 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .plugy-connected .signal-audio-controls .btn{width:100%;min-height:44px;font-size:13px}
 .plugy-screen #plugy-audio-status{font-size:11px;margin:4px 0;min-height:16px}
 .plugy-message>.text-link{font-size:11px;min-height:32px;padding:4px 8px}
-.plugy-connected .signal-reward{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:12px;width:100%;margin:0;padding:10px 12px;border:1px solid #647da8;border-radius:8px;background:#15233c;text-align:left}
-.plugy-connected .signal-reward strong{width:48px;height:48px;margin:0;font:32px/1 monospace}
-.plugy-connected .signal-reward span{font:9px/1.4 monospace;letter-spacing:.08em;color:#b9c9e1}
-.plugy-connected .signal-reward small{display:block;margin-top:4px;font-size:13px;line-height:1.4;color:#edf1ff}
+:is(.plugy-connected,.cipko-finished) .signal-reward{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:12px;width:100%;margin:0;padding:10px 12px;border:1px solid #647da8;border-radius:8px;background:#15233c;text-align:left}
+:is(.plugy-connected,.cipko-finished) .signal-reward strong{width:48px;height:48px;margin:0;font:32px/1 monospace}
+:is(.plugy-connected,.cipko-finished) .signal-reward span{font:9px/1.4 monospace;letter-spacing:.08em;color:#b9c9e1}
+:is(.plugy-connected,.cipko-finished) .signal-reward small{display:block;margin-top:4px;font-size:13px;line-height:1.4;color:#edf1ff}
 .plugy-screen .signal-content>[data-action="next"]{min-height:44px;padding:10px 14px;font-size:13px}
 @media(max-height:720px){
  .plugy-screen .signal-content{gap:7px;padding:8px 0}
@@ -283,7 +283,7 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .plugy-grid{--cell-size:32px;gap:3px;padding:8px}
  .plugy-screen .plugy-hint{min-height:28px}
  .plugy-party-scene{max-width:360px}
- .plugy-connected .signal-reward{padding:8px 10px}
+ :is(.plugy-connected,.cipko-finished) .signal-reward{padding:8px 10px}
 }
 @media(orientation:landscape) and (max-height:580px) and (min-width:640px){
  .plugy-lock .signal-content{width:min(100%,800px);display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"party grid" "heading grid" "welcome grid" "instruction grid" "hint grid";gap:7px 24px;justify-items:center}
@@ -324,9 +324,9 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 .plugy-connected .signal-audio-controls .btn{min-height:50px;border-radius:10px;font-size:14px}
 .plugy-connected #plugy-audio-status{font-size:11px;line-height:1.5;min-height:18px;margin:10px 0 0;color:#bdc7dd}
 .plugy-connected .plugy-message>.text-link{min-height:44px;font-size:12px;text-underline-offset:4px}
-.plugy-connected .signal-reward{padding:14px 16px;gap:14px;border-color:#f0c88055;border-radius:16px;background:linear-gradient(110deg,#f3c77b12,#17233a 70%)}
-.plugy-connected .signal-reward strong{display:grid;place-items:center;border:1px solid #f0c88066;border-radius:10px;background:#f3c77b0a;color:#ffd494}
-.plugy-connected .signal-reward span{color:#e9c992}
+:is(.plugy-connected,.cipko-finished) .signal-reward{padding:14px 16px;gap:14px;border-color:#f0c88055;border-radius:16px;background:linear-gradient(110deg,#f3c77b12,#17233a 70%)}
+:is(.plugy-connected,.cipko-finished) .signal-reward strong{display:grid;place-items:center;border:1px solid #f0c88066;border-radius:10px;background:#f3c77b0a;color:#ffd494}
+:is(.plugy-connected,.cipko-finished) .signal-reward span{color:#e9c992}
 @media(max-width:380px){
  .plugy-result-heading{gap:10px}
  .plugy-connected .plugy-unlock{padding:8px;gap:6px;font-size:7px}
@@ -335,7 +335,7 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
  .plugy-connected .signal-content{gap:8px;padding:8px 0}
  .plugy-connected .plugy-thanks{padding:10px 12px}
  .plugy-connected .plugy-message{padding:12px 12px 0}
- .plugy-connected .signal-reward{padding:10px 12px}
+ :is(.plugy-connected,.cipko-finished) .signal-reward{padding:10px 12px}
 }
 @media(orientation:landscape) and (max-height:580px) and (min-width:640px){
  .plugy-connected .signal-content{width:min(100%,800px);display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;padding:2px 0}
@@ -389,6 +389,7 @@ main.signal-mode.is-entering-answer{top:var(--answer-viewport-top,0px);bottom:au
 @media(prefers-reduced-motion:no-preference){.cipko-pixel:active,.cipko-card:active{transform:scale(.95)}}
 .cipko-screen .cipko-tile{touch-action:none}
 
+.cipko-finished .signal-reward{margin-top:12px}
 .cipko-finished .cipko-digits{gap:10px;margin:28px 0}
 .cipko-finished .cipko-digits li{width:78px;padding:12px 0}
 .cipko-finished .cipko-digits strong{font-size:42px}

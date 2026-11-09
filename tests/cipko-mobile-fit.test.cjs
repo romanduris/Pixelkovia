@@ -38,6 +38,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
     if(round<3){await previewLayout(round,true);await fits(`${width}x${height}, result ${round+1}`);}
    }
    await previewLayout(4);await fits(`${width}x${height}, paper handoff`);
+   if(width===320||width===390&&height===664)await page.screenshot({path:`/tmp/cipko-reward-${engine.name()}-${width}-${height}.png`});
   }
   await page.setViewportSize({width:320,height:568});await reset(1);
   const from=page.locator('[data-kind="select"][data-index="2"]'),to=page.locator('[data-kind="slot"][data-index="2"]');
