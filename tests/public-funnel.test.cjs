@@ -30,6 +30,8 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
   for(const [width,height]of [[320,568],[360,640],[390,844],[430,932],[768,1024],[1366,768],[1440,900]]){
    const context=await browser.newContext({ignoreHTTPSErrors:BASE.startsWith('https://localhost:'),viewport:{width,height},deviceScaleFactor:1,isMobile:width<600,hasTouch:width<600});
    const page=await context.newPage(),errors=[],missing=[],outgoing=[];
+   // Collection itself is covered against D1 in marketing-dashboard.test.cjs.
+   await page.route('**/api/marketing/event',route=>route.fulfill({json:{recorded:true}}));
    await page.route('**/api/checkout/config',route=>route.fulfill({json:{enabled:false,publishableKey:null}}));
    page.on('pageerror',e=>errors.push(e.message));
    page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(BASE))missing.push(r.url())});
@@ -85,7 +87,7 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
    await require('./helpers/checkout-voucher.cjs')(page,{standalone:width===390,screenshotPrefix:width===390?'/tmp/pixelkovia-voucher-public':undefined});
    assert.equal(await page.locator('[name="name"]').count(),0);await page.locator('#customer-email').fill('test@example.com');
    await page.locator('#customer-email').press('Enter');await page.evaluate(()=>document.querySelector('#checkout-form').requestSubmit());
-   assert.deepEqual(outgoing,[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);
+   assert.ok(outgoing.some(url=>new URL(url).pathname==='/api/marketing/event'),'session collection is active');assert.deepEqual(outgoing.filter(url=>new URL(url).pathname!=='/api/marketing/event'),[]);assert.equal(await page.evaluate(()=>Object.values(localStorage).some(v=>v.includes('test@example.com'))),false);
    assert.equal(await page.evaluate(()=>localStorage.getItem('zahada-v1-progress')),'{"progressVersion":2,"stage":3,"started":true}');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);
@@ -96,6 +98,6 @@ assert.equal(compiled.window.SITE_CONFIG.access,undefined);assert.equal(compiled
   for(const route of [...forbidden,'admin/api/customers','_protected/game.html','_protected/game-data.js','assets/printables/p2-preview.webp','missing-page']){
    const response=await page.request.get(BASE+'/'+route,{maxRedirects:0});assert.equal(response.status(),route==='admin'?303:404,'private routes require authorization: '+route);
   }
-  console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, four-photo swipe/keyboard gallery, preview, sticky CTA, all price combinations, inactive purchase, no submissions and unchanged game progress.');
+  console.log('PASS: sales-only artifact; rendered HTML; no game/answers/PDF/admin; seven responsive sizes, full hero, FAQ, four-photo swipe/keyboard gallery, preview, sticky CTA, all price combinations, inactive purchase, no payment submissions and unchanged game progress.');
  }finally{await browser.close();if(server)await server.mf.dispose();}
 })().catch(e=>{console.error(e);process.exitCode=1});

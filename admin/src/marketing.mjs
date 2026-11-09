@@ -10,7 +10,7 @@ const day=86400000;
 export const safeCampaign=value=>typeof value==='string'&&/^[a-zA-Z0-9_. -]{1,80}$/.test(value)?value:'';
 // No raw URL, referrer, UA, IP, email, form value or arbitrary event properties.
 export async function marketingEvent(request,env,input,at=Date.now()){
-  if(input.consent!==true||!['visit','checkout'].includes(input.type)||!validId(input.visitId)||!validId(input.visitorId))throw new HttpError(400,'Neplatná analytická udalosť alebo chýbajúci súhlas.');
+  if(input.mode!=='session'||!['visit','checkout'].includes(input.type)||!validId(input.visitId)||!validId(input.visitorId))throw new HttpError(400,'Neplatná analytická udalosť alebo režim návštevnej relácie.');
   const db=env.TQ_DB,scope='marketing:'+await hash((env.CUSTOMER_AUTH_SECRET||'local')+':'+(request.headers.get('CF-Connecting-IP')||'unknown'));
   const limit=await first(db,`INSERT INTO customer_login_attempts VALUES(?,1,?) ON CONFLICT(scope_key) DO UPDATE SET attempts=CASE WHEN window_start<=? THEN 1 ELSE attempts+1 END,window_start=CASE WHEN window_start<=? THEN excluded.window_start ELSE window_start END RETURNING attempts`,scope,at,at-60000,at-60000);
   if(limit.attempts>60)throw new HttpError(429,'Príliš veľa udalostí.');
@@ -103,9 +103,10 @@ export async function marketingReport(env,params,at=Date.now()){
   const warnings=[];
   if(!collectionEnabled)warnings.push('Zber návštev v prehliadači je vypnutý. Zachované návštevy a checkouty sú historické záznamy; nové pribúdať nebudú. Serverové platby a nákupy sa sledujú naďalej.');
   if(f.start<state.started_at)warnings.push('Návštevy, návštevný funnel a konverzia pokrývajú iba nameranú časť obdobia od začiatku zberu. Staršiu návštevnosť nepoznáme; Nákupy a tržby zahŕňajú celé zvolené obdobie.');
-  warnings.push('Návštevy zahŕňajú iba prehliadače s analytickým súhlasom. Celkovú návštevnosť ani podiel meraných návštev nepoznáme.');
+  warnings.push('Zbierame krátke návštevné relácie bez panela súhlasu; doplnenie súhlasu je v backlogu. Relácie nie sú unikátni ľudia. Celkovú návštevnosť ani podiel meraných návštev nepoznáme.');
+  warnings.push('Počas dočasného vypnutia zberu sa návštevy nemerali; chýbajúce udalosti spätne nedopĺňame.');
   if(!state.last_event_at)warnings.push('Zatiaľ nebola prijatá žiadna analytická udalosť; zber návštev ešte nie je potvrdený.');
-  else if(at-state.last_event_at>day)warnings.push('Viac než 24 hodín neprišla analytická udalosť. Môže ísť aj o nulovú návštevnosť alebo odmietnutý súhlas.');
+  else if(at-state.last_event_at>day)warnings.push('Viac než 24 hodín neprišla analytická udalosť. Môže ísť aj o nulovú návštevnosť, blokovanie merania alebo výpadok.');
   if(checks.length<2||checks.some(c=>!c.ok||at-c.checked_at>1800000))warnings.push('Serverové kontroly platobného zdroja chýbajú, zlyhali alebo sú staršie než 30 minút.');
   const collectionInRange=!!state.last_event_at&&f.end>state.started_at;
   const visitAvailable=collectionInRange&&!f.product;

@@ -4,8 +4,8 @@ Záložka: https://pixelkovia.rodulab.com/admin#marketing. Rovnaké prihlásenie
 
 ## Údaje a metodika
 
-- **Návštevy**: prvostranné udalosti z `/` a `/checkout` iba po dobrovoľnom analytickom súhlase. Jedna návšteva používa náhodné UUID; po 30 minútach medzi zaznamenanými otvoreniami stránky začína nová. Obnovenie ani ďalšia karta tú istú návštevu nezdvojujú. Celková návštevnosť bez súhlasu, bez JS alebo s blokovačom nie je známa.
-- **Checkout**: unikátny pseudonymný identifikátor prehliadača s otvorením checkoutu v návštevnej kohorte. Nie fyzické osoby. Identifikátor prehliadača sa po 90 dňoch obnoví; v D1 je iba jeho SHA-256 hash.
+- **Návštevy**: prvostranné udalosti z `/` a `/checkout`, aktuálne bez panela a bez podmienky súhlasu podľa pokynu vlastníka. Náhodné identifikátory zostávajú iba v `sessionStorage` aktuálnej karty; po 30 minútach medzi otvoreniami stránky sa obnovia. Refresh a prechod na checkout návštevu nezdvojujú; nová karta môže vytvoriť samostatnú reláciu. Celkový počet návštev bez JS, s blokovačom alebo nedostupným úložiskom nepoznáme.
+- **Checkout**: unikátne návštevné relácie s otvorením checkoutu v kohorte, nie fyzické osoby. V D1 je iba SHA-256 hash náhodného druhého identifikátora. Zachované staršie záznamy používali dlhodobý identifikátor prehliadača; zmena metodiky aj prestávka v meraní sú uvedené v prehľade.
 - **Platobný pokus vo funneli**: jedinečná existujúca Stripe Session pripravená serverom a priradená návšteve. Nie zadanie karty ani bankové potvrdenie; tieto kroky MVP nesľubuje.
 - **Nákupy a tržby**: existujúce serverom overené platené transakcie podľa `payment_observations.paid_at`, prípadne pôvodného overeného `orders.paid_at`. Jedna Session s darčekom = jeden nákup a celá jej suma. Objednávky a herné prístupy sa agregujú samostatne, bez násobenia cez JOIN. Bezplatné objednávky sa nepočítajú ako platené nákupy. Historické platby bez návštevnej atribúcie sú v neznámom zdroji.
 - **Tržby**: hrubé inkaso v EUR pred refundáciami, poplatkami a nákladmi. Refundovaná platba zostáva historickou platenou transakciou a je tiež vo výslovne označenom počte refundácií; nejde o čisté tržby.
@@ -27,9 +27,9 @@ Facebook/Instagram bez plateného UTM média sa neoznačuje ako reklama. Meta os
 
 ## Súhlas a bezpečnosť
 
-Na výslovnú požiadavku vlastníka bol panel súhlasu aj odkaz na jeho nastavenie odstránený. Z predajnej stránky, checkoutu a verejného buildu sú odstránené aj súvisiace JS/CSS súbory. Nové návštevy, prehliadačové identifikátory a marketingová atribúcia sa nezbierajú ani pri skôr uloženom súhlase. Produkcia má `MARKETING_COLLECTION_ENABLED=false`; existujúci zberový endpoint vracia 410 aj pre staré otvorené stránky. Serverové overovanie platieb, bezpečná platobná diagnostika a nákupy zostávajú aktívne. Uložené návštevy zostávajú ako historické záznamy, dashboard uvádza vypnutý zber a priebežná konverzia je nedostupná. Nie sú vložené žiadne GA4, Clarity alebo Meta Pixel skripty.
+Na výslovnú požiadavku vlastníka je zber zapnutý bez panela súhlasu. Súhlas sa nepredstiera ani neukladá ako udelený: payload používa `mode: session`, bez poľa `consent`. Nový `funnel-metrics.js` ignoruje staré nastavenia a dlhodobé identifikátory v localStorage. Doplnenie skutočného súhlasu je otvorená položka v [backlogu](../BACKLOG/BACKLOG.md). Produkcia má `MARKETING_COLLECTION_ENABLED=true`; vypnutie prepínača zablokuje aj staré otvorené stránky odpoveďou 410. Serverové overovanie platieb, diagnostika a nákupy pokračujú nezávisle. Nie sú vložené žiadne GA4, Clarity ani Meta Pixel skripty.
 
-Zachovaný, v produkcii vypnutý POST `/api/marketing/event` má strict origin, limit veľkosti JSON, povolené typy, formát náhodných identifikátorov a rate limit cez existujúci mechanizmus. Ide o klientské analytické signály, nie overených ľudí. Neukladá IP, UA, osobné údaje, obsah polí ani údaje karty. IP slúži iba na existujúci zahashovaný limit s tajným serverovým kľúčom. Prepojenie návštevy a platby vyžaduje oba náhodné identifikátory a existujúci nákupný request key; opakovanie nemení prvú atribúciu. Výpadok atribúcie neblokuje checkout. Výpadok udalosti môže ponechať nákup nepriradený.
+POST `/api/marketing/event` má strict origin, limit veľkosti JSON, povolené typy, režim relácie, formát náhodných identifikátorov a rate limit cez existujúci mechanizmus. Ide o klientské analytické signály, nie overených ľudí. Neukladá IP, UA, osobné údaje, obsah polí ani údaje karty. IP slúži iba na existujúci zahashovaný limit s tajným serverovým kľúčom. Prepojenie návštevy a platby vyžaduje oba náhodné identifikátory a existujúci nákupný request key; opakovanie nemení prvú atribúciu. Výpadok atribúcie neblokuje checkout. Výpadok udalosti môže ponechať nákup nepriradený. Počas dočasného vypnutia zberu sa návštevy nemerali a chýbajúce udalosti sa spätne nedopĺňajú.
 
 Čítanie reportu aj administrátorského JS vyžaduje existujúce prihlásenie. Zdrojová atribúcia a návštevy sa čistia po 366 dňoch existujúcim cron procesom. Obchodné záznamy sa nemažú. Uchované nákupy môžu po uplynutí analytickej retencie stratiť zdroj; historická atribúcia sa neodhaduje.
 
@@ -40,11 +40,11 @@ Pri implementácii boli overené názvy environment a Codespaces secrets aj exis
 Pred reklamou 18. 11. 2026:
 
 1. Zjednotiť UTM odkazy pre každú reklamu a influencer kampaň.
-2. Pred prípadným opätovným spustením merania návštev dohodnúť jeho spôsob. Aktuálne je zber v prehliadači zámerne vypnutý. Produkčné skúšobné návštevy patria do reálnych dát; nepoužívať vymyslené návštevy alebo nákupy.
+2. Overiť meranie návštevy → checkout na cieľových zariadeniach a doplniť súhlas podľa backlogu. Produkčné skúšobné návštevy patria do reálnych dát; nepoužívať vymyslené návštevy alebo nákupy.
 3. Pri porovnávaní rešpektovať skutočný uvedený interval merania konverzie; rozhodovať podľa dostatočného objemu, nie ilustračných čísel.
 4. Pre CAC doplniť autorizovaný Meta Ads zdroj alebo samostatne zadané skutočné denné výdavky podľa kampane. Bez toho vyhodnocovať len návštevnosť a nákupy.
 5. Dokončiť existujúce P0 overenie podrobných platobných krokov z `MD/P0-monitorovanie-platobneho-funnelu.md`; toto marketingové MVP ho nenahrádza.
 
-Kontroly: backendové testy vrátane SQL kohorty/darčekov/refundácií/oneskorených úhrad, origin a autentifikácie; prehliadačové testy reálneho report API nad lokálnou D1, súhlasu a atribúcie, filtrov a rozloženia 320–1512 px; regresie existujúceho checkoutu a administrácie. Aktualizácia prehľadu je manuálna a po 5 minútach sa zobrazí upozornenie na starý snapshot.
+Kontroly: backendové testy vrátane SQL kohorty/darčekov/refundácií/oneskorených úhrad, origin a autentifikácie; prehliadačové testy reálneho report API nad lokálnou D1, automatického zberu bez panela, krátkych relácií a atribúcie, filtrov a rozloženia 320–1512 px; regresie existujúceho checkoutu a administrácie. Aktualizácia prehľadu je manuálna a po 5 minútach sa zobrazí upozornenie na starý snapshot.
 
 WebKit v tomto kontajneri vyžaduje virtuálne grafické prostredie: `xvfb-run -a env QA_BROWSER=webkit QA_HEADED=1 PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/marketing-dashboard.test.cjs`. Samotný headless WebKit tu padá aj na minimálnom natívnom formulárovom poli. Overenie cez Xvfb prešlo; fyzický iPhone nebol použitý.

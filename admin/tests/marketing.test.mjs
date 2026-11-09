@@ -6,7 +6,7 @@ import {marketingEvent,marketingReport,marketingFilters,linkMarketingAttempt,pru
 import worker from '../src/worker.mjs';
 const origin='https://pixelkovia.rodulab.com',at=Date.UTC(2026,10,10,12),day=86400000;
 const req=()=>new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin,'content-type':'application/json'}});
-const input=(extra={})=>({type:'visit',consent:true,visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'facebook_ads',campaign:'launch-2026',device:'mobile',...extra});
+const input=(extra={})=>({type:'visit',mode:'session',visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'facebook_ads',campaign:'launch-2026',device:'mobile',...extra});
 async function setup(){const db=fresh();await execute(db,'UPDATE marketing_state SET started_at=?',at-30*day);return {db,env:{TQ_DB:db,MARKETING_COLLECTION_ENABLED:'true',CUSTOMER_AUTH_SECRET:'a'.repeat(64)}};}
 async function attempt(db,{visitId=null,created=at-3600000,paid=at-1000,total=2498,gift=true,selection=['episode-1','atlas-pixelkov'],refund=false,orders=true,delivery='sent'}={}){
  const id=crypto.randomUUID(),session='cs_test_'+id.replaceAll('-','');
@@ -30,7 +30,8 @@ test('unmeasured visits/conversions and costs stay unavailable; API requires exi
   const anonymous=await worker.fetch(new Request(origin+'/api/admin/marketing'),{...env,ADMIN_AUTH_MODE:'password'});assert.equal(anonymous.status,401);
   for(const path of ['/api/admin/marketing','/marketing.js']){const denied=await worker.fetch(new Request(origin+path),{...env,ADMIN_AUTH_MODE:'password'});assert.equal(denied.status,path.startsWith('/api/')?401:303);}
   const forged=await worker.fetch(new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin:'https://attacker.invalid','content-type':'application/json'},body:JSON.stringify(input())}),env);assert.equal(forged.status,403);
-  await assert.rejects(marketingEvent(req(),env,input({consent:false}),at),e=>e.status===400);
+  await assert.rejects(marketingEvent(req(),env,input({mode:'persistent'}),at),e=>e.status===400);
+  await assert.rejects(marketingEvent(req(),env,input({mode:undefined,consent:true}),at),e=>e.status===400);
  }finally{db.close();}
 });
 test('visit refreshes deduplicate; unique checkout browsers differ from sessions; source remains first touch and PII is discarded',async()=>{
@@ -92,7 +93,7 @@ test('Bratislava calendar dates handle DST and reject invalid filters',()=>{
  for(const params of [{period:'bad'},{source:"' OR 1=1"},{campaign:'private@example.invalid'},{period:'custom',from:'2026-02-30',to:'2026-03-01'},{period:'custom',from:'2026-13-01',to:'2026-13-02'},{period:'custom',from:'2026-11-10',to:'2026-11-09'}])assert.throws(()=>marketingFilters(new URLSearchParams(params),at),e=>e.status===400);
 });
 
-test('disabled browser collection rejects even a cached consented request and preserves paid reporting',async()=>{
+test('disabled browser collection rejects even a cached collection request and preserves paid reporting',async()=>{
  const {db,env}=await setup();try{
   await attempt(db,{gift:false,total:1499});
   const disabled={...env,MARKETING_COLLECTION_ENABLED:'false'};
