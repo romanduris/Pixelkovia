@@ -78,6 +78,26 @@ test('verified payment with missing fulfillment and gift email failure count onc
   const d=await marketingReport(env,new URLSearchParams({period:'today'}),at);assert.equal(d.metrics.accessIssues,2);assert.equal(d.metrics.accessIssueOrders,4);assert.equal(d.metrics.purchases,3);
  }finally{db.close();}
 });
+test('unified overview counts calendar attempts, checkout openings and free purchases without inventing visitor conversion',async()=>{
+ const {db,env}=await setup();try{
+  const v=input();await marketingEvent(req(),env,v,at-day);
+  await marketingEvent(req(),env,{...v,type:'checkout'},at-2000);
+  await attempt(db,{visitId:v.visitId,created:at-day,paid:at-1000,gift:false});
+  await attempt(db,{gift:false,total:0});
+  await attempt(db,{gift:false,total:1499});
+  await attempt(db,{gift:false,paid:null,orders:false});
+  const d=await marketingReport(env,new URLSearchParams({period:'today'}),at);
+  assert.deepEqual(d.periodMetrics,{visits:0,checkouts:1,attempts:3,purchases:2,freePurchases:1});
+  assert.equal(d.metrics.conversion,null);assert.equal(d.cohort.purchases,0);
+  const fb=await marketingReport(env,new URLSearchParams({period:'today',source:'facebook_ads'}),at);
+  assert.deepEqual(fb.periodMetrics,{visits:0,checkouts:1,attempts:0,purchases:1,freePurchases:0});
+  const product=await marketingReport(env,new URLSearchParams({period:'today',product:'game'}),at);
+  assert.equal(product.periodMetrics.visits,null);assert.equal(product.periodMetrics.checkouts,null);assert.equal(product.periodMetrics.attempts,3);
+  await execute(db,'UPDATE marketing_state SET started_at=?',at-500);
+  const partial=await marketingReport(env,new URLSearchParams({period:'today'}),at);
+  assert.equal(partial.partialPeriod,true);assert.equal(partial.periodMetrics.purchases,2);assert.equal(partial.periodMetrics.attempts,3);
+ }finally{db.close();}
+});
 test('attribution requires matching random IDs and existing request key; repeat linkage is idempotent',async()=>{
  const {db,env}=await setup();try{
   const v=input();await marketingEvent(req(),env,v,at-4000);const id=await attempt(db),key=crypto.randomUUID();
