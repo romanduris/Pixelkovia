@@ -69,7 +69,7 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
   try{
     const url=new URL(request.url),path=url.pathname;
     if(env.ENVIRONMENT==='local'&&!localRequest(request,env))throw new HttpError(403,'Lokálny režim nie je povolený na verejnej adrese.');
-    if(path==='/api/marketing/event'&&request.method==='POST'){sameOrigin(request);return json(await marketingEvent(request,env,await body(request)));}
+    if(path==='/api/marketing/event'&&request.method==='POST'){sameOrigin(request);if(env.MARKETING_COLLECTION_ENABLED!=='true')throw new HttpError(410,'Zber návštev v prehliadači je vypnutý.');return json(await marketingEvent(request,env,await body(request)));}
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){
       const session=url.searchParams.get('session_id'),checkoutId=url.searchParams.get('checkout_id');
@@ -80,8 +80,10 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(path==='/api/checkout/session'&&request.method==='POST'){
       sameOrigin(request);paymentInput=await body(request);
       const result=await createCheckout(env,{...paymentInput,__ip:request.headers.get('CF-Connecting-IP')||'unknown'});
-      const link=linkMarketingAttempt(env,paymentInput).catch(()=>console.error('marketing_attribution_failed'));
-      if(context?.waitUntil)context.waitUntil(link);else await link;
+      if(env.MARKETING_COLLECTION_ENABLED==='true'){
+        const link=linkMarketingAttempt(env,paymentInput).catch(()=>console.error('marketing_attribution_failed'));
+        if(context?.waitUntil)context.waitUntil(link);else await link;
+      }
       return json(result);
     }
     if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await releaseCheckout(env,paymentInput));}

@@ -39,7 +39,7 @@ export async function prepareFunnel(output){
   for(const [original,crop]of Object.entries(previews))markup=markup.replaceAll(original,crop);
   let index=await readFile(path.join(root,'index.html'),'utf8');
   index=index.replace(/\s*<script\b[^>]*>[\s\S]*?<\/script>/g,'')
-    .replace('</head>','  <link rel="canonical" href="https://pixelkovia.rodulab.com/">\n  <script defer src="library-catalog.js"></script>\n  <script defer src="book-previews.js"></script>\n  <script defer src="sales-interactions.js"></script>\n  <script defer src="marketing-consent.js"></script>\n</head>')
+    .replace('</head>','  <link rel="canonical" href="https://pixelkovia.rodulab.com/">\n  <script defer src="library-catalog.js"></script>\n  <script defer src="book-previews.js"></script>\n  <script defer src="sales-interactions.js"></script>\n</head>')
     .replace('<main id="app"></main>',`<main id="app">${markup}</main>`)
     .replace(/<noscript>[\s\S]*?<\/noscript>/,'<noscript><p>Výber doplnkov v ponuke vyžaduje JavaScript.</p></noscript>')
     .replace(/\s*<dialog id="modal"[^>]*><\/dialog>/,'');
@@ -48,7 +48,7 @@ export async function prepareFunnel(output){
   // Reuse the same price functions and data without publishing access/admin code.
   const purchaseConfig=`/* Generated public catalog. Access and payment readiness are server-owned. */\n(()=>{\nconst products=${JSON.stringify(config.products)};\nconst offer=${JSON.stringify(config.offer)};\nconst payments=${JSON.stringify(config.payments)};\nconst money=(${config.money.toString()});\nconst product=(${config.product.toString()});\nconst quote=(${config.quote.toString()});\nconst managementUrl=()=>location.origin+'/admin';\nwindow.SITE_CONFIG={products,offer,money,product,quote,payments,managementUrl};\n})();\n`;
   await writeFile(path.join(output,'purchase-config.js'),purchaseConfig);
-  const code=['supervisor.js','supervisor.css','portal-library.js','portal-library.css','book-previews.js','book-previews.css','styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js','marketing-consent.js','marketing-consent.css','library.css','library.js','library-catalog.js'];
+  const code=['supervisor.js','supervisor.css','portal-library.js','portal-library.css','book-previews.js','book-previews.css','styles.css','adventure.css','presentation.css','party.css','sales.css','checkout.css','checkout.js','sales-interactions.js','library.css','library.js','library-catalog.js'];
   for(const file of code)await cp(path.join(root,file),path.join(output,file));
   const assets=[
     'favicon.ico','assets/brand/piko-32.png','assets/brand/piko-192.png','assets/brand/piko-180.png',

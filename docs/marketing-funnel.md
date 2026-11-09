@@ -27,9 +27,9 @@ Facebook/Instagram bez plateného UTM média sa neoznačuje ako reklama. Meta os
 
 ## Súhlas a bezpečnosť
 
-`marketing-consent.js` spravuje dobrovoľné povolenie/odmietnutie/odvolanie. Bez súhlasu sa neposiela analytická udalosť ani nevytvára analytický identifikátor. Rozhodnutie sa pamätá 180 dní. Prvý súhlas sa zobrazí hneď v zornom poli ako nemodálny panel, na mobile nad spodnými nákupnými tlačidlami. Opätovné otvorenie nastavení zostáva pri päte predajnej stránky a checkoutu; neblokujú nákup a nemenia cenu ani platobný formulár. Nie sú vložené žiadne GA4, Clarity alebo Meta Pixel skripty.
+Na výslovnú požiadavku vlastníka bol panel súhlasu aj odkaz na jeho nastavenie odstránený. Z predajnej stránky, checkoutu a verejného buildu sú odstránené aj súvisiace JS/CSS súbory. Nové návštevy, prehliadačové identifikátory a marketingová atribúcia sa nezbierajú ani pri skôr uloženom súhlase. Produkcia má `MARKETING_COLLECTION_ENABLED=false`; existujúci zberový endpoint vracia 410 aj pre staré otvorené stránky. Serverové overovanie platieb, bezpečná platobná diagnostika a nákupy zostávajú aktívne. Uložené návštevy zostávajú ako historické záznamy, dashboard uvádza vypnutý zber a priebežná konverzia je nedostupná. Nie sú vložené žiadne GA4, Clarity alebo Meta Pixel skripty.
 
-Verejný POST `/api/marketing/event` má strict origin, limit veľkosti JSON, povolené typy, formát náhodných identifikátorov a rate limit cez existujúci mechanizmus. Ide o klientské analytické signály, nie overených ľudí. Neukladá IP, UA, osobné údaje, obsah polí ani údaje karty. IP slúži iba na existujúci zahashovaný limit s tajným serverovým kľúčom. Prepojenie návštevy a platby vyžaduje oba náhodné identifikátory a existujúci nákupný request key; opakovanie nemení prvú atribúciu. Výpadok atribúcie neblokuje checkout. Výpadok udalosti môže ponechať nákup nepriradený.
+Zachovaný, v produkcii vypnutý POST `/api/marketing/event` má strict origin, limit veľkosti JSON, povolené typy, formát náhodných identifikátorov a rate limit cez existujúci mechanizmus. Ide o klientské analytické signály, nie overených ľudí. Neukladá IP, UA, osobné údaje, obsah polí ani údaje karty. IP slúži iba na existujúci zahashovaný limit s tajným serverovým kľúčom. Prepojenie návštevy a platby vyžaduje oba náhodné identifikátory a existujúci nákupný request key; opakovanie nemení prvú atribúciu. Výpadok atribúcie neblokuje checkout. Výpadok udalosti môže ponechať nákup nepriradený.
 
 Čítanie reportu aj administrátorského JS vyžaduje existujúce prihlásenie. Zdrojová atribúcia a návštevy sa čistia po 366 dňoch existujúcim cron procesom. Obchodné záznamy sa nemažú. Uchované nákupy môžu po uplynutí analytickej retencie stratiť zdroj; historická atribúcia sa neodhaduje.
 
@@ -40,7 +40,7 @@ Pri implementácii boli overené názvy environment a Codespaces secrets aj exis
 Pred reklamou 18. 11. 2026:
 
 1. Zjednotiť UTM odkazy pre každú reklamu a influencer kampaň.
-2. Overiť prijatie návštevy a checkoutu so súhlasom, odmietnutie a odvolanie na cieľových zariadeniach. Produkčné skúšobné návštevy patria do reálnych dát; nepoužívať vymyslené návštevy alebo nákupy.
+2. Pred prípadným opätovným spustením merania návštev dohodnúť jeho spôsob. Aktuálne je zber v prehliadači zámerne vypnutý. Produkčné skúšobné návštevy patria do reálnych dát; nepoužívať vymyslené návštevy alebo nákupy.
 3. Pri porovnávaní rešpektovať skutočný uvedený interval merania konverzie; rozhodovať podľa dostatočného objemu, nie ilustračných čísel.
 4. Pre CAC doplniť autorizovaný Meta Ads zdroj alebo samostatne zadané skutočné denné výdavky podľa kampane. Bez toho vyhodnocovať len návštevnosť a nákupy.
 5. Dokončiť existujúce P0 overenie podrobných platobných krokov z `MD/P0-monitorovanie-platobneho-funnelu.md`; toto marketingové MVP ho nenahrádza.

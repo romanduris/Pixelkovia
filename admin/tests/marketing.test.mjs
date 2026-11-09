@@ -7,7 +7,7 @@ import worker from '../src/worker.mjs';
 const origin='https://pixelkovia.rodulab.com',at=Date.UTC(2026,10,10,12),day=86400000;
 const req=()=>new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin,'content-type':'application/json'}});
 const input=(extra={})=>({type:'visit',consent:true,visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'facebook_ads',campaign:'launch-2026',device:'mobile',...extra});
-async function setup(){const db=fresh();await execute(db,'UPDATE marketing_state SET started_at=?',at-30*day);return {db,env:{TQ_DB:db,CUSTOMER_AUTH_SECRET:'a'.repeat(64)}};}
+async function setup(){const db=fresh();await execute(db,'UPDATE marketing_state SET started_at=?',at-30*day);return {db,env:{TQ_DB:db,MARKETING_COLLECTION_ENABLED:'true',CUSTOMER_AUTH_SECRET:'a'.repeat(64)}};}
 async function attempt(db,{visitId=null,created=at-3600000,paid=at-1000,total=2498,gift=true,selection=['episode-1','atlas-pixelkov'],refund=false,orders=true,delivery='sent'}={}){
  const id=crypto.randomUUID(),session='cs_test_'+id.replaceAll('-','');
  await execute(db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id,gift_game) VALUES(?,?,?,?,?,?,?,?)',id,'private@example.invalid','Private',JSON.stringify(selection),total,created,session,+gift);
@@ -90,6 +90,16 @@ test('attribution requires matching random IDs and existing request key; repeat 
 test('Bratislava calendar dates handle DST and reject invalid filters',()=>{
  for(const [date,hours] of [['2026-03-29',23],['2026-10-25',25]]){const f=marketingFilters(new URLSearchParams({period:'custom',from:date,to:date}),at);assert.equal((f.end-f.start)/3600000,hours);}
  for(const params of [{period:'bad'},{source:"' OR 1=1"},{campaign:'private@example.invalid'},{period:'custom',from:'2026-02-30',to:'2026-03-01'},{period:'custom',from:'2026-13-01',to:'2026-13-02'},{period:'custom',from:'2026-11-10',to:'2026-11-09'}])assert.throws(()=>marketingFilters(new URLSearchParams(params),at),e=>e.status===400);
+});
+
+test('disabled browser collection rejects even a cached consented request and preserves paid reporting',async()=>{
+ const {db,env}=await setup();try{
+  await attempt(db,{gift:false,total:1499});
+  const disabled={...env,MARKETING_COLLECTION_ENABLED:'false'};
+  const response=await worker.fetch(new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(input())}),disabled);
+  assert.equal(response.status,410);assert.equal((await first(db,'SELECT count(*) n FROM marketing_visits')).n,0);
+  const report=await marketingReport(disabled,new URLSearchParams(),at);assert.equal(report.collectionEnabled,false);assert.equal(report.metrics.purchases,1);assert.equal(report.metrics.revenueCents,1499);assert.equal(report.metrics.conversion,null);assert.match(report.conversionReason,/vypnutý/);
+ }finally{db.close();}
 });
 
 test('checkout still succeeds if attribution storage fails; browser cannot forge paid analytics',async()=>{

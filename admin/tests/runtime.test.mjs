@@ -39,7 +39,7 @@ test('password-only authentication works in actual Workers/D1 runtime and gates 
  const {makePasswordSecrets}=await import('../src/password-auth.mjs');
  const password='runtime-test-only-password-84931';
  const secrets=await makePasswordSecrets(password);
- const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-password-runtime'},bindings:{ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',...secrets},serviceBindings:{ASSETS:async request=>new Response(new URL(request.url).pathname==='/'?'protected-admin':'login-asset')}}));
+ const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-password-runtime'},bindings:{ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',MARKETING_COLLECTION_ENABLED:'true',...secrets},serviceBindings:{ASSETS:async request=>new Response(new URL(request.url).pathname==='/'?'protected-admin':'login-asset')}}));
  try{
   const db=await mf.getD1Database('TQ_DB');
   for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
