@@ -9,7 +9,7 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  const server=await workerServer(),engine=process.env.QA_BROWSER==='webkit'?webkit:chromium;
  const browser=await engine.launch({headless:true,...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',JSC_useJIT:'0'}}:{})});
  try{
-  const secondPassword='qa-only-second-purchase-password',record=await credentials(server.email,secondPassword,'a'.repeat(64)),at=Date.now();
+  const secondPassword='b'.repeat(24),record=await credentials(server.email,secondPassword,'a'.repeat(64)),at=Date.now();
   await execute(server.db,'INSERT INTO customers VALUES(?,?,?,?)','qa-second',server.email,'Druhá rodina',at);
   await execute(server.db,'INSERT INTO customer_credentials VALUES(?,?,?,?,?)','qa-second',record.lookup,record.salt,record.hash,at);
   for(const productId of ['episode-1','story-book-after'])await createOrder(server.db,{customerId:'qa-second',productId,externalReference:'qa-second-'+productId});

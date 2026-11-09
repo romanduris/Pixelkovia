@@ -23,7 +23,7 @@ export async function customerLogin(request,env,input,at=Date.now()){
   const scope=hex(await keyedHash(env.CUSTOMER_AUTH_SECRET,'login:'+String(request.headers.get('CF-Connecting-IP')||'unknown')));
   const attempt=await first(env.TQ_DB,`INSERT INTO customer_login_attempts VALUES(?,1,?) ON CONFLICT(scope_key) DO UPDATE SET attempts=CASE WHEN window_start<=? THEN 1 ELSE attempts+1 END,window_start=CASE WHEN window_start<=? THEN excluded.window_start ELSE window_start END RETURNING attempts`,scope,at,at-900000,at-900000);
   if(attempt.attempts>10)return {status:429,error:'Príliš veľa pokusov. Skúste to o 15 minút.'};
-  if(!email||typeof password!=='string'||password.length<16||password.length>128)return {status:401,error:'E-mail alebo heslo nie je správne.'};
+  if(!email||typeof password!=='string'||password.length<12||password.length>128)return {status:401,error:'E-mail alebo heslo nie je správne.'};
   const lookup=hex(await keyedHash(env.CUSTOMER_AUTH_SECRET,email+'\0'+password));
   const record=await first(env.TQ_DB,'SELECT * FROM customer_credentials WHERE lookup_hash=?',lookup);
   // A full password derivation is also performed for unknown credentials.

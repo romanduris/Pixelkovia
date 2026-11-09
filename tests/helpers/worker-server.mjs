@@ -20,7 +20,7 @@ function assets(directory){return async request=>{
   return new Response(request.method==='HEAD'?null:content,{headers});
 };}
 export async function workerServer(){
-  const adminPassword='qa-only-administrator-password-28549',customerPassword='qa-only-customer-password-39485',secret='a'.repeat(64),email='family@example.invalid';
+  const adminPassword='qa-only-administrator-password-28549',customerPassword='012345abcdef',secret='a'.repeat(64),email='family@example.invalid';
   const mf=new Miniflare(convertV4MiniflareOptions({host:'127.0.0.1',https:true,workers:[
     {name:'gateway',modules:true,scriptPath:path.join(root,'dist/funnel/_worker.js'),serviceBindings:{BACKEND:'backend',ASSETS:assets(path.join(root,'dist/funnel'))}},
     {name:'backend',modules:true,scriptPath:path.join(root,'admin/.build-check/worker.js'),compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'isolated-journey'},bindings:{ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',WEB_URL:'https://pixelkovia.rodulab.com',CUSTOMER_AUTH_SECRET:secret,...await makePasswordSecrets(adminPassword)},serviceBindings:{ASSETS:assets(path.join(root,'admin/public'))}}

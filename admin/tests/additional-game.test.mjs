@@ -29,6 +29,7 @@ test('additional game has server-owned price, two isolated orders, exact entitle
   assert.equal(orders.reduce((sum,o)=>sum+o.total_cents,0),checkout.totalCents);assert.notEqual(orders[0].customer_id,orders[1].customer_id);
   const deliveries=await query(db,'SELECT co.kind,d.* FROM checkout_orders co JOIN access_deliveries d ON d.order_id=co.order_id ORDER BY co.kind');
   const messages=await Promise.all(deliveries.map(d=>unseal(d.encrypted_message,secret)));
+  assert.ok(messages.every(message=>message.password.length===12),'both independent orders receive 12-character passwords');
   assert.equal(messages[0].gift,true);assert.equal(messages[1].gift,false);assert.equal(messages[0].email,messages[1].email);assert.notEqual(messages[0].password,messages[1].password);
   assert.deepEqual(messages[0].products,['Hra Pixelkovia – Stratený signál']);assert.equal(messages[1].products.length,4);
   assert.match(accessEmail(messages[0]).text,/môžete preposlať/);assert.ok(!accessEmail(messages[0]).html.includes(messages[1].password));

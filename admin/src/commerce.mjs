@@ -191,7 +191,7 @@ export async function fulfill(env,sessionId){
   if(attempt.gift_game)plans.push({kind:'gift',ids:['episode-1'],prices:{'episode-1':giftTotal},total:giftTotal,reference:session.id+':gift'});
   const batch=[];
   for(const plan of plans){
-    const id=plan.id=uuid(),customerId=uuid(),password=randomToken().slice(0,24);
+    const id=plan.id=uuid(),customerId=uuid(),password=randomToken().slice(0,12);
     const c=await credentials(attempt.email,password,env.CUSTOMER_AUTH_SECRET,at);
     const message=await seal({email:attempt.email,password,name:attempt.name,gift:plan.kind==='gift',products:plan.ids.map(id=>product(id).name)},env.CUSTOMER_AUTH_SECRET);
     batch.push(statement(db,'INSERT INTO customers VALUES(?,?,?,?)',customerId,attempt.email,attempt.name||attempt.email,at),statement(db,'INSERT INTO customer_credentials VALUES(?,?,?,?,?)',customerId,c.lookup,c.salt,c.hash,at),statement(db,"INSERT INTO orders SELECT ?,?,?,CASE WHEN EXISTS(SELECT 1 FROM payment_refunds WHERE payment_intent=?) THEN 'refunded' ELSE 'paid' END,?,?,?,?",id,customerId,plan.reference,intentId,plan.total,'EUR',at,at),statement(db,'INSERT INTO checkout_orders VALUES(?,?,?)',attempt.id,plan.kind,id));

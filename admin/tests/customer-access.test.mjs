@@ -28,6 +28,7 @@ test('two purchases with the same email get isolated credentials, orders and boo
   assert.equal((await first(db,'SELECT COUNT(*) n FROM orders')).n,2);
   const d1=await first(db,'SELECT * FROM access_deliveries WHERE order_id=?',order1.id),d2=await first(db,'SELECT * FROM access_deliveries WHERE order_id=?',order2.id);
   const m1=await unseal(d1.encrypted_message,secret),m2=await unseal(d2.encrypted_message,secret);
+  assert.equal(m1.password.length,12);assert.equal(m2.password.length,12);
   assert.notEqual(m1.password,m2.password);assert.ok(!d1.encrypted_message.includes(m1.password));
   const login=await customerLogin(new Request(origin,{headers:{'CF-Connecting-IP':'192.0.2.1'}}),env,{email,password:m1.password});assert.equal(login.status,200);
   const identity=await customerSession(new Request(origin,{headers:{cookie:'__Host-pixelkovia='+login.token}}),env);
@@ -64,6 +65,18 @@ test('two purchases with the same email get isolated credentials, orders and boo
   assert.equal((await first(db,"SELECT SUM(unit_price_cents) n FROM order_items WHERE order_id=? AND product_id LIKE 'story-book-%'",previousOrder.id)).n,500);
   const originalFetch=globalThis.fetch;
   try{globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.resend.com/emails');const mail=JSON.parse(options.body);assert.equal(mail.from,'Piko · Pixelkovia <Piko@pixelkovia.rodulab.com>');assert.equal(mail.reply_to,'miky@pixelkovia.rodulab.com');assert.ok(mail.text.includes('/Supervisor'));assert.ok(mail.text.endsWith('Piko · Pixelkovia'));assert.ok(mail.html.includes('<p>Piko · Pixelkovia</p>'));return Response.json({id:'provider-'+options.headers['Idempotency-Key']});};await sendPending(env);assert.equal((await first(db,'SELECT status FROM access_deliveries WHERE order_id=?',order1.id)).status,'sent');assert.equal((await first(db,'SELECT encrypted_message FROM access_deliveries WHERE order_id=?',order1.id)).encrypted_message,null);}finally{globalThis.fetch=originalFetch;db.close();}
+});
+test('previously issued 24-character purchase passwords remain valid',async()=>{
+ const db=fresh(),email='existing@example.invalid',password='a'.repeat(24),at=Date.now();
+ try{
+  const record=await credentials(email,password,secret,at);
+  await execute(db,'INSERT INTO customers VALUES(?,?,?,?)','existing-customer',email,'Existujúca rodina',at);
+  await execute(db,'INSERT INTO customer_credentials VALUES(?,?,?,?,?)','existing-customer',record.lookup,record.salt,record.hash,at);
+  const login=await customerLogin(new Request(origin),{TQ_DB:db,CUSTOMER_AUTH_SECRET:secret},{email,password});
+  assert.equal(login.status,200);
+  const identity=await customerSession(new Request(origin,{headers:{cookie:'__Host-pixelkovia='+login.token}}),{TQ_DB:db});
+  assert.equal(identity.customerId,'existing-customer');
+ }finally{db.close();}
 });
 test('failed or forged payment notifications cannot grant access; unsigned webhook is rejected',async()=>{
   const db=fresh(),env={TQ_DB:db,STRIPE_SECRET_KEY:'rk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture'};
