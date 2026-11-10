@@ -16,7 +16,10 @@ export function midnight(date){
 }
 export function marketingFilters(params,at=Date.now()){
   const period=params.get('period')||'14',today=localDate(at);let start,end;
-  if(period==='custom'){
+  if(period==='since'){
+    start=midnight(params.get('from')||'');end=at+1;
+    if(start>at||Date.parse(today)-Date.parse(params.get('from'))>365*day)throw new HttpError(400,'Vyberte minulý alebo dnešný dátum, najviac 366 dní dozadu.');
+  }else if(period==='custom'){
     start=midnight(params.get('from')||'');const last=midnight(params.get('to')||'');end=midnight(localDate(last+36*3600000));
     if(last<start||end-start>366*day||start>at)throw new HttpError(400,'Rozsah musí byť minulý alebo aktuálny, najviac 366 dní.');
   }else{

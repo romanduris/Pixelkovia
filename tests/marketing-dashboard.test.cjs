@@ -105,7 +105,25 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);assert.equal(await page.locator('#marketing-funnel-details').evaluate(el=>el.open),true);
   assert.equal(await page.locator('#marketing-period-purchases').isChecked(),true);assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),9);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   assert.equal(await page.evaluate(()=>document.activeElement.id),'refresh-marketing');
+  // Date selection belongs in the toolbar and works with the filters panel closed.
+  assert.ok(await page.locator('.marketing-toolbar #marketing-since').isVisible());
+  const sinceDate=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(Date.now());
+  await page.locator('#marketing-since').fill(sinceDate);await page.locator('#marketing-since').blur();await ready();
+  assert.match(calls.at(-1),/period=since/);assert.ok(calls.at(-1).includes('from='+sinceDate));assert.ok(!calls.at(-1).includes('to='));
+  assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(3).innerText(),'1');
   await page.locator('#marketing-filter-toggle').click();
+  await page.locator('[name=source]').selectOption('facebook_ads');await page.locator('[name=campaign]').selectOption('launch-2026');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();
+  await page.reload();await ready();
+  assert.equal(await page.locator('#marketing-since').inputValue(),sinceDate);assert.match(calls.at(-1),/period=since/);assert.match(calls.at(-1),/source=facebook_ads/);assert.match(calls.at(-1),/campaign=launch-2026/);
+  assert.equal(await page.locator('#marketing-filter-panel').isVisible(),true);assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);assert.equal(await page.locator('#marketing-funnel-details').evaluate(el=>el.open),true);
+  assert.ok(await page.locator('#marketing-period-purchases').isChecked());assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
+  const cookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-marketing-layout-v1');
+  assert.ok(cookie);assert.equal(cookie.path,'/admin');assert.equal(cookie.secure,true);assert.equal(cookie.sameSite,'Strict');assert.ok(cookie.expires>Date.now()/1000+300*86400);
+  const saved=JSON.parse(decodeURIComponent(cookie.value));assert.equal(saved.selected.period,'since');assert.equal(saved.selected.from,sinceDate);assert.equal(saved.selected.to,undefined);assert.ok(!JSON.stringify(saved).includes('private'));assert.ok(cookie.value.length<4096);
+  await page.locator('.marketing-purchase-link').click();await page.waitForURL('**/admin#payments?**');await page.locator('.payment-funnel-scope').waitFor();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),1);
+  await page.getByRole('link',{name:'Späť na funnel'}).click();await page.locator('.marketing-dashboard').waitFor();await ready();assert.equal(await page.locator('#marketing-since').inputValue(),sinceDate);
+  await page.locator('#marketing-since').fill('');await page.locator('#marketing-since').blur();await ready();assert.match(calls.at(-1),/period=14/);assert.match(calls.at(-1),/source=facebook_ads/);
+  await page.locator('#marketing-reset').click();await ready();await page.reload();await ready();assert.equal(await page.locator('#marketing-since').inputValue(),'');assert.match(calls.at(-1),/period=14/);
   await page.locator('[name=source]').selectOption('instagram_ads');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.ok(calls.at(-1).includes('source=instagram_ads'));assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(3).innerText(),'0');
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(4).innerText(),'Nedostupné');assert.ok(await page.locator('#marketing-chip-source').isVisible());assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);
   await page.locator('#marketing-chip-source').click();await ready();assert.equal(await page.locator('#marketing-chip-source').count(),0);assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(3).innerText(),'1');
@@ -119,7 +137,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-filter-toggle').click();
   for(const width of [1440,1920,768,375,320]){
    await page.setViewportSize({width,height:width===1920?1080:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no page overflow '+width);
-   assert.ok(await page.locator('#marketing-filter-toggle').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
+   assert.ok(await page.locator('#marketing-filter-toggle').isVisible());assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
    if(width>=1440){const positions=await page.locator('.marketing-kpis .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(Math.max(...positions)-Math.min(...positions)<1,'five metrics in one row');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
    if(width<=375){await page.locator('#marketing-filter-toggle').tap();assert.equal(await page.locator('#marketing-filter-panel').isVisible(),true);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'expanded filters have no overflow');await page.locator('[name=device]').focus();await page.keyboard.press('Escape');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.equal(await page.evaluate(()=>document.activeElement.id),'marketing-filter-toggle');}
    await page.screenshot({path:'/tmp/pixelkovia-marketing-after-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png',fullPage:true});
@@ -161,6 +179,6 @@ const origin='https://pixelkovia.rodulab.com';
   const count=events.length;await page.goto(origin+'/checkout');assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),{});assert.equal(events.length,count);
   assert.ok(await page.locator('main').isVisible());
   assert.deepEqual(errors,[]);
-  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom dates, keyboard disclosures and state restoration, sorting and permanently expanded source list, period-payment column, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
+  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and permanently expanded source list, period-payment column, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
  }finally{await context.close();await browser.close();db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

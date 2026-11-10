@@ -115,6 +115,14 @@ test('Bratislava calendar dates handle DST and reject invalid filters',()=>{
  for(const params of [{period:'bad'},{source:"' OR 1=1"},{campaign:'private@example.invalid'},{period:'custom',from:'2026-02-30',to:'2026-03-01'},{period:'custom',from:'2026-13-01',to:'2026-13-02'},{period:'custom',from:'2026-11-10',to:'2026-11-09'}])assert.throws(()=>marketingFilters(new URLSearchParams(params),at),e=>e.status===400);
 });
 
+test('since-date reports start at Bratislava midnight and keep extending to the current time',()=>{
+ const params=new URLSearchParams({period:'since',from:'2026-10-25',source:'facebook'});
+ const first=marketingFilters(params,at),next=marketingFilters(params,at+day);
+ assert.equal(first.start,Date.parse('2026-10-24T22:00:00Z'));assert.equal(first.end,at+1);
+ assert.equal(next.start,first.start);assert.equal(next.end,at+day+1);assert.equal(next.to,'2026-11-11');assert.equal(next.source,'facebook');
+ for(const from of ['', '2026-02-30','2026-11-11','2025-11-09'])assert.throws(()=>marketingFilters(new URLSearchParams({period:'since',from}),at),e=>e.status===400);
+});
+
 test('disabled browser collection rejects even a cached collection request and preserves paid reporting',async()=>{
  const {db,env}=await setup();try{
   await attempt(db,{gift:false,total:1499});
