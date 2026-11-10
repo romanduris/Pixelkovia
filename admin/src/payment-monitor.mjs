@@ -1,4 +1,4 @@
-import {marketingFilters,attemptsCTE,conditions} from './marketing-query.mjs';
+import {marketingFilters,attemptsCTE,conditions,midnight} from './marketing-query.mjs';
 import {HttpError} from './auth.mjs';
 import {first,query,execute,hash} from './db.mjs';
 import {progressTypes,recordPaymentProgress,progressMetadata,summarizeProgress} from './payment-progress.mjs';
@@ -165,7 +165,7 @@ function readAttemptCursor(value){
 // Matches SQLite's created_at DESC, id ASC order, including equal timestamps.
 const olderAttempt=(row,key)=>row.createdAt<key.createdAt||(row.createdAt===key.createdAt&&row.id>key.id);
 export async function paymentReport(env,params,ready){
-  const days=params.get('days')==='all'?'all':Number(params.get('days')||1);if(![1,7,30,'all'].includes(days))throw new HttpError(400,'Neplatné obdobie.');
+  const period=params.get('days')||'1',days=['all','custom'].includes(period)?period:Number(period);if(![1,7,30,'all','custom'].includes(days))throw new HttpError(400,'Neplatné obdobie.');
   const category=params.get('category')||'';if(category&&!['technical','bank','validation','customer','lifecycle'].includes(category))throw new HttpError(400,'Neplatný filter.');
   const attemptStatus=params.get('status')||'',attemptCounts={started:0,abandoned:0,cancelled:0,error:0,successful:0,declined:0,unknown:0};
   if(attemptStatus&&!Object.hasOwn(attemptCounts,attemptStatus))throw new HttpError(400,'Neplatný stav platby.');
@@ -174,11 +174,13 @@ export async function paymentReport(env,params,ready){
   const requestedPage=Number(params.get('page')||1);if(!Number.isSafeInteger(requestedPage)||requestedPage<1)throw new HttpError(400,'Neplatná strana.');
   const cursor=readAttemptCursor(params.get('cursor')),through=readAttemptCursor(params.get('through'));
   if((cursor&&through)||((cursor||through)&&requestedPage!==1))throw new HttpError(400,'Neplatná kombinácia stránkovania.');
-  const at=Date.now(),since=days==='all'?0:at-days*86400000,db=env.TQ_DB;
+  const at=Date.now(),fromDate=days==='custom'?params.get('since')||'':'',since=days==='custom'?midnight(fromDate):days==='all'?0:at-days*86400000,db=env.TQ_DB;
+  if(since>at)throw new HttpError(400,'Začiatočný dátum nesmie byť v budúcnosti.');
   const productFilter=params.get('paymentProduct')||'',methodFilter=params.get('method')||'';
   if((productFilter&&!products.has(productFilter))||(methodFilter&&!methods.has(methodFilter)))throw new HttpError(400,'Neplatný filter produktu alebo platobnej metódy.');
   const progressMeta=await progressMetadata(db);
   const scope=params.get('scope')||'';if(!['','funnel'].includes(scope))throw new HttpError(400,'Neplatný rozsah platieb.');
+  if(scope==='funnel'&&days==='custom')throw new HttpError(400,'Obdobie nákupov určuje filter predajného funnelu.');
   let funnel=null,paidIds=null;
   if(scope==='funnel'){
     const asOf=Number(params.get('asOf')||at);
@@ -279,5 +281,5 @@ export async function paymentReport(env,params,ready){
   const queueStale=progressMeta.audit?.oldest_due&&at-progressMeta.audit.oldest_due>1800000;
   const stale=checks.length<2||checks.some(c=>at-c.checked_at>1800000)||!progressMeta.audit||at-progressMeta.audit.checked_at>1800000||queueStale,badChecks=checks.some(c=>!c.ok);
   const needsAttention=!ready||badChecks||errors24.count>0||declines24.count>0||deliveries.failed>0||deliveries.delayed>0||fulfillment.count>0;
-  return {generatedAt:at,funnel,days,productFilter,methodFilter,progress,category,attemptStatus,attentionOnly,attemptId,attention,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
+  return {generatedAt:at,funnel,days,fromDate,since,productFilter,methodFilter,progress,category,attemptStatus,attentionOnly,attemptId,attention,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
 }

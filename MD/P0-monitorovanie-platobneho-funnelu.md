@@ -24,6 +24,7 @@ Overené v oficiálnych definíciách [Checkout SDK](https://github.com/stripe/s
 
 ## Kohorta a presnosť
 
+- Vo výbere obdobia je aj **Od dátumu…** s poľom **Zobrazovať od**. Zahŕňa zvolený deň od 00:00 v Europe/Bratislava až do teraz, so správnym letným/zimným časom. Rovnaká hranica platí pre počty stavov, priebeh aj tabuľku a diagnostické záznamy. Dátum a režim sa ukladajú medzi nastaveniami administrátora a obnovia po reloadovaní aj po návrate z presného výberu nákupov z predajného funnelu. Aktuálny prevádzkový monitoring zostáva samostatne za posledných 24 hodín.
 - Obdobie vyberá dátum **vzniku nákupného pokusu**, výsledok je aktuálny k času načítania. Neskoršia úhrada sa objaví pri pôvodnej kohorte. Konverzia = overené peňažné úhrady / pokusy s nenulovou cenou. Nulové objednávky a refundácie sú samostatne; úhrada zostáva historicky dosiahnutá aj po refundácii.
 - Preklik Nákupy z predajného funnelu naďalej používa presný výber podľa dátumu úhrady a jeho snapshotu. V tomto režime prehľad výslovne upozorňuje, že výber iba uhradených nákupov nemeria straty medzi krokmi.
 - Filtre produktu a metódy upravujú celý prehľad aj tabuľku a resetujú stránkovanie. Pri zaplatenom nákupe má prednosť overená skutočná metóda; pri nezaplatenom posledné klientské potvrdenie. Bez známej metódy zostáva Neznáme. Filter produktu znamená obsah nákupu, aj knihu kúpenú ako doplnok.
@@ -43,7 +44,7 @@ Audit pokračuje bez prehliadača každých 10 minút. Namiesto pôvodných 8 ko
 
 ## Overenie
 
-- `npm --prefix admin test`: 106 testov vrátane skutočného Workers/D1 runtime. Doplnená kontrola súbežného opakovania a inkrementu potvrdení priamo v D1, filtrov, kohorty, historických dát, darčeka, zdarma, refundácie, retencie a auditu dlhšej fronty.
+- `npm --prefix admin test`: 107 testov vrátane skutočného Workers/D1 runtime. Doplnená kontrola súbežného opakovania a inkrementu potvrdení priamo v D1, filtrov, kohorty, historických dát, darčeka, zdarma, refundácie, retencie a auditu dlhšej fronty.
 - `tests/checkout-progress.test.cjs`: nasadzovaný checkout, skutočné Worker handlery a lokálna SQLite; karta aj obe peňaženky, hra aj samostatné knihy, opakované chyby a opravy, dvojklik, refresh a porovnanie presných počtov s managementom. Chromium a WebKit, mobilné aj desktopové rozmery. Obsah Stripe udalosti sa nedostane do diagnostického payloadu.
 - `STRIPE_INLINE_SMOKE=1 ... node --test tests/stripe-inline-live.test.mjs`: skutočný Stripe API/SDK, načítanie, zadávanie, kompletnosť, validácia a identifikátor potvrdenia. Platobné požiadavky sú v prehliadači zablokované; nevznikne PaymentIntent ani úhrada a vytvorené nezaplatené Session sa expirujú.
 - Existujúce regresie `checkout-payment`, `checkout-recovery`, `payment-admin` a `marketing-dashboard` preverujú zachovaný formulár, timeout, návrat z banky, neskorý overený výsledok, pôvodné stavy a presný preklik nákupov do platieb.

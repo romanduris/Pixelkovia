@@ -23,7 +23,8 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
     if(url.pathname==='/api/admin/payments'){
       calls.push(url.searchParams.toString());if(fail)return route.fulfill({status:503,json:{error:'Dočasne nedostupné'}});
       const data=structuredClone(report);if(largeList)data.rows=structuredClone(manyRows);
-      data.days=url.searchParams.get('days')==='all'?'all':Number(url.searchParams.get('days')||1);data.attemptStatus=url.searchParams.get('status')||'';
+      data.days=['all','custom'].includes(url.searchParams.get('days'))?url.searchParams.get('days'):Number(url.searchParams.get('days')||1);data.fromDate=data.days==='custom'?url.searchParams.get('since')||'':'';data.attemptStatus=url.searchParams.get('status')||'';
+      if(data.fromDate){const {midnight}=await import('../admin/src/marketing-query.mjs');data.rows=data.rows.filter(r=>r.createdAt>=midnight(data.fromDate));}
       if(richAttention){
         const events=[{id:'linked-error',attempt_id:'batch-090',linked_attempt_id:'batch-090',type:'webhook_error',source:'server',category:'technical',label:'Chyba spracovania podpísanej Stripe udalosti',code:'',method:'unknown',created_at:now},{id:'global-error',attempt_id:null,linked_attempt_id:null,type:'webhook_error',source:'server',category:'technical',label:'Chyba bez uloženého prepojenia',code:'',method:'unknown',created_at:now},...extraEvents].map(e=>({...e,reviewed_at:reviews.get(e.id)||null,reviewed_by:reviews.has(e.id)?'Správca':null}));
         const pending=events.filter(e=>!e.reviewed_at),linked=pending.filter(e=>e.linked_attempt_id);
@@ -143,6 +144,12 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
   await page.locator('#payment-days').selectOption('7');await ready();assert.ok(calls.some(p=>p.includes('days=7')));await page.reload();await ready();assert.equal(await page.locator('#payment-days').inputValue(),'7','chosen period survives a new page load');
   assert.equal(await page.locator('#load-more-payments').count(),0);
   await page.locator('#payment-days').selectOption('all');await ready();assert.ok(calls.some(p=>p.includes('days=all')&&!p.includes('cursor=')&&!p.includes('through=')));
+  const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava'}).format(now);
+  await page.locator('#payment-days').selectOption('custom');await ready();assert.equal(await page.locator('#payment-from').inputValue(),today);assert.equal(await page.locator('.payment-attempt-row').count(),4);
+  await page.locator('#payment-from').fill('2026-11-06');await page.locator('#payment-from').dispatchEvent('change');await ready();assert.equal(await page.locator('.payment-attempt-row').count(),5);
+  assert.ok(calls.at(-1).includes('since=2026-11-06'));assert.ok(!calls.at(-1).includes('through='));
+  await page.reload();await ready();assert.equal(await page.locator('#payment-days').inputValue(),'custom');assert.equal(await page.locator('#payment-from').inputValue(),'2026-11-06');
+  await page.locator('#payment-days').selectOption('all');await ready();assert.equal(await page.locator('#payment-from').count(),0);assert.ok(!calls.at(-1).includes('since='));
 
   assert.equal(await page.locator('[data-attempt="method-3"] .attempt-successful').innerText(),'Úspešná · zdarma');
   assert.deepEqual(await page.locator('[data-attempt="method-3"] .payment-product-tag').allTextContents(),['Base','Vznik','Záblesk','Atlas','+1 hra']);

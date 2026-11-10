@@ -544,3 +544,32 @@ test('bounded audit drains more than one batch, reaches old pending attempts and
   assert.equal(reads,29);assert.equal(r.progress.audit.remaining,0);assert.equal(r.counts.expired,29);assert.equal(r.health,'observing');
  }finally{f.db.close();}
 });
+
+test('custom start date applies Bratislava midnight to attempts, progress and logs and preserves global operational alerts',async()=>{
+ const f=fixture();try{
+  const {midnight,localDate}=await import('../src/marketing-query.mjs');
+  const start='2026-03-29',boundary=midnight(start); // daylight saving starts that day
+  await execute(f.db,'UPDATE payment_progress_meta SET started_at=?',boundary-86400000);
+  const ids=[];
+  for(const [i,at] of [boundary-1,boundary,boundary+1].entries()){
+   const checkout=await createCheckout(f.env,{...f.input,email:'from'+i+'@example.invalid',attemptKey:crypto.randomUUID()});
+   const a=await first(f.db,'SELECT id FROM checkout_attempts WHERE stripe_session_id=?',checkout.sessionId);ids.push(a.id);
+   await execute(f.db,'UPDATE checkout_attempts SET created_at=? WHERE id=?',at,a.id);
+   await paymentLog(f.env,{type:'session_created',attemptId:a.id,dedupe:'date-test',at});
+   await execute(f.db,'INSERT INTO payment_progress(attempt_id,form_loaded,last_at) VALUES(?,?,?)',a.id,at,at);
+  }
+  await paymentLog(f.env,{type:'sdk_error',attemptId:ids[0],dedupe:'global-issue'});
+  let r=await paymentReport(f.env,new URLSearchParams({days:'custom',since:start}),true);
+  assert.equal(r.days,'custom');assert.equal(r.fromDate,start);assert.equal(r.since,boundary);
+  assert.equal(boundary,Date.parse('2026-03-28T23:00:00Z'));
+  assert.equal(r.total,2);assert.equal(r.matchingTotal,2);assert.equal(r.progress.cohort,2);assert.equal(r.progress.counts.loaded,2);
+  assert.deepEqual(new Set(r.rows.map(a=>a.id)),new Set(ids.slice(1)));
+  assert.equal(r.logs.filter(l=>l.type==='session_created'&&ids.includes(l.attempt_id)&&l.created_at<=boundary+1).length,2);
+  assert.equal(r.errors24,1,'current global alert remains even for an older attempt');
+  const today=localDate(Date.now());r=await paymentReport(f.env,new URLSearchParams({days:'custom',since:today}),true);
+  assert.equal(r.total,0);assert.equal(r.progress.cohort,0);
+  for(const since of ['', '2026-02-30','2026-13-01','not-a-date','2026-1-01','9999-12-31'])await assert.rejects(()=>paymentReport(f.env,new URLSearchParams({days:'custom',since}),true),e=>e.status===400,since);
+  await assert.rejects(()=>paymentReport(f.env,new URLSearchParams({days:'custom',since:start,scope:'funnel'}),true),e=>e.status===400);
+  assert.equal((await paymentReport(f.env,new URLSearchParams({days:'all'}),true)).total,3);
+ }finally{f.db.close();}
+});
