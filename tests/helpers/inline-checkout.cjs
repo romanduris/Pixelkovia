@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path');
 const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const origin='https://pixelkovia.rodulab.com',sessionId='cs_test_inline_fixture123456';
 const engine={chromium,webkit}[process.env.QA_BROWSER||'chromium'];
-async function launch(){return engine.launch({headless:true,...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',JSC_useJIT:'0'}}:{})});}
+async function launch(){return engine.launch({headless:process.env.QA_HEADED!=='1',...(engine===webkit?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',WEBKIT_DISABLE_DMABUF_RENDERER:'1',LIBGL_ALWAYS_SOFTWARE:'1',GSK_RENDERER:'cairo',JSC_useJIT:'0'}}:{})});}
 function install(options){
  const s=window.inlineFixture={calls:[],validated:0,destroyed:0,cardElements:0,walletElements:0,walletFailed:0,walletResolved:0,nativeReturned:false,nativeComplete:false,totalCents:1499,validationError:options.validationError||false,wrongTotal:options.wrongTotal||false,cardLoadError:options.cardLoadError||false,walletAvailable:options.walletAvailable!==false,loadError:options.loadError||false};
  window.Stripe=(key,config)=>({initCheckoutElementsSdk(init){s.init=init;s.locale=config.locale;return {
@@ -17,7 +17,7 @@ function install(options){
     return new Promise((resolve,reject)=>{s.finish=r=>{if(r?.throw){const error=Error(r.message||'Network interrupted');error.name=r.name||'Error';reject(error);}else resolve(r);};});
    }
   }};},
-  createPaymentElement(config){s.cardElements++;s.cardConfig=config;const div=document.createElement('div');div.textContent='Stripe card fields';div.style.height='150px';const events={};return {on(t,h){events[t]=h;},mount(sel){document.querySelector(sel).append(div);events[s.cardLoadError?'loaderror':'ready']?.({});},destroy(){div.remove();}};},
+  createPaymentElement(config){s.cardElements++;s.cardConfig=config;const div=document.createElement('div');div.textContent='Stripe card fields';div.style.height='150px';const events={};s.cardChange=event=>events.change?.(event);return {on(t,h){if(!['ready','change','focus','blur','escape','loaderror'].includes(t))throw Error('Unsupported Payment Element event: '+t);events[t]=h;},mount(sel){document.querySelector(sel).append(div);events[s.cardLoadError?'loaderror':'ready']?.({});},destroy(){div.remove();}};},
   createExpressCheckoutElement(config){s.walletElements++;s.walletConfig=config;const events={},button=document.createElement('button');button.type='button';button.textContent='Fixture '+options.wallet;
    const event={expressPaymentType:options.wallet,paymentFailed(){s.walletFailed++;}};
    s.confirmWallet=async()=>{s.nativeReturned=false;await events.confirm(event);s.nativeReturned=true;queueMicrotask(()=>s.nativeComplete=s.destroyed===0);};
@@ -69,7 +69,7 @@ async function open(browser,options={}){
  await page.goto(origin+'/checkout'+(options.query||''));
  await page.waitForFunction(()=>!document.querySelector('.checkout-buy').disabled||!document.querySelector('#payment-panel').hidden||document.querySelector('#payment-note').textContent.includes('nie sú dostupné'));
  async function voucher(code){await page.locator('#voucher-open').click();await page.locator('#voucher-code').fill(code);await page.locator('#voucher-form').evaluate(el=>el.requestSubmit());}
- async function start(){await page.locator('[name=email]').fill('family@example.invalid');await page.locator('.checkout-buy').click();try{await page.locator('#stripe-pay').waitFor();}catch(error){error.message+='\nFixture: '+JSON.stringify({query:options.query,posts:f.posts.length,totalCents:f.totalCents,status:await page.locator('#payment-status').innerText(),note:await page.locator('#payment-note').innerText(),errors});throw error;}}
+ async function start(email='family@example.invalid'){await page.locator('[name=email]').fill(email);await page.locator('.checkout-buy').click();try{await page.locator('#stripe-pay').waitFor();}catch(error){error.message+='\nFixture: '+JSON.stringify({query:options.query,posts:f.posts.length,totalCents:f.totalCents,status:await page.locator('#payment-status').innerText(),note:await page.locator('#payment-note').innerText(),errors});throw error;}}
  async function finish(result={type:'success'}){await page.evaluate(result=>inlineFixture.finish(result),result);}
  async function close(){if(errors.length)throw Error('Browser errors: '+errors.join('; '));await context.close();}
  return {page,context,f,voucher,start,finish,close};

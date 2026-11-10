@@ -429,6 +429,7 @@ test('administrator reviews persist per event, survive duplicate webhooks, reope
   const f=fixture();try{
     const session=await createCheckout(f.env,f.input),s=f.sessions.get(session.sessionId);s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_review',status:'succeeded'};f.env.RESEND_API_KEY='';
     await paymentWebhook(f.event('checkout.session.completed',s,'evt_review_paid'),f.env);
+    f.env.RESEND_API_KEY='re_fixture';await auditPayments(f.env);f.env.RESEND_API_KEY='';
     await monitorCheck(f.env,'stripe',true);await monitorCheck(f.env,'webhook',true);
     const id=(await first(f.db,'SELECT id FROM checkout_attempts')).id;
     await paymentLog(f.env,{type:'webhook_error',attemptId:id,dedupe:'review-first'});
@@ -478,4 +479,68 @@ test('review endpoint requires an administrator, same origin, strict event and b
     assert.equal((await worker.fetch(req('http://localhost',{eventId:bank.id,reviewed:true}),local)).status,200);
     report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.declines24,0);assert.ok(!report.rows[0].issues.some(i=>i.kind==='bank'));assert.notEqual(report.rows[0].status,'successful');
   }finally{f.db.close();}
+});
+
+test('progress milestones and individual confirmations deduplicate replays, retain retries and never imply payment',async()=>{
+ const f=fixture();try{
+  await createCheckout(f.env,f.input);
+  const send=extra=>browserPaymentEvent(request({}),f.env,{productId:'episode-1',attemptKey:f.input.attemptKey,method:'card',...extra});
+  for(const type of ['form_loaded','fields_started','fields_complete','fields_validated','validation_error'])await Promise.all([send({type}),send({type})]);
+  const eventId=crypto.randomUUID();await Promise.all([send({type:'confirm_started',eventId}),send({type:'confirm_started',eventId})]);
+  const loadId=crypto.randomUUID();await Promise.all([send({type:'form_loaded',eventId:loadId}),send({type:'form_loaded',eventId:loadId})]);
+  await send({type:'form_loaded',eventId:crypto.randomUUID()});
+  await send({type:'confirm_started',eventId:crypto.randomUUID()});
+  await send({type:'confirm_started'}); // a legacy diagnostic has no exact count
+  let p=(await paymentReport(f.env,new URLSearchParams(),true)).progress;
+  assert.equal(p.cohort,1);assert.equal(p.confirmations,2);
+  assert.equal(p.formLoads,2);
+  for(const key of ['session','loaded','started','complete','validated','validation','confirmed'])assert.equal(p.counts[key],1,key);
+  assert.equal(p.counts.paid,0);assert.equal(p.counts.access,0);assert.equal(p.gaps.paid,1);
+  await send({type:'fields_complete',method:'DO_NOT_STORE',card:'4242424242424242',email:'DO_NOT_STORE'});
+  const saved=JSON.stringify(await query(f.db,'SELECT * FROM payment_progress'))+JSON.stringify(await query(f.db,'SELECT * FROM payment_confirmations'));
+  for(const forbidden of ['424242','DO_NOT_STORE',f.input.attemptKey,f.input.email])assert.ok(!saved.includes(forbidden));
+  const row=(await paymentReport(f.env,new URLSearchParams(),true)).rows[0];assert.equal(row.progress.confirmations,2);assert.equal(row.status,'started');
+  assert.equal((await worker.fetch(request({...f.input,type:'paid',productId:'episode-1'}),f.env)).status,400);
+ }finally{f.db.close();}
+});
+test('progress uses creation cohorts and current verified results, excludes legacy and separates gifts, free, refund and actual method',async()=>{
+ const f=fixture();try{
+  const checkout=await createCheckout(f.env,{...f.input,giftGame:true}),s=f.sessions.get(checkout.sessionId);
+  const a=await first(f.db,'SELECT id FROM checkout_attempts WHERE stripe_session_id=?',s.id);
+  await browserPaymentEvent(request({}),f.env,{type:'confirm_started',eventId:crypto.randomUUID(),productId:'episode-1',method:'apple_pay',attemptKey:f.input.attemptKey});
+  let report=await paymentReport(f.env,new URLSearchParams({method:'apple_pay'}),true);assert.equal(report.total,1);assert.equal(report.progress.counts.paid,0);
+  s.status='complete';s.payment_status='paid';s.payment_intent={id:'pi_progress',status:'succeeded',latest_charge:{payment_method_details:{type:'card',card:{wallet:{type:'google_pay'}}}}};
+  f.env.RESEND_API_KEY='';await paymentWebhook(f.event('checkout.session.completed',s,'evt_progress'),f.env);
+  report=await paymentReport(f.env,new URLSearchParams({method:'google_pay'}),true);assert.equal(report.total,1);assert.equal(report.progress.counts.paid,1);assert.equal(report.progress.counts.access,1);assert.equal(report.progress.counts.email,0);assert.equal(report.rows[0].orderCount,2);
+  assert.equal((await paymentReport(f.env,new URLSearchParams({method:'apple_pay'}),true)).total,0,'settled method wins');
+  await execute(f.db,"UPDATE access_deliveries SET status='sent',sent_at=?",Date.now());
+  await execute(f.db,"UPDATE orders SET status='refunded'");
+  report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.progress.counts.refunded,1);assert.equal(report.progress.counts.paid,1);assert.equal(report.progress.counts.email,1);
+  f.env.RESEND_API_KEY='re_fixture';
+  const free=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),voucherCode:'free'}),z=f.sessions.get(free.sessionId);z.status='complete';z.payment_status='no_payment_required';
+  f.env.RESEND_API_KEY='';await paymentWebhook(f.event('checkout.session.completed',z,'evt_progress_free'),f.env);
+  f.env.RESEND_API_KEY='re_fixture';
+  const legacy=await createCheckout(f.env,{...f.input,attemptKey:crypto.randomUUID(),baseId:'story-book-before'});
+  const meta=await first(f.db,'SELECT started_at FROM payment_progress_meta');
+  await execute(f.db,'UPDATE checkout_attempts SET created_at=? WHERE stripe_session_id=?',meta.started_at-1,legacy.sessionId);
+  report=await paymentReport(f.env,new URLSearchParams(),true);assert.equal(report.progress.legacy,1);assert.equal(report.progress.cohort,2);assert.equal(report.progress.counts.free,1);assert.equal(report.progress.payableCohort,1);assert.equal(report.progress.paidRate,1);
+  assert.equal((await paymentReport(f.env,new URLSearchParams({paymentProduct:'story-book-before'}),true)).progress.cohort,0);
+  for(const input of [{method:'injected'},{paymentProduct:'bad'}])await assert.rejects(()=>paymentReport(f.env,new URLSearchParams(input),true),e=>e.status===400);
+  await execute(f.db,'UPDATE payment_confirmations SET created_at=?',Date.now()-91*86400000);await prunePaymentLog(f.env);
+  assert.equal((await first(f.db,'SELECT count(*) n FROM payment_confirmations')).n,0);
+  assert.equal((await first(f.db,'SELECT confirmation_count n FROM payment_progress WHERE attempt_id=?',a.id)).n,1,'aggregate survives event retention');
+ }finally{f.db.close();}
+});
+test('bounded audit drains more than one batch, reaches old pending attempts and warns about lag',async()=>{
+ const f=fixture();try{
+  for(let i=0;i<29;i++)await createCheckout(f.env,{...f.input,email:'audit'+i+'@example.invalid',attemptKey:crypto.randomUUID()});
+  await execute(f.db,'UPDATE checkout_attempts SET created_at=?',Date.now()-8*86400000);
+  for(const s of f.sessions.values())s.status='expired';
+  let active=0,maxActive=0,reads=0;const retrieve=f.env.STRIPE_CLIENT.checkout.sessions.retrieve;
+  f.env.STRIPE_CLIENT.checkout.sessions.retrieve=async id=>{active++;maxActive=Math.max(maxActive,active);reads++;try{await new Promise(resolve=>setTimeout(resolve,1));return retrieve(id);}finally{active--;}};
+  await auditPayments(f.env);let r=await paymentReport(f.env,new URLSearchParams({days:'all'}),true);
+  assert.equal(reads,24);assert.ok(maxActive<=4);assert.equal(r.progress.audit.remaining,5);assert.equal(r.health,'stale');
+  await auditPayments(f.env);r=await paymentReport(f.env,new URLSearchParams({days:'all'}),true);
+  assert.equal(reads,29);assert.equal(r.progress.audit.remaining,0);assert.equal(r.counts.expired,29);assert.equal(r.health,'observing');
+ }finally{f.db.close();}
 });

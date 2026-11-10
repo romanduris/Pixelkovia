@@ -4,16 +4,10 @@
 >
 > Podrobné technické zadania pre Codex zostávajú v `MD/`. Zmeny produktu alebo architektúry schvaľuje MASTER DESIGNER.
 
-## P0 – Kritické pred ostrým spustením
-
-- [ ] **Management – rozbehať a overiť kompletné monitorovanie priebehu platby pred platenou reklamou.** Vidieť počty otvorení formulára, začatého a dokončeného zadávania údajov, potvrdení, úspešných úhrad a zlyhaní aj odchody medzi krokmi. Nadviazať na existujúci prehľad platieb; najprv preskúmať, čo a ako spoľahlivo merať cez Stripe a server bez údajov karty, potom doplniť a otestovať meranie pre hru aj knihy. [Plán a kritériá dokončenia](../MD/P0-monitorovanie-platobneho-funnelu.md).
-
 ## P1 – Dokončiť / preveriť pred spustením
 
 - [ ] **Pripomenúť pri ďalšom otvorení projektu: dokončiť Meta Ads výdavky a overenie Purchase.** Pixel `1120983200688486` aj priradenie reklamného účtu `1141555698571585` sú potvrdené; Meta Test events prijal PageView a InitiateCheckout. Zostáva prístup na čítanie výdavkov, implementácia ich importu a výpočtu CAC a potvrdenie Purchase pri skutočnej overenej platbe. [Presný stav a zostávajúce kroky](../MD/DOKONCIT-meta-ads-a-purchase.md).
 - [ ] **Facebook + Instagram – predreklamný obsah a dvojtýždňový rozbeh.** Pripraviť **14 príspevkov** so scenármi (poradie, formát, vizuál, text, CTA) a počas **minimálne 14 dní pred platenou reklamou** pravidelne publikovať. Obsah má ukazovať jednu skutočnú hru Pixelkovia – Stratený signál: ako hra vyzerá a funguje doma, papierové úlohy, mobilné interakcie, postavy, prípravu, vek, trvanie, rodinný zážitok a ponuku. Vizuály typu **cover C** využiť na vysvetľujúci obsah a reklamy; **cover B** ponechať ako brandový Facebook cover (upraviť mobilné orezanie). Vychádzať z originálnych assetov a implementovaných funkcií. Cieľ = dôvera, predaj a merateľné výsledky, nie iba lajky. Scenáre schváliť pred publikovaním.
-- [ ] **Rodičovská stránka – hodnotenie po dohraní hry.** Automatické ukončenie po dohraní záverečného videa, následný návrat cez „Koniec hry“ na portál a dobrovoľné hviezdičky s komentárom sú implementované. Oprava z 2. 11. 2026 povoľuje ukončenie aj pri chýbajúcom zázname úlohy, zachováva skutočné počty a umožňuje opakovať neúspešné ukončenie. Od 9. 11. 2026 sa dokončenie ukladá automaticky pri dohraní videa a obnoví sa aj po výpadku alebo obnovení stránky; overenie je v `tests/finale-recovery.test.cjs`. Knižnica je dostupná aj bez hodnotenia. **Zostáva** spracovanie recenzií pred zverejnením a prepojenie na verejné hodnotenie; preto celá položka zostáva otvorená.
-- [ ] **Po hodnotení – zvýrazniť knižnicu v rodičovskom portáli.** Po odoslaní alebo preskočení hodnotenia prehľadne zobraziť dostupné zakúpené knižky na čítanie a ponuku dokúpenia nezakúpených. Nezablokovať prístup ku knižnici, ak rodič hodnotenie nechce vyplniť.
 - [ ] **Cloudflare Observability – kontrola spotreby a ceny.** Pred ostrým spustením preveriť logy, traces, sampling, retenciu, plán a možné poplatky od 1. 12. 2026. [Detailné zadanie](../MD/PRELAUNCH-cloudflare-observability-a-codex-pristup.md).
 - [ ] **Cloudflare API prístup pre Codex.** Overiť, či vie Codex čítať Observability metriky; podľa potreby zriadiť samostatný read-only token s minimálnymi oprávneniami. Žiadna zmena billing nastavení bez schválenia. [Detailné zadanie](../MD/PRELAUNCH-cloudflare-observability-a-codex-pristup.md).
 - [ ] **Mobilné UX a knižky – záverečné testovanie.** Na mobiloch overiť nákup knižiek, zobrazenie v rodičovskom portáli, čitateľnosť a priechodnosť celej cesty.
@@ -28,7 +22,6 @@
 - [ ] **RoduLab – jednoduchý zastrešujúci web (po PoC).** Potvrdený názov **RoduLab** (bez „s“) a doména **rodulab.com**. Neskôr pripraviť stručnú dôveryhodnú stránku interaktívneho/digitálneho štúdia: kto sme, čo robíme, kontakt a krátke prezentácie projektov **Pixelkovia, BTS Radar a Living Stones (kamienky)**. Pri každom uviesť len overené skutočnosti a pravdivý stav (hotový projekt vs. experiment); bez fiktívnych klientov, referencií alebo tvrdenia o registrovanej firme. Teraz nie je prioritou – najskôr predaj Pixelkovie.
 - [ ] **Možnosť „bumoferu“ – preskúmať, či to chceme.** Pracovný názov podľa poznámky; najprv upresniť význam, prínos pre hráča, náročnosť a rozhodnúť áno/nie. Bez automatickej implementácie.
 - [ ] **Vianočný darčekový nákup / darčekový poukaz.** Preskúmať jednoduché darovanie hry ako vianočného darčeka, prípadne nadväznosť na druhú licenciu.
-- [ ] **Zber a využitie spätnej väzby.** Po nazbieraní skutočných recenzií vyhodnotiť opakujúce sa pripomienky a použiť ich pri zlepšovaní prvej hry.
 
 ---
 

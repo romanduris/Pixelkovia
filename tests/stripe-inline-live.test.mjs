@@ -84,6 +84,9 @@ test('real inline Stripe preserves the original page and validates fields withou
   assert.ok(blocked>0,'complete valid fields reach the deliberately blocked payment boundary');
   assert.ok(await number.isEditable());assert.ok(await page.locator('#retry-payment').isVisible());
   assert.ok(!diagnostics.some(e=>['billing_phone_missing','billing_email_missing','sdk_integration_error'].includes(e.code)),'the real SDK accepts our billing collection contract');
+  for(const type of ['form_loaded','fields_started','fields_complete','fields_validated','confirm_started'])assert.ok(diagnostics.some(e=>e.type===type),'actual Stripe SDK emitted '+type);
+  const confirmation=diagnostics.find(e=>e.type==='confirm_started');assert.match(confirmation.eventId,/^[a-f0-9-]{36}$/i);
+  assert.ok(!JSON.stringify(diagnostics).includes('4242424242424242'),'telemetry never contains card values');
   const unchanged=await client.checkout.sessions.retrieve(active.sessionId);assert.equal(unchanged.payment_intent,null);assert.equal(unchanged.payment_status,'unpaid');
   if(process.env.CHECKOUT_SCREENSHOT_DIR){await page.locator('#payment-slot').scrollIntoViewIfNeeded();await page.screenshot({path:process.env.CHECKOUT_SCREENSHOT_DIR+'/stripe-inline-validation-390.png',fullPage:false});}
  }finally{

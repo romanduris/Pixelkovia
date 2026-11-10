@@ -29,8 +29,12 @@
   const post=(url,input)=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(url==='/api/checkout/session'?{...input,...window.PixelkoviaMarketing?.context()}:input)});
   // No payment awaits diagnostics. Send fixed event names only, without Stripe
   // errors, field values, card data, email, URL or payment client secrets.
+  const observedMilestones=new Set();
   function diagnostic(type,method='unknown',code=''){
-    const data={type,method,code,productId:baseId,attemptKey:purchase?.attemptKey};
+    const milestones=['fields_started','fields_complete','fields_validated','wallet_available'];
+    const key=purchase?.attemptKey+':'+type;
+    if(milestones.includes(type)){if(observedMilestones.has(key))return;observedMilestones.add(key);}
+    const data={type,method,code,productId:baseId,attemptKey:purchase?.attemptKey,...(['confirm_started','form_loaded'].includes(type)?{eventId:crypto.randomUUID()}:{})};
     setTimeout(()=>{try{void fetch('/api/checkout/diagnostic',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),keepalive:true,signal:AbortSignal.timeout(4000)}).catch(()=>{});}catch{}},0);
   }
   function confirmationCode(error){
@@ -278,6 +282,7 @@
           const validation=await loaded.actions.validateElements();
           if(!alive)return;
           if(validation.type==='error'){diagnostic('validation_error','card');readyForRetry(validation.error.validation_errors?.[0]?.message||validation.error.message||'Skontrolujte údaje karty označené vo formulári.');return;}
+          diagnostic('fields_validated','card');
         }catch{diagnostic('validation_connection_error','card');if(alive)readyForRetry('Údaje karty sa nepodarilo overiť. Skontrolujte pripojenie a skúste to znova.');return;}
       }
       if(!alive)return;
@@ -324,7 +329,10 @@
         // Forcing an uncollected phone to 'never' makes complete-card confirmation
         // throw. Checkout's billing defaults preserve the compact form safely.
         payment=checkout.createPaymentElement({layout:'tabs',wallets:{applePay:'never',googlePay:'never',link:'never'}});
-        payment.on('ready',()=>{if(alive){cardReady=true;syncPayButton();}});
+        payment.on('ready',()=>{if(alive){diagnostic('form_loaded','card');cardReady=true;syncPayButton();}});
+        // Read only the SDK booleans, never value/billing details/card contents.
+        // Non-empty includes autofill, not necessarily a physical keystroke.
+        payment.on('change',event=>{if(!alive)return;if(event.empty===false)diagnostic('fields_started','card');if(event.complete===true)diagnostic('fields_complete','card');});
         payment.on('loaderror',()=>{if(alive){diagnostic('element_error','card');cardReady=false;syncPayButton();paymentMessage('Údaje karty sa nepodarilo načítať. Skontrolujte pripojenie a obnovte pôvodný formulár.','error');document.querySelector('#retry-payment').hidden=false;}});
         if(configuration.wallets?.applePay||configuration.wallets?.googlePay){
           wallet=checkout.createExpressCheckoutElement({buttonHeight:44,layout:{maxColumns:2,maxRows:1},paymentMethods:{applePay:configuration.wallets?.applePay?'always':'never',googlePay:configuration.wallets?.googlePay?'always':'never',link:'never',paypal:'never',amazonPay:'never',klarna:'never'}});

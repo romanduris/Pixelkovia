@@ -297,9 +297,20 @@ export async function auditPayments(env){
     await monitorCheck(env,'webhook',!!hook&&(hook.enabled_events.includes('*')||required.every(e=>hook.enabled_events.includes(e))));
     await monitorCheck(env,'stripe',true);
   }catch{await monitorCheck(env,'stripe',false);}
-  const attempts=await query(env.TQ_DB,`SELECT a.* FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
-    WHERE a.created_at>? AND a.stripe_session_id IS NOT NULL AND (p.state IS NULL OR p.state IN('ready','pending','failed') OR (p.state IN('paid','free','refunded') AND m.attempt_id IS NULL) OR (p.state IN('paid','free') AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.external_reference=a.stripe_session_id)))
-    ORDER BY coalesce(p.checked_at,0),a.created_at LIMIT 8`,Date.now()-7*86400000);
-  for(const a of attempts){try{await verifiedCheckoutStatus(env,a.stripe_session_id);}catch(error){await paymentLog(env,{type:'status_error',attemptId:a.id,code:error.type});}}
+  const at=Date.now();
+  const queueSQL=`FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
+    WHERE a.stripe_session_id IS NOT NULL AND (
+      p.state IS NULL OR (p.state IN('ready','pending','failed') AND p.checked_at<?)
+      OR (p.state IN('paid','free','refunded') AND m.attempt_id IS NULL AND p.checked_at<?)
+      OR (p.state IN('paid','free') AND p.checked_at<? AND NOT EXISTS(SELECT 1 FROM orders o WHERE o.external_reference=a.stripe_session_id)))`;
+  const queueArgs=[at-600000,at+1,at-600000];
+  // At most 24 Stripe Session reads, four at a time. Each includes the expanded
+  // intent/charge. Never scan just the newest seven days or silently drop old pending payments.
+  const attempts=await query(env.TQ_DB,'SELECT a.* '+queueSQL+' ORDER BY coalesce(p.checked_at,0),a.created_at LIMIT 24',...queueArgs);
+  for(let offset=0;offset<attempts.length;offset+=4)await Promise.all(attempts.slice(offset,offset+4).map(async a=>{
+    try{await verifiedCheckoutStatus(env,a.stripe_session_id);}catch(error){await paymentLog(env,{type:'status_error',attemptId:a.id,code:error.type});}
+  }));
+  const remaining=await first(env.TQ_DB,'SELECT count(*) n,min(coalesce(p.checked_at,a.created_at)) oldest '+queueSQL,at-600000,at,at-600000);
+  await execute(env.TQ_DB,`INSERT INTO payment_audit_queue VALUES(1,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,examined=excluded.examined,remaining=excluded.remaining,oldest_due=excluded.oldest_due`,Date.now(),attempts.length,remaining.n,remaining.oldest);
   await prunePaymentLog(env);
 }

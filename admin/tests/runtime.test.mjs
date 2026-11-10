@@ -2,12 +2,21 @@ import {test} from 'node:test';import {sessionFor} from './support.mjs';import a
 import {Miniflare,convertV4MiniflareOptions} from 'miniflare';import {execute,first} from '../src/db.mjs';
 import {createOrder} from '../src/game-service.mjs';import {checklist} from '../src/checklist.mjs';
 import Stripe from 'stripe';
+import {recordPaymentProgress} from '../src/payment-progress.mjs';
 test('actual workerd/D1 runtime: migrations, protected APIs, server checklist, device activation and answer transaction',async()=>{
  const bundle=new URL('../.build-check/worker.js',import.meta.url);assert.ok(fs.existsSync(bundle),'Run npm run build:check before the integration test.');
  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:bundle.pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-runtime-test'},bindings:{ENVIRONMENT:'production',STRIPE_SECRET_KEY:'sk_test_runtime_fixture',STRIPE_WEBHOOK_SECRET:'whsec_runtime_fixture'}}));
  try{
   const db=await mf.getD1Database('TQ_DB');
   for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
+  await execute(db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at) VALUES(?,?,?,?,?,?)','runtime-progress','progress@example.invalid','','["episode-1"]',1499,Date.now());
+  const observation={type:'confirm_started',eventId:crypto.randomUUID(),method:'card'},progressEnv={TQ_DB:db};
+  await Promise.all([recordPaymentProgress(progressEnv,{id:'runtime-progress'},observation,Date.now()),recordPaymentProgress(progressEnv,{id:'runtime-progress'},observation,Date.now())]);
+  await recordPaymentProgress(progressEnv,{id:'runtime-progress'},{...observation,eventId:crypto.randomUUID()},Date.now());
+  assert.equal((await first(db,"SELECT confirmation_count n FROM payment_progress WHERE attempt_id='runtime-progress'")).n,2,'real D1 atomic batch counts replays once and deliberate retries separately');
+  const load={type:'form_loaded',eventId:crypto.randomUUID(),method:'card'};
+  await Promise.all([recordPaymentProgress(progressEnv,{id:'runtime-progress'},load,Date.now()),recordPaymentProgress(progressEnv,{id:'runtime-progress'},load,Date.now())]);
+  assert.equal((await first(db,"SELECT load_count n FROM payment_progress WHERE attempt_id='runtime-progress'")).n,1,'real D1 counts repeated delivery of the same form load only once');
   const payload=JSON.stringify({id:'evt_runtime_signed',type:'checkout.session.completed',data:{object:{id:'cs_test_runtime_fixture',payment_status:'unpaid'}}});
   const signature=new Stripe('sk_test_runtime_fixture').webhooks.generateTestHeaderString({payload,secret:'whsec_runtime_fixture'});
   const notification=await mf.dispatchFetch('http://localhost/api/stripe/webhook',{method:'POST',body:payload,headers:{'stripe-signature':signature}});
