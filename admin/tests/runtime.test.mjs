@@ -3,6 +3,22 @@ import {Miniflare,convertV4MiniflareOptions} from 'miniflare';import {execute,fi
 import {createOrder} from '../src/game-service.mjs';import {checklist} from '../src/checklist.mjs';
 import Stripe from 'stripe';
 import {recordPaymentProgress} from '../src/payment-progress.mjs';
+import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
+test('Meta import commits JSON batches and empty-day coverage in the actual Workers/D1 runtime',async()=>{
+ const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-runtime-test'}}));
+ try{
+  const db=await mf.getD1Database('TQ_DB');
+  for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
+  const rows=Array.from({length:125},(_,i)=>({account_id:metaAccount,account_currency:'EUR',campaign_id:String(i+1),campaign_name:'Runtime',date_start:'2026-11-10',date_stop:'2026-11-10',publisher_platform:'facebook',spend:'0.01'}));
+  const env={TQ_DB:db,META_ADS_ACCESS_TOKEN:'runtime-fixture',META_ADS_FETCH:async url=>Response.json(url.pathname.endsWith('/insights')?{data:rows}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'})};
+  const at=Date.parse('2026-11-10T12:00:00Z');
+  await syncMetaAds(env,{from:'2026-11-09',to:'2026-11-10'},at);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,125);
+  assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);
+  await syncMetaAds(env,{from:'2026-11-09',to:'2026-11-10'},at+61000);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,125);
+ }finally{await mf.dispose();}
+});
 test('actual workerd/D1 runtime: migrations, protected APIs, server checklist, device activation and answer transaction',async()=>{
  const bundle=new URL('../.build-check/worker.js',import.meta.url);assert.ok(fs.existsSync(bundle),'Run npm run build:check before the integration test.');
  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:bundle.pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'tq-runtime-test'},bindings:{ENVIRONMENT:'production',STRIPE_SECRET_KEY:'sk_test_runtime_fixture',STRIPE_WEBHOOK_SECRET:'whsec_runtime_fixture'}}));
@@ -56,6 +72,7 @@ test('password-only authentication works in actual Workers/D1 runtime and gates 
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/customers')).status,401);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments')).status,401);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing')).status,401);
+  for(const path of ['sync','campaign'])assert.equal((await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing/ads/'+path,{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:'{}'})).status,401);
   assert.equal((await mf.dispatchFetch('https://admin.example.invalid/login')).status,200);
   const login=await mf.dispatchFetch('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify({password})});
   assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];

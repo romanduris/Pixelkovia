@@ -676,3 +676,9 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 @media(max-width:750px){.payment-table-tools:has(.payment-date-filter){flex-wrap:wrap}.payment-date-filter{order:1;flex:1 0 100%;justify-content:space-between;min-height:42px}.payment-date-filter input{max-width:none;width:calc(100% - 100px);min-height:40px}.payment-period-note{padding:10px;font-size:10px}}
 .payment-date-filter span{white-space:nowrap}
 @media(max-width:1050px){.payment-workspace-toolbar:has(.payment-date-filter){flex-wrap:wrap}.payment-table-tools:has(.payment-date-filter){flex-wrap:wrap;flex-shrink:1;min-width:0;width:100%}}
+.marketing-ads-controls{padding:0 16px 14px;font-size:.82rem;overflow-wrap:anywhere}
+.marketing-ads-controls p{margin:8px 0;color:var(--muted)}
+.marketing-ads-controls button{max-width:100%;white-space:normal}
+.marketing-ads-campaign{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:12px}
+.marketing-ads-campaign label{display:grid;gap:5px;flex:1 1 190px;min-width:0}
+.marketing-ads-campaign input{width:100%;min-width:0;min-height:40px;box-sizing:border-box;color:var(--text);background:#18243b;border:1px solid #3e4f70;border-radius:5px;padding:7px 9px}

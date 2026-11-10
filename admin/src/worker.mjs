@@ -14,6 +14,7 @@ import {supportWebhook} from './support-mail.mjs';
 import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
 import {consentState,saveConsent,readConsent,prunePrivacy} from './privacy.mjs';
 import {claimMetaPurchase} from './meta-purchase.mjs';
+import {syncMetaAds,scheduledMetaAds,saveMetaCampaign} from './meta-ads.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
 async function body(request){
@@ -66,7 +67,7 @@ async function customerApi(request,env,path){
   if(path==='/api/customer/complete'&&request.method==='POST')return json(await gameEvent(db,run,{...input,type:'complete'}));
   throw new HttpError(404,'Endpoint neexistuje.');
 }
-export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env),pruneMarketing(env),prunePrivacy(env)]);},async fetch(request,env,context){
+export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env),pruneMarketing(env),prunePrivacy(env),scheduledMetaAds(env)]);},async fetch(request,env,context){
   let paymentInput;
   try{
     const url=new URL(request.url),path=url.pathname;
@@ -133,6 +134,8 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     }
     sameOrigin(request);
     if(path==='/api/admin/payments/review'&&request.method==='POST')return json(await reviewPaymentEvent(env,await body(request),admin));
+    if(path==='/api/admin/marketing/ads/sync'&&request.method==='POST')return json(await syncMetaAds(env,await body(request)));
+    if(path==='/api/admin/marketing/ads/campaign'&&request.method==='POST')return json(await saveMetaCampaign(env,await body(request)));
     if(request.method!=='GET'&&request.method!=='HEAD')throw new HttpError(405,'Administrátorské rozhranie je v tejto etape iba na čítanie.');
     if(path==='/api/admin/context')return json({admin:admin.email,authMode:admin.authMode||'access',environment:env.ENVIRONMENT||'production',demo:localRequest(request,env)&&env.DEMO_MODE==='true',fakeCustomers:await fakeCustomerCount(env.TQ_DB),webUrl:env.WEB_URL||null,timeZone:'Europe/Bratislava',customerAuthConnected:!!env.CUSTOMER_AUTH_SECRET});
     if(path==='/api/admin/products')return json(await query(env.TQ_DB,'SELECT * FROM products ORDER BY id'));

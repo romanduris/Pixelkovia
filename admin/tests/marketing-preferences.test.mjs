@@ -15,5 +15,5 @@ test('invalid and stale saved date selections recover to the default period',()=
   assert.deepEqual(normalizePreferences({selected:{period:'since',from:'2026-11-10'}},Date.parse('2026-11-10T23:30:00Z')).selected,{period:'since',from:'2026-11-10'});
 });
 test('social table expansion is an allowlisted persistent display preference',()=>{
- assert.deepEqual(normalizePreferences({open:['source-facebook','source-instagram','source-influencer']},at).open,['source-facebook','source-instagram']);
+ assert.deepEqual(normalizePreferences({open:['source-facebook','source-instagram','source-other','source-influencer']},at).open,['source-facebook','source-instagram','source-other']);
 });

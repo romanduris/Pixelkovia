@@ -2,6 +2,7 @@ import {HttpError} from './auth.mjs';
 import {first,query,execute,hash} from './db.mjs';
 import {dailyMarketing} from './marketing-series.mjs';
 import {attemptFor} from './payment-monitor.mjs';
+import {metaAdsReport} from './meta-ads.mjs';
 
 import {sources,safeCampaign,marketingFilters,attemptsCTE,conditions} from './marketing-query.mjs';
 export {sources,safeCampaign,marketingFilters} from './marketing-query.mjs';
@@ -67,10 +68,11 @@ export async function marketingReport(env,params,at=Date.now()){
     const v=visitSources.find(r=>r.source===key),c=cohorts.find(r=>r.source===key),p=calendarSources.find(r=>r.source===key),n=visitAvailable?(v?.visits||0):null;
     return {source:key,label,visits:n,purchases:collectionInRange?(c?.purchases||0):null,periodPurchases:p?.purchases||0,conversion:!conversionReason&&n>0?(c?.purchases||0)/n:null};
   });
+  const adsReport=await metaAdsReport(env,f,{enabled:collectionEnabled,startedAt:state.started_at,lastEventAt:state.last_event_at},at);
   return {generatedAt:at,collectionEnabled,periodMetrics,charts:await dailyMarketing(db,f,state,at),filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
     metrics:{visits:visitAvailable?visits.visits:null,checkouts:collectionInRange&&!f.product?visits.checkouts:null,purchases:metric.purchases,revenueCents:metric.revenue,orders:metric.orders,gameAccesses:metric.game_accesses,refunds:metric.refunds,accessIssues:metric.access_issues,accessIssueOrders:metric.access_issue_orders,attributedPurchases:metric.attributed,technicalSignals:issues.signals,technicalAttempts:issues.attempts,conversion:conversionReason?null:cohortTotal.purchases/visits.visits},
-    cohort:{attempts:collectionInRange?cohortTotal.attempts:null,purchases:collectionInRange?cohortTotal.purchases:null},rows,campaigns:campaigns.map(r=>r.campaign),conversionReason,
-    costs:null,cac:null,costReason:'Meta Ads nemá nakonfigurovaný autorizovaný zdroj výdavkov. Automatický import ani manuálne výdavky nie sú pripojené.',coverage:null,
+    cohort:{attempts:collectionInRange?cohortTotal.attempts:null,purchases:collectionInRange?cohortTotal.purchases:null},rows,campaigns:[...new Set([...campaigns.map(r=>r.campaign),...adsReport.ads.campaigns.map(c=>c.utm)])].sort(),conversionReason,
+    ...adsReport,coverage:null,
     addons,addonReason:'Existujúci výber pri vytvorení Stripe relácie. Nie počet zobrazení, kliknutí, zmien výberu ani zaplatených doplnkov.',
     technicalComplete:f.start>=at-90*day,technicalStartedAt:retention?.earliest||null};
 }

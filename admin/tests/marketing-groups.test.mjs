@@ -18,3 +18,12 @@ test('social groups retain unavailable metrics and include only sources returned
  const disabled=groupedSources({rows:[row('facebook',5,2,4)],conversionReason:'Disabled'});assert.equal(disabled[0].conversion,null);
  const empty=groupedSources({rows:[row('facebook',0,0,0)],conversionReason:null});assert.equal(empty[0].conversion,null);
 });
+test('additional sources sum separately from Meta and preserve filtered and unavailable metrics',()=>{
+ const rows=[row('direct',2,1,2),row('unknown',3,2,4),row('organic',5,1,1),row('meta',7,2,3)];
+ const grouped=groupedSources({rows,conversionReason:null}),other=grouped.find(r=>r.group==='other');
+ assert.equal(other.label,'Ďalšie zdroje');assert.equal(other.visits,10);assert.equal(other.purchases,4);assert.equal(other.periodPurchases,7);assert.equal(other.conversion,.4);
+ assert.deepEqual(other.children.map(r=>r.source),['direct','unknown','organic']);assert.equal(grouped.length,2);assert.equal(grouped.find(r=>r.source==='meta').visits,7);
+ const filtered=groupedSources({rows:[rows[2]],conversionReason:null});assert.equal(filtered[0].children.length,1);assert.equal(filtered[0].visits,5);
+ const unavailable=groupedSources({rows:[row('direct',null,null,1),rows[1]],conversionReason:'Unavailable'})[0];
+ assert.equal(unavailable.visits,null);assert.equal(unavailable.purchases,null);assert.equal(unavailable.conversion,null);assert.equal(unavailable.periodPurchases,5);
+});
