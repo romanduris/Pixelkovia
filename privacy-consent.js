@@ -63,7 +63,9 @@
  });
  const link=document.createElement('button');link.type='button';link.className='privacy-settings-link';link.textContent='Nastavenia súkromia';
  link.addEventListener('click',()=>{show();analytics.focus();});
- (document.querySelector('footer')||document.body).append(link);
+ const footer=document.querySelector('footer');
+ if(footer)footer.classList.add('privacy-footer');
+ (footer||document.body).append(link);
  window.PixelkoviaConsent={allows,open:()=>show(),get pixelId(){return pixelId;},get choice(){return choice;},get pending(){return !resolved||saving;},refresh};
  const changed=()=>{resolved=false;choice=null;announce();void refresh();};
  try{channel=new BroadcastChannel('pixelkovia-privacy');channel.onmessage=changed;}catch{}
