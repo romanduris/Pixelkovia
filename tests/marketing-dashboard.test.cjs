@@ -80,7 +80,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'1');
   await page.locator('#marketing-unique').check();
   assert.match(await page.locator('.marketing-chart figcaption').innerText(),/Unikátne prehliadače/);
-  assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'1*');
+  assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'1');
   const day=page.locator('.marketing-chart-day[tabindex="0"]').first();await day.focus();await page.keyboard.press('End');
   assert.match(await page.locator('.marketing-chart-readout').first().innerText(),/Unikátne prehliadače: 1/);
   await page.locator('#marketing-summary-charts').click();await page.locator('#refresh-marketing').click();await ready();

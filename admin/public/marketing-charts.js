@@ -23,7 +23,7 @@ function chartSvg(days,unique){
   const interval=Math.max(1,Math.ceil(days.length/8));
   const tick=i===days.length-1||(i%interval===0&&days.length-1-i>=Math.max(1,interval*.65));
   const label=tick?`<text class="chart-axis" x="${x+step/2}" y="248" text-anchor="middle">${shortDate(day.date)}</text>`:'';
-  const count=day[key]==null?'—':num(day[key])+(partial?'*':'');
+  const count=day[key]==null?'—':num(day[key]);
   const totalLabel=`<text class="chart-total${day[key]==null?' chart-total-unavailable':''}" x="${x+step/2}" y="${day[key]==null?top-8:y(day[key])-8}" text-anchor="middle" data-marketing-count="${day.date}">${count}</text>`;
   const description=`${day.date}: ${num(day[key])} ${unique?'unikátnych prehliadačov':'návštev'}${partial?', čiastočné meranie':''}`;
   return `<g class="marketing-chart-day" tabindex="${i===0?'0':'-1'}" role="img" aria-label="${esc(description)}" data-marketing-day="${day.date}" data-marketing-day-index="${i}"><title>${esc(description)}</title><rect class="chart-hit" x="${x}" y="${top-20}" width="${step}" height="${bottom-top+20}"/>${shapes}${totalLabel}${label}</g>`;
