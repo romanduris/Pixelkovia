@@ -31,7 +31,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
   assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),5);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').innerText(),/Čakáme na prvú/);
   assert.equal(await page.locator('#marketing-filter-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),9);assert.equal(await page.locator('#marketing-all-sources').count(),0);
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),6);assert.equal(await page.locator('#marketing-all-sources').count(),0);
   assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('420'));
   await page.locator('#marketing-unique').check();assert.match(await page.locator('.marketing-chart-empty').innerText(),/Zatiaľ bez údajov/);assert.equal(await page.locator('.marketing-chart-svg').count(),0);await page.locator('#marketing-unique').uncheck();
   // A fresh visitor is unmeasured until explicit analytics consent; marketing stays off.
@@ -93,17 +93,33 @@ const origin='https://pixelkovia.rodulab.com';
   assert.match(await page.locator('.payment-table-heading').innerText(),/1/);assert.ok(await page.locator('#payment-days').isDisabled());
   await page.reload();await ready();assert.equal(await page.locator('.payment-attempt-row').count(),1);
   await page.getByRole('link',{name:'Späť na funnel'}).click();await page.locator('.marketing-dashboard').waitFor();await ready();
-  const row=page.locator('.marketing-table-wrap tbody tr').filter({hasText:'Facebook reklama'});assert.equal(await row.locator('td').nth(2).innerText(),'100 %');
+  const row=page.locator('[data-marketing-root=group-facebook]');assert.equal(await row.locator('td').nth(2).innerText(),'100 %');
+  // Networks are collapsed summaries with two detail rows, independently persistent.
+  assert.equal(await page.locator('#marketing-group-facebook').getAttribute('aria-expanded'),'false');
+  assert.equal(await page.locator('#marketing-source-facebook_ads').isVisible(),false);
+  assert.equal(await page.locator('.marketing-table-wrap').getByText('Influencer',{exact:true}).count(),0);
+  await page.locator('#marketing-group-facebook').focus();await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#marketing-group-facebook').getAttribute('aria-expanded'),'true');
+  assert.ok(await page.locator('#marketing-source-facebook_ads').isVisible());assert.ok(await page.locator('#marketing-source-facebook').isVisible());
+  assert.equal(await page.locator('#marketing-source-facebook_ads th').innerText(),'Reklama');assert.equal(await page.locator('#marketing-source-facebook th').innerText(),'Bežný príspevok');
+  await page.locator('#marketing-group-instagram').click();
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),10);
+  await page.reload();await ready();
+  for(const network of ['facebook','instagram']){assert.equal(await page.locator('#marketing-group-'+network).getAttribute('aria-expanded'),'true');assert.ok(await page.locator('#marketing-source-'+network+'_ads').isVisible());}
+  await page.locator('#marketing-sort-visits').click();await page.locator('#refresh-marketing').click();await ready();
+  assert.ok(await page.locator('#marketing-source-facebook').isVisible());
+  for(const network of ['facebook','instagram'])await page.locator('#marketing-group-'+network).click();
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),6);
   assert.match(await page.locator('.marketing-health-status').innerText(),/nedostupné/);
   await page.locator('#marketing-kpi-conversion').focus();await page.keyboard.press('Enter');assert.ok(await page.locator('.marketing-kpi[open]').count());assert.match(await page.locator('.marketing-kpi[open]').innerText(),/Nákupy priradené/);
   await page.keyboard.press('Escape');assert.equal(await page.locator('.marketing-kpi[open]').count(),0);
   await page.locator('#marketing-summary-funnel-details').click();await page.locator('#marketing-summary-attribution').focus();await page.keyboard.press('Enter');
   await page.locator('#marketing-period-purchases').check();
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),9);assert.ok(await page.locator('[data-marketing-sort-header=periodPurchases]').isVisible());
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),6);assert.ok(await page.locator('[data-marketing-sort-header=periodPurchases]').isVisible());
   await page.locator('#marketing-sort-label').click();await page.locator('#marketing-sort-label').click();assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   await page.locator('#refresh-marketing').click();await ready();
   assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);assert.equal(await page.locator('#marketing-funnel-details').evaluate(el=>el.open),true);
-  assert.equal(await page.locator('#marketing-period-purchases').isChecked(),true);assert.equal(await page.locator('.marketing-table-wrap tbody tr').count(),9);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
+  assert.equal(await page.locator('#marketing-period-purchases').isChecked(),true);assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),6);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   assert.equal(await page.evaluate(()=>document.activeElement.id),'refresh-marketing');
   // Date selection belongs in the toolbar and works with the filters panel closed.
   assert.ok(await page.locator('.marketing-toolbar #marketing-since').isVisible());
@@ -139,7 +155,10 @@ const origin='https://pixelkovia.rodulab.com';
    await page.setViewportSize({width,height:width===1920?1080:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no page overflow '+width);
    assert.ok(await page.locator('#marketing-filter-toggle').isVisible());assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
    if(width>=1440){const positions=await page.locator('.marketing-kpis .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(Math.max(...positions)-Math.min(...positions)<1,'five metrics in one row');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
-   if(width<=375){await page.locator('#marketing-filter-toggle').tap();assert.equal(await page.locator('#marketing-filter-panel').isVisible(),true);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'expanded filters have no overflow');await page.locator('[name=device]').focus();await page.keyboard.press('Escape');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.equal(await page.evaluate(()=>document.activeElement.id),'marketing-filter-toggle');}
+   if(width<=375){
+    await page.locator('#marketing-group-facebook').tap();assert.ok(await page.locator('#marketing-source-facebook').isVisible());assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await page.locator('#marketing-sources-title').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/pixelkovia-social-groups-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
+    await page.locator('#marketing-group-facebook').tap();await page.locator('#marketing-filter-toggle').tap();assert.equal(await page.locator('#marketing-filter-panel').isVisible(),true);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'expanded filters have no overflow');await page.locator('[name=device]').focus();await page.keyboard.press('Escape');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.equal(await page.evaluate(()=>document.activeElement.id),'marketing-filter-toggle');}
    await page.screenshot({path:'/tmp/pixelkovia-marketing-after-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png',fullPage:true});
    if(width===375)await page.screenshot({path:'/tmp/pixelkovia-marketing-mobile-viewport.png'});
   }
@@ -179,6 +198,6 @@ const origin='https://pixelkovia.rodulab.com';
   const count=events.length;await page.goto(origin+'/checkout');assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),{});assert.equal(events.length,count);
   assert.ok(await page.locator('main').isVisible());
   assert.deepEqual(errors,[]);
-  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and permanently expanded source list, period-payment column, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
+  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and expandable social totals with persistent children, hidden influencer, period-payment column, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
  }finally{await context.close();await browser.close();db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -490,6 +490,13 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-table-wrap thead th{position:static;background:#162238;font-size:12px;text-transform:none;letter-spacing:0;padding-top:2px;padding-bottom:2px}
 .marketing-table-wrap thead th button{display:inline-flex;align-items:center;gap:2px;text-align:inherit;justify-content:flex-end;font-size:12px;border:0;background:transparent;padding:6px 0;min-height:32px;width:100%;border-radius:3px;line-height:1.4}
 .marketing-table-wrap thead th:first-child button{justify-content:flex-start}
+.marketing-table-wrap .marketing-source-group th{padding-block:0}
+.marketing-source-group th button{display:flex;align-items:center;gap:7px;width:100%;min-height:38px;padding:7px 0;border:0;background:transparent;text-align:left;font:inherit;color:#e2edff}
+.marketing-source-arrow{display:inline-block;font-size:20px;line-height:1;transition:transform .15s}
+.marketing-source-group button[aria-expanded="true"] .marketing-source-arrow{transform:rotate(90deg)}
+.marketing-source-child{background:#0d192b}
+.marketing-table-wrap .marketing-source-child th:first-child{padding-left:36px;color:#b6c9e0;font-size:12px}
+@media(max-width:750px){.marketing-table-wrap .marketing-source-child{margin-left:12px;width:calc(100% - 12px);border-left:2px solid #344c68}.marketing-table-wrap .marketing-source-child th:first-child{padding-left:0;font-size:13px}.marketing-source-group th button{min-height:44px}}
 .marketing-table-wrap tbody tr:last-child :is(td,th){border-bottom:0}
 .marketing-table-wrap tbody th{background:transparent;text-transform:none;letter-spacing:0}
 .marketing-table-wrap tbody tr:hover{background:#17243a}
