@@ -29,6 +29,8 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
   const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
   await page.goto(base+'/?utm_source=facebook&utm_medium=paid_social&utm_campaign=consent-qa');
   await page.locator('.privacy-panel').waitFor({state:'visible'});
+  assert.equal(await page.locator('.privacy-actions button').first().getAttribute('data-privacy'),'accept');
+  assert.equal(await page.locator('[data-privacy="accept"]').innerText(),'Súhlasím so všetkým');
   assert.equal(metaRequests.length,0);assert.equal((await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,0);
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
   await page.screenshot({path:'/tmp/pixelkovia-consent-phone.png',fullPage:false});
@@ -84,7 +86,59 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    await page.locator('.privacy-panel').screenshot({path:`/tmp/pixelkovia-consent-settings-${width}.png`});await page.locator('[data-privacy="close"]').click();
   }
+  // The root switch controls prompting only; it cannot bypass either consent gate.
+  let configStatus=200,configBody={consentEnabled:false};
+  await context.route('**/consent-config.json',route=>route.fulfill({status:configStatus,json:configBody}));
+  await context.clearCookies();
+  const visitsBefore=(await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,requestsBefore=metaRequests.length;
+  await page.reload();await page.waitForFunction(()=>window.PixelkoviaConsent&&!window.PixelkoviaConsent.pending);
+  assert.ok(await page.locator('.privacy-panel').isHidden());
+  assert.deepEqual(await page.evaluate(()=>[PixelkoviaConsent.allows('analytics'),PixelkoviaConsent.allows('marketing')]),[false,false]);
+  assert.equal((await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,visitsBefore);
+  assert.equal(metaRequests.length,requestsBefore);assert.equal(await page.locator('iframe[src="/assets/meta-pixel"]').count(),0);
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
+  // Users can still opt in and withdraw through the footer while prompting is off.
+  await page.locator('.privacy-settings-link').click();await page.locator('[name="privacy-analytics"]').check();
+  const manualVisit=page.waitForResponse(r=>r.url().includes('/api/marketing/event'));
+  await page.locator('[data-privacy="save"]').click();await manualVisit;
+  await page.waitForFunction(()=>PixelkoviaConsent.allows('analytics'));
+  assert.equal((await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,visitsBefore+1);
+  await page.reload();await page.waitForFunction(()=>PixelkoviaConsent.allows('analytics'));
+  assert.ok(await page.locator('.privacy-panel').isHidden());assert.equal(metaRequests.length,requestsBefore);
+  // Expiration also stays quiet and stops optional collection with the switch off.
+  await server.db.prepare('UPDATE privacy_consents SET expires_at=?').bind(Date.now()-1).run();
+  await page.evaluate(()=>PixelkoviaConsent.refresh());
+  assert.ok(await page.locator('.privacy-panel').isHidden());
+  assert.deepEqual(await page.evaluate(()=>[PixelkoviaConsent.allows('analytics'),PixelkoviaConsent.allows('marketing')]),[false,false]);
+  await page.locator('.privacy-settings-link').click();await page.locator('[data-privacy="accept"]').click();
+  await page.waitForFunction(()=>PixelkoviaConsent.allows('analytics')&&PixelkoviaConsent.allows('marketing'));
+  await page.reload();await page.waitForFunction(()=>PixelkoviaConsent.allows('analytics')&&PixelkoviaConsent.allows('marketing'));
+  assert.ok(await page.locator('.privacy-panel').isHidden());
+  await page.locator('.privacy-settings-link').click();await page.locator('[data-privacy="reject"]').click();
+  await page.waitForFunction(()=>!PixelkoviaConsent.pending&&!PixelkoviaConsent.allows('analytics')&&!PixelkoviaConsent.allows('marketing'));
+  assert.equal(await page.locator('iframe[src="/assets/meta-pixel"]').count(),0);
+  // A failed consent API also grants nothing and does not reopen the disabled prompt.
+  await page.route('**/api/privacy/consent',route=>route.fulfill({status:503,json:{error:'QA unavailable'}}));
+  await page.reload();await page.waitForFunction(()=>window.PixelkoviaConsent&&!PixelkoviaConsent.pending);
+  assert.ok(await page.locator('.privacy-panel').isHidden());
+  assert.deepEqual(await page.evaluate(()=>[PixelkoviaConsent.allows('analytics'),PixelkoviaConsent.allows('marketing')]),[false,false]);
+  await page.unroute('**/api/privacy/consent');
+  // Missing, malformed or mistyped configuration falls back to the enabled prompt.
+  await context.clearCookies();
+  for(const [status,body]of [[404,{}],[200,{consentEnabled:'false'}],[200,null]]){
+   configStatus=status;configBody=body;
+   await page.reload();await page.locator('.privacy-panel').waitFor({state:'visible'});
+   assert.deepEqual(await page.evaluate(()=>[PixelkoviaConsent.allows('analytics'),PixelkoviaConsent.allows('marketing')]),[false,false]);
+  }
+  for(const [width,height]of (process.env.QA_BROWSER==='webkit'?[[390,844]]:[[320,568],[390,844],[1366,900]])){
+   await page.setViewportSize({width,height});
+   const controls=await page.locator('.privacy-actions button:visible').evaluateAll(buttons=>buttons.map(button=>({action:button.dataset.privacy,height:button.getBoundingClientRect().height,fontSize:parseFloat(getComputedStyle(button).fontSize)})));
+   assert.ok(controls.every(button=>button.height>=44));
+   assert.ok(controls.find(button=>button.action==='accept').fontSize>controls.find(button=>button.action==='reject').fontSize);
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:`/tmp/pixelkovia-consent-prompt-${process.env.QA_BROWSER||'chromium'}-${width}.png`});
+  }
   assert.deepEqual(errors,[]);
-  await context.close();console.log('PASS: explicit granular consent, server cookie gates, revocation across tabs, no optional storage before consent, UTM, clean isolated Pixel URL, configured ID, verified gift Purchase once across reload, blocked SDK, and consent UI ('+(process.env.QA_BROWSER||'chromium')+').');
+  await context.close();console.log('PASS: explicit granular consent, server cookie gates, revocation across tabs, no optional storage before consent, UTM, clean isolated Pixel URL, configured ID, verified gift Purchase once across reload, blocked SDK, consent UI, disabled prompting with remembered/manual/expired consent, and config/API failures ('+(process.env.QA_BROWSER||'chromium')+').');
  }finally{await browser.close();await server.mf.dispose();}
 })().catch(error=>{console.error(error);process.exitCode=1});

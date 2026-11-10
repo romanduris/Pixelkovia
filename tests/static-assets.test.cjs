@@ -1,5 +1,9 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const inventory=JSON.parse(fs.readFileSync('dist/deployment-inventory.json','utf8')),root='dist/funnel';
+const consentConfig=JSON.parse(fs.readFileSync('consent-config.json','utf8'));
+assert.deepEqual(Object.keys(consentConfig),['consentEnabled']);assert.equal(typeof consentConfig.consentEnabled,'boolean');
+assert.deepEqual(JSON.parse(fs.readFileSync(root+'/consent-config.json','utf8')),consentConfig);
+assert.ok(inventory.public.includes('/consent-config.json'),'the single consent switch is explicitly public');
 assert.ok([...inventory.public,...Object.keys(inventory.protected)].every(route=>!route.startsWith('/assets/Photo/')&&!/^\/assets\/sales\/family-.*mobile/.test(route)),'uncropped source photographs and retired family scenes stay outside the deployment');
 const routes=JSON.parse(fs.readFileSync(root+'/_routes.json','utf8'));assert.deepEqual(routes.include,['/*']);assert.deepEqual(routes.exclude,[]);
 let versioned=0;

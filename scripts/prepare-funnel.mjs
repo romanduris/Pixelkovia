@@ -8,6 +8,9 @@ import {createHash} from 'node:crypto';
 const root=fileURLToPath(new URL('../',import.meta.url));
 export async function prepareFunnel(output){
   await mkdir(output,{recursive:true});
+  const consentConfig=JSON.parse(await readFile(path.join(root,'consent-config.json'),'utf8'));
+  if(Object.keys(consentConfig).length!==1||typeof consentConfig.consentEnabled!=='boolean')throw Error('consent-config.json must contain only the boolean consentEnabled.');
+  await cp(path.join(root,'consent-config.json'),path.join(output,'consent-config.json'));
   const content={window:{},URL};
   vm.createContext(content);
   // Authored sources are read only during the build, never published as game JS.

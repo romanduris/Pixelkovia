@@ -35,6 +35,12 @@ Facebook/Instagram bez plateného UTM média sa neoznačuje ako reklama. Meta os
 
 Od verzie súhlasu `2026-11-09` sa nepovinná analytika aj marketing štandardne nespúšťajú. Panel ponúka rovnako dostupné prijatie a odmietnutie, samostatné voľby **Analytika návštev** a **Marketing · Meta Pixel** a opätovné otvorenie cez **Nastavenia súkromia** v pätičke. Odmietnutie neblokuje nákup ani hru. Platby, doručenie prístupu a nevyhnutná obnova objednávky fungujú nezávisle.
 
+### Zobrazenie panela
+
+V koreňovom `consent-config.json` je jediný prepínač `consentEnabled`, predvolene `true`. Pri `true` sa návštevníkovi bez platnej voľby automaticky zobrazí kompaktný panel s hlavným tlačidlom **Súhlasím so všetkým**, viditeľným odmietnutím na jeden klik a odkazom na samostatné nastavenia. Pri `false` sa automatická výzva nezobrazuje; **Nastavenia súkromia** v pätičke zostávajú dostupné na udelenie aj odvolanie súhlasu. Existujúci platný súhlas sa naďalej rešpektuje. Bez neho sa nepovinná analytika ani Meta Pixel nespustia. Vypnutie výzvy neudelí súhlas, nemení serverovú kontrolu ani neovplyvní nákup, hru či potrebné obchodné záznamy.
+
+Konfigurácia sa načíta raz pri otvorení stránky bez použitia cache. Pri chýbajúcom, neplatnom alebo nedostupnom súbore zostáva výzva zapnutá. Zmenu súboru treba zostaviť cez `node scripts/prepare-static.mjs` a nasadiť existujúcim `scripts/deploy-funnel.mjs`; build overí, že obsahuje len jeden booleovský prepínač.
+
 Voľbu potvrdzuje `/api/privacy/consent`. D1 uchováva iba hash náhodného tokenu, verziu, príznaky účelov a časy. Opaque cookie `__Host-pixelkovia-consent` má `HttpOnly`, `Secure`, `SameSite=Lax`, cestu `/` a platnosť 180 dní. Zmena voľby zruší predchádzajúci záznam; odvolanie sa prenesie aj do iných otvorených kariet. Cron odstráni doklady najneskôr 180 dní po skončení platnosti. Pri chybe API, chýbajúcej cookie, vypršaní alebo zablokovanom úložisku sa meranie nespustí. Server zamietne aj starého klienta bez príslušného súhlasu. `MARKETING_COLLECTION_ENABLED` zostáva nezávislý vypínač vlastnej analytiky.
 
 Prijatie marketingu samo osebe nepovoľuje vlastnú analytiku a naopak. Historické návštevy sa neprepisujú na údaj so súhlasom. GA4 ani Clarity nie sú vložené.

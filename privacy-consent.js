@@ -3,9 +3,13 @@
  'use strict';
  if(location.pathname.startsWith('/admin')||location.pathname==='/hra')return;
  const version='2026-11-09',signalKey='pixelkovia-privacy-updated';
- let choice=null,pixelId=null,saving=false,resolved=false,revision=0,previousFocus=null,channel=null;
+ let choice=null,pixelId=null,saving=false,resolved=false,revision=0,previousFocus=null,channel=null,consentEnabled=true;
+ // Hiding the automatic prompt never grants consent. A missing/invalid config keeps it enabled.
+ const configuration=fetch('/consent-config.json',{cache:'no-store',credentials:'same-origin',signal:AbortSignal.timeout(4000)})
+  .then(response=>{if(!response.ok)throw Error('Configuration unavailable');return response.json();})
+  .then(config=>{if(typeof config?.consentEnabled==='boolean')consentEnabled=config.consentEnabled;}).catch(()=>{});
  const root=document.createElement('section');root.className='privacy-panel';root.hidden=true;root.setAttribute('aria-labelledby','privacy-heading');
- root.innerHTML=`<div class="privacy-intro"><h2 id="privacy-heading">Vaše súkromie, vaša voľba</h2><p>Nepovinné meranie zapneme iba s vaším súhlasom. Analytika nám ukáže návštevnosť; Meta Pixel pomáha merať reklamu a nákupy. Hra aj nákup fungujú aj po odmietnutí.</p></div><div class="privacy-options" hidden><label><input type="checkbox" name="privacy-analytics"><span><strong>Analytika návštev</strong><small>Zdroj kampane a cesta na checkout vo vlastnom prehľade.</small></span></label><label><input type="checkbox" name="privacy-marketing"><span><strong>Marketing · Meta Pixel</strong><small>Odosielanie návštev, začatia checkoutu a potvrdeného nákupu spoločnosti Meta.</small></span></label></div><div class="privacy-actions"><button type="button" data-privacy="reject">Odmietnuť nepovinné</button><button type="button" data-privacy="accept">Prijať všetko</button><button type="button" data-privacy="settings" aria-expanded="false">Nastavenia</button><button type="button" data-privacy="save" hidden>Uložiť výber</button><button type="button" data-privacy="close" hidden>Zavrieť</button></div><details class="privacy-details"><summary>Aké údaje meriame?</summary><p>Nevyhnutné úložisko zabezpečuje prihlásenie, hru, obnovu objednávky a uloženie tejto voľby na 180 dní. Voľbu môžete kedykoľvek zmeniť cez „Nastavenia súkromia“ v pätičke.</p><p>Vlastná analytika uchováva náhodnú návštevnú reláciu, UTM zdroj a kampaň, typ zariadenia a otvorenie checkoutu najviac 366 dní. Relácia v karte sa obnoví po 30 minútach neaktivity. Po odmietnutí sa nové návštevné údaje nezbierajú.</p><p>Meta Platforms Ireland získava po marketingovom súhlase udalosti, identifikátory prehliadača, IP adresu a technické údaje potrebné na meranie a priradenie reklamy. Súbory _fbp a _fbc môžu zostať do 90 dní. Naše udalosti neposielajú e-mail, heslo, údaje karty ani platobné parametre v URL. <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer">Zásady ochrany údajov Meta</a>.</p><p>Záznam voľby uchovávame počas jej platnosti a najviac ďalších 180 dní. Overenie platieb a doručenie prístupu fungujú nezávisle od nepovinného merania. Otázky: <a href="mailto:miky@pixelkovia.rodulab.com">miky@pixelkovia.rodulab.com</a>.</p></details><p class="privacy-status" role="status" aria-live="polite"></p>`;
+ root.innerHTML=`<div class="privacy-intro"><h2 id="privacy-heading">Pomôžete nám vylepšiť Pixelkoviu?</h2><p>So súhlasom meriame návštevnosť a cez Meta Pixel aj účinnosť reklám a nákupy. Voľbu môžete kedykoľvek zmeniť.</p></div><div class="privacy-options" hidden><label><input type="checkbox" name="privacy-analytics"><span><strong>Analytika návštev</strong><small>Zdroj kampane a cesta na checkout vo vlastnom prehľade.</small></span></label><label><input type="checkbox" name="privacy-marketing"><span><strong>Marketing · Meta Pixel</strong><small>Odosielanie návštev, začatia checkoutu a potvrdeného nákupu spoločnosti Meta.</small></span></label></div><div class="privacy-actions"><button type="button" data-privacy="accept">Súhlasím so všetkým</button><button type="button" data-privacy="reject">Odmietnuť nepovinné</button><button type="button" data-privacy="settings" aria-expanded="false">Upraviť nastavenia</button><button type="button" data-privacy="save" hidden>Uložiť výber</button><button type="button" data-privacy="close" hidden>Zavrieť</button></div><details class="privacy-details"><summary>Aké údaje meriame?</summary><p>Nevyhnutné úložisko zabezpečuje prihlásenie, hru, obnovu objednávky a uloženie tejto voľby na 180 dní. Voľbu môžete kedykoľvek zmeniť cez „Nastavenia súkromia“ v pätičke.</p><p>Vlastná analytika uchováva náhodnú návštevnú reláciu, UTM zdroj a kampaň, typ zariadenia a otvorenie checkoutu najviac 366 dní. Relácia v karte sa obnoví po 30 minútach neaktivity. Po odmietnutí sa nové návštevné údaje nezbierajú.</p><p>Meta Platforms Ireland získava po marketingovom súhlase udalosti, identifikátory prehliadača, IP adresu a technické údaje potrebné na meranie a priradenie reklamy. Súbory _fbp a _fbc môžu zostať do 90 dní. Naše udalosti neposielajú e-mail, heslo, údaje karty ani platobné parametre v URL. <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer">Zásady ochrany údajov Meta</a>.</p><p>Záznam voľby uchovávame počas jej platnosti a najviac ďalších 180 dní. Overenie platieb a doručenie prístupu fungujú nezávisle od nepovinného merania. Otázky: <a href="mailto:miky@pixelkovia.rodulab.com">miky@pixelkovia.rodulab.com</a>.</p></details><p class="privacy-status" role="status" aria-live="polite"></p>`;
  document.body.append(root);
  const settings=root.querySelector('.privacy-options'),status=root.querySelector('.privacy-status'),analytics=root.querySelector('[name="privacy-analytics"]'),marketing=root.querySelector('[name="privacy-marketing"]');
  const button=action=>root.querySelector(`[data-privacy="${action}"]`);
@@ -16,12 +20,13 @@
   const c=data?.choice;
   choice=c&&c.version===version&&typeof c.analytics==='boolean'&&typeof c.marketing==='boolean'&&Number.isFinite(c.createdAt)&&Number.isFinite(c.expiresAt)&&c.expiresAt>Date.now()?c:null;
   pixelId=/^\d{8,20}$/.test(data?.pixelId||'')?data.pixelId:null;
-  root.hidden=!!choice;
-  if(!choice)show(false);
+  root.hidden=true;
+  if(!choice)prompt();
   announce();
  }
+ function prompt(){if(consentEnabled)show(false);else root.hidden=true;}
  function show(expanded=true){
-  previousFocus=document.activeElement;root.hidden=false;settings.hidden=!expanded;analytics.checked=allows('analytics');marketing.checked=allows('marketing');
+  previousFocus=document.activeElement;root.hidden=false;root.dataset.expanded=String(expanded);settings.hidden=!expanded;analytics.checked=allows('analytics');marketing.checked=allows('marketing');
   button('settings').hidden=expanded;button('settings').setAttribute('aria-expanded',String(expanded));button('save').hidden=!expanded;button('close').hidden=!choice;
  }
  async function request(method='GET',body){
@@ -31,8 +36,8 @@
  }
  async function refresh(){
   const current=++revision;
-  try{const data=await request();if(current===revision&&!saving)apply(data);}
-  catch{if(current===revision&&!saving){resolved=true;choice=null;show(false);announce();status.textContent='Nastavenia sa nepodarilo načítať. Nepovinné meranie je vypnuté.';}}
+  try{const [data]=await Promise.all([request(),configuration]);if(current===revision&&!saving)apply(data);}
+  catch{await configuration;if(current===revision&&!saving){resolved=true;choice=null;prompt();announce();status.textContent='Nastavenia sa nepodarilo načítať. Nepovinné meranie je vypnuté.';}}
  }
  async function save(a,m){
   if(saving)return;saving=true;++revision;announce();status.textContent='Ukladám vašu voľbu…';
@@ -65,6 +70,6 @@
  window.addEventListener('storage',event=>{if(event.key===signalKey)changed();});
  window.addEventListener('focus',()=>void refresh());
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(choice?.expiresAt<=Date.now()){choice=null;announce();}void refresh();}});
- setInterval(()=>{if(choice?.expiresAt<=Date.now()){choice=null;show(false);announce();}},30000);
+ setInterval(()=>{if(choice?.expiresAt<=Date.now()){choice=null;prompt();announce();}},30000);
  window.PixelkoviaConsent.ready=refresh();
 })();
