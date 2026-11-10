@@ -582,11 +582,8 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .chart-unavailable{fill:#1b2a40;stroke:#405775;stroke-dasharray:3 4}
 .chart-hit{fill:transparent}.chart-zero{stroke:#7b95b5;stroke-width:2}
 .marketing-chart-day:focus{outline:none}.marketing-chart-day:focus .chart-hit{stroke:#d4c5ff;stroke-width:2}
-.chart-source-facebook_ads{fill:#6b9cff;background:#6b9cff}.chart-source-instagram_ads{fill:#eb8cb9;background:#eb8cb9}
-.chart-source-meta{fill:#b79af4;background:#b79af4}.chart-source-facebook{fill:#81c4e9;background:#81c4e9}
-.chart-source-instagram{fill:#f1b27e;background:#f1b27e}.chart-source-influencer{fill:#e2d078;background:#e2d078}
-.chart-source-direct{fill:#81dcc0;background:#81dcc0}.chart-source-organic{fill:#b7d98b;background:#b7d98b}
-.chart-source-unknown{fill:#93a2ba;background:#93a2ba}
+.chart-source-facebook{fill:#6b9cff;background:#6b9cff}.chart-source-instagram{fill:#eb8cb9;background:#eb8cb9}
+.chart-source-other{fill:#93a2ba;background:#93a2ba}
 .marketing-chart-readout{min-height:42px;font-size:12px;color:#c6d9ed;line-height:1.7;padding:10px 12px;border:1px solid #2b405c;border-radius:6px;background:#132136;margin:10px 0 0}
 .payment-funnel-scope{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:16px;border:1px solid #537b83;border-radius:8px;background:#142b36;margin-bottom:16px}
 .payment-funnel-scope>div{flex:1 1 350px}.payment-funnel-scope strong{font-size:14px}.payment-funnel-scope p{font-size:12px;line-height:1.7;color:#bdd0df;margin:5px 0 0}

@@ -31,7 +31,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
   assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),5);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').innerText(),/Čakáme na prvú/);
   assert.equal(await page.locator('#marketing-filter-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),4);assert.equal(await page.locator('#marketing-all-sources').count(),0);
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('#marketing-all-sources').count(),0);
   assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('420'));
   await page.locator('#marketing-unique').check();assert.match(await page.locator('.marketing-chart-empty').innerText(),/Zatiaľ bez údajov/);assert.equal(await page.locator('.marketing-chart-svg').count(),0);await page.locator('#marketing-unique').uncheck();
   // A fresh visitor is unmeasured until explicit analytics consent; marketing stays off.
@@ -75,6 +75,26 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('[data-marketing-period]').count(),5);
   assert.ok(await page.locator('#marketing-charts').evaluate(el=>el.open));
   assert.equal(await page.locator('.marketing-chart-svg').count(),1);
+  assert.deepEqual(await page.locator('.marketing-chart-legend li').allTextContents(),['Facebook','Instagram','Others']);
+  // Mixed sources exercise all three stacks with actual report aggregation and day readouts.
+  const chartFixtures=[];
+  for(const source of ['facebook','instagram_ads','instagram','meta','direct','unknown','organic','influencer']){
+    const id=crypto.randomUUID();chartFixtures.push(id);const time=Date.now();
+    await execute(db,'INSERT INTO marketing_visits VALUES(?,?,?,?,?,?,?,?,?)',id,'chart-'+id,source,'chart-fixture','mobile',time,null,time,'browser-'+id);
+  }
+  await page.locator('#refresh-marketing').click();await ready();
+  const latestDay=page.locator('.marketing-chart-day').last();
+  assert.deepEqual(await latestDay.locator('rect[class^="chart-source-"]').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-source-facebook','chart-source-instagram','chart-source-other']);
+  await latestDay.focus();assert.match(await page.locator('.marketing-chart-readout').innerText(),/Facebook: 2 · Instagram: 2 · Others: 5/);
+  assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'9');
+  await page.locator('#marketing-unique').check();await latestDay.focus();assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'9');assert.match(await page.locator('.marketing-chart-readout').innerText(),/Facebook: 2 · Instagram: 2 · Others: 5/);
+  await page.locator('#marketing-unique').uncheck();
+  await page.locator('#marketing-group-other').click();assert.equal(await page.locator('#marketing-source-meta').isVisible(),true);
+  await page.locator('#marketing-charts').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/pixelkovia-three-source-chart-'+(process.env.QA_BROWSER||'chromium')+'.png',fullPage:true});
+  await page.locator('#marketing-group-other').click();
+  for(const id of chartFixtures)await execute(db,'DELETE FROM marketing_visits WHERE id=?',id);
+  await page.locator('#refresh-marketing').click();await ready();
+
   assert.equal(await page.locator('.marketing-advanced,.marketing-chart-stats,.marketing-chart-data,#marketing-availability,#marketing-methodology,#marketing-units,#marketing-quality-more').count(),0);
   assert.equal(await page.locator('[data-marketing-count]').count(),14);
   assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'1');
@@ -106,27 +126,27 @@ const origin='https://pixelkovia.rodulab.com';
   for(const [source,label] of [['direct','Bez informácie o pôvode'],['unknown','Neznámy alebo iný zdroj'],['organic','Neplatená návštevnosť']]){
    assert.ok(await page.locator('#marketing-source-'+source).isVisible());assert.equal(await page.locator('#marketing-source-'+source+' th').innerText(),label);
   }
-  assert.ok(await page.locator('[data-marketing-root=meta]').isVisible());assert.equal(await page.locator('[data-marketing-root=meta] th').innerText(),'Meta (UTM)');
+  assert.equal(await page.locator('[data-marketing-root=meta]').count(),0);assert.ok(await page.locator('#marketing-source-meta').isVisible());assert.equal(await page.locator('#marketing-source-meta th').innerText(),'Meta (UTM)');assert.match(await page.locator('#marketing-group-other').innerText(),/Others/);
   await page.reload();await ready();assert.equal(await page.locator('#marketing-group-other').getAttribute('aria-expanded'),'true');
   await page.locator('#marketing-group-other').click();
   await page.locator('#marketing-group-instagram').click();
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),8);
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),7);
   await page.reload();await ready();
   for(const network of ['facebook','instagram']){assert.equal(await page.locator('#marketing-group-'+network).getAttribute('aria-expanded'),'true');assert.ok(await page.locator('#marketing-source-'+network+'_ads').isVisible());}
   await page.locator('#marketing-sort-visits').click();await page.locator('#refresh-marketing').click();await ready();
   assert.ok(await page.locator('#marketing-source-facebook').isVisible());
   for(const network of ['facebook','instagram'])await page.locator('#marketing-group-'+network).click();
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),4);
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);
   assert.match(await page.locator('.marketing-health-status').innerText(),/nedostupné/);
   await page.locator('#marketing-kpi-conversion').focus();await page.keyboard.press('Enter');assert.ok(await page.locator('.marketing-kpi[open]').count());assert.match(await page.locator('.marketing-kpi[open]').innerText(),/Nákupy priradené/);
   await page.keyboard.press('Escape');assert.equal(await page.locator('.marketing-kpi[open]').count(),0);
   await page.locator('#marketing-summary-funnel-details').click();await page.locator('#marketing-summary-attribution').focus();await page.keyboard.press('Enter');
   await page.locator('#marketing-period-purchases').check();
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),4);assert.ok(await page.locator('[data-marketing-sort-header=periodPurchases]').isVisible());
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.ok(await page.locator('[data-marketing-sort-header=periodPurchases]').isVisible());
   await page.locator('#marketing-sort-label').click();await page.locator('#marketing-sort-label').click();assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   await page.locator('#refresh-marketing').click();await ready();
   assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);assert.equal(await page.locator('#marketing-funnel-details').evaluate(el=>el.open),true);
-  assert.equal(await page.locator('#marketing-period-purchases').isChecked(),true);assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),4);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
+  assert.equal(await page.locator('#marketing-period-purchases').isChecked(),true);assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   assert.equal(await page.evaluate(()=>document.activeElement.id),'refresh-marketing');
   // Date selection belongs in the toolbar and works with the filters panel closed.
   assert.ok(await page.locator('.marketing-toolbar #marketing-since').isVisible());

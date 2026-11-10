@@ -1,6 +1,16 @@
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-SK').format(value);
 const shortDate=value=>value.slice(8,10)+'.'+value.slice(5,7)+'.';
+export const sourceGroups=[['facebook','Facebook',['facebook_ads','facebook']],['instagram','Instagram',['instagram_ads','instagram']],['other','Others',['meta','direct','unknown','organic']]];
+export function groupChartDay(day){
+ const sources=sourceGroups.map(([source,label,keys])=>{
+  const rows=day.sources.filter(row=>source==='other'?!sourceGroups.slice(0,2).some(([, ,members])=>members.includes(row.source)):keys.includes(row.source));
+  const sum=key=>day[key]==null||rows.some(row=>row[key]==null)?null:rows.reduce((total,row)=>total+row[key],0);
+  return {source,label,visits:sum('visits'),uniqueVisitors:sum('uniqueVisitors')};
+ });
+ // Source-level unique counts are already disjoint per day in the server report.
+ return {...day,sources};
+}
 let scrollObserver;
 export function paymentLink(d){
  const params=new URLSearchParams({scope:'funnel',period:'custom',from:d.filters.from,to:d.filters.to,asOf:String(d.generatedAt)});
@@ -30,23 +40,22 @@ function chartSvg(days,unique){
  }).join('');
  return `<div class="marketing-chart-scroll" tabindex="0" role="region" aria-label="Denná návštevnosť podľa zdroja; na úzkej obrazovke posúvajte vodorovne"><svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Návštevnosť podľa zdroja" role="group">${axes}${bars}</svg></div>`;
 }
-export function chartContent(d,unique,sourceNames){
- const charts=d.charts,days=charts?.days||[],key=unique?'uniqueVisitors':'visits';
+export function chartContent(d,unique){
+ const charts=d.charts,days=(charts?.days||[]).map(groupChartDay),key=unique?'uniqueVisitors':'visits';
  const available=days.some(day=>day[key]!=null);
- const active=Object.keys(sourceNames).filter(source=>days.some(day=>day.sources.some(row=>row.source===source&&row[key]>0)));
  const caption=unique?'Unikátne prehliadače':'Návštevné relácie';
  const start=charts?.uniqueStartedAt?new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(charts.uniqueStartedAt):null;
  const empty=`<div class="marketing-chart-empty" role="status"><strong>Zatiaľ bez údajov</strong><p>${unique?`Unikátne prehliadače meriame${start?' od '+esc(start):' od zapnutia nového merania'}. Staršie návštevy sa spätne nerozlišujú.`:'Pre zvolené obdobie a filtre nemáme nameranú návštevnosť.'}</p></div>`;
- return `<figure class="marketing-chart"><figcaption><h3>Návštevnosť po dňoch a zdrojoch</h3><span>${caption} · Bratislava</span></figcaption>${active.length?`<ul class="marketing-chart-legend" aria-label="Zdroje návštevnosti">${active.map(source=>`<li><i class="chart-source-${source}" aria-hidden="true"></i>${esc(sourceNames[source])}</li>`).join('')}</ul>`:''}${available?chartSvg(days,unique):empty}${available?'<p class="marketing-chart-readout" aria-live="polite">Vyberte deň kurzorom, dotykom alebo šípkami na klávesnici.</p>':''}</figure>`;
+ return `<figure class="marketing-chart"><figcaption><h3>Návštevnosť po dňoch a zdrojoch</h3><span>${caption} · Bratislava</span></figcaption>${available?`<ul class="marketing-chart-legend" aria-label="Zdroje návštevnosti">${sourceGroups.map(([source,label])=>`<li><i class="chart-source-${source}" aria-hidden="true"></i>${esc(label)}</li>`).join('')}</ul>`:''}${available?chartSvg(days,unique):empty}${available?'<p class="marketing-chart-readout" aria-live="polite">Vyberte deň kurzorom, dotykom alebo šípkami na klávesnici.</p>':''}</figure>`;
 }
-export function bindChartDays(root,d,unique,sourceNames){
+export function bindChartDays(root,d,unique){
  scrollObserver?.disconnect();
  scrollObserver=new ResizeObserver(entries=>entries.forEach(({target})=>{if(!target.isConnected)scrollObserver.unobserve(target);else target.scrollLeft=Math.max(0,target.scrollWidth-target.clientWidth);}));
  root.querySelectorAll('.marketing-chart-scroll').forEach(element=>scrollObserver.observe(element));
  const key=unique?'uniqueVisitors':'visits';
  const reveal=target=>{
-  const day=d.charts?.days.find(day=>day.date===target.dataset.marketingDay);if(!day)return;
-  const sources=day.sources.filter(row=>row[key]>0).map(row=>sourceNames[row.source]+': '+num(row[key])).join(' · ');
+  const raw=d.charts?.days.find(day=>day.date===target.dataset.marketingDay);if(!raw)return;
+  const day=groupChartDay(raw),sources=day.sources.filter(row=>row[key]>0).map(row=>row.label+': '+num(row[key])).join(' · ');
   target.closest('figure').querySelector('.marketing-chart-readout').textContent=`${day.date} · ${unique?'Unikátne prehliadače':'Návštevy'}: ${num(day[key])}${sources?' · '+sources:''}${(unique?day.uniquePartial:day.partial)?' · čiastočné meranie':''}`;
  };
  root.querySelectorAll('[data-marketing-day]').forEach(target=>{
