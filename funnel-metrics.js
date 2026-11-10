@@ -1,9 +1,9 @@
-/* First-party session measurements, collected only after explicit analytics consent.
-   Short-lived IDs stay in sessionStorage; advertising has its own independent choice. */
+/* First-party measurements only after explicit analytics consent.
+   Sessions stay in sessionStorage; an optional 90-day random browser ID deduplicates visits. */
 (()=>{
   'use strict';
   if(!['/','/index.html','/checkout','/checkout.html'].includes(location.pathname))return;
-  const visitKey='pixelkovia-funnel-session-v1';let current=null;
+  const visitKey='pixelkovia-funnel-session-v1',browserKey='pixelkovia-analytics-browser-v1';let current=null;
   const read=key=>{try{return JSON.parse(sessionStorage.getItem(key));}catch{return null;}};
   const write=(key,value)=>{try{sessionStorage.setItem(key,JSON.stringify(value));return true;}catch{return false;}};
   function device(){if(navigator.userAgentData?.mobile)return 'mobile';const ua=navigator.userAgent;return /iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?'tablet':/Mobi|iPhone|iPod/i.test(ua)?'mobile':ua?'desktop':'unknown';}
@@ -21,16 +21,23 @@
     }
     return {source,campaign:/^[a-zA-Z0-9_. -]{1,80}$/.test(campaign)?campaign:''};
   }
+  function browserId(){
+    try{
+      const at=Date.now();let saved=JSON.parse(localStorage.getItem(browserKey));
+      if(!saved||!/^[a-f0-9-]{36}$/.test(saved.id)||!Number.isFinite(saved.expiresAt)||saved.expiresAt<=at||saved.expiresAt>at+90*86400000){saved={id:crypto.randomUUID(),expiresAt:at+90*86400000};localStorage.setItem(browserKey,JSON.stringify(saved));}
+      return saved.id;
+    }catch{return null;}
+  }
   function visit(){
     const at=Date.now();let v=read(visitKey);
     if(!v||typeof v!=='object'||!Number.isFinite(v.lastAt)||at-v.lastAt>1800000||at<v.lastAt)v={visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),...attribution(),device:device(),lastAt:at};
-    v.lastAt=at;if(!write(visitKey,v))return null;return v;
+    v.lastAt=at;v.browserId=browserId();if(!write(visitKey,v))return null;return v;
   }
   function collect(){
-    if(!window.PixelkoviaConsent?.allows('analytics')){current=null;if(window.PixelkoviaConsent&&!window.PixelkoviaConsent.pending)try{sessionStorage.removeItem(visitKey);}catch{}return;}
+    if(!window.PixelkoviaConsent?.allows('analytics')){current=null;if(window.PixelkoviaConsent&&!window.PixelkoviaConsent.pending){try{sessionStorage.removeItem(visitKey);}catch{}try{localStorage.removeItem(browserKey);}catch{}}return;}
     try{current=visit();}catch{current=null;}if(!current)return;
-    const {visitId,visitorId,source,campaign,device}=current;
-    const payload={visitId,visitorId,source,campaign,device,type:location.pathname.startsWith('/checkout')?'checkout':'visit',mode:'session'};
+    const {visitId,visitorId,browserId,source,campaign,device}=current;
+    const payload={visitId,visitorId,browserId,source,campaign,device,type:location.pathname.startsWith('/checkout')?'checkout':'visit',mode:'session'};
     // Network/storage failure never blocks a purchase or changes its outcome.
     try{void fetch('/api/marketing/event',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true,signal:AbortSignal.timeout(4000)}).catch(()=>{});}catch{}
   }

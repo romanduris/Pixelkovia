@@ -1,6 +1,6 @@
 import {HttpError} from './auth.mjs';
 import {first,hash,randomToken} from './db.mjs';
-export const CONSENT_VERSION='2026-11-09';
+export const CONSENT_VERSION='2026-11-10';
 export const META_PIXEL_ID='1120983200688486';
 export const CONSENT_MS=180*86400000;
 const cookieName='__Host-pixelkovia-consent';

@@ -32,7 +32,7 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
   assert.equal(await page.locator('.privacy-actions button').first().getAttribute('data-privacy'),'accept');
   assert.equal(await page.locator('[data-privacy="accept"]').innerText(),'Súhlasím so všetkým');
   assert.equal(metaRequests.length,0);assert.equal((await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,0);
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-analytics-browser-v1')),null);
   await page.screenshot({path:'/tmp/pixelkovia-consent-phone.png',fullPage:false});
   await page.locator('[data-privacy="reject"]').click();
   if(process.env.DEBUG_CONSENT){await page.waitForTimeout(500);console.log(JSON.stringify({status:await page.locator('.privacy-status').innerText(),cookies:(await context.cookies()).map(({name,domain,secure,httpOnly})=>({name,domain,secure,httpOnly})),choice:await page.evaluate(()=>window.PixelkoviaConsent.choice)}));}
@@ -44,14 +44,14 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
   await page.waitForFunction(()=>window.PixelkoviaConsent.allows('analytics'));
   await recorded;
   assert.equal(metaRequests.length,0);assert.equal((await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,1);
-  assert.equal((await server.db.prepare('SELECT source FROM marketing_visits').first()).source,'facebook_ads');
+  assert.equal((await server.db.prepare('SELECT source FROM marketing_visits').first()).source,'facebook_ads');assert.ok(await page.evaluate(()=>JSON.parse(localStorage.getItem('pixelkovia-analytics-browser-v1'))?.id));
   await page.locator('.privacy-settings-link').click();await page.locator('[name="privacy-analytics"]').uncheck();await page.locator('[name="privacy-marketing"]').check();await page.locator('[data-privacy="save"]').click();
   await page.waitForFunction(()=>window.PixelkoviaConsent.allows('marketing'));
   const pixel=()=>page.frames().find(f=>f.url().endsWith('/assets/meta-pixel'));
   await page.waitForFunction(()=>document.querySelector('iframe[src="/assets/meta-pixel"]'));
   await page.waitForFunction(()=>{try{return document.querySelector('iframe[src="/assets/meta-pixel"]')?.contentWindow.__metaCalls?.some(c=>c[0]==='track'&&c[1]==='PageView');}catch{return false;}});
   const calls=await pixel().evaluate(()=>window.__metaCalls);assert.ok(calls.some(c=>c[0]==='init'&&c[1]==='1120983200688486'));assert.ok(calls.some(c=>c[0]==='set'&&c[1]==='autoConfig'&&c[2]===false));
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-analytics-browser-v1')),null);
   const at=Date.now();
   await server.db.prepare('INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id,gift_game) VALUES(?,?,?,?,?,?,?,?)').bind(id,'secret@example.invalid','Secret','["episode-1","atlas-pixelkov"]',2498,at,sessionId,1).run();
   sessions.set(sessionId,{id:sessionId,client_reference_id:id,mode:'payment',amount_total:2498,currency:'eur',livemode:false,status:'complete',payment_status:'paid',payment_intent:{id:'pi_consentbrowser',status:'succeeded'}});
@@ -96,7 +96,7 @@ const {chromium,webkit,devices}=require(process.env.PLAYWRIGHT_MODULE||'playwrig
   assert.deepEqual(await page.evaluate(()=>[PixelkoviaConsent.allows('analytics'),PixelkoviaConsent.allows('marketing')]),[false,false]);
   assert.equal((await server.db.prepare('SELECT count(*) n FROM marketing_visits').first()).n,visitsBefore);
   assert.equal(metaRequests.length,requestsBefore);assert.equal(await page.locator('iframe[src="/assets/meta-pixel"]').count(),0);
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('pixelkovia-funnel-session-v1')),null);assert.equal(await page.evaluate(()=>localStorage.getItem('pixelkovia-analytics-browser-v1')),null);
   // Users can still opt in and withdraw through the footer while prompting is off.
   await page.locator('.privacy-settings-link').click();await page.locator('[name="privacy-analytics"]').check();
   const manualVisit=page.waitForResponse(r=>r.url().includes('/api/marketing/event'));

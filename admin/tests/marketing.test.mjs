@@ -4,6 +4,8 @@ import {fresh} from './support.mjs';
 import {first,execute,hash} from '../src/db.mjs';
 import {marketingEvent,marketingReport,marketingFilters,linkMarketingAttempt,pruneMarketing} from '../src/marketing.mjs';
 import worker from '../src/worker.mjs';
+import {paymentReport} from '../src/payment-monitor.mjs';
+import {calendarDays} from '../src/marketing-series.mjs';
 const origin='https://pixelkovia.rodulab.com',at=Date.UTC(2026,10,10,12),day=86400000;
 const req=()=>new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin,'content-type':'application/json'}});
 const input=(extra={})=>({type:'visit',mode:'session',visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'facebook_ads',campaign:'launch-2026',device:'mobile',...extra});
@@ -28,7 +30,7 @@ test('unmeasured visits/conversions and costs stay unavailable; API requires exi
  const {db,env}=await setup();try{
   const d=await marketingReport(env,new URLSearchParams(),at);assert.equal(d.metrics.visits,null);assert.equal(d.metrics.conversion,null);assert.equal(d.cohort.attempts,null);assert.equal(d.rows[0].purchases,null);assert.equal(d.cac,null);assert.equal(d.metrics.purchases,0);
   const anonymous=await worker.fetch(new Request(origin+'/api/admin/marketing'),{...env,ADMIN_AUTH_MODE:'password'});assert.equal(anonymous.status,401);
-  for(const path of ['/api/admin/marketing','/marketing.js']){const denied=await worker.fetch(new Request(origin+path),{...env,ADMIN_AUTH_MODE:'password'});assert.equal(denied.status,path.startsWith('/api/')?401:303);}
+  for(const path of ['/api/admin/marketing','/marketing.js','/marketing-charts.js']){const denied=await worker.fetch(new Request(origin+path),{...env,ADMIN_AUTH_MODE:'password'});assert.equal(denied.status,path.startsWith('/api/')?401:303);}
   const forged=await worker.fetch(new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin:'https://attacker.invalid','content-type':'application/json'},body:JSON.stringify(input())}),env);assert.equal(forged.status,403);
   await assert.rejects(marketingEvent(req(),env,input({mode:'persistent'}),at),e=>e.status===400);
   await assert.rejects(marketingEvent(req(),env,input({mode:undefined,consent:true}),at),e=>e.status===400);
@@ -131,5 +133,69 @@ test('checkout still succeeds if attribution storage fails; browser cannot forge
   assert.equal(response.status,200);assert.equal((await response.json()).sessionId,'cs_test_marketingfixture');await Promise.all(pending);
   assert.equal((await first(db,'SELECT count(*) n FROM orders')).n,0);
   await assert.rejects(marketingEvent(req(),env,input({type:'paid'})),e=>e.status===400);
+ }finally{db.close();}
+});
+
+test('daily sources use real Bratislava days, unique browsers deduplicate across sessions and sources without backfill',async()=>{
+ const {db,env}=await setup();try{
+  await execute(db,'UPDATE marketing_state SET unique_started_at=?',at-2*day);
+  const browserA=crypto.randomUUID(),browserB=crypto.randomUUID();
+  await marketingEvent(req(),env,input(),at-3*day);
+  await marketingEvent(req(),env,input({browserId:browserA,type:'checkout'}),at-day);
+  const today=input({browserId:browserA});await marketingEvent(req(),env,today,at-5000);await marketingEvent(req(),env,today,at-4500);
+  await marketingEvent(req(),env,input({browserId:browserA,source:'instagram_ads',type:'checkout'}),at-4000);
+  await marketingEvent(req(),env,input({browserId:browserB,source:'instagram_ads'}),at-3000);
+  await marketingEvent(req(),env,input({source:'unknown'}),at-2000);
+  const report=await marketingReport(env,new URLSearchParams({period:'7'}),at),charts=report.charts,todayRow=charts.days.at(-1);
+  assert.equal(charts.days.length,7);assert.equal(todayRow.date,'2026-11-10');
+  assert.equal(todayRow.visits,4);assert.equal(todayRow.uniqueVisitors,2);assert.equal(todayRow.checkouts,1);assert.equal(todayRow.uniqueCheckouts,1);
+  assert.equal(todayRow.checkoutRate,.25);assert.equal(todayRow.uniqueCheckoutRate,.5);assert.equal(todayRow.uniquePartial,true);assert.equal(todayRow.unidentifiedVisits,1);
+  assert.equal(todayRow.sources.find(row=>row.source==='facebook_ads').uniqueVisitors,1);
+  assert.equal(todayRow.sources.find(row=>row.source==='instagram_ads').uniqueVisitors,1);
+  assert.equal(todayRow.sources.reduce((sum,row)=>sum+row.uniqueVisitors,0),todayRow.uniqueVisitors);
+  assert.equal(charts.uniqueVisitors,2);assert.equal(charts.uniqueCheckouts,1);
+  assert.equal(charts.days.find(row=>row.date==='2026-11-07').uniqueVisitors,null);
+  assert.equal(charts.days.find(row=>row.date==='2026-11-07').visits,1);
+  const instagram=(await marketingReport(env,new URLSearchParams({period:'7',source:'instagram_ads'}),at)).charts.days.at(-1);
+  assert.equal(instagram.visits,2);assert.equal(instagram.uniqueVisitors,2);assert.equal(instagram.sources.length,1);
+  const unavailable=(await marketingReport(env,new URLSearchParams({product:'game'}),at)).charts;
+  assert.ok(unavailable.days.every(row=>row.visits===null&&row.uniqueVisitors===null));assert.equal(unavailable.uniqueVisitors,null);
+  const stored=await first(db,'SELECT browser_id FROM marketing_visits WHERE id=?',today.visitId);
+  assert.equal(stored.browser_id,await hash('browser:'+browserA));assert.ok(!JSON.stringify(report).includes(browserA));
+ }finally{db.close();}
+});
+
+test('daily calendar buckets cover DST once and the new 90-day preset includes today',()=>{
+ for(const [date,hours]of [['2026-03-29',23],['2026-10-25',25]]){
+  const f=marketingFilters(new URLSearchParams({period:'custom',from:date,to:date}),at),days=calendarDays(f);
+  assert.equal(days.length,1);assert.equal((days[0].end-days[0].start)/3600000,hours);
+ }
+ const f=marketingFilters(new URLSearchParams({period:'90'}),at);assert.equal(calendarDays(f).length,90);assert.equal(f.to,'2026-11-10');
+});
+
+test('purchase drill-down returns the exact paid set for every report filter, including old attempts, gifts and refunds',async t=>{
+ t.mock.method(Date,'now',()=>at);
+ const {db,env}=await setup();try{
+  const v=input();await marketingEvent(req(),env,v,at-10000);
+  const gift=await attempt(db,{visitId:v.visitId,created:at-40*day});
+  const refund=await attempt(db,{refund:true,gift:false,total:1499});
+  await attempt(db,{gift:false,total:0});await attempt(db,{gift:false,paid:null,orders:false});
+  await attempt(db,{paid:at+1000});
+  const filters=[{}, {source:'facebook_ads'}, {source:'unknown'}, {campaign:'launch-2026'}, {device:'mobile'}, {product:'game'}, {source:'instagram_ads'}];
+  for(const filter of filters){
+   const params=new URLSearchParams({period:'today',...filter}),report=await marketingReport(env,params,at);
+   params.set('scope','funnel');params.set('asOf',String(at));params.set('days','all');
+   const payments=await paymentReport(env,params,true);
+   assert.equal(payments.matchingTotal,report.periodMetrics.purchases,JSON.stringify(filter));
+   if(!Object.keys(filter).length)assert.deepEqual(new Set(payments.rows.map(row=>row.id)),new Set([gift,refund]));
+   if(filter.source==='facebook_ads')assert.deepEqual(payments.rows.map(row=>row.id),[gift]);
+  }
+  for(let index=0;index<45;index++)await attempt(db,{gift:false,orders:false});
+  const params=new URLSearchParams({scope:'funnel',period:'today',asOf:String(at),days:'all'});
+  const firstPage=await paymentReport(env,params,true);assert.equal(firstPage.matchingTotal,47);assert.equal(firstPage.rows.length,40);assert.equal(firstPage.hasMore,true);
+  params.set('cursor',firstPage.nextCursor);
+  const nextPage=await paymentReport(env,params,true);assert.equal(nextPage.matchingTotal,47);assert.equal(nextPage.rows.length,7);assert.equal(nextPage.hasMore,false);
+  assert.equal(new Set([...firstPage.rows,...nextPage.rows].map(row=>row.id)).size,47);
+  await assert.rejects(paymentReport(env,new URLSearchParams({scope:'funnel',asOf:String(at+10000)}),true),error=>error.status===400);
  }finally{db.close();}
 });

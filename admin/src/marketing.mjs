@@ -1,13 +1,14 @@
 import {HttpError} from './auth.mjs';
 import {first,query,execute,hash} from './db.mjs';
+import {dailyMarketing} from './marketing-series.mjs';
 import {attemptFor} from './payment-monitor.mjs';
 
-export const sources={facebook_ads:'Facebook reklama',instagram_ads:'Instagram reklama',meta:'Meta (UTM)',facebook:'Facebook (UTM)',instagram:'Instagram (UTM)',influencer:'Influencer',direct:'Priame návštevy',organic:'Organic',unknown:'Ostatné / neznáme'};
+import {sources,safeCampaign,marketingFilters,attemptsCTE,conditions} from './marketing-query.mjs';
+export {sources,safeCampaign,marketingFilters} from './marketing-query.mjs';
 const devices=['mobile','desktop','tablet','unknown'];
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 const validId=value=>typeof value==='string'&&uuid.test(value);
 const day=86400000;
-export const safeCampaign=value=>typeof value==='string'&&/^[a-zA-Z0-9_. -]{1,80}$/.test(value)?value:'';
 // No raw URL, referrer, UA, IP, email, form value or arbitrary event properties.
 export async function marketingEvent(request,env,input,at=Date.now()){
   if(input.mode!=='session'||!['visit','checkout'].includes(input.type)||!validId(input.visitId)||!validId(input.visitorId))throw new HttpError(400,'Neplatná analytická udalosť alebo režim návštevnej relácie.');
@@ -16,7 +17,7 @@ export async function marketingEvent(request,env,input,at=Date.now()){
   if(limit.attempts>60)throw new HttpError(429,'Príliš veľa udalostí.');
   const source=Object.hasOwn(sources,input.source)?input.source:'unknown',device=devices.includes(input.device)?input.device:'unknown';
   await db.batch([
-    db.prepare(`INSERT INTO marketing_visits VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET last_at=max(last_at,excluded.last_at),checkout_at=coalesce(checkout_at,excluded.checkout_at) WHERE visitor_id=excluded.visitor_id`).bind(input.visitId,await hash(input.visitorId),source,safeCampaign(input.campaign),device,at,input.type==='checkout'?at:null,at),
+    db.prepare(`INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET last_at=max(last_at,excluded.last_at),checkout_at=coalesce(checkout_at,excluded.checkout_at),browser_id=coalesce(browser_id,excluded.browser_id) WHERE visitor_id=excluded.visitor_id`).bind(input.visitId,await hash(input.visitorId),source,safeCampaign(input.campaign),device,at,input.type==='checkout'?at:null,at,validId(input.browserId)?await hash('browser:'+input.browserId):null),
     db.prepare('UPDATE marketing_state SET last_event_at=? WHERE id=1').bind(at)
   ]);
   return {recorded:true};
@@ -28,61 +29,6 @@ export async function linkMarketingAttempt(env,input,at=Date.now()){
   if(!visit)return;
   const attempt=await attemptFor(env,{attemptKey:input.attemptKey});
   if(attempt)await execute(env.TQ_DB,'INSERT OR IGNORE INTO marketing_attribution VALUES(?,?,?)',attempt.id,visit.id,at);
-}
-function localDate(at){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(at);}
-function midnight(date){
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T00:00:00Z'))||new Date(date+'T00:00:00Z').toISOString().slice(0,10)!==date)throw new HttpError(400,'Neplatný dátum.');
-  const utc=Date.parse(date+'T00:00:00Z');let value=utc;
-  for(let i=0;i<3;i++){
-    const parts=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(value);
-    const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));value=utc-(Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second)-value);
-  }
-  return value;
-}
-export function marketingFilters(params,at=Date.now()){
-  const period=params.get('period')||'14',today=localDate(at);let start,end;
-  if(period==='custom'){
-    start=midnight(params.get('from')||'');const last=midnight(params.get('to')||'');end=midnight(localDate(last+36*3600000));
-    if(last<start||end-start>366*day||start>at)throw new HttpError(400,'Rozsah musí byť minulý alebo aktuálny, najviac 366 dní.');
-  }else{
-    if(!['today','7','14','30'].includes(period))throw new HttpError(400,'Neplatné obdobie.');
-    start=midnight(localDate(midnight(today)-(period==='today'?0:Number(period)-1)*day+12*3600000));end=at+1;
-  }
-  const source=params.get('source')||'',device=params.get('device')||'',product=params.get('product')||'',campaign=params.get('campaign')||'';
-  if((source&&!Object.hasOwn(sources,source))||(device&&!devices.includes(device))||!['','game','books','combination'].includes(product)||(campaign&&safeCampaign(campaign)!==campaign))throw new HttpError(400,'Neplatný filter.');
-  return {period,from:localDate(start),to:localDate(Math.min(end-1,at)),start,end:Math.min(end,at+1),source,device,product,campaign};
-}
-// Each row is one Stripe Session / transaction, including a gift purchase.
-// Orders, entitlements and access emails are aggregated separately, before joins.
-const attemptsCTE=`WITH linked AS (
- SELECT a.id attempt_id,o.id order_id FROM checkout_attempts a JOIN orders o ON o.external_reference=a.stripe_session_id
- UNION SELECT attempt_id,order_id FROM checkout_orders
-), os AS (
- SELECT l.attempt_id,count(*) order_count,min(o.paid_at) order_paid_at,
- sum(o.status IN('paid','refunded')) settled_orders,
- sum(CASE WHEN o.status='paid' AND (d.order_id IS NULL OR d.status='failed' OR (d.status<>'sent' AND o.created_at<?)) THEN 1 ELSE 0 END) delivery_issues,
- sum((SELECT count(*) FROM entitlements e JOIN order_items i ON i.id=e.order_item_id WHERE i.order_id=o.id AND e.product_id='episode-1' AND e.status='valid')) game_accesses,
- sum(o.status='refunded') refund_orders
- FROM linked l JOIN orders o ON o.id=l.order_id LEFT JOIN access_deliveries d ON d.order_id=o.id GROUP BY l.attempt_id
-), a AS (
- SELECT c.id,c.created_at,c.total_cents,c.selection,c.gift_game,c.stripe_session_id,
- coalesce(p.paid_at,CASE WHEN os.settled_orders>0 THEN os.order_paid_at END) paid_at,
- CASE WHEN c.total_cents>0 AND (p.paid_at IS NOT NULL AND p.state IN('paid','refunded') OR os.settled_orders>0) THEN 1 ELSE 0 END paid,
- CASE WHEN c.total_cents=0 AND (p.paid_at IS NOT NULL AND p.state='free' OR os.settled_orders>0) THEN 1 ELSE 0 END free,
- coalesce(os.order_count,0) order_count,coalesce(os.game_accesses,0) game_accesses,
- CASE WHEN p.state IN('paid','free') AND coalesce(os.order_count,0)<CASE WHEN c.gift_game=1 THEN 2 ELSE 1 END AND p.paid_at<? THEN 1 ELSE 0 END fulfillment_issue,
- coalesce(os.delivery_issues,0) delivery_issues,
- CASE WHEN p.state='refunded' OR os.refund_orders>0 THEN 1 ELSE 0 END refunded,
- coalesce(v.source,'unknown') source,coalesce(v.campaign,'') campaign,coalesce(v.device,'unknown') device,
- m.visit_id,v.visitor_id,v.started_at visit_started_at,v.checkout_at,
- CASE WHEN EXISTS(SELECT 1 FROM json_each(c.selection) WHERE value='episode-1') THEN CASE WHEN EXISTS(SELECT 1 FROM json_each(c.selection) WHERE value IN('story-book-before','story-book-after')) THEN 'combination' ELSE 'game' END ELSE 'books' END product
- FROM checkout_attempts c LEFT JOIN payment_observations p ON p.attempt_id=c.id LEFT JOIN os ON os.attempt_id=c.id
- LEFT JOIN marketing_attribution m ON m.attempt_id=c.id LEFT JOIN marketing_visits v ON v.id=m.visit_id
-)`;
-function conditions(f,alias='a'){
-  const clauses=[],values=[];
-  for(const key of ['source','device','campaign','product'])if(f[key]){clauses.push(`${['source','device'].includes(key)?`coalesce(${alias}.${key},'unknown')`:`${alias}.${key}`}=?`);values.push(f[key]);}
-  return {sql:clauses.length?' AND '+clauses.join(' AND '):'',values};
 }
 export async function marketingReport(env,params,at=Date.now()){
   const db=env.TQ_DB,f=marketingFilters(params,at),filter=conditions(f),vf=conditions({...f,product:''},'v');
@@ -121,7 +67,7 @@ export async function marketingReport(env,params,at=Date.now()){
     const v=visitSources.find(r=>r.source===key),c=cohorts.find(r=>r.source===key),p=calendarSources.find(r=>r.source===key),n=visitAvailable?(v?.visits||0):null;
     return {source:key,label,visits:n,purchases:collectionInRange?(c?.purchases||0):null,periodPurchases:p?.purchases||0,conversion:!conversionReason&&n>0?(c?.purchases||0)/n:null};
   });
-  return {generatedAt:at,collectionEnabled,periodMetrics,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
+  return {generatedAt:at,collectionEnabled,periodMetrics,charts:await dailyMarketing(db,f,state,at),filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
     metrics:{visits:visitAvailable?visits.visits:null,checkouts:collectionInRange&&!f.product?visits.checkouts:null,purchases:metric.purchases,revenueCents:metric.revenue,orders:metric.orders,gameAccesses:metric.game_accesses,refunds:metric.refunds,accessIssues:metric.access_issues,accessIssueOrders:metric.access_issue_orders,attributedPurchases:metric.attributed,technicalSignals:issues.signals,technicalAttempts:issues.attempts,conversion:conversionReason?null:cohortTotal.purchases/visits.visits},
     cohort:{attempts:collectionInRange?cohortTotal.attempts:null,purchases:collectionInRange?cohortTotal.purchases:null},rows,campaigns:campaigns.map(r=>r.campaign),conversionReason,
     costs:null,cac:null,costReason:'Meta Ads nemá nakonfigurovaný autorizovaný zdroj výdavkov. Automatický import ani manuálne výdavky nie sú pripojené.',coverage:null,

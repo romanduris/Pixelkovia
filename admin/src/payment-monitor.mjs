@@ -1,3 +1,4 @@
+import {marketingFilters,attemptsCTE,conditions} from './marketing-query.mjs';
 import {HttpError} from './auth.mjs';
 import {first,query,execute,hash} from './db.mjs';
 
@@ -163,6 +164,15 @@ export async function paymentReport(env,params,ready){
   const cursor=readAttemptCursor(params.get('cursor')),through=readAttemptCursor(params.get('through'));
   if((cursor&&through)||((cursor||through)&&requestedPage!==1))throw new HttpError(400,'Neplatná kombinácia stránkovania.');
   const at=Date.now(),since=days==='all'?0:at-days*86400000,db=env.TQ_DB;
+  const scope=params.get('scope')||'';if(!['','funnel'].includes(scope))throw new HttpError(400,'Neplatný rozsah platieb.');
+  let funnel=null,paidIds=null;
+  if(scope==='funnel'){
+    const asOf=Number(params.get('asOf')||at);
+    if(!Number.isSafeInteger(asOf)||asOf<0||asOf>at+1000)throw new HttpError(400,'Neplatný čas prehľadu.');
+    funnel=marketingFilters(params,Math.min(asOf,at));
+    const filter=conditions(funnel);
+    paidIds=(await query(db,attemptsCTE+` SELECT id FROM a WHERE paid=1 AND paid_at>=? AND paid_at<?`+filter.sql,at-600000,at-120000,funnel.start,funnel.end,...filter.values)).map(row=>row.id);
+  }
   // Signal history is independent of the selected event category and row batch.
   const signalGroups=await query(db,`SELECT l.attempt_id,a.id linked_id,l.category,count(*) count,max(l.created_at) latest_at FROM payment_log l
     LEFT JOIN checkout_attempts a ON a.id=l.attempt_id LEFT JOIN payment_event_reviews r ON r.event_id=l.id
@@ -189,7 +199,7 @@ export async function paymentReport(env,params,ready){
     coalesce(os.order_count,0) order_count,coalesce(os.delivery_errors,0) delivery_errors,coalesce(os.delivery_delays,0) delivery_delays,os.order_states,os.orders_paid,os.has_refund,os.fulfilled_at,
     coalesce(os.delivery_count,0) delivery_count,coalesce(os.sent_count,0) sent_count,coalesce(os.failed_count,0) failed_count,coalesce(os.queued_count,0) queued_count,os.sent_at
     FROM checkout_attempts a LEFT JOIN payment_observations p ON p.attempt_id=a.id LEFT JOIN payment_methods m ON m.attempt_id=a.id
-    LEFT JOIN payment_attempt_outcomes s ON s.attempt_id=a.id LEFT JOIN order_summary os ON os.attempt_id=a.id WHERE a.created_at>=? ORDER BY a.created_at DESC,a.id`,at-600000,since);
+    LEFT JOIN payment_attempt_outcomes s ON s.attempt_id=a.id LEFT JOIN order_summary os ON os.attempt_id=a.id WHERE ${funnel?'a.id IN (SELECT value FROM json_each(?))':'a.created_at>=?'} ORDER BY a.created_at DESC,a.id`,at-600000,funnel?JSON.stringify(paidIds):since);
   const counts={paid:0,free:0,refunded:0,failed:0,pending:0,ready:0,expired:0,unknown:0},matching=[];let attemptsWithIssues=0;
   for(const a of attempts){
     const status=a.has_refund?'refunded':a.orders_paid===1?(a.total_cents===0?'free':'paid'):a.observed_state||'unknown';counts[status]++;
@@ -244,5 +254,5 @@ export async function paymentReport(env,params,ready){
   const attention={attemptsInPeriod:attemptsWithIssues,linkedAttempts24:signalMap.size,unlinkedTechnical,eventTotal:signalGroups.reduce((sum,g)=>sum+g.count,0),reviewedTotal:reviewed.count,events:attentionEvents.map(l=>({...l,label:paymentTypes[l.type]?.[1]||'Neznáme'}))};
   const stale=checks.length<2||checks.some(c=>at-c.checked_at>1800000),badChecks=checks.some(c=>!c.ok);
   const needsAttention=!ready||badChecks||errors24.count>0||declines24.count>0||deliveries.failed>0||deliveries.delayed>0||fulfillment.count>0;
-  return {generatedAt:at,days,category,attemptStatus,attentionOnly,attemptId,attention,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
+  return {generatedAt:at,funnel,days,category,attemptStatus,attentionOnly,attemptId,attention,attemptCounts,page,pages,pageSize,hasMore,nextCursor,refreshCursor,matchingTotal:matching.length,enabled:ready,health:needsAttention?'attention':stale?'stale':'observing',counts,total:attempts.length,technical,errors24:errors24.count,declines24:declines24.count,recent,deliveries:{failed:deliveries.failed||0,delayed:deliveries.delayed||0},fulfillmentDelayed:fulfillment.count,lastSuccessAt:lastSuccess?.at||null,checks,rows,logs:logs.map(l=>({...l,label:paymentTypes[l.type]?.[1]||l.type})),retentionDays:90};
 }

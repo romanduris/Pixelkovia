@@ -51,7 +51,7 @@ report.rows[0].createdAt=Date.UTC(2026,10,6,7,18);
     }
     if(url.pathname==='/api/admin/dashboard')return route.fulfill({json:{metrics:{customers:1,paidOrders:1,revenueByCurrency:{EUR:1499},purchasedGames:1,unactivated:1,activated:0,playing:0,completed:0,meanCompletionMs:null,medianCompletionMs:null},charts:{purchases:[],activations:[],completions:[]},funnel:[],cohort:''}});
     if(url.pathname==='/api/admin/feedback')return route.fulfill({json:[]});
-    const files={'/admin':'index.html','/admin/':'index.html','/admin/admin.js':'admin.js','/admin/marketing.js':'marketing.js','/admin/admin.css':'admin.css','/admin/payment-methods/apple-pay.svg':'payment-methods/apple-pay.svg','/admin/payment-methods/google-pay.svg':'payment-methods/google-pay.svg','/admin/payment-methods/card.svg':'payment-methods/card.svg'},file=files[url.pathname];
+    const files={'/admin':'index.html','/admin/':'index.html','/admin/admin.js':'admin.js','/admin/marketing.js':'marketing.js','/admin/marketing-charts.js':'marketing-charts.js','/admin/admin.css':'admin.css','/admin/payment-methods/apple-pay.svg':'payment-methods/apple-pay.svg','/admin/payment-methods/google-pay.svg':'payment-methods/google-pay.svg','/admin/payment-methods/card.svg':'payment-methods/card.svg'},file=files[url.pathname];
     if(!file)return route.fulfill({status:404,body:''});return route.fulfill({contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'text/html',body:fs.readFileSync('admin/public/'+file)});
   });
   const ready=()=>page.waitForFunction(()=>document.querySelector('#view').getAttribute('aria-busy')==='false');
