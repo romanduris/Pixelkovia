@@ -2,7 +2,7 @@
 import {HttpError} from './auth.mjs';
 const day=86400000;
 const devices=['mobile','desktop','tablet','unknown'];
-export const sources={facebook_ads:'Facebook reklama',instagram_ads:'Instagram reklama',meta:'Meta (UTM)',facebook:'Facebook (UTM)',instagram:'Instagram (UTM)',influencer:'Influencer',direct:'Priame návštevy',organic:'Organic',unknown:'Ostatné / neznáme'};
+export const sources={facebook_ads:'Facebook reklama',instagram_ads:'Instagram reklama',meta:'Meta (UTM)',facebook:'Facebook odkaz',instagram:'Instagram odkaz',influencer:'Influencer',direct:'Priame návštevy',organic:'Organic',unknown:'Ostatné / neznáme'};
 export const safeCampaign=value=>typeof value==='string'&&/^[a-zA-Z0-9_. -]{1,80}$/.test(value)?value:'';
 export function localDate(at){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(at);}
 export function midnight(date){
