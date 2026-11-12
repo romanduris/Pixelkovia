@@ -496,7 +496,6 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-source-group button[aria-expanded="true"] .marketing-source-arrow{transform:rotate(90deg)}
 .marketing-source-child{background:#0d192b}
 .marketing-table-wrap .marketing-source-child th:first-child{padding-left:36px;color:#b6c9e0;font-size:12px}
-@media(max-width:750px){.marketing-table-wrap .marketing-source-child{margin-left:12px;width:calc(100% - 12px);border-left:2px solid #344c68}.marketing-table-wrap .marketing-source-child th:first-child{padding-left:0;font-size:13px}.marketing-source-group th button{min-height:44px}}
 .marketing-table-wrap tbody tr:last-child :is(td,th){border-bottom:0}
 .marketing-table-wrap tbody th{background:transparent;text-transform:none;letter-spacing:0}
 .marketing-table-wrap tbody tr:hover{background:#17243a}
@@ -523,22 +522,43 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
   .marketing-toolbar-actions{justify-content:flex-start;gap:6px}.marketing-toolbar-actions select{flex:1;min-width:0}
   .marketing-dashboard button,.marketing-dashboard select{min-height:44px;font-size:13px}.marketing-dashboard .marketing-icon-button{width:44px}
   .marketing-toolbar-meta{font-size:12px;gap:4px}.marketing-timezone{display:none}
-  .marketing-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:0 2px 8px}.marketing-kpi>summary{padding:12px;gap:6px}
-  .marketing-kpi:nth-child(odd){border-left:0}.marketing-kpi:nth-child(n+3){border-top:1px solid var(--m-border)}.marketing-kpi:last-child{grid-column:1/-1}
-  .marketing-kpi-label{font-size:13px}.marketing-kpi strong{font-size:27px}.marketing-kpi small{font-size:11px;line-height:1.6}
-  .marketing-kpi strong.is-unavailable{font-size:17px;line-height:2}.marketing-kpi>p{padding:0 12px 12px}
+  .marketing-kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:0;padding:0}
+  .marketing-kpi{grid-column:span 2}.marketing-kpi>summary{padding:8px 10px;gap:4px;min-height:70px}
+  .marketing-kpi:nth-child(n+4){grid-column:span 3;border-top:1px solid var(--m-border)}.marketing-kpi:nth-child(4){border-left:0}
+  .marketing-kpi-label{font-size:11px;line-height:1.3;min-height:22px;align-items:flex-start;gap:3px}
+  .marketing-kpi .marketing-info{width:13px;height:13px;font-size:9px;margin-left:2px}
+  .marketing-kpi strong{font-size:24px;line-height:1.2}.marketing-kpi small{display:none}
+  .marketing-kpi:nth-child(n+4)>summary{display:grid;grid-template-columns:1fr auto;align-items:center}
+  .marketing-kpi:nth-child(n+4) .marketing-kpi-label{grid-column:1/-1;min-height:16px}
+  .marketing-kpi:nth-child(n+4) strong{grid-column:1}
+  .marketing-kpi .marketing-purchase-link{min-height:32px}
+  #marketing-kpi-purchases small{display:block;grid-column:2;grid-row:2;font-size:10px;line-height:1.3;text-align:right}
+  .marketing-kpi strong.is-unavailable{font-size:14px;line-height:1.5;overflow-wrap:anywhere}.marketing-kpi>p{padding:0 10px 10px;font-size:12px}
+  .marketing-kpi[open]{grid-column:1/-1;border-left:0}
+  .marketing-funnel>.marketing-section-heading{padding:9px 10px 7px;gap:6px}.marketing-funnel>.marketing-section-heading h2{font-size:13px}
+  .marketing-funnel>.marketing-section-heading>span{font-size:10px}
+  .marketing-funnel>.marketing-disclosure>summary,.marketing-sources>.marketing-disclosure>summary{min-height:36px;padding:7px 10px;font-size:12px}
   .marketing-quality{align-items:flex-start;flex-wrap:wrap;gap:6px;font-size:12px}.marketing-quality .marketing-period-note{flex-basis:calc(100% - 30px)}
   .marketing-quality button{margin-left:22px;min-height:36px;background:transparent}
   .marketing-section-heading{padding:12px 14px 8px}.marketing-section-heading>span{font-size:11px}
-  .marketing-period-toggle{min-height:44px}.marketing-table-wrap thead{display:none}
-  .marketing-mobile-sort{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 14px 8px;color:var(--m-muted);font-size:12px}
-  .marketing-mobile-sort select{min-width:0;max-width:75%;background:#111c30}
-  .marketing-table-wrap table,.marketing-table-wrap tbody{display:block;width:100%}
-  .marketing-table-wrap tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;padding:12px 14px;border-bottom:1px solid var(--m-border)}
-  .marketing-table-wrap :is(th,td){display:block;width:auto;text-align:left;padding:0;border:0;font-size:15px;min-width:0}
-  .marketing-table-wrap th:first-child{grid-column:1/-1;width:auto;padding:0;font-size:14px;font-weight:600}
-  .marketing-table-wrap td::before{display:block;content:attr(data-label);font-size:12px;color:var(--m-muted);margin-bottom:3px}
-  .marketing-table-wrap tbody tr:last-child{border:0}.marketing-source-footer{padding:6px 14px;font-size:12px}
+  .marketing-period-toggle{min-height:36px}
+  .marketing-sources>.marketing-section-heading{padding:4px 10px;gap:4px}.marketing-sources>.marketing-section-heading h2{font-size:12px}
+  .marketing-sources .marketing-period-toggle{font-size:11px;gap:5px}
+  .marketing-table-wrap{overflow-x:auto;overscroll-behavior-x:contain}
+  .marketing-table-wrap table{min-width:290px}
+  .marketing-table-wrap table:has([data-marketing-sort-header="periodPurchases"]:not([hidden])){min-width:420px}
+  .marketing-table-wrap th,.marketing-table-wrap td{padding:6px 4px;font-size:12px;overflow-wrap:normal}
+  .marketing-table-wrap th:first-child{width:32%;padding-left:10px;overflow-wrap:anywhere}
+  .marketing-table-wrap thead th{font-size:11px}
+  .marketing-table-wrap [data-marketing-sort-header="visits"]{width:19%}
+  .marketing-table-wrap [data-marketing-sort-header="purchases"]{width:22%}
+  .marketing-table-wrap [data-marketing-sort-header="conversion"]{width:27%}
+  .marketing-table-wrap table:has([data-marketing-sort-header="periodPurchases"]:not([hidden])) thead th{width:19%}
+  .marketing-table-wrap table:has([data-marketing-sort-header="periodPurchases"]:not([hidden])) thead th:first-child{width:24%}
+  .marketing-table-wrap thead th button{font-size:11px;min-height:40px;padding:4px 0;gap:1px}
+  .marketing-source-group th button{min-height:42px;padding:6px 0;gap:4px}
+  .marketing-table-wrap .marketing-source-child th:first-child{padding-left:20px;font-size:11px}
+  .marketing-source-footer{padding:6px 10px;font-size:11px}
   .marketing-business{grid-template-columns:1fr;gap:12px}
   .marketing-metric{margin:0 14px}.marketing-metric>summary{min-height:44px;flex-wrap:wrap;gap:5px 10px}
   .marketing-metric>summary>span{font-size:13px}.marketing-metric strong{font-size:14px}.marketing-revenue strong{font-size:23px}
@@ -547,7 +567,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
   .marketing-filter-panel{padding:12px}.marketing-filter-actions{flex-wrap:wrap}.marketing-custom-dates{grid-template-columns:repeat(2,minmax(0,1fr))}
   .marketing-filter-chips button{font-size:12px}
 }
-@media(max-width:360px){.marketing-filters{grid-template-columns:1fr}.marketing-kpi-label{font-size:12px}.marketing-kpi>summary{padding:10px}.marketing-kpi small{font-size:11px}.marketing-toolbar-actions{display:grid;grid-template-columns:1fr auto auto}.marketing-toolbar-actions #marketing-logout:not([hidden]){grid-column:3;justify-self:end}.marketing-toolbar-actions button,.marketing-toolbar-actions select{padding-left:8px;padding-right:8px}}
+@media(max-width:360px){.marketing-filters{grid-template-columns:1fr}.marketing-kpi>summary{padding-inline:8px}.marketing-table-wrap td{font-size:11px}.marketing-table-wrap thead th button{font-size:10px}.marketing-sources>.marketing-section-heading h2{font-size:11px}.marketing-sources .marketing-period-toggle{font-size:10.5px}.marketing-toolbar-actions{display:grid;grid-template-columns:1fr auto auto}.marketing-toolbar-actions #marketing-logout:not([hidden]){grid-column:3;justify-self:end}.marketing-toolbar-actions button,.marketing-toolbar-actions select{padding-left:8px;padding-right:8px}}
 
 /* Daily first-party observations and exact paid-transaction drill-down. */
 .marketing-period-buttons{display:flex;gap:3px;padding:3px;border:1px solid #34475f;border-radius:8px;background:#0c1729}
