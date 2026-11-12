@@ -6,6 +6,8 @@ Používa sa účet Stripe **Pixelkovia**, `acct_1UVB5BGle1VvIsLT`, jednorazové
 
 Kľúče patria do **Codespaces secrets**, s prístupom repozitára `romanduris/Pixelkovia`, a do Cloudflare Worker secrets. Nezadávajú sa do chatu, Git súborov ani argumentov príkazu.
 
+Aktuálny inventár trvalého uloženia, chýbajúce kópie a postup obnovy sú v [prehľade projektových secrets](project-secrets.md). Repository Codespaces secrets pretrvajú zmazanie jednotlivého Codespace; samotná lokálna premenná nestačí.
+
 - `PIXELKOVIA_TOKEN`: existujúci Cloudflare token.
 - `CUSTOMER_AUTH_SECRET`: existujúci náhodný autentifikačný a šifrovací kľúč; po začatí predaja ho neotáčať bez samostatného migračného postupu.
 - `STRIPE_SECRET_KEY`: preferovaný obmedzený `rk_live_` kľúč pre vlastný server. Potrebuje čítanie účtu a relácií, tvorbu Checkout Sessions a správu platobného webhooku.
