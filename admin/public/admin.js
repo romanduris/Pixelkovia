@@ -1,4 +1,4 @@
-import {marketing,marketingParams,bindMarketing,rememberMarketing,sourceNames,marketingDevices,marketingProducts} from './marketing.js';
+import {marketing,marketingParams,bindMarketing,rememberMarketing,refreshMarketingAge,sourceNames,marketingDevices,marketingProducts} from './marketing.js';
 const $=s=>document.querySelector(s);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const date=value=>value==null?'—':new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(value);
@@ -680,4 +680,4 @@ $('#close-detail').addEventListener('click',()=>{detailId++;$('#detail').close()
 setInterval(refreshPaymentHealth,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshPaymentHealth();});
 
-setInterval(()=>{const label=document.querySelector('.marketing-freshness');if(label&&Date.now()-Number(label.dataset.generated)>300000){label.textContent='Prehľad je starší než 5 minút. Obnovte údaje pred rozhodovaním.';label.setAttribute('role','alert');}},30000);
+setInterval(refreshMarketingAge,30000);
