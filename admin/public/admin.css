@@ -735,3 +735,5 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-ads-campaign{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:12px}
 .marketing-ads-campaign label{display:grid;gap:5px;flex:1 1 190px;min-width:0}
 .marketing-ads-campaign input{width:100%;min-width:0;min-height:40px;box-sizing:border-box;color:var(--text);background:#18243b;border:1px solid #3e4f70;border-radius:5px;padding:7px 9px}
+
+.admin-social-download{display:inline-flex;align-items:center;min-height:44px;color:var(--mint);font-size:12px;text-underline-offset:4px}

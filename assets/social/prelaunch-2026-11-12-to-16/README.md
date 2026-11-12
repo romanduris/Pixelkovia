@@ -2,6 +2,10 @@
 
 Osem statických návrhov pre Facebook a Instagram. **Pripravené na schválenie vlastníkom; nič nebolo publikované ani naplánované na sociálnych sieťach.** Predajný web, checkout, ceny, administrácia aj hra zostali bez zmien.
 
+## Stiahnutie
+
+Celý ZIP je dostupný po prihlásení správcu na [pixelkovia.rodulab.com/admin/social/Pixelkovia-prispevky-12-16-november-2026.zip](https://pixelkovia.rodulab.com/admin/social/Pixelkovia-prispevky-12-16-november-2026.zip). V administrácii je aj odkaz **Príspevky 12.–16. 11. · ZIP**. Archív sa vytvára pri zostavení z týchto zdrojov; samostatná lokálna kópia nie je potrebná.
+
 ## Obsah balíka
 
 | Plánovaný deň | Súbor | Formát | Posolstvo |

@@ -3,6 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {build} from '../admin/node_modules/esbuild/lib/main.js';
 import vm from 'node:vm';
+import {execFileSync} from 'node:child_process';
 const root=fileURLToPath(new URL('../',import.meta.url));
 async function files(directory,prefix=''){const list=[];for(const item of await readdir(directory,{withFileTypes:true})){const relative=prefix+item.name;if(item.isDirectory())list.push(...await files(path.join(directory,item.name),relative+'/'));else list.push(relative);}return list;}
 export async function prepareProtected(output){
@@ -22,6 +23,8 @@ export async function prepareProtected(output){
   await add('/signal-print.css','signal-print.css','game');
   for(const [route,file,role]of documents)await add(route,file,role,true);
   for(const file of await files(path.join(root,'assets'))){
+    // Social authoring files are delivered to the administrator as one archive.
+    if(file.startsWith('social/'))continue;
     // Previous lifestyle illustrations remain sources for existing social covers only.
     if(/^sales\/family-.*\.webp$/.test(file))continue;
     if(!/\.(?:webp|png|svg|mp3|mp4|pdf|ttf|ico)$/.test(file))continue;
@@ -29,6 +32,11 @@ export async function prepareProtected(output){
     const role=/^books\/(before|after)-[123]\.webp$/.test(file)?'book-'+file.split('/')[1].split('-')[0]:file.startsWith('finale-production/')&&!file.endsWith('start-a.png')?'admin':'game';
     await add('/'+relative,relative,role);
   }
+  const campaign='prelaunch-2026-11-12-to-16',download='Pixelkovia-prispevky-12-16-november-2026.zip';
+  const archiveFile='admin/social/'+download,archiveTarget=path.join(output,'_protected',archiveFile);
+  await mkdir(path.dirname(archiveTarget),{recursive:true});
+  execFileSync('python3',['-m','zipfile','-c',archiveTarget,path.join(root,'assets/social',campaign)],{stdio:'pipe'});
+  inventory['/admin/social/'+download]={file:archiveFile,role:'admin',document:false,download};
   await writeFile(path.join(output,'_routes.json'),JSON.stringify({version:1,include:['/*'],exclude:[]}));
   await build({entryPoints:[path.join(root,'funnel/gateway.mjs')],outfile:path.join(output,'_worker.js'),bundle:true,format:'esm',platform:'browser',target:'es2022',define:{PUBLIC_FILES:JSON.stringify(publicFiles),PRIVATE_FILES:JSON.stringify(inventory)}});
   await writeFile(path.join(root,'dist/deployment-inventory.json'),JSON.stringify({public:publicFiles,protected:inventory},null,2));

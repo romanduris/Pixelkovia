@@ -49,6 +49,11 @@ export default {async fetch(request,env){
         const script=`<script nonce="${nonce}">window.PIXELKOVIA_ADMIN=${admin};${run?'window.PIXELKOVIA_RUN='+JSON.stringify(run).replaceAll('<','\\u003c')+';':''}</script>`;
         response=new HTMLRewriter().on('head',{element(e){e.prepend(script,{html:true});}}).transform(response);
       }
+      if(privateFile.download&&response.ok){
+        response=new Response(response.body,response);
+        response.headers.set('Content-Type','application/zip');
+        response.headers.set('Content-Disposition',`attachment; filename="${privateFile.download}"`);
+      }
       return secured(response,true,nonce);
     }
     if(path.endsWith('.html')&&PUBLIC_FILES.includes(path))return redirect(path==='/index.html'?'/':path==='/supervisor.html'?'/Supervisor':path.slice(0,-5)+url.search);
