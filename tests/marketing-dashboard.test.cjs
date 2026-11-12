@@ -178,18 +178,27 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-period-purchases').uncheck();await page.locator('#marketing-sort-visits').click();
   for(const period of ['today','7','14','30','90','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
   await page.locator('#marketing-filter-toggle').click();
-  for(const width of [1440,1920,768,375,320]){
+  for(const width of [1440,1920,768,480,430,390,375,360,320]){
    await page.setViewportSize({width,height:width===1920?1080:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no page overflow '+width);
-   assert.ok(await page.locator('#marketing-filter-toggle').isVisible());assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
+   assert.equal(await page.locator('#marketing-filter-toggle').isVisible(),width>750);assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
    if(width>=1440){const positions=await page.locator('.marketing-kpis .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(Math.max(...positions)-Math.min(...positions)<1,'five metrics in one row');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
-   if(width<=375){
+   if(width<=750){
+    assert.equal(await page.locator('#marketing-logout').isVisible(),false);
+    await page.locator('#marketing-funnel-details').evaluate(el=>el.open=true);
+    assert.equal(await page.locator('#marketing-funnel-details').isVisible(),false,'saved open explanation stays hidden on phones');
+    await page.locator('#marketing-funnel-details').evaluate(el=>el.open=false);
+    const toolbar=await page.locator('.marketing-toolbar').boundingBox(),periods=await page.locator('.marketing-period-buttons').boundingBox(),calendar=await page.locator('.marketing-since-date').boundingBox();
+    assert.ok(toolbar.height<130,'compact phone toolbar '+width);assert.ok(Math.abs(periods.y-calendar.y)<4,'calendar shares period row '+width);assert.ok(calendar.x>=periods.x+periods.width,'calendar is at the right of periods');
+    await page.locator('#marketing-since').fill(sinceDate);await page.locator('#marketing-since').blur();await ready();assert.match(calls.at(-1),/period=since/);
+    await page.locator('[data-marketing-period="14"]').tap();await ready();assert.match(calls.at(-1),/period=14/);
     await page.locator('#marketing-group-facebook').tap();assert.ok(await page.locator('#marketing-source-facebook').isVisible());assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     await page.locator('#marketing-group-other').tap();assert.ok(await page.locator('#marketing-source-direct').isVisible());assert.ok(await page.locator('#marketing-source-organic').isVisible());assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     await page.locator('#marketing-sources-title').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/pixelkovia-social-groups-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
-    await page.locator('#marketing-group-other').tap();await page.locator('#marketing-group-facebook').tap();await page.locator('#marketing-filter-toggle').tap();assert.equal(await page.locator('#marketing-filter-panel').isVisible(),true);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'expanded filters have no overflow');await page.locator('[name=device]').focus();await page.keyboard.press('Escape');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.equal(await page.evaluate(()=>document.activeElement.id),'marketing-filter-toggle');}
+    await page.locator('#marketing-group-other').tap();await page.locator('#marketing-group-facebook').tap();}
    await page.screenshot({path:'/tmp/pixelkovia-marketing-after-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png',fullPage:true});
    if(width===375)await page.screenshot({path:'/tmp/pixelkovia-marketing-mobile-viewport.png'});
   }
+  await page.setViewportSize({width:1440,height:900});
   await page.locator('#marketing-filter-toggle').click();await page.locator('[name=period]').selectOption('custom');assert.equal(await page.locator('[name=from]').isEnabled(),true);
   await page.locator('[name=from]').fill('2026-10-01');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').nth(4).innerText(),'100 %');assert.match(await page.locator('.marketing-period-note').innerText(),/Iba nameraná časť obdobia/);
   // Server-verified fixtures exercise mixed date semantics and ratios above 100%.

@@ -571,6 +571,8 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 
 /* Daily first-party observations and exact paid-transaction drill-down. */
 .marketing-period-buttons{display:flex;gap:3px;padding:3px;border:1px solid #34475f;border-radius:8px;background:#0c1729}
+.marketing-period-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
+.marketing-date-icon{display:none;pointer-events:none}
 .marketing-period-buttons button{min-width:39px;border:0;background:transparent;padding:6px 10px;color:#becfe4}
 .marketing-period-buttons button[aria-pressed="true"]{background:#334c69;color:#fff;box-shadow:inset 0 0 0 1px #789bc5}
 .marketing-since-date{display:flex;align-items:center;gap:8px;min-width:0;padding:3px 8px 3px 10px;border:1px solid #34475f;border-radius:8px;background:#0c1729;color:#becfe4;font-size:12px;white-space:nowrap}
@@ -608,7 +610,22 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .payment-funnel-scope{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:16px;border:1px solid #537b83;border-radius:8px;background:#142b36;margin-bottom:16px}
 .payment-funnel-scope>div{flex:1 1 350px}.payment-funnel-scope strong{font-size:14px}.payment-funnel-scope p{font-size:12px;line-height:1.7;color:#bdd0df;margin:5px 0 0}
 .payment-funnel-scope>a{font-size:12px;min-height:40px;display:flex;align-items:center;color:#bdebdc}
-@media(max-width:750px){.marketing-period-buttons{flex:1 1 100%;justify-content:space-between}.marketing-period-buttons button{flex:1;min-height:40px}.marketing-toolbar-actions{display:flex;flex-wrap:wrap}.marketing-chart-panel>summary small{display:none}.marketing-chart-controls{align-items:flex-start;flex-direction:column}.marketing-chart-panel>.marketing-disclosure-body{padding-inline:12px}}
+@media(max-width:750px){
+  .marketing-toolbar{grid-template-columns:minmax(0,1fr) auto;gap:8px}
+  .marketing-title{grid-column:1;grid-row:1}.marketing-title h1{font-size:18px}
+  .marketing-toolbar-actions{display:contents}
+  .marketing-period-controls{grid-column:1/-1;grid-row:2;flex-wrap:nowrap;gap:6px}
+  .marketing-period-buttons{flex:1 1 auto;min-width:0;justify-content:space-between}
+  .marketing-period-buttons button{flex:1;min-width:0;min-height:36px;padding:6px 4px;font-size:12px}
+  .marketing-period-controls .marketing-since-date{position:relative;flex:0 0 42px;width:42px;height:44px;justify-content:center;padding:0}
+  .marketing-since-date>span{display:none}.marketing-date-icon{display:block}
+  .marketing-period-controls .marketing-since-date input{position:absolute;inset:0;width:100%;height:100%;min-height:0;opacity:0;cursor:pointer;padding:0}
+  .marketing-since-date:focus-within{outline:2px solid #96e5d3;outline-offset:3px}
+  .marketing-toolbar #refresh-marketing{grid-column:2;grid-row:1;min-height:40px;padding:6px 9px;font-size:12px}
+  .marketing-toolbar-meta{grid-row:3}
+  .marketing-toolbar #marketing-filter-toggle,.marketing-toolbar #marketing-logout,#marketing-filter-panel,.marketing-funnel>#marketing-funnel-details{display:none!important}
+  .marketing-chart-panel>summary small{display:none}.marketing-chart-controls{align-items:flex-start;flex-direction:column}.marketing-chart-panel>.marketing-disclosure-body{padding-inline:12px}
+}
 
 /* Expanded purchases expose complete values, independently of compact table cells. */
 .payment-detail-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:20px}
