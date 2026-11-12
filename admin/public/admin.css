@@ -551,15 +551,12 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
   .marketing-sources .marketing-period-toggle{font-size:11px;gap:5px}
   .marketing-table-wrap{overflow-x:auto;overscroll-behavior-x:contain}
   .marketing-table-wrap table{min-width:290px}
-  .marketing-table-wrap table:has([data-marketing-sort-header="periodPurchases"]:not([hidden])){min-width:420px}
   .marketing-table-wrap th,.marketing-table-wrap td{padding:6px 4px;font-size:12px;overflow-wrap:normal}
   .marketing-table-wrap th:first-child{width:32%;padding-left:10px;overflow-wrap:anywhere}
   .marketing-table-wrap thead th{font-size:11px}
   .marketing-table-wrap [data-marketing-sort-header="visits"]{width:19%}
   .marketing-table-wrap [data-marketing-sort-header="purchases"]{width:22%}
   .marketing-table-wrap [data-marketing-sort-header="conversion"]{width:27%}
-  .marketing-table-wrap table:has([data-marketing-sort-header="periodPurchases"]:not([hidden])) thead th{width:19%}
-  .marketing-table-wrap table:has([data-marketing-sort-header="periodPurchases"]:not([hidden])) thead th:first-child{width:24%}
   .marketing-table-wrap thead th button{font-size:11px;min-height:40px;padding:4px 0;gap:1px}
   .marketing-source-group th button{min-height:42px;padding:6px 0;gap:4px}
   .marketing-table-wrap .marketing-source-child th:first-child{padding-left:20px;font-size:11px}

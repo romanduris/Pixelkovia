@@ -153,12 +153,11 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-kpi-conversion').focus();await page.keyboard.press('Enter');assert.ok(await page.locator('.marketing-kpi[open]').count());assert.match(await page.locator('.marketing-kpi[open]').innerText(),/Nákupy priradené/);
   await page.keyboard.press('Escape');assert.equal(await page.locator('.marketing-kpi[open]').count(),0);
   await page.locator('#marketing-summary-funnel-details').click();await page.locator('#marketing-summary-attribution').focus();await page.keyboard.press('Enter');
-  await page.locator('#marketing-period-purchases').check();
-  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.ok(await page.locator('[data-marketing-sort-header=periodPurchases]').isVisible());
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('#marketing-period-purchases,[data-marketing-sort-header=periodPurchases]').count(),0);
   await page.locator('#marketing-sort-label').click();await page.locator('#marketing-sort-label').click();assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   await page.locator('#refresh-marketing').click();await ready();
   assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);assert.equal(await page.locator('#marketing-funnel-details').evaluate(el=>el.open),true);
-  assert.equal(await page.locator('#marketing-period-purchases').isChecked(),true);assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
+  assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   assert.equal(await page.evaluate(()=>document.activeElement.id),'refresh-marketing');
   // Date selection belongs in the toolbar and works with the filters panel closed.
   assert.ok(await page.locator('.marketing-toolbar #marketing-since').isVisible());
@@ -171,7 +170,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.reload();await ready();
   assert.equal(await page.locator('#marketing-since').inputValue(),sinceDate);assert.match(calls.at(-1),/period=since/);assert.match(calls.at(-1),/source=facebook_ads/);assert.match(calls.at(-1),/campaign=launch-2026/);
   assert.equal(await page.locator('#marketing-filter-panel').isVisible(),true);assert.equal(await page.locator('#marketing-attribution').evaluate(el=>el.open),true);assert.equal(await page.locator('#marketing-funnel-details').evaluate(el=>el.open),true);
-  assert.ok(await page.locator('#marketing-period-purchases').isChecked());assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
+  assert.equal(await page.locator('[data-marketing-sort-header=label]').getAttribute('aria-sort'),'ascending');
   const cookie=(await context.cookies(origin+'/admin')).find(c=>c.name==='pixelkovia-admin-marketing-layout-v1');
   assert.ok(cookie);assert.equal(cookie.path,'/admin');assert.equal(cookie.secure,true);assert.equal(cookie.sameSite,'Strict');assert.ok(cookie.expires>Date.now()/1000+300*86400);
   const saved=JSON.parse(decodeURIComponent(cookie.value));assert.equal(saved.selected.period,'since');assert.equal(saved.selected.from,sinceDate);assert.equal(saved.selected.to,undefined);assert.ok(!JSON.stringify(saved).includes('private'));assert.ok(cookie.value.length<4096);
@@ -187,7 +186,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('[name=source]').selectOption('');await page.locator('[name=product]').selectOption('game');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
   await page.locator('[name=product]').selectOption('');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();
   await page.locator('#marketing-summary-attribution').click();await page.locator('#marketing-summary-funnel-details').click();
-  await page.locator('#marketing-period-purchases').uncheck();await page.locator('#marketing-sort-visits').click();
+  await page.locator('#marketing-sort-visits').click();
   for(const period of ['today','7','14','30','90','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
   await page.locator('#marketing-filter-toggle').click();
   for(const width of [1440,1920,768,480,430,390,375,360,320]){
@@ -220,9 +219,8 @@ const origin='https://pixelkovia.rodulab.com';
   // Server-verified fixtures exercise mixed date semantics and ratios above 100%.
   const addPayment=async(id,visit)=>{const time=Date.now();await execute(db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id) VALUES(?,?,?,?,?,?,?)',id,'fixture@example.invalid','Fixture','["episode-1"]',1499,time,'cs_test_'+id);await execute(db,'INSERT INTO payment_observations VALUES(?,?,?,?)',id,'paid',time,time);if(visit)await execute(db,'INSERT INTO marketing_attribution VALUES(?,?,?)',id,visit,time);};
   await addPayment('marketing-unattributed',null);await page.locator('#refresh-marketing').click();await ready();assert.equal(await page.locator('#marketing-kpi-purchases strong').innerText(),'2');assert.equal(await page.locator('#marketing-kpi-conversion strong').innerText(),'100 %');
-  await page.locator('#marketing-period-purchases').check();
   await page.locator('#marketing-group-other').click();
-  const unknown=page.locator('#marketing-source-unknown');assert.equal(await unknown.locator('td').last().innerText(),'1');assert.equal(await unknown.locator('td').nth(1).innerText(),'0');
+  const unknown=page.locator('#marketing-source-unknown');assert.equal(await unknown.locator('td').count(),3);assert.equal(await unknown.locator('td').nth(1).innerText(),'0');
   await addPayment('marketing-second',ids.marketingVisitId);await page.locator('#refresh-marketing').click();await ready();assert.equal(await page.locator('#marketing-kpi-conversion strong').innerText(),'200 %');assert.match(await page.locator('#marketing-kpi-checkout small').innerText(),/Platobné pokusy: 3/);
   for(const id of ['marketing-unattributed','marketing-second']){await execute(db,'DELETE FROM marketing_attribution WHERE attempt_id=?',id);await execute(db,'DELETE FROM payment_observations WHERE attempt_id=?',id);await execute(db,'DELETE FROM checkout_attempts WHERE id=?',id);}
   await execute(db,'INSERT INTO payment_monitor_checks VALUES(?,?,?)','stripe',0,Date.now());await page.locator('#refresh-marketing').click();await ready();assert.ok(await page.locator('.marketing-health.has-issues').isVisible());assert.match(await page.locator('.marketing-health-status').innerText(),/Vyžaduje pozornosť/);
@@ -280,6 +278,6 @@ const origin='https://pixelkovia.rodulab.com';
   const count=events.length;await page.goto(origin+'/checkout');assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),{});assert.equal(events.length,count);
   assert.ok(await page.locator('main').isVisible());
   assert.deepEqual(errors,[]);
-  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and expandable social totals with persistent children, hidden influencer, period-payment column, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
+  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and expandable social totals with persistent children, hidden influencer, four-column source table, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
  }finally{await context.close();await browser.close();db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});
