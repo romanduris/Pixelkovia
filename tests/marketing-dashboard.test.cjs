@@ -29,7 +29,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.goto(origin+'/admin#marketing');await ready();
   assert.equal(await page.locator('[data-page]').count(),3);assert.equal(await page.locator('#page-title').innerText(),'Predajný funnel');
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
-  assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),5);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').innerText(),/Čakáme na prvú/);
+  assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),6);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').innerText(),/Čakáme na prvú/);
   assert.equal(await page.locator('#marketing-filter-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);
   assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('#marketing-all-sources').count(),0);
   assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('420'));
@@ -73,7 +73,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('#marketing-kpi-checkout strong').innerText(),'2');
   assert.equal(await page.locator('#marketing-kpi-purchases strong').innerText(),'1');
   assert.equal(await page.locator('#marketing-kpi-conversion strong').innerText(),'100 %');
-  assert.deepEqual(await page.locator('.marketing-kpi-label').evaluateAll(els=>els.map(el=>el.firstChild.textContent)),['Funnel','Check Out','Nákupy','Konverzia','Tržby']);
+  assert.deepEqual(await page.locator('.marketing-kpi-label').evaluateAll(els=>els.map(el=>el.firstChild.textContent)),['Zobrazenia reklamy','Zobrazenia stránky','Otvorenia checkoutu','Nákupy','Konverzia','Tržby']);
   assert.match(await page.locator('#marketing-kpi-checkout small').innerText(),/Platobné pokusy: 1/);
   assert.match(await page.locator('#marketing-kpi-revenue strong').innerText(),/14,99/);
   assert.match(await page.locator('#marketing-kpi-revenue small').innerText(),/Reklama: Nedostupné/);
@@ -97,6 +97,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#refresh-marketing').click();await ready();
   const latestDay=page.locator('.marketing-chart-day').last();
   assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-facebook','chart-bar chart-source-instagram','chart-bar chart-source-other']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
+  assert.deepEqual(await page.locator('#marketing-kpi-visits [data-funnel-source] b').allTextContents(),['1','1','7']);
   await latestDay.focus();assert.deepEqual(await page.locator('.marketing-chart-legend li').evaluateAll(els=>els.map(el=>el.getAttribute('aria-label'))),['Facebook: 2','Instagram: 2','Others: 5']);
   assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'9');
   await page.locator('#marketing-unique').check();await latestDay.focus();assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'9');assert.deepEqual(await page.locator('.marketing-chart-legend li').evaluateAll(els=>els.map(el=>el.getAttribute('aria-label'))),['Facebook: 2','Instagram: 2','Others: 5']);
@@ -195,7 +196,7 @@ const origin='https://pixelkovia.rodulab.com';
   for(const period of ['30','90']){
    await page.locator('[data-marketing-period="'+period+'"]').tap();await ready();
    assert.ok(await page.locator('[data-marketing-day]').count()<=Number(period));assert.equal(await page.locator('[data-marketing-day-count]').count(),await page.locator('[data-marketing-day]').count());
-   await page.locator('.marketing-chart-day[tabindex="0"]').focus();await page.keyboard.press('Home');
+   await page.mouse.move(0,0);await page.locator('.marketing-chart-day[tabindex="0"]').focus();await page.keyboard.press('Home');
    assert.equal(await page.locator('[data-chart-step="-1"]').isDisabled(),true);await page.keyboard.press('End');
    assert.equal(await page.locator('[data-chart-step="1"]').isDisabled(),true);
    assert.ok(await page.locator('.marketing-chart-plot').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
@@ -205,14 +206,14 @@ const origin='https://pixelkovia.rodulab.com';
   for(const width of [1440,1920,768,480,430,390,375,360,320]){
    await page.setViewportSize({width,height:width===1920?1080:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no page overflow '+width);
    assert.equal(await page.locator('#marketing-filter-toggle').isVisible(),width>750);assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
-   if(width>=1440){const positions=await page.locator('.marketing-kpis .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(Math.max(...positions)-Math.min(...positions)<1,'five metrics in one row');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
+   if(width>=1440){const positions=await page.locator('.marketing-steps .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(Math.max(...positions)-Math.min(...positions)<1,'four funnel steps in one desktop row');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
    await page.waitForFunction(()=>{const plot=document.querySelector('.marketing-chart-plot'),svg=plot?.querySelector('svg');return plot&&svg&&Math.abs(Number(svg.getAttribute('width'))-plot.clientWidth)<2;});
    assert.ok(await page.locator('.marketing-chart-plot').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'chart fits its container '+width);
    if(width<=750){assert.ok((await page.locator('#marketing-charts').boundingBox()).height<320,'compact phone chart '+width);}
    await page.locator('#marketing-charts').screenshot({path:'/tmp/pixelkovia-slim-bars-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
    assert.ok(await page.locator('#marketing-overview-unique').isVisible());
    assert.ok(await page.locator('#marketing-kpi-checkout small').isVisible());assert.ok(await page.locator('#marketing-kpi-revenue small').isVisible());
-   const overview=await page.locator('.marketing-funnel').boundingBox();assert.ok(overview.height<300,'compact five-metric overview '+width);
+   const overview=await page.locator('.marketing-funnel').boundingBox();assert.ok(overview.height<(width<=1100?480:370),'compact four-step funnel and unchanged financial results '+width);
    await page.locator('.marketing-funnel').screenshot({path:'/tmp/pixelkovia-overview-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
    if(width<=750){
     assert.equal(await page.locator('#marketing-logout').isVisible(),false);
@@ -254,11 +255,11 @@ const origin='https://pixelkovia.rodulab.com';
   env.META_ADS_FETCH=async url=>{
     if(metaFailure)return Response.json({error:{code:190,error_subcode:463,message:'not returned to browser'}},{status:400});
     const day=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(Date.now());
-    return Response.json(url.pathname.endsWith('/insights')?{data:[{account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'facebook',spend:'12.34'}]}:{account_id:'1141555698571585',currency:'EUR',timezone_name:'Europe/Bratislava'});
+    return Response.json(url.pathname.endsWith('/insights')?{data:[{account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'facebook',spend:'12.34',impressions:'1234'}, {account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'instagram',spend:'0.00',impressions:'500'}, {account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'messenger',spend:'0.00',impressions:'66'}]}:{account_id:'1141555698571585',currency:'EUR',timezone_name:'Europe/Bratislava'});
   };
   await page.locator('[data-marketing-period="14"]').click();await ready();
   await page.locator('#marketing-sync-ads').click();await page.waitForResponse(r=>r.url().includes('/api/admin/marketing?'));await ready();
-  assert.match(await page.locator('#marketing-metric-costs strong').innerText(),/12,34/);assert.match(await page.locator('#marketing-kpi-revenue small').innerText(),/Reklama − 12,34/);assert.equal(await page.locator('#marketing-metric-cac strong').innerText(),'Nedostupné');
+  assert.equal(await page.locator('#marketing-kpi-impressions strong').innerText(),'1\u00a0800');assert.match(await page.locator('#marketing-metric-costs strong').innerText(),/12,34/);assert.match(await page.locator('#marketing-kpi-revenue small').innerText(),/Reklama − 12,34/);assert.equal(await page.locator('#marketing-metric-cac strong').innerText(),'Nedostupné');
   assert.equal((await page.locator('.marketing-ads-campaign label').innerText()).replace(/\s+/g,' '),'Launch <campaign> (123)');
   await page.locator('.marketing-ads-campaign input').fill('launch-2026');await page.locator('.marketing-ads-campaign button').click();
   await page.waitForResponse(r=>r.url().includes('/api/admin/marketing?'));await ready();
@@ -268,6 +269,19 @@ const origin='https://pixelkovia.rodulab.com';
     await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'ads controls fit '+width);
     await page.locator('#marketing-metric-costs').scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/pixelkovia-meta-ads-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
   }
+  assert.deepEqual(await page.locator('#marketing-kpi-impressions [data-funnel-source] b').allTextContents(),['1\u00a0234','500','66']);
+  await page.locator('.marketing-funnel').evaluate(el=>{const badge=document.createElement('p');badge.id='qa-fixture-label';badge.textContent='TESTOVACIE ÚDAJE · QA';badge.style.cssText='padding:6px 10px;color:#ffe0a3;font-size:11px;font-weight:700';el.prepend(badge);});
+  for(const width of [1440,430,390,360,320]){
+   await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+   const box=await page.locator('.marketing-funnel').boundingBox();
+   await page.locator('.marketing-funnel').screenshot({path:'/tmp/pixelkovia-fb-ig-funnel-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
+   const qaHeight=(await page.locator('#qa-fixture-label').boundingBox()).height;assert.ok(box.height-qaHeight<(width<=750?470:370),'compact measured FB/IG funnel '+width+' height '+(box.height-qaHeight));
+  }
+  await page.locator('.marketing-funnel').evaluate(root=>{const sizes=[...root.querySelectorAll('*')].map(el=>[el,parseFloat(getComputedStyle(el).fontSize)]);for(const[el,size]of sizes)el.style.fontSize=(size*2)+'px';});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'funnel fits with 200% text at 320px');
+  assert.ok(await page.locator('#marketing-kpi-impressions strong').isVisible());assert.ok(await page.locator('#marketing-kpi-revenue strong').isVisible());
+  const enlarged=await page.locator('.marketing-results .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(enlarged[1]>enlarged[0],'financial results stack when enlarged text needs more room');
+  await page.locator('.marketing-funnel').screenshot({path:'/tmp/pixelkovia-fb-ig-text200-320-'+(process.env.QA_BROWSER||'chromium')+'.png'});
   metaFailure=true;await execute(db,'UPDATE meta_ads_state SET last_attempt_at=0');
   await page.locator('#marketing-sync-ads').click();await page.waitForResponse(r=>r.url().includes('/api/admin/marketing?'));await ready();
   assert.equal(await page.locator('#marketing-metric-costs strong').innerText(),'Nedostupné');assert.equal(await page.locator('#marketing-metric-cac strong').innerText(),'Nedostupné');assert.match(await page.locator('[data-marketing-detail="metric-costs"]').innerText(),/190 \/ 463/);
@@ -295,6 +309,6 @@ const origin='https://pixelkovia.rodulab.com';
   const count=events.length;await page.goto(origin+'/checkout');assert.deepEqual(await page.evaluate(()=>window.PixelkoviaMarketing.context()),{});assert.equal(events.length,count);
   assert.ok(await page.locator('main').isVisible());
   assert.deepEqual(errors,[]);
-  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and expandable social totals with persistent children, hidden influencer, four-column source table, unified five-metric overview and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
+  console.log('PASS marketing: real API/D1 aggregation, unavailable data, explicit analytics consent and server cookie validation, refresh/checkout deduplication, disabled collection switch, UTM and verified payments, cohort versus period payments, uncapped 200% conversion, filter chips/reset/quick/custom/since dates, admin-scoped cookie preferences and reload restoration, keyboard disclosures and state restoration, sorting and expandable social totals with persistent children, hidden influencer, four-column source table, compact four-step FB/IG funnel, unchanged conversion/revenue/CAC, unique source deduplication, 200% text and independent period attempts, missing/stale/failed checks, five-minute warning, error state, 320–1920px ('+(process.env.QA_BROWSER||'chromium')+').');
  }finally{await context.close();await browser.close();db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

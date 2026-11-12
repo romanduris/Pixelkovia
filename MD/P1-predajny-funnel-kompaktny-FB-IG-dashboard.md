@@ -1,6 +1,6 @@
 # Pixelkovia – kompaktný Predajný funnel: Facebook / Instagram
 
-**Stav:** Schválené produktové zadanie na implementáciu cez Codex (12. 11. 2026).  
+**Stav:** Implementované v existujúcej administrácii (12. 11. 2026); živé nenulové porovnanie a reklamný pilot zostávajú na overenie.
 **Priorita:** P1 – pred víkendovým testom reklám, ak je možné bezpečne stihnúť.  
 **Rozsah:** Existujúca administrácia `/admin`, záložka **Predajný funnel**. Žiadna nová administračná stránka.
 
@@ -82,16 +82,16 @@ Pri každom zo štyroch krokov:
 
 ## 8. Testy a akceptačné kritériá
 
-- [ ] Nová metrika „Zobrazenia reklamy“ je úplne prvá a má celok + FB/IG.
-- [ ] „Zobrazenia stránky“, „Otvorenia checkoutu“ a „Nákupy“ majú celok + farebný FB/IG rozpad, prípadne neutrálne ostatné/neznáme.
-- [ ] Súčet segmentov súhlasí s celkovým počtom, kde je údaj dostupný; nevzniká dvojité počítanie.
+- [x] Nová metrika „Zobrazenia reklamy“ je úplne prvá a má celok + FB/IG.
+- [x] „Zobrazenia stránky“, „Otvorenia checkoutu“ a „Nákupy“ majú celok + farebný FB/IG rozpad, prípadne neutrálne ostatné/neznáme.
+- [x] Súčet segmentov súhlasí s celkovým počtom, kde je údaj dostupný; nevzniká dvojité počítanie.
 - [ ] Čísla Meta `impressions` za rovnaké obdobie/kampaň zodpovedajú Ads Manageru v rámci rovnakého nastavenia časového pásma a metodiky.
-- [ ] Graf funguje na 320/360/390/430 px, na desktope, pri väčšom písme aj pri tmavom/svetlom motíve, ak ho administrácia podporuje.
-- [ ] Mobilný funnel je krátky, zrozumiteľný a nemá horizontálny scroll.
-- [ ] Konverzia a najmä **Zisk s existujúcim „− reklama“** ostávajú vizuálne aj výpočtovo zachované.
-- [ ] Zmeny filtrov nespôsobia nesprávne miešanie kampaní alebo zdrojov.
-- [ ] Chýbajúce dáta a neaktuálny import sa zobrazujú pravdivo.
-- [ ] Automatizované testy a manuálne vizuálne overenie nepoškodia existujúcu admin sekciu.
+- [x] Graf funguje na 320/360/390/430 px, na desktope, pri väčšom písme aj pri tmavom/svetlom motíve, ak ho administrácia podporuje.
+- [x] Mobilný funnel je krátky, zrozumiteľný a nemá horizontálny scroll.
+- [x] Konverzia a najmä **Zisk s existujúcim „− reklama“** ostávajú vizuálne aj výpočtovo zachované.
+- [x] Zmeny filtrov nespôsobia nesprávne miešanie kampaní alebo zdrojov.
+- [x] Chýbajúce dáta a neaktuálny import sa zobrazujú pravdivo.
+- [x] Automatizované testy a manuálne vizuálne overenie nepoškodia existujúcu admin sekciu.
 
 ## 9. Odovzdanie
 
@@ -103,3 +103,15 @@ Codex nech uvedie:
 5. Čo ešte chýba pred víkendovým pilotom reklám.
 
 **Nevypĺňaj reálny dashboard ukážkovými dátami. Nemeň finančné vzorce. Nedávaj do produkcie neoverené tvrdenia o atribúcii.**
+
+
+## Realizácia a overenie · 12. 11. 2026
+
+- Pred implementáciou bol vykonaný [audit merania, atribúcie a finančného základu](../docs/marketing-funnel-audit-2026-11-12.md). Živé Meta GET požiadavky so súčasným tokenom vrátili HTTP 200 vrátane `impressions` / `publisher_platform`; výsledkom boli nulové zobrazenia bez riadkov platforiem za 30. 10.–12. 11.
+- Existujúci import, administrátorské endpointy a D1 zostali zachované. Aditívne uloženie impressions má vlastné pokrytie; staré výdavky sa neprehlasujú za namerané zobrazenia. Rovnaká transakcia chráni výdavky aj nový import pred čiastočným uložením.
+- Nové `funnel` v existujúcom reporte rozdeľuje kalendárne návštevy, otvorenia checkoutu a zaplatené transakcie. Unikátne prehliadače sú v každom kroku priradené iba jednému zdroju spomedzi aktuálnych filtrov. Darček zostáva jednou transakciou, zdarma mimo platených nákupov, refundácia samostatným existujúcim ukazovateľom.
+- **Spresnenie finančného názvu:** aktuálna karta je **Tržby**, nie Zisk; vykazuje hrubé inkaso a vedľa neho **Reklama − …**. Názov, hodnoty a výpočet zostali zachované. Žiadny čistý zisk sa nepridával ani neodhadoval. Konverzia a CAC používajú pôvodné vzorce.
+- Chrome a Safari: 320–1920 px, samostatne 320/360/390/430 px, zmena období, zdrojov, kampaní, produktu, unikátneho režimu, chyby, nedostupnosť a 200 % písmo. Pri zväčšenom písme sa finančné ukazovatele prirodzene presunú pod seba. Administrácia má existujúci tmavý motív; svetlý motív nepodporuje.
+- Prešlo 137 backendových testov vrátane reálneho workerd/D1 runtime, migrácie existujúcich dát, platieb, bezpečnosti a zachovania finančných metrík. Mobilné a desktopové [QA snímky](../docs/qa/funnel-fb-ig/README.md) sú označené ako testovacie údaje a nevstupujú do produkčného dashboardu.
+
+**Pred pilotom:** v Ads Manageri porovnať skutočné nenulové impressions za rovnaké obdobie a platformu, potvrdiť UTM na reálnych umiestneniach reklám a overiť aspoň jeden platený FB/IG nákup na cieľových telefónoch. Bez súhlasu alebo bez identifikovaného reklamného zdroja zostáva nákup v Ostatné / neznáme. Zmeny reklám, platený test a nevyžiadané zmeny checkoutu neboli vykonané.

@@ -22,7 +22,7 @@ test('shipped Meta API fetch works in workerd and refuses redirects before forwa
    assert.equal(calls.length,redirect?1:2);assert.ok(!JSON.stringify(body).includes('runtime-meta-secret-fixture'));
    const state=await first(db,'SELECT last_success_at,last_error FROM meta_ads_state');
    if(redirect){assert.match(state.last_error,/HTTP 302.*presmerovanie/);assert.equal(state.last_success_at,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,0);}
-   else{assert.ok(state.last_success_at);assert.equal(state.last_error,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);}
+   else{assert.ok(state.last_success_at);assert.equal(state.last_error,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_impression_days WHERE synced_at IS NOT NULL')).n,2);}
   }finally{await mf.dispose();}
  }
 });
@@ -31,14 +31,16 @@ test('Meta import commits JSON batches and empty-day coverage in the actual Work
  try{
   const db=await mf.getD1Database('TQ_DB');
   for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
-  const rows=Array.from({length:125},(_,i)=>({account_id:metaAccount,account_currency:'EUR',campaign_id:String(i+1),campaign_name:'Runtime',date_start:'2026-11-10',date_stop:'2026-11-10',publisher_platform:'facebook',spend:'0.01'}));
+  const rows=Array.from({length:125},(_,i)=>({account_id:metaAccount,account_currency:'EUR',campaign_id:String(i+1),campaign_name:'Runtime',date_start:'2026-11-10',date_stop:'2026-11-10',publisher_platform:'facebook',spend:'0.01',impressions:'2'}));
   const env={TQ_DB:db,META_ADS_ACCESS_TOKEN:'runtime-fixture',META_ADS_FETCH:async url=>Response.json(url.pathname.endsWith('/insights')?{data:rows}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'})};
   const at=Date.parse('2026-11-10T12:00:00Z');
   await syncMetaAds(env,{from:'2026-11-09',to:'2026-11-10'},at);
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,125);
+  assert.equal((await first(db,'SELECT sum(impressions) n FROM meta_ads_impressions')).n,250);
   assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);
   await syncMetaAds(env,{from:'2026-11-09',to:'2026-11-10'},at+61000);
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,125);
+  assert.equal((await first(db,'SELECT sum(impressions) n FROM meta_ads_impressions')).n,250);
  }finally{await mf.dispose();}
 });
 test('actual workerd/D1 runtime: migrations, protected APIs, server checklist, device activation and answer transaction',async()=>{

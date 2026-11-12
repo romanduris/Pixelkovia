@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fresh} from './support.mjs';
+import {fresh,LocalD1} from './support.mjs';
+import {readFile,readdir} from 'node:fs/promises';
 import {first,query,execute} from '../src/db.mjs';
-import {syncMetaAds,scheduledMetaAds,metaAdsReport,saveMetaCampaign,metaAccount,spendCents} from '../src/meta-ads.mjs';
+import {syncMetaAds,scheduledMetaAds,metaAdsReport,metaImpressionsReport,saveMetaCampaign,metaAccount,spendCents} from '../src/meta-ads.mjs';
 import {marketingFilters,midnight} from '../src/marketing-query.mjs';
 import worker from '../src/worker.mjs';
 const at=Date.parse('2026-11-10T12:00:00Z'),day=86400000;
@@ -157,5 +158,70 @@ test('admin POSTs require an authenticated administrator and same origin; absent
   assert.equal((await worker.fetch(post('http://localhost','https://attacker.invalid'),{TQ_DB:db,ENVIRONMENT:'local'})).status,403);
   assert.equal((await worker.fetch(post('http://localhost'),{TQ_DB:db,ENVIRONMENT:'local'})).status,503);
   assert.equal((await first(db,'SELECT last_attempt_at FROM meta_ads_state')).last_attempt_at,null);
+ }finally{db.close();}
+});
+
+test('impressions reuse the spend import, require their own coverage and respect platform/campaign filters',async()=>{
+ const {db,env,mock}=setup();try{
+  await syncMetaAds(env,range,at);
+  let costs=await metaAdsReport(env,filters(),collection,at);
+  assert.equal(costs.costs,1234);
+  assert.equal((await metaImpressionsReport(env,filters(),costs,at)).total,null,'old/missing impression fields do not prove zero');
+  env.META_ADS_FETCH=api([row({impressions:'80'}),row({publisher_platform:'instagram',spend:'0.00',impressions:'20'}),row({publisher_platform:'audience_network',spend:'0.00',impressions:'10'})]).fetch;
+  await syncMetaAds(env,range,at+61000);
+  await saveMetaCampaign(env,{campaignId:'123',utmCampaign:'launch-2026'});
+  costs=await metaAdsReport(env,filters(),collection,at+62000);assert.equal(costs.costs,1234);
+  let r=await metaImpressionsReport(env,filters(),costs,at+62000);
+  assert.deepEqual([r.total,r.facebook,r.instagram,r.other],[110,80,20,10]);assert.equal(r.syncedAt,at+61000);
+  for(const [filter,total]of [[{source:'facebook_ads'},80],[{source:'instagram_ads'},20],[{campaign:'launch-2026'},110]]){
+   const f=filters(filter);r=await metaImpressionsReport(env,f,await metaAdsReport(env,f,collection,at+62000),at+62000);assert.equal(r.total,total);
+  }
+  for(const filter of [{source:'facebook'},{device:'mobile'},{product:'books'},{campaign:'unmapped'}]){
+   const f=filters(filter);assert.equal((await metaImpressionsReport(env,f,await metaAdsReport(env,f,collection,at+62000),at+62000)).total,null);
+  }
+  const stale=await metaAdsReport(env,filters(),collection,at+3*3600000);assert.equal((await metaImpressionsReport(env,filters(),stale,at+3*3600000)).total,null);
+  const fields=mock.calls.find(c=>c.url.pathname.endsWith('/insights')).url.searchParams.get('fields');assert.ok(fields.split(',').includes('impressions'));
+  env.META_ADS_FETCH=api([]).fetch;await syncMetaAds(env,range,at+122000);
+  costs=await metaAdsReport(env,filters(),collection,at+123000);
+  r=await metaImpressionsReport(env,filters(),costs,at+123000);assert.deepEqual([r.total,r.facebook,r.instagram,r.other],[0,0,0,0]);assert.equal(costs.costs,0);
+ }finally{db.close();}
+});
+test('malformed impressions never invent zero or change a valid expense import',async()=>{
+ for(const impressions of [undefined,null,'-1','1.5','1e3','9007199254740992',42]){
+  const {db,env}=setup([row({impressions})]);try{
+   await syncMetaAds(env,range,at);const costs=await metaAdsReport(env,filters(),collection,at);
+   assert.equal(costs.costs,1234);assert.equal((await metaImpressionsReport(env,filters(),costs,at)).total,null);
+   assert.equal((await first(db,'SELECT last_error FROM meta_ads_state')).last_error,null);
+  }finally{db.close();}
+ }
+});
+test('the existing cron bootstraps 30 days of impressions, then retains its seven-day hourly refresh',async()=>{
+ const {db,env}=setup();try{
+  await syncMetaAds(env,range,at-2*3600000);
+  const mock=api([row({impressions:'80'})]);env.META_ADS_FETCH=mock.fetch;
+  await scheduledMetaAds(env,at);
+  assert.equal(JSON.parse(mock.calls.find(c=>c.url.pathname.endsWith('/insights')).url.searchParams.get('time_range')).since,'2026-10-12');
+  assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_impression_days WHERE synced_at IS NOT NULL')).n,30);
+  assert.deepEqual(await scheduledMetaAds(env,at+1000),{skipped:true});
+  mock.calls.length=0;await scheduledMetaAds(env,at+3600000);
+  assert.equal(JSON.parse(mock.calls.find(c=>c.url.pathname.endsWith('/insights')).url.searchParams.get('time_range')).since,'2026-11-04');
+ }finally{db.close();}
+});
+test('impression migration preserves existing amounts and remains compatible with the previously shipped importer',async()=>{
+ const db=new LocalD1();try{
+  const directory=new URL('../migrations/',import.meta.url);
+  for(const name of (await readdir(directory)).filter(name=>name.endsWith('.sql')&&name<'0022_meta_impressions.sql').sort())db.sqlite.exec(await readFile(new URL(name,directory),'utf8'));
+  await execute(db,'INSERT INTO meta_ads_spend VALUES(?,?,?,?,?)','2026-11-10','123','Launch','facebook',1234);
+  await execute(db,'INSERT INTO meta_ads_days VALUES(?,?)','2026-11-10',at);
+  await execute(db,'UPDATE meta_ads_state SET last_success_at=?,last_attempt_at=? WHERE id=1',at,at);
+  const spend=await query(db,'SELECT * FROM meta_ads_spend'),coverage=await query(db,'SELECT * FROM meta_ads_days');
+  db.sqlite.exec(await readFile(new URL('0022_meta_impressions.sql',directory),'utf8'));
+  assert.deepEqual(await query(db,'SELECT * FROM meta_ads_spend'),spend);assert.deepEqual(await query(db,'SELECT * FROM meta_ads_days'),coverage);
+  assert.equal((await first(db,'SELECT last_success_at FROM meta_ads_state')).last_success_at,at);
+  assert.equal((await first(db,'SELECT last_attempt_at FROM meta_ads_state')).last_attempt_at,null);
+  assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_impression_days')).n,0);
+  await execute(db,'INSERT INTO meta_ads_spend VALUES(?,?,?,?,?)','2026-11-09','123','Launch','facebook',100);
+  await execute(db,'INSERT INTO meta_ads_days VALUES(?,?)','2026-11-09',at);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1334);
  }finally{db.close();}
 });

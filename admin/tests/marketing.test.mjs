@@ -26,6 +26,29 @@ async function attempt(db,{visitId=null,created=at-3600000,paid=at-1000,total=24
  }}
  return id;
 }
+test('four-step breakdown keeps ad sources distinct, counts gifts once and preserves financial and cohort totals',async()=>{
+ const {db,env}=await setup();try{
+  await execute(db,'UPDATE marketing_state SET unique_started_at=?',at-30*day);
+  const browser=crypto.randomUUID(),fb=input({browserId:browser}),ig=input({source:'instagram_ads',browserId:browser}),ordinary=input({source:'facebook',browserId:crypto.randomUUID()});
+  await marketingEvent(req(),env,{...fb,type:'checkout',checkoutOpenId:crypto.randomUUID()},at-5000);
+  await marketingEvent(req(),env,{...ig,type:'checkout',checkoutOpenId:crypto.randomUUID()},at-4000);
+  await marketingEvent(req(),env,ordinary,at-3000);
+  await marketingEvent(req(),env,{...fb,type:'checkout',checkoutOpenId:crypto.randomUUID()},at-2000);
+  await attempt(db,{visitId:fb.visitId,gift:true});await attempt(db,{visitId:ig.visitId,gift:false,total:1499,refund:true});
+  await attempt(db,{gift:false,total:1499});await attempt(db,{visitId:fb.visitId,gift:false,total:0});
+  const params=new URLSearchParams({period:'today'}),d=await marketingReport(env,params,at);
+  const counts=value=>[value.total,value.facebook,value.instagram,value.other];
+  assert.deepEqual(counts(d.funnel.visits),[3,1,1,1]);assert.deepEqual(counts(d.funnel.checkouts),[3,2,1,0]);
+  assert.deepEqual(counts(d.funnel.uniqueVisits),[2,1,0,1]);assert.deepEqual(counts(d.funnel.uniqueCheckouts),[1,1,0,0]);
+  assert.deepEqual(counts(d.funnel.purchases),[3,1,1,1]);assert.equal(d.periodMetrics.freePurchases,1);
+  assert.equal(d.metrics.revenueCents,5496);assert.equal(d.metrics.purchases,3);assert.equal(d.metrics.refunds,1);assert.equal(d.metrics.orders,4);assert.equal(d.metrics.conversion,2/3);
+  assert.equal(d.uniqueMetrics.conversion,1/2);
+  const filtered=await marketingReport(env,new URLSearchParams({period:'today',source:'instagram_ads'}),at);
+  assert.deepEqual(counts(filtered.funnel.uniqueVisits),[1,0,1,0]);assert.deepEqual(counts(filtered.funnel.uniqueCheckouts),[1,0,1,0]);assert.deepEqual(counts(filtered.funnel.purchases),[1,0,1,0]);
+  const product=await marketingReport(env,new URLSearchParams({period:'today',product:'game'}),at);assert.equal(product.funnel.visits.total,null);assert.equal(product.funnel.checkouts.facebook,null);assert.equal(product.funnel.purchases.total,3);
+  const frozen=await marketingReport({...env,MARKETING_COLLECTION_ENABLED:'false'},params,at);assert.deepEqual(frozen.funnel.purchases,d.funnel.purchases);assert.equal(frozen.metrics.revenueCents,d.metrics.revenueCents);assert.equal(frozen.metrics.conversion,null);
+ }finally{db.close();}
+});
 test('unmeasured visits/conversions and costs stay unavailable; API requires existing admin and same origin',async()=>{
  const {db,env}=await setup();try{
   const d=await marketingReport(env,new URLSearchParams(),at);assert.equal(d.metrics.visits,null);assert.equal(d.metrics.conversion,null);assert.equal(d.cohort.attempts,null);assert.equal(d.rows[0].purchases,null);assert.equal(d.cac,null);assert.equal(d.metrics.purchases,0);

@@ -57,13 +57,15 @@ export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={
     if(!['Europe/Bratislava','Europe/Prague'].includes(account.timezone_name))throw new HttpError(502,'Časové pásmo reklamného účtu nezodpovedá dňom v Bratislave.');
     const rows=[],keys=new Set();let after='';
     for(let page=0;page<20;page++){
-      const data=await graph(env,'act_'+metaAccount+'/insights',{fields:'account_id,account_currency,campaign_id,campaign_name,date_start,date_stop,spend',level:'campaign',time_increment:'1',time_range:JSON.stringify({since:from,until:to}),breakdowns:'publisher_platform',limit:'500',...(after?{after}:{})},signal);
+      const data=await graph(env,'act_'+metaAccount+'/insights',{fields:'account_id,account_currency,campaign_id,campaign_name,date_start,date_stop,spend,impressions',level:'campaign',time_increment:'1',time_range:JSON.stringify({since:from,until:to}),breakdowns:'publisher_platform',limit:'500',...(after?{after}:{})},signal);
       if(!Array.isArray(data.data))throw new HttpError(502,'Meta nevrátila denný prehľad výdavkov.');
       for(const r of data.data){
         if(r.account_id!==metaAccount||r.account_currency!=='EUR'||!id(r.campaign_id)||typeof r.campaign_name!=='string'||r.campaign_name.length>400||!days.includes(r.date_start)||r.date_stop!==r.date_start||typeof r.publisher_platform!=='string'||!/^\w{1,40}$/.test(r.publisher_platform))throw new HttpError(502,'Meta vrátila neplatné alebo neporovnateľné riadky výdavkov.');
         const key=[r.date_start,r.campaign_id,r.publisher_platform].join(':');
         if(keys.has(key))throw new HttpError(502,'Meta vrátila duplicitný riadok výdavkov.');keys.add(key);
-        rows.push({day:r.date_start,campaign:r.campaign_id,name:r.campaign_name,platform:r.publisher_platform,cents:spendCents(r.spend)});
+        // Missing/malformed impressions must not corrupt or suppress valid costs.
+        const impressions=typeof r.impressions==='string'&&/^\d{1,16}$/.test(r.impressions)&&Number.isSafeInteger(Number(r.impressions))?Number(r.impressions):null;
+        rows.push({day:r.date_start,campaign:r.campaign_id,name:r.campaign_name,platform:r.publisher_platform,cents:spendCents(r.spend),impressions});
       }
       if(rows.length>5000)throw new HttpError(502,'Prehľad je príliš veľký; vyberte kratší rozsah.');
       if(!data.paging?.next)break;
@@ -73,8 +75,11 @@ export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={
       after=cursor;
     }
     const statements=[db.prepare('DELETE FROM meta_ads_spend WHERE day>=? AND day<=?').bind(from,to)];
-    for(let i=0;i<rows.length;i+=100)statements.push(db.prepare(`INSERT INTO meta_ads_spend SELECT json_extract(value,'$.day'),json_extract(value,'$.campaign'),json_extract(value,'$.name'),json_extract(value,'$.platform'),json_extract(value,'$.cents') FROM json_each(?)`).bind(JSON.stringify(rows.slice(i,i+100))));
+    for(let i=0;i<rows.length;i+=100)statements.push(db.prepare(`INSERT INTO meta_ads_spend(day,campaign_id,campaign_name,platform,spend_cents) SELECT json_extract(value,'$.day'),json_extract(value,'$.campaign'),json_extract(value,'$.name'),json_extract(value,'$.platform'),json_extract(value,'$.cents') FROM json_each(?)`).bind(JSON.stringify(rows.slice(i,i+100))));
     statements.push(db.prepare(`INSERT INTO meta_ads_days SELECT value,? FROM json_each(?) WHERE 1 ON CONFLICT(day) DO UPDATE SET synced_at=excluded.synced_at`).bind(at,JSON.stringify(days)));
+    statements.push(db.prepare('DELETE FROM meta_ads_impressions WHERE day>=? AND day<=?').bind(from,to));
+    for(let i=0;i<rows.length;i+=100)statements.push(db.prepare(`INSERT INTO meta_ads_impressions SELECT json_extract(value,'$.day'),json_extract(value,'$.campaign'),json_extract(value,'$.platform'),json_extract(value,'$.impressions') FROM json_each(?) WHERE json_extract(value,'$.impressions') IS NOT NULL`).bind(JSON.stringify(rows.slice(i,i+100))));
+    statements.push(db.prepare(`INSERT INTO meta_ads_impression_days SELECT value,? FROM json_each(?) WHERE 1 ON CONFLICT(day) DO UPDATE SET synced_at=excluded.synced_at`).bind(rows.every(r=>r.impressions!==null)?at:null,JSON.stringify(days)));
     statements.push(db.prepare(`UPDATE meta_ads_state SET currency='EUR',timezone=?,last_success_at=?,last_error=NULL,lock_token=NULL,lock_until=0 WHERE id=1 AND lock_token=?`).bind(account.timezone_name,at,token));
     // Complete range replacement and coverage are a single D1 transaction.
     await db.batch(statements);
@@ -89,7 +94,8 @@ export async function scheduledMetaAds(env,at=Date.now()){
   if(!env.META_ADS_ACCESS_TOKEN)return {skipped:true};
   const today=localDate(at);
   const state=await first(env.TQ_DB,'SELECT last_success_at FROM meta_ads_state WHERE id=1');
-  try{return await syncMetaAds(env,{from:shift(today,state.last_success_at?-6:-29),to:today},at,{automatic:true});}
+  const impressions=await first(env.TQ_DB,'SELECT 1 FROM meta_ads_impression_days WHERE synced_at IS NOT NULL LIMIT 1');
+  try{return await syncMetaAds(env,{from:shift(today,state.last_success_at&&impressions?-6:-29),to:today},at,{automatic:true});}
   catch{return {failed:true};} // The sanitized failure is visible in the admin report.
 }
 export async function saveMetaCampaign(env,input){
@@ -131,4 +137,22 @@ export async function metaAdsReport(env,f,collection,at=Date.now()){
   base.cac=base.costs/count;
   base.cacReason='Výdavky / '+count+' priradených platených transakcií z reklamných návštev v rovnakých dňoch. Neskoršie úhrady kohorty sa dopĺňajú; darček je jedna transakcia, zdarma sa vylučuje, refundovaná platba ostáva historickým nákupom. Ide o cenu za nameraný nákup, nie overeného nového zákazníka; návštevy bez súhlasu a nepriradené nákupy chýbajú.';
   return base;
+}
+
+// Additive reporting only. Cost/CAC calculations above retain their definitions.
+export async function metaImpressionsReport(env,f,costReport,at=Date.now()){
+  const unavailable=reason=>({total:null,facebook:null,instagram:null,other:null,syncedAt:null,partial:false,reason});
+  if(costReport.costs==null)return unavailable(costReport.costReason);
+  const coverage=await query(env.TQ_DB,'SELECT day,synced_at impressions_synced_at FROM meta_ads_impression_days WHERE day>=? AND day<=?',f.from,f.to);
+  if(coverage.length!==dates(f.from,f.to).length||coverage.some(r=>r.impressions_synced_at==null))return unavailable('Pre časť obdobia chýba overený import zobrazení reklamy. Obnovte Meta údaje pre zvolené obdobie.');
+  const syncedAt=Math.min(...coverage.map(r=>r.impressions_synced_at));
+  if(coverage.some(r=>r.day===localDate(at)&&at-r.impressions_synced_at>2*hour))return unavailable('Dnešné zobrazenia reklamy sú staršie než dve hodiny. Obnovte Meta údaje.');
+  const platform=f.source==='facebook_ads'?'facebook':f.source==='instagram_ads'?'instagram':'';
+  const rows=await query(env.TQ_DB,`SELECT i.impressions,s.platform,coalesce(m.utm_campaign,s.campaign_id) utm FROM meta_ads_spend s LEFT JOIN meta_ads_impressions i USING(day,campaign_id,platform) LEFT JOIN meta_ads_campaigns m USING(campaign_id) WHERE s.day>=? AND s.day<=?`+(platform?' AND s.platform=?':''),f.from,f.to,...(platform?[platform]:[]));
+  const selected=rows.filter(r=>!f.campaign||r.utm===f.campaign);
+  if(selected.some(r=>r.impressions==null))return unavailable('Meta neposkytla platný počet zobrazení pre všetky vybrané riadky. Výdavky sú vykázané samostatne.');
+  const result={total:0,facebook:0,instagram:0,other:0,syncedAt,partial:coverage.some(r=>r.day===localDate(at)),reason:'Zobrazenia reklamy z Meta, nie unikátni ľudia ani návštevy webu. Dnešok je priebežný; Meta môže údaje doplniť.'};
+  for(const row of selected){result.total+=row.impressions;result[['facebook','instagram'].includes(row.platform)?row.platform:'other']+=row.impressions;}
+  if(!Number.isSafeInteger(result.total))return unavailable('Počet zobrazení je mimo podporovaného číselného rozsahu.');
+  return result;
 }
