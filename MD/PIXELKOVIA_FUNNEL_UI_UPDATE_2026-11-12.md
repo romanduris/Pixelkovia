@@ -1,6 +1,6 @@
 # Pixelkovia – update UI stránky „Predajný funnel“
 
-**Stav:** Zadanie pre Codex, 12. 11. 2026  
+**Stav:** Implementované a otestované, 12. 11. 2026
 **Rozsah:** Existujúca záložka **Predajný funnel** v administrácii. Úprava hlavne UI, bez prestavby analytiky.
 
 ## Cieľ
@@ -74,20 +74,30 @@ Pre všetky sumy v EUR použiť formát na **jedno desatinné miesto** (napr. `5
 
 ## 7. Akceptačné kritériá
 
-- [ ] Užší filter a diskrétnejšie zaobchádzanie s hornou informačnou hláškou.
-- [ ] Štyri kroky presne: **Zobrazenia, Stránka, Checkout, Nákupy**.
-- [ ] V každom riadku názov → farebný pruh → číslo, správne zarovnané.
-- [ ] Dĺžky pruhov zodpovedajú reálnym počtom, bez zavádzania pri neporovnateľných metrikách.
-- [ ] Segmenty FB / IG / ostatné a malé čísla vnútri, ak sa zmestia.
-- [ ] Legenda je až pod grafmi.
-- [ ] Konverzia a Tržby zostali zachované.
-- [ ] Zisk = tržby − reklama, kladný zelený / záporný červený, EUR na 1 desatinné miesto.
-- [ ] Existujúca položka **„− reklama“** sa zachováva a suma sa neodpočítava dvakrát.
-- [ ] Mobil 320/360/390/430 px a desktop bez pretečenia.
-- [ ] Testy existujúcich filtrov a finančných výpočtov prešli.
+- [x] Užší filter a diskrétnejšie zaobchádzanie s hornou informačnou hláškou.
+- [x] Štyri kroky presne: **Zobrazenia, Stránka, Checkout, Nákupy**.
+- [x] V každom riadku názov → farebný pruh → číslo, správne zarovnané.
+- [x] Dĺžky pruhov zodpovedajú reálnym počtom, bez zavádzania pri neporovnateľných metrikách.
+- [x] Segmenty FB / IG / ostatné a malé čísla vnútri, ak sa zmestia.
+- [x] Legenda je až pod grafmi.
+- [x] Konverzia a Tržby zostali zachované.
+- [x] Zisk = tržby − reklama, kladný zelený / záporný červený, EUR na 1 desatinné miesto.
+- [x] Existujúca položka **„− reklama“** sa zachováva a suma sa neodpočítava dvakrát.
+- [x] Mobil 320/360/390/430 px a desktop bez pretečenia.
+- [x] Testy existujúcich filtrov a finančných výpočtov prešli.
 
 ## 8. Odovzdanie
 
 Po implementácii uveď upravené súbory, výsledky testov, prípadné obmedzenia údajov a screenshoty mobilnej aj desktopovej verzie. Nič nesimuluj v produkčných číslach.
 
 **Priorita:** Čistý, kompaktný, intuitívny horný predajný funnel bez zbytočnej komplexity.
+
+
+## Realizácia a overenie
+
+- Úpravy zostali v hornej časti existujúcej záložky: užšie obdobia, rozbaľovacia informácia o kvalite merania, štyri zarovnané riadky, adaptívne štítky segmentov, legenda pod grafmi a výsledky Konverzia / Tržby / Zisk. Otvorenie definícií sa ukladá medzi existujúce administračné preferencie.
+- Dáta, reporty, databáza, atribúcia, počítanie nákupov a pôvodné finančné výpočty zostali zachované. Zisk sa odvodzuje iba v UI ako `revenueCents - costs`, pred zaokrúhlením; pri chýbajúcich, neúplných, chybných alebo neaktuálnych nákladoch je nedostupný. Existujúce „Reklama − …“ zostáva pri hrubých tržbách. Spodný obchodný detail sa nemenil.
+- Reklamné impressions majú samostatnú mierku. Webové kroky používajú maximum dostupných webových objemov; graf môže podľa skutočných počítadiel aj rásť a nepredstiera jednu kohortu ani mieru odchodu. Minimum 4 px je uvedené v metodike. Nulové a nedostupné hodnoty nevytvárajú farebné segmenty.
+- Prešlo 137 backendových testov; samostatne aj 3 testy preferencií po rozšírení povolených názvov detailov. Prešiel build statického balíka aj Wrangler dry-run.
+- Celý prehliadačový scenár prešiel v Chromium a WebKit (Safari cez virtuálnu obrazovku), 320–1920 px vrátane 320/360/390/430 px a 200 % písma. Overené filtre, nedostupnosť, nulové náklady, kladný/záporný/nulový zisk, zachovaná konverzia/tržby/CAC, zarovnanie a štítky bez pretečenia.
+- Aktualizované [snímky a podrobnosti QA](../docs/qa/funnel-fb-ig/README.md) obsahujú výslovne označené testovacie údaje. Reálna nenulová reklamná atribúcia na cieľových zariadeniach zostáva samostatným predreklamným overením; tento UI zásah ju nenahrádza.

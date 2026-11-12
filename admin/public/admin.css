@@ -451,11 +451,11 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-filter-chips{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
 .marketing-filter-chips button{display:flex;gap:8px;align-items:center;min-width:0;max-width:100%;font-size:12px;overflow-wrap:anywhere}
 .marketing-filter-chips button>span{font-size:17px}
-.marketing-quality{display:flex;gap:10px;align-items:center;border-left:2px solid #b9a070;padding:6px 10px;color:#e2d2ae;background:#ac8e4820;border-radius:0 5px 5px 0;font-size:12px}
-.marketing-quality>span{font-size:16px;align-self:flex-start}
-.marketing-period-note{flex:1;min-width:0}
+.marketing-quality{flex:1 1 auto;min-width:0;color:#e2d2ae;font-size:11px}
+.marketing-quality>summary{display:flex;align-items:center;gap:5px;min-height:28px;width:fit-content;cursor:pointer;list-style:none;border-radius:4px}
+.marketing-quality .marketing-info{margin:0;border-color:#b9a070;color:inherit}
+.marketing-period-note{padding:8px 10px;border-left:2px solid #b9a070;background:#ac8e4815;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
 .marketing-period-note p+p{margin-top:3px}
-.marketing-quality button{font-size:12px;flex-shrink:0;min-height:30px;background:transparent;border-color:#746747;color:#f0dfbb}
 .marketing-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;padding:0 4px 10px}
 .marketing-kpi{min-width:0;border-left:1px solid var(--m-border);overflow:hidden}
 .marketing-kpi:first-child{border-left:0}
@@ -575,10 +575,10 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 @media(max-width:360px){.marketing-filters{grid-template-columns:1fr}.marketing-kpi>summary{padding-inline:8px}.marketing-table-wrap td{font-size:11px}.marketing-table-wrap thead th button{font-size:10px}.marketing-sources>.marketing-section-heading h2{font-size:11px}.marketing-sources .marketing-period-toggle{font-size:10.5px}.marketing-toolbar-actions{display:grid;grid-template-columns:1fr auto auto}.marketing-toolbar-actions #marketing-logout:not([hidden]){grid-column:3;justify-self:end}.marketing-toolbar-actions button,.marketing-toolbar-actions select{padding-left:8px;padding-right:8px}}
 
 /* Daily first-party observations and exact paid-transaction drill-down. */
-.marketing-period-buttons{display:flex;gap:3px;padding:3px;border:1px solid #34475f;border-radius:8px;background:#0c1729}
+.marketing-period-buttons{display:flex;gap:1px;padding:2px;border:1px solid #34475f;border-radius:8px;background:#0c1729}
 .marketing-period-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
 .marketing-date-icon{display:none;pointer-events:none}
-.marketing-period-buttons button{min-width:39px;border:0;background:transparent;padding:6px 10px;color:#becfe4}
+.marketing-period-buttons button{min-width:36px;border:0;background:transparent;padding:6px 7px;color:#becfe4}
 .marketing-period-buttons button[aria-pressed="true"]{background:#334c69;color:#fff;box-shadow:inset 0 0 0 1px #789bc5}
 .marketing-since-date{display:flex;align-items:center;gap:8px;min-width:0;padding:3px 8px 3px 10px;border:1px solid #34475f;border-radius:8px;background:#0c1729;color:#becfe4;font-size:12px;white-space:nowrap}
 .marketing-since-date input{width:132px;min-width:0;min-height:32px;border:0;background:transparent;color:#e7edf7;color-scheme:dark;font:inherit}
@@ -640,7 +640,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
   .marketing-title{grid-column:1;grid-row:1}.marketing-title h1{font-size:18px}
   .marketing-toolbar-actions{display:contents}
   .marketing-period-controls{grid-column:1/-1;grid-row:2;flex-wrap:nowrap;gap:6px}
-  .marketing-period-buttons{flex:1 1 auto;min-width:0;justify-content:space-between}
+  .marketing-period-buttons{flex:0 1 auto;min-width:0;justify-content:space-between}
   .marketing-period-buttons button{flex:1;min-width:0;min-height:36px;padding:6px 4px;font-size:12px}
   .marketing-period-controls .marketing-since-date{position:relative;flex:0 0 42px;width:42px;height:44px;justify-content:center;padding:0}
   .marketing-since-date>span{display:none}.marketing-date-icon{display:block}
@@ -737,46 +737,56 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-ads-campaign input{width:100%;min-width:0;min-height:40px;box-sizing:border-box;color:var(--text);background:#18243b;border:1px solid #3e4f70;border-radius:5px;padding:7px 9px}
 
 
-/* A normalized source share in each step; the widths are not drop-off rates. */
-.marketing-kpis{display:block;padding:0}
-.marketing-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--m-border)}
-.marketing-funnel-step{--step-width:100%;border-left:1px solid var(--m-border)}
-.marketing-funnel-step:nth-child(2){--step-width:94%}.marketing-funnel-step:nth-child(3){--step-width:88%}.marketing-funnel-step:nth-child(4){--step-width:82%}
-.marketing-funnel-step>summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:12px;min-height:100px}
-.marketing-step-heading{min-width:0}.marketing-step-heading small{display:block;margin-top:3px;font-size:11px;line-height:1.3;overflow-wrap:anywhere}
-.marketing-funnel-step .marketing-kpi-label{line-height:1.35;font-size:12px}
-.marketing-funnel-step strong{font-size:24px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-.marketing-funnel-step strong.is-unavailable{font-size:14px;line-height:1.4}
-.marketing-source-strip{grid-column:1/-1;display:grid;gap:5px;min-width:0}
-.marketing-source-track{display:flex;width:var(--step-width);height:7px;border-radius:3px;overflow:hidden;background:#344159}
-.marketing-source-track.is-unavailable{background:repeating-linear-gradient(135deg,#344159,#344159 4px,#202f45 4px,#202f45 8px)}
-.marketing-source-track>i{height:100%;flex-shrink:0}
+/* Only the upper funnel: volume rows, source segments and financial results. */
+.marketing-kpis{display:block;padding:0;container-type:inline-size}
+.marketing-steps{display:grid;grid-template-columns:max-content minmax(0,1fr) max-content;row-gap:0;padding:0 16px 8px}
+.marketing-funnel-step,.marketing-funnel-step>summary{display:grid;grid-template-columns:subgrid;grid-column:1/-1;min-width:0}
+.marketing-funnel-step{border:0}
+.marketing-funnel-step+.marketing-funnel-step{border-top:1px solid #26364c}
+.marketing-funnel-step>summary{align-items:center;column-gap:16px;padding:5px 0;min-height:42px}
+.marketing-funnel-step .marketing-kpi-label{justify-content:flex-start;gap:0;line-height:1.3;font-size:18px;font-weight:700;color:#e7edf7}
+.marketing-funnel-step .marketing-info{width:13px;height:13px;font-size:9px;margin-left:5px}
+.marketing-info.is-partial{color:#e2d2ae;border-color:#b9a070}
+.marketing-funnel-step strong{font-size:26px;line-height:1.25;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.marketing-funnel-step strong.is-unavailable{font-size:13px;letter-spacing:0;white-space:normal;overflow-wrap:anywhere}
+.marketing-source-strip{display:block;min-width:0;border-radius:4px;background:#1c2b40}
+.marketing-source-track{display:flex;width:0;height:25px;border-radius:4px;overflow:hidden}
+.marketing-source-track.is-unavailable{width:100%;background:repeating-linear-gradient(135deg,#344159,#344159 4px,#202f45 4px,#202f45 8px)}
+.marketing-source-segment{height:100%;flex-shrink:0;min-width:0;overflow:hidden;text-align:center;color:#091522;font-weight:700;font-size:11px;font-style:normal;line-height:25px}
+.marketing-source-segment>span{display:block;width:max-content;margin:auto;visibility:hidden;white-space:nowrap}
 .funnel-source-facebook{background:#459bff}.funnel-source-instagram{background:#ff52b9}.funnel-source-other{background:#a6b0c2}
-.marketing-source-counts{display:flex;flex-wrap:wrap;gap:3px 9px;font-size:11px;line-height:1.3;color:#c3d0e3;font-variant-numeric:tabular-nums}
-.marketing-source-counts>span{display:inline-flex;align-items:center;gap:3px;min-width:0;overflow-wrap:anywhere}
+.marketing-step-detail{grid-column:1/-1;padding:2px 0 12px;min-width:0;color:#c6d7ec;font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.marketing-source-counts{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:12px;color:#c3d0e3;font-variant-numeric:tabular-nums}
+.marketing-source-counts>span{display:inline-flex;align-items:center;gap:4px;min-width:0;overflow-wrap:anywhere}
 .marketing-source-counts b{font-weight:600;color:#f0f5ff}
-.marketing-source-counts i,.marketing-funnel-legend i{display:inline-block;width:7px;height:7px;border-radius:2px;flex-shrink:0}
-.marketing-funnel-legend{display:flex;flex-wrap:wrap;gap:5px 14px;padding:0 16px 8px;color:#b9c9de;font-size:11px;line-height:1.4}
+.marketing-source-counts i,.marketing-funnel-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.marketing-funnel-legend{display:flex;flex-wrap:wrap;gap:5px 14px;padding:0 16px 6px;color:#b9c9de;font-size:11px;line-height:1.4}
 .marketing-funnel-legend>span{display:inline-flex;align-items:center;gap:5px}
-.marketing-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10em),1fr))}
+.marketing-funnel-method{padding:0 16px 10px;color:#9aafc8;font-size:11px;line-height:1.5}
+.marketing-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,7em),1fr));border-top:1px solid var(--m-border)}
 .marketing-results .marketing-kpi{grid-column:auto;border-top:0}.marketing-results .marketing-kpi:first-child{border-left:0}
 .marketing-results .marketing-kpi[open]{grid-column:1/-1}
-.marketing-funnel-method{padding:0 16px 10px;color:#9aafc8;font-size:11px;line-height:1.5}
-@media(max-width:1100px){.marketing-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.marketing-funnel-step:nth-child(n+3){border-top:1px solid var(--m-border)}.marketing-funnel-step:nth-child(odd){border-left:0}}
+.marketing-results .marketing-kpi>summary{min-height:0}
+.marketing-results .marketing-kpi strong{white-space:normal;overflow-wrap:anywhere}
+.marketing-results .marketing-kpi strong.is-unavailable{font-size:12px;line-height:2.5;letter-spacing:0}
+.marketing-results .is-positive strong{color:#71e0ae}.marketing-results .is-negative strong{color:#ff8c9e}
 @media(max-width:750px){
- .marketing-steps{display:block}
- .marketing-funnel-step{border:0;border-top:1px solid var(--m-border)}
- .marketing-funnel-step:first-child{border-top:0}
- .marketing-funnel-step>summary{min-height:0;padding:4px 10px;gap:1px 8px}
- .marketing-funnel-step .marketing-kpi-label{font-size:12px;min-height:0;align-items:center}
- .marketing-funnel-step strong{font-size:22px;line-height:1.2}.marketing-funnel-step strong.is-unavailable{font-size:14px;max-width:110px}
- .marketing-step-heading small{display:block;font-size:10px;line-height:1.3;margin-top:1px}
+ .marketing-steps{padding:0 10px 6px}
+ .marketing-funnel-step>summary{min-height:42px;padding:6px 0;column-gap:8px}
+ .marketing-funnel-step .marketing-kpi-label{font-size:14px;min-height:0;align-items:center}
+ .marketing-funnel-step strong{font-size:22px}.marketing-funnel-step strong.is-unavailable{font-size:11px;max-width:76px}
+ .marketing-source-track{height:22px}.marketing-source-segment{line-height:22px;font-size:10px}
  .marketing-funnel-step .marketing-purchase-link{min-height:28px}
- .marketing-source-strip{gap:2px}.marketing-source-track{height:6px}
- .marketing-source-counts{font-size:11px;gap:3px 12px}
- .marketing-results .marketing-kpi>summary{min-height:0;padding:8px 10px;gap:3px}
+ .marketing-results .marketing-kpi>summary{padding:8px 10px;gap:3px}
  .marketing-results .marketing-kpi-label{min-height:16px}
  .marketing-results .marketing-kpi strong{font-size:24px}
+ .marketing-results #marketing-kpi-conversion strong{font-size:22px;white-space:nowrap}
  .marketing-funnel-legend{padding:0 10px 6px;gap:5px 10px;font-size:10px}
- .marketing-funnel-method{padding:3px 10px 8px;font-size:10px;line-height:1.4}
+ .marketing-funnel-method{padding:0 10px 8px;font-size:10px;line-height:1.4}
+}
+/* Text zoom can require a second line; keep every label and total readable. */
+@container (max-width:17em){
+ .marketing-steps{grid-template-columns:minmax(0,1fr) max-content}
+ .marketing-funnel-step .marketing-kpi-label{grid-column:1/-1}
+ .marketing-funnel-step>summary{row-gap:5px}
 }
