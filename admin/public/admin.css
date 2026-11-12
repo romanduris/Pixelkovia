@@ -575,10 +575,10 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 @media(max-width:360px){.marketing-filters{grid-template-columns:1fr}.marketing-kpi>summary{padding-inline:8px}.marketing-table-wrap td{font-size:11px}.marketing-table-wrap thead th button{font-size:10px}.marketing-sources>.marketing-section-heading h2{font-size:11px}.marketing-sources .marketing-period-toggle{font-size:10.5px}.marketing-toolbar-actions{display:grid;grid-template-columns:1fr auto auto}.marketing-toolbar-actions #marketing-logout:not([hidden]){grid-column:3;justify-self:end}.marketing-toolbar-actions button,.marketing-toolbar-actions select{padding-left:8px;padding-right:8px}}
 
 /* Daily first-party observations and exact paid-transaction drill-down. */
-.marketing-period-buttons{display:flex;gap:1px;padding:2px;border:1px solid #34475f;border-radius:8px;background:#0c1729}
+.marketing-period-buttons{display:flex;gap:3px;padding:3px;border:1px solid #34475f;border-radius:8px;background:#0c1729}
 .marketing-period-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
 .marketing-date-icon{display:none;pointer-events:none}
-.marketing-period-buttons button{min-width:36px;border:0;background:transparent;padding:6px 7px;color:#becfe4}
+.marketing-period-buttons button{min-width:40px;border:0;background:transparent;padding:6px 7px;color:#becfe4}
 .marketing-period-buttons button[aria-pressed="true"]{background:#334c69;color:#fff;box-shadow:inset 0 0 0 1px #789bc5}
 .marketing-since-date{display:flex;align-items:center;gap:8px;min-width:0;padding:3px 8px 3px 10px;border:1px solid #34475f;border-radius:8px;background:#0c1729;color:#becfe4;font-size:12px;white-space:nowrap}
 .marketing-since-date input{width:132px;min-width:0;min-height:32px;border:0;background:transparent;color:#e7edf7;color-scheme:dark;font:inherit}
@@ -639,10 +639,10 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
   .marketing-toolbar{grid-template-columns:minmax(0,1fr) auto;gap:8px}
   .marketing-title{grid-column:1;grid-row:1}.marketing-title h1{font-size:18px}
   .marketing-toolbar-actions{display:contents}
-  .marketing-period-controls{grid-column:1/-1;grid-row:2;flex-wrap:nowrap;gap:6px}
-  .marketing-period-buttons{flex:0 1 auto;min-width:0;justify-content:space-between}
-  .marketing-period-buttons button{flex:1;min-width:0;min-height:36px;padding:6px 4px;font-size:12px}
-  .marketing-period-controls .marketing-since-date{position:relative;flex:0 0 42px;width:42px;height:44px;justify-content:center;padding:0}
+  .marketing-period-controls{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:8px}
+  .marketing-period-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));min-width:0;gap:3px}
+  .marketing-period-buttons button{width:100%;min-width:0;min-height:40px;margin:0;padding:6px 4px;font-size:12px}
+  .marketing-period-controls .marketing-since-date{position:relative;width:44px;height:44px;justify-content:center;padding:0}
   .marketing-since-date>span{display:none}.marketing-date-icon{display:block}
   .marketing-period-controls .marketing-since-date input{position:absolute;inset:0;width:100%;height:100%;min-height:0;opacity:0;cursor:pointer;padding:0}
   .marketing-since-date:focus-within{outline:2px solid #96e5d3;outline-offset:3px}
@@ -762,7 +762,6 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-source-counts i,.marketing-funnel-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .marketing-funnel-legend{display:flex;flex-wrap:wrap;gap:5px 14px;padding:0 16px 6px;color:#b9c9de;font-size:11px;line-height:1.4}
 .marketing-funnel-legend>span{display:inline-flex;align-items:center;gap:5px}
-.marketing-funnel-method{padding:0 16px 10px;color:#9aafc8;font-size:11px;line-height:1.5}
 .marketing-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,7em),1fr));border-top:1px solid var(--m-border)}
 .marketing-results .marketing-kpi{grid-column:auto;border-top:0}.marketing-results .marketing-kpi:first-child{border-left:0}
 .marketing-results .marketing-kpi[open]{grid-column:1/-1}
@@ -782,7 +781,6 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
  .marketing-results .marketing-kpi strong{font-size:24px}
  .marketing-results #marketing-kpi-conversion strong{font-size:22px;white-space:nowrap}
  .marketing-funnel-legend{padding:0 10px 6px;gap:5px 10px;font-size:10px}
- .marketing-funnel-method{padding:0 10px 8px;font-size:10px;line-height:1.4}
 }
 /* Text zoom can require a second line; keep every label and total readable. */
 @container (max-width:17em){

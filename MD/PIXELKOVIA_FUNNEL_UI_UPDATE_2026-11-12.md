@@ -101,3 +101,10 @@ Po implementácii uveď upravené súbory, výsledky testov, prípadné obmedzen
 - Prešlo 137 backendových testov; samostatne aj 3 testy preferencií po rozšírení povolených názvov detailov. Prešiel build statického balíka aj Wrangler dry-run.
 - Celý prehliadačový scenár prešiel v Chromium a WebKit (Safari cez virtuálnu obrazovku), 320–1920 px vrátane 320/360/390/430 px a 200 % písma. Overené filtre, nedostupnosť, nulové náklady, kladný/záporný/nulový zisk, zachovaná konverzia/tržby/CAC, zarovnanie a štítky bez pretečenia.
 - Aktualizované [snímky a podrobnosti QA](../docs/qa/funnel-fb-ig/README.md) obsahujú výslovne označené testovacie údaje. Reálna nenulová reklamná atribúcia na cieľových zariadeniach zostáva samostatným predreklamným overením; tento UI zásah ju nenahrádza.
+
+
+### Spresnenie podľa vlastníka po nasadení
+
+- Mobilný prepínač období používa päť rovnakých stĺpcov s medzerami a samostatnú 44 px plochu kalendára, aby sa filtre nestláčali. Funkcia filtrov a dátové zdroje zostávajú zachované.
+- Segmenty ukazujú iba číselné hodnoty; označenia FB / IG / ostatné zostávajú v legende a v prístupnom popise či detaile.
+- Veta o mierke a minime pruhu bola odstránená z hlavného prehľadu. Metodika a obmedzenia sú naďalej dostupné po otvorení informácie pri metrike.

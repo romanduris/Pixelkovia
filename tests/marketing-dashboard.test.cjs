@@ -199,9 +199,9 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-sort-visits').click();
   for(const period of ['today','7','14','30','90','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
   await page.setViewportSize({width:320,height:900});
-  for(const period of ['30','90']){
+  for(const period of ['today','7','14','30','90']){
    await page.locator('[data-marketing-period="'+period+'"]').tap();await ready();
-   assert.ok(await page.locator('[data-marketing-day]').count()<=Number(period));assert.equal(await page.locator('[data-marketing-day-count]').count(),await page.locator('[data-marketing-day]').count());
+   assert.ok(await page.locator('[data-marketing-day]').count()<=(period==='today'?1:Number(period)));assert.equal(await page.locator('[data-marketing-day-count]').count(),await page.locator('[data-marketing-day]').count());
    await page.mouse.move(0,0);await page.locator('.marketing-chart-day[tabindex="0"]').focus();await page.keyboard.press('Home');
    assert.equal(await page.locator('[data-chart-step="-1"]').isDisabled(),true);await page.keyboard.press('End');
    assert.equal(await page.locator('[data-chart-step="1"]').isDisabled(),true);
@@ -227,6 +227,9 @@ const origin='https://pixelkovia.rodulab.com';
     assert.equal(await page.locator('#marketing-funnel-details').isVisible(),false,'saved open explanation stays hidden on phones');
     await page.locator('#marketing-funnel-details').evaluate(el=>el.open=false);
     const toolbar=await page.locator('.marketing-toolbar').boundingBox(),periods=await page.locator('.marketing-period-buttons').boundingBox(),calendar=await page.locator('.marketing-since-date').boundingBox();
+    const periodButtons=await page.locator('[data-marketing-period]').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,right:r.right,width:r.width,height:r.height};}));
+    for(let i=0;i<periodButtons.length;i++){assert.ok(periodButtons[i].width>=40&&periodButtons[i].height>=40,'period touch target '+width);if(i)assert.ok(periodButtons[i].x>=periodButtons[i-1].right+2,'period buttons have distinct spacing '+width);}
+    assert.equal(await page.locator('[data-marketing-period][aria-pressed="true"]').count(),1);
     assert.ok(toolbar.height<130,'compact phone toolbar '+width);assert.ok(Math.abs(periods.y-calendar.y)<4,'calendar shares period row '+width);assert.ok(calendar.x>=periods.x+periods.width,'calendar is at the right of periods');
     await page.locator('#marketing-since').fill(sinceDate);await page.locator('#marketing-since').blur();await ready();assert.match(calls.at(-1),/period=since/);
     await page.locator('[data-marketing-period="14"]').tap();await ready();assert.match(calls.at(-1),/period=14/);
@@ -290,6 +293,9 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('.marketing-funnel').evaluate(el=>{const badge=document.createElement('p');badge.id='qa-fixture-label';badge.textContent='TESTOVACIE ÚDAJE · QA';badge.style.cssText='padding:6px 10px;color:#ffe0a3;font-size:11px;font-weight:700';el.prepend(badge);});
   for(const width of [1440,430,390,360,320]){
    await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+   assert.ok(await page.locator('.marketing-source-segment>span').evaluateAll(els=>els.every(el=>/^[\d\s]+$/.test(el.textContent))),'segments show only numbers');
+   assert.equal(await page.locator('.marketing-funnel-method').count(),0,'method is available only inside metric details');
+   await page.locator('.marketing-toolbar').screenshot({path:'/tmp/pixelkovia-funnel-toolbar-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
    const rows=await page.locator('.marketing-funnel-step>summary').evaluateAll(els=>els.map(el=>[...el.children].map(child=>{const r=child.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom};})));
    for(const row of rows){assert.ok(row[0].right<=row[1].x+1&&row[1].right<=row[2].x+1,'name, bar, number fit one row '+width);assert.ok(Math.abs(row[1].x-rows[0][1].x)<1,'shared bar start '+width);assert.ok(Math.abs(row[2].right-rows[0][2].right)<1,'shared count end '+width);}
    assert.ok(await page.locator('.marketing-source-segment>span').evaluateAll(els=>els.every(el=>getComputedStyle(el).visibility==='hidden'||el.getBoundingClientRect().width<=el.parentElement.clientWidth-6)),'labels fit their segments');
