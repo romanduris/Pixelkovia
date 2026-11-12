@@ -25,11 +25,16 @@ function providerError(status,error){
   return new HttpError(502,`Meta API HTTP ${status}${code!==null?' · kód '+code:''}${sub!==null?' / '+sub:''}. ${detail}`);
 }
 async function graph(env,path,params,signal){
+  const accessToken=String(env.META_ADS_ACCESS_TOKEN).trim();
+  if(!/^[\x21-\x7e]+$/.test(accessToken))throw new HttpError(502,'Meta token má neplatný formát. Vložte celý token bez vnútorných medzier alebo zalomenia riadkov.');
   const url=new URL(`https://graph.facebook.com/${metaVersion}/${path}`);
   for(const [key,value]of Object.entries(params))url.searchParams.set(key,value);
   let response,data;
-  try{response=await (env.META_ADS_FETCH||fetch)(url,{headers:{Authorization:'Bearer '+env.META_ADS_ACCESS_TOKEN},redirect:'error',signal});data=await response.json();}
-  catch{throw new HttpError(502,'Meta API je nedostupné alebo nevrátilo platnú odpoveď.');}
+  try{response=await (env.META_ADS_FETCH||fetch)(url,{headers:{Authorization:'Bearer '+accessToken},redirect:'error',signal});}
+  catch{throw new HttpError(502,signal.aborted?'Meta API prekročilo časový limit. Skúste import znova.':'Spojenie s Meta API zlyhalo pred prijatím HTTP odpovede. Overte sieťovú dostupnosť; platnosť tokenu zatiaľ nebola potvrdená.');}
+  try{data=await response.json();}
+  catch{throw new HttpError(502,`Meta API HTTP ${response.status}: odpoveď nie je platný JSON. Obsah odpovede sa z bezpečnostných dôvodov nezobrazuje.`);}
+  if(!data||typeof data!=='object'||Array.isArray(data))throw new HttpError(502,`Meta API HTTP ${response.status}: neočakávaný formát JSON odpovede.`);
   if(!response.ok||data.error)throw providerError(response.status,data.error);
   return data;
 }

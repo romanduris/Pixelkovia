@@ -58,6 +58,33 @@ test('wrong account, currency, timezone, duplicate rows, invalid amounts and bro
  }
  assert.equal(spendCents('0.01'),1);assert.equal(spendCents('12.3'),1230);for(const value of ['-1','1e3','NaN','1,23',12])assert.throws(()=>spendCents(value));
 });
+test('transport and response failures remain distinct and never leak token or provider content',async()=>{
+ for(const [fetch,expected]of [
+  [async()=>{throw Error('private transport test-token-never-in-url');},/pred prijatím HTTP odpovede/],
+  [async()=>new Response('<html>private test-token-never-in-url</html>',{status:503}),/HTTP 503: odpoveď nie je platný JSON/],
+  [async()=>Response.json(null),/HTTP 200: neočakávaný formát JSON/],
+  [async()=>Response.json('private test-token-never-in-url'),/HTTP 200: neočakávaný formát JSON/],
+  [async()=>Response.json([]),/HTTP 200: neočakávaný formát JSON/]
+ ]){
+  const {db,env}=setup();try{
+   await syncMetaAds(env,range,at);
+   const coverage=await query(db,'SELECT * FROM meta_ads_days');env.META_ADS_FETCH=fetch;
+   await assert.rejects(syncMetaAds(env,range,at+61000),e=>e.status===502&&expected.test(e.message)&&!e.message.includes('private')&&!e.message.includes(env.META_ADS_ACCESS_TOKEN));
+   const state=await first(db,'SELECT last_error,lock_until FROM meta_ads_state');
+   assert.match(state.last_error,expected);assert.ok(!state.last_error.includes(env.META_ADS_ACCESS_TOKEN));assert.equal(state.lock_until,0);
+   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);assert.deepEqual(await query(db,'SELECT * FROM meta_ads_days'),coverage);
+  }finally{db.close();}
+ }
+});
+test('token paste trims outer whitespace but rejects embedded whitespace before making a request',async()=>{
+ const {db,env,mock}=setup();try{
+  env.META_ADS_ACCESS_TOKEN=' \n'+env.META_ADS_ACCESS_TOKEN+'\r\n';
+  await syncMetaAds(env,range,at);assert.equal(mock.calls[0].init.headers.Authorization,'Bearer test-token-never-in-url');
+  const calls=mock.calls.length;env.META_ADS_ACCESS_TOKEN='test-token\nprivate-value';
+  await assert.rejects(syncMetaAds(env,range,at+61000),e=>e.status===502&&/neplatný formát/.test(e.message)&&!e.message.includes('private-value'));
+  assert.equal(mock.calls.length,calls);assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);
+ }finally{db.close();}
+});
 test('a D1 write failure rolls back range replacement and coverage together',async()=>{
  const {db,env}=setup();try{
   await syncMetaAds(env,range,at);
