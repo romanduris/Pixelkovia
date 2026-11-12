@@ -96,7 +96,7 @@ const origin='https://pixelkovia.rodulab.com';
   }
   await page.locator('#refresh-marketing').click();await ready();
   const latestDay=page.locator('.marketing-chart-day').last();
-  assert.deepEqual(await page.locator('.chart-line').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-line chart-source-facebook','chart-line chart-source-instagram','chart-line chart-source-other']);
+  assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-facebook','chart-bar chart-source-instagram','chart-bar chart-source-other']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
   await latestDay.focus();assert.deepEqual(await page.locator('.marketing-chart-legend li').evaluateAll(els=>els.map(el=>el.getAttribute('aria-label'))),['Facebook: 2','Instagram: 2','Others: 5']);
   assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'9');
   await page.locator('#marketing-unique').check();await latestDay.focus();assert.equal(await page.locator('[data-marketing-count]').last().textContent(),'9');assert.deepEqual(await page.locator('.marketing-chart-legend li').evaluateAll(els=>els.map(el=>el.getAttribute('aria-label'))),['Facebook: 2','Instagram: 2','Others: 5']);
@@ -194,7 +194,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.setViewportSize({width:320,height:900});
   for(const period of ['30','90']){
    await page.locator('[data-marketing-period="'+period+'"]').tap();await ready();
-   assert.ok(await page.locator('[data-marketing-day]').count()<=Number(period));
+   assert.ok(await page.locator('[data-marketing-day]').count()<=Number(period));assert.equal(await page.locator('[data-marketing-day-count]').count(),await page.locator('[data-marketing-day]').count());
    await page.locator('.marketing-chart-day[tabindex="0"]').focus();await page.keyboard.press('Home');
    assert.equal(await page.locator('[data-chart-step="-1"]').isDisabled(),true);await page.keyboard.press('End');
    assert.equal(await page.locator('[data-chart-step="1"]').isDisabled(),true);
@@ -209,7 +209,7 @@ const origin='https://pixelkovia.rodulab.com';
    await page.waitForFunction(()=>{const plot=document.querySelector('.marketing-chart-plot'),svg=plot?.querySelector('svg');return plot&&svg&&Math.abs(Number(svg.getAttribute('width'))-plot.clientWidth)<2;});
    assert.ok(await page.locator('.marketing-chart-plot').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'chart fits its container '+width);
    if(width<=750){assert.ok((await page.locator('#marketing-charts').boundingBox()).height<320,'compact phone chart '+width);}
-   await page.locator('#marketing-charts').screenshot({path:'/tmp/pixelkovia-line-chart-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
+   await page.locator('#marketing-charts').screenshot({path:'/tmp/pixelkovia-slim-bars-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
    assert.ok(await page.locator('#marketing-overview-unique').isVisible());
    assert.ok(await page.locator('#marketing-kpi-checkout small').isVisible());assert.ok(await page.locator('#marketing-kpi-revenue small').isVisible());
    const overview=await page.locator('.marketing-funnel').boundingBox();assert.ok(overview.height<300,'compact five-metric overview '+width);

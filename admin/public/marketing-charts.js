@@ -18,32 +18,43 @@ export function paymentLink(d){
  return '#payments?'+params;
 }
 function chartSvg(days,unique,width=640,selected=days.length-1){
- const key=unique?'uniqueVisitors':'visits',height=width<600?152:218,left=34,right=12,top=16,bottom=height-27;
- const peak=Math.max(0,...days.flatMap(day=>day.sources.map(source=>source[key]||0)));
- const max=Math.max(2,Math.ceil(peak/2)*2),x=i=>days.length===1?(left+width-right)/2:left+i*(width-left-right)/(days.length-1),y=value=>bottom-value/max*(bottom-top);
+ const key=unique?'uniqueVisitors':'visits',height=width<600?152:218,left=30,right=8;
+ const step=(width-left-right)/Math.max(1,days.length),barWidth=Math.min(9,step*.55);
+ const longest=Math.max(1,...days.map(day=>String(day[key]??'').length));
+ const vertical=step<longest*6+5,font=vertical?Math.max(5,Math.min(8,Math.floor(step))):10;
+ // Dense labels point upward. Reserve room for staggered labels while keeping
+ // every calendar slot and its bar within the actual container width.
+ const headroom=vertical?Math.min(height*.48,longest*font*.65*(Math.ceil(font/step)+1)+10):24;
+ const top=Math.max(26,headroom),showDates=step>=30,bottom=height-(showDates?25:9);
+ const peak=Math.max(0,...days.map(day=>day[key]||0)),max=Math.max(2,Math.ceil(peak/2)*2);
+ const x=i=>left+step*(i+.5),y=value=>bottom-value/max*(bottom-top);
  const compact=value=>new Intl.NumberFormat('sk-SK',{notation:'compact',maximumFractionDigits:1}).format(value);
- const axes=[0,max/2,max].map(value=>`<line class="chart-gridline" x1="${left}" x2="${width-right}" y1="${y(value)}" y2="${y(value)}"/><text class="chart-axis" x="${left-9}" y="${y(value)+4}" text-anchor="end">${compact(value)}</text>`).join('');
- const lines=sourceGroups.map(([source])=>{
-  let path='',previous=false;
-  const dots=[];
-  days.forEach((day,i)=>{
-   const value=day.sources.find(row=>row.source===source)?.[key];
-   if(day[key]==null||value==null){previous=false;return;}
-   path+=(previous?'L':'M')+x(i)+' '+y(value)+' ';previous=true;
-   const isolated=(i===0||days[i-1][key]==null)&&(i===days.length-1||days[i+1][key]==null);
-   if(isolated)dots.push(`<circle class="chart-source-${source} chart-point" cx="${x(i)}" cy="${y(value)}" r="3"/>`);
-  });
-  return `<path class="chart-line chart-source-${source}" d="${path.trim()}"/>${dots.join('')}`;
- }).join('');
- const ticks=[...new Set(Array.from({length:Math.min(4,days.length)},(_,i)=>Math.round(i*(days.length-1)/Math.max(1,Math.min(4,days.length)-1))))];
- const labels=ticks.map(i=>`<text class="chart-axis" x="${x(i)}" y="${height-5}" text-anchor="${i===0?'start':i===days.length-1?'end':'middle'}">${shortDate(days[i].date)}</text>`).join('');
- const targets=days.map((day,i)=>{
-  const from=i===0?left:(x(i-1)+x(i))/2,to=i===days.length-1?width-right:(x(i)+x(i+1))/2;
+ const axes=[0,max/2,max].map(value=>`<line class="chart-gridline" x1="${left}" x2="${width-right}" y1="${y(value)}" y2="${y(value)}"/><text class="chart-axis" x="${left-7}" y="${y(value)+4}" text-anchor="end">${compact(value)}</text>`).join('');
+ const placed=[],totals=[];
+ const bars=days.map((day,i)=>{
+  const center=x(i),at=center-barWidth/2;
+  let shapes='',total=0;
+  if(day[key]!=null){
+   for(const source of day.sources){const value=source[key]||0;if(value){shapes+=`<rect class="chart-bar chart-source-${source.source}" x="${at}" y="${y(total+value)}" width="${barWidth}" height="${value/max*(bottom-top)}"/>`;total+=value;}}
+   if(!total)shapes=`<line class="chart-zero" x1="${at}" x2="${at+barWidth}" y1="${bottom}" y2="${bottom}"/>`;
+  }
+  const count=day[key]==null?'—':num(day[key]),labelHeight=vertical?count.length*font*.65:font;
+  let labelY=(day[key]==null?bottom:y(day[key]))-5;
+  if(vertical){
+   for(let n=0;n<placed.length+1;n++){
+    const collision=placed.find(p=>Math.abs(p.x-center)<font+1&&labelY>p.top-2&&labelY-labelHeight<p.bottom+2);
+    if(!collision)break;labelY=collision.top-2;
+   }
+   placed.push({x:center,top:labelY-labelHeight,bottom:labelY});
+  }
+  const label=`<text class="chart-day-total${i===selected?' is-selected':''}${day[key]==null?' is-unavailable':''}" data-marketing-day-count="${day.date}" x="${center}" y="${labelY}" text-anchor="${vertical?'start':'middle'}" font-size="${font}"${vertical?` transform="rotate(-90 ${center} ${labelY})"`:''} aria-hidden="true">${count}</text>`;
+  totals.push(label);
   const description=`${day.date}: ${num(day[key])} ${unique?'unikátnych prehliadačov':'návštev'}${(unique?day.uniquePartial:day.partial)?', čiastočné meranie':''}`;
-  return `<g class="marketing-chart-day" tabindex="${i===selected?'0':'-1'}" role="img" aria-label="${esc(description)}" data-marketing-day="${day.date}" data-marketing-day-index="${i}"><title>${esc(description)}</title><rect class="chart-hit" x="${from}" y="${top-8}" width="${Math.max(1,to-from)}" height="${bottom-top+16}"/></g>`;
+  return `<g class="marketing-chart-day${i===selected?' is-selected':''}" tabindex="${i===selected?'0':'-1'}" role="img" aria-label="${esc(description)}" data-marketing-day="${day.date}" data-marketing-day-index="${i}"><title>${esc(description)}</title><rect class="chart-hit" x="${left+step*i}" y="0" width="${step}" height="${bottom+3}"/>${shapes}</g>`;
  }).join('');
- const day=days[selected],markers=day[key]==null?'':`<line class="chart-selection-line" x1="${x(selected)}" x2="${x(selected)}" y1="${top}" y2="${bottom}"/>`+day.sources.map(source=>`<circle class="chart-point chart-source-${source.source}" cx="${x(selected)}" cy="${y(source[key]||0)}" r="3.5"/>`).join('');
- return `<svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Denná návštevnosť podľa zdroja, čas v Bratislave. Vyberte deň dotykom alebo šípkami." role="group">${axes}${lines}${markers}${labels}${targets}</svg>`;
+ const ticks=showDates?[...new Set(Array.from({length:Math.min(4,days.length)},(_,i)=>Math.round(i*(days.length-1)/Math.max(1,Math.min(4,days.length)-1))))]:[];
+ const labels=ticks.map(i=>`<text class="chart-axis chart-date" x="${x(i)}" y="${height-5}" text-anchor="middle">${shortDate(days[i].date)}</text>`).join('');
+ return `<svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Denná návštevnosť podľa zdroja, čas v Bratislave. Vyberte deň dotykom alebo šípkami." role="group">${axes}${bars}${totals.join('')}${labels}</svg>`;
 }
 function measuredRange(d,unique){
  const key=unique?'uniqueVisitors':'visits',all=(d.charts?.days||[]).map(groupChartDay);

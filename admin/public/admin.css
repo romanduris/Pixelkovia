@@ -615,12 +615,15 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .chart-axis{font:10px Arial,sans-serif;fill:#7f96b2}
 .chart-hit{fill:transparent}
 .marketing-chart-day:focus{outline:none}.marketing-chart-day:focus .chart-hit{fill:#a6c4ee0a;stroke:#adc8e655;stroke-width:1}
-.chart-selection-line{stroke:#a8bdd3;stroke-opacity:.3;stroke-width:1;stroke-dasharray:3 4}
 .chart-source-facebook{--chart-color:#79a7ff;fill:var(--chart-color);background:var(--chart-color)}
 .chart-source-instagram{--chart-color:#e593c1;fill:var(--chart-color);background:var(--chart-color)}
 .chart-source-other{--chart-color:#96b6c3;fill:var(--chart-color);background:var(--chart-color)}
-.marketing-chart-svg .chart-line{fill:none;stroke:var(--chart-color);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.chart-point{stroke:#101b2d;stroke-width:1.5;pointer-events:none}
+.chart-bar{opacity:.8;pointer-events:none}
+.marketing-chart-day.is-selected .chart-bar{opacity:1}
+.chart-zero{stroke:#90a8c2;stroke-width:2;pointer-events:none}
+.chart-day-total{font-family:Arial,sans-serif;font-weight:600;fill:#dce8f8;pointer-events:none}
+.chart-day-total.is-unavailable{fill:#7f96b2;font-weight:400}
+.chart-day-total.is-selected{fill:#fff}
 @media(max-width:750px){
  .marketing-chart-panel>summary{padding:3px 12px;font-size:13px;min-height:46px}
  .marketing-chart-panel>summary>.marketing-chart-unique{font-size:11px}
