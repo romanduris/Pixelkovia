@@ -29,6 +29,7 @@ Conversions API je samostatná prípadná úloha. Token z jeho sekcie nenahrádz
 ## Implementácia a bezpečné doplnenie prístupu
 
 - Diagnostika rozlišuje neplatný formát tokenu, zlyhanie pred HTTP odpoveďou, časový limit a neplatný JSON s HTTP statusom. Vonkajšie medzery tokenu sa pri volaní odstránia; vnútorné medzery a zalomenia sa odmietnu bez vypísania hodnoty. Pridelené oprávnenia sa nemenia.
+- Príčina prvých zlyhaní bola reprodukovaná v workerd: `redirect: 'error'` nie je podporovaný a vyvolal TypeError ešte pred HTTP volaním. Volanie používa `redirect: 'manual'` a všetky HTTP 3xx výslovne odmieta pred parsovaním odpovede. Runtime regresný test volá skutočný nasadený handler a globálny fetch s izolovaným outbound poskytovateľom; overuje úspešný import aj odmietnutie presmerovania bez odoslania credentials na iný host. Po nasadení opravy ešte treba potvrdiť živý výsledok.
 - Backend: `admin/src/meta-ads.mjs`, existujúci Worker/D1, migrácia `0020_meta_ads.sql`. Graph API v26.0, účet pevne `1141555698571585`; iba GET account/insights.
 - Administrácia → Predajný funnel → Reklamné náklady: rozbaliť, obnoviť celé zvolené obdobie a priradiť existujúce `utm_campaign`. Zmena priradenia nemení reklamné odkazy ani historické návštevy.
 - Cron skúša import raz za hodinu (prvýkrát 30 dní, následne posledných 7 dní vrátane dneška). Staršie obdobie sa obnoví tlačidlom, najviac 366 dní.

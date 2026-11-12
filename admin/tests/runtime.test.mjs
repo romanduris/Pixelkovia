@@ -4,6 +4,28 @@ import {createOrder} from '../src/game-service.mjs';import {checklist} from '../
 import Stripe from 'stripe';
 import {recordPaymentProgress} from '../src/payment-progress.mjs';
 import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
+test('shipped Meta API fetch works in workerd and refuses redirects before forwarding credentials',async()=>{
+ for(const redirect of [false,true]){
+  const calls=[];
+  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-fetch-runtime-'+redirect},bindings:{ENVIRONMENT:'local',META_ADS_ACCESS_TOKEN:'runtime-meta-secret-fixture'},outboundService:async request=>{
+   const url=new URL(request.url);calls.push(url.href);
+   assert.equal(url.origin,'https://graph.facebook.com');assert.equal(request.headers.get('Authorization'),'Bearer runtime-meta-secret-fixture');
+   if(redirect)return new Response(null,{status:302,headers:{location:'https://untrusted.invalid/runtime-meta-secret-fixture'}});
+   return Response.json(url.pathname.endsWith('/insights')?{data:[]}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'});
+  }}));
+  try{
+   const db=await mf.getD1Database('TQ_DB');
+   for(const file of fs.readdirSync(new URL('../migrations',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())for(const sql of fs.readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8').split(';').map(s=>s.trim()).filter(Boolean))await db.prepare(sql).run();
+   const from=new Date(Date.now()-2*86400000).toISOString().slice(0,10),to=new Date(Date.now()-86400000).toISOString().slice(0,10);
+   const response=await mf.dispatchFetch('http://localhost/api/admin/marketing/ads/sync',{method:'POST',headers:{origin:'http://localhost','content-type':'application/json'},body:JSON.stringify({from,to})});
+   const body=await response.json();assert.equal(response.status,redirect?502:200,JSON.stringify(body));
+   assert.equal(calls.length,redirect?1:2);assert.ok(!JSON.stringify(body).includes('runtime-meta-secret-fixture'));
+   const state=await first(db,'SELECT last_success_at,last_error FROM meta_ads_state');
+   if(redirect){assert.match(state.last_error,/HTTP 302.*presmerovanie/);assert.equal(state.last_success_at,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,0);}
+   else{assert.ok(state.last_success_at);assert.equal(state.last_error,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);}
+  }finally{await mf.dispose();}
+ }
+});
 test('Meta import commits JSON batches and empty-day coverage in the actual Workers/D1 runtime',async()=>{
  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-runtime-test'}}));
  try{

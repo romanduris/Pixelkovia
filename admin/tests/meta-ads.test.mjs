@@ -29,7 +29,7 @@ test('daily import replaces a range atomically, corrects spend and records real 
   assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);
   env.META_ADS_FETCH=mock.fetch;await syncMetaAds(env,range,at+61000);
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);
-  for(const {url,init}of mock.calls){assert.equal(url.origin,'https://graph.facebook.com');assert.equal(init.headers.Authorization,'Bearer '+env.META_ADS_ACCESS_TOKEN);assert.ok(!url.href.includes(env.META_ADS_ACCESS_TOKEN));assert.equal(init.redirect,'error');}
+  for(const {url,init}of mock.calls){assert.equal(url.origin,'https://graph.facebook.com');assert.equal(init.headers.Authorization,'Bearer '+env.META_ADS_ACCESS_TOKEN);assert.ok(!url.href.includes(env.META_ADS_ACCESS_TOKEN));assert.equal(init.redirect,'manual');}
   const insight=mock.calls.find(c=>c.url.pathname.endsWith('/insights')).url;assert.equal(insight.searchParams.get('breakdowns'),'publisher_platform');assert.equal(insight.searchParams.get('time_increment'),'1');
   env.META_ADS_FETCH=api([]).fetch;await syncMetaAds(env,range,at+122000);
   assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_spend')).n,0);

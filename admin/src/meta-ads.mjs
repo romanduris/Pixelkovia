@@ -30,8 +30,9 @@ async function graph(env,path,params,signal){
   const url=new URL(`https://graph.facebook.com/${metaVersion}/${path}`);
   for(const [key,value]of Object.entries(params))url.searchParams.set(key,value);
   let response,data;
-  try{response=await (env.META_ADS_FETCH||fetch)(url,{headers:{Authorization:'Bearer '+accessToken},redirect:'error',signal});}
+  try{response=await (env.META_ADS_FETCH||fetch)(url,{headers:{Authorization:'Bearer '+accessToken},redirect:'manual',signal});}
   catch{throw new HttpError(502,signal.aborted?'Meta API prekročilo časový limit. Skúste import znova.':'Spojenie s Meta API zlyhalo pred prijatím HTTP odpovede. Overte sieťovú dostupnosť; platnosť tokenu zatiaľ nebola potvrdená.');}
+  if(response.status>=300&&response.status<400)throw new HttpError(502,`Meta API HTTP ${response.status}: presmerovanie bolo odmietnuté.`);
   try{data=await response.json();}
   catch{throw new HttpError(502,`Meta API HTTP ${response.status}: odpoveď nie je platný JSON. Obsah odpovede sa z bezpečnostných dôvodov nezobrazuje.`);}
   if(!data||typeof data!=='object'||Array.isArray(data))throw new HttpError(502,`Meta API HTTP ${response.status}: neočakávaný formát JSON odpovede.`);
