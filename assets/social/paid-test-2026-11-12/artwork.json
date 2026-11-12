@@ -1,52 +1,43 @@
 {
+  "version": 2,
   "status": "prepared-for-owner-review",
   "socialPublication": false,
   "adActivation": false,
   "selectedConcept": "A",
-  "photography": "Genuine owner-supplied still photos. Cropping, rotation and normal exposure correction only. No synthetic people, screens or gameplay.",
-  "illustrations": "Concept C only: unchanged approved AI-generated Piko portrait. A/final use no added character or scene illustration.",
-  "review": {
-    "existingAssetImagesAtStart": 138,
-    "originalPhotos": 6,
-    "scope": "All pre-existing raster images under assets, before creating this folder."
-  },
+  "mode": "built-in image_gen",
+  "promptFile": "PROMPTS.json",
+  "provenance": "A/B/C are generated advertising illustrations, including the people, rooms and scene phones. They are not documentary customer photographs. The additional product Story alone includes the unchanged approved real game excerpt, labelled explicitly. Typography stays editable in SVG.",
+  "safety": "Generated paper has no original task, QR or answer. Only the deliberately approved game-lock-partial.webp is reused as a real screen. Original unredacted photographs are not embedded.",
   "sources": [
     {
-      "key": "phone",
-      "file": "sources/phone-upright.webp",
-      "original": "assets/Photo/20261108_193537.jpg",
-      "originalSha256": "723ff7b67ab39531ec8dd99a2aa3348f8f8a4b4619b7723127a646dae0452073",
-      "sha256": "7b64006aec35f380a7aa4fa5603304a8ee8bc7ecba0ebabf91a3fde59407100e",
-      "recipe": {
-        "orient": true,
-        "initialCrop": {
-          "left": 1330,
-          "top": 800,
-          "width": 1050,
-          "height": 1220
-        },
-        "rotationDegrees": 22,
-        "workingWidth": 1600,
-        "physicalCrop": {
-          "left": 432,
-          "top": 160,
-          "width": 672,
-          "height": 824
-        }
-      },
-      "safety": "Only device top, memory cards and hands. QR, handwritten background answers and lower progress/code strip are physically absent."
+      "key": "A",
+      "file": "sources/scene-A-room.webp",
+      "sha256": "6b1240233e3445ecb267c16430f18fb2be801b61df4dfbaac99d2a74830c9f52",
+      "bytes": 671892
     },
     {
-      "key": "paper",
-      "file": "assets/social/prelaunch-2026-11-12-to-16/sources/paper-hands.webp",
-      "sha256": "dc63b08e6b85750f3d0feb665a49d2e742df36d7e5d53fa25ec20b94105631d8",
-      "safety": "Hands partly cover the paper wheels; no complete instructions, QR or solution."
+      "key": "B",
+      "file": "sources/scene-B-phone.webp",
+      "sha256": "2d20995fe6d6411faa268af0883a34d1ea7d8c2cc0fc1d81de11abe3e0d60687",
+      "bytes": 566602
     },
     {
-      "key": "piko",
-      "file": "assets/characters/piko.png",
-      "sha256": "20e183d5348ff1e7fa844a555ef553f58d113d24920a2f033457ea3b77ea91db",
-      "safety": "Unchanged approved portrait; uniform scaling only."
+      "key": "C",
+      "file": "sources/scene-C-discovery.webp",
+      "sha256": "b18658d72e6b94f7574459cef564957ec0002d7cecbb34755d6c5d0ffa5f8f91",
+      "bytes": 720966
+    },
+    {
+      "key": "helper",
+      "file": "sources/pixi-lettering.png",
+      "sha256": "d1c45a2965af8758caa1ea91e5378e8365875fcd6905fde171f8c7c901effe9f",
+      "bytes": 1666809
+    },
+    {
+      "key": "actual",
+      "file": "../../../assets/sales/game-lock-partial.webp",
+      "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+      "bytes": 65878
     }
   ],
   "exports": [
@@ -54,76 +45,100 @@
       "file": "pixelkovia_ad_concept_A_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 847765,
-      "sha256": "b7ebe5f1f13f82d47299bec656be7f9c9ea8e617a8dd9fdf573dd57c4003693f",
+      "bytes": 2550871,
+      "sha256": "9dcd5cd318a3e47b90553a014829577dab431adb807c8399fbef2b25aea19a8a",
       "design": "A",
-      "sources": [
-        "paper",
-        "phone"
+      "actualGameplay": false,
+      "headlines": [
+        "Dnes má vaša",
+        "obývačka",
+        "tajomstvo."
       ],
-      "headline": "Papierové stopy.Príbeh v mobile.",
       "linkSticker": null
     },
     {
       "file": "pixelkovia_ad_concept_B_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 1121483,
-      "sha256": "1ea23462a5bc437a56259d394c603bfd0555a3255063108a5dd30427a15913a2",
+      "bytes": 2345790,
+      "sha256": "045467220cc4e3b4682e0eb007ba99cf370847a6f411a31c325d6aa0dd63b8cc",
       "design": "B",
-      "sources": [
-        "paper",
-        "phone"
+      "actualGameplay": false,
+      "headlines": [
+        "Jeden mobil.",
+        "Všetci v hre.",
+        "Spolu až do finále."
       ],
-      "headline": "Dobrodružstvozačína doma.",
       "linkSticker": null
     },
     {
       "file": "pixelkovia_ad_concept_C_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 772416,
-      "sha256": "b0430c1b0c98c89f30aea8756b2cc948f203157cd0ff09c60e68e6afc5b7ebd9",
+      "bytes": 2582218,
+      "sha256": "eec016c7ef717e24d16d263cb0bd0b999cb1938ebe0201c301bf2832d82afec1",
       "design": "C",
-      "sources": [
-        "paper",
-        "phone",
-        "piko"
+      "actualGameplay": false,
+      "headlines": [
+        "Čo ukrýva",
+        "vaša obývačka?"
       ],
-      "headline": "7 záhad.Jeden tím.",
       "linkSticker": null
     },
     {
       "file": "pixelkovia_ad_final_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 847765,
-      "sha256": "b7ebe5f1f13f82d47299bec656be7f9c9ea8e617a8dd9fdf573dd57c4003693f",
+      "bytes": 2550871,
+      "sha256": "9dcd5cd318a3e47b90553a014829577dab431adb807c8399fbef2b25aea19a8a",
       "design": "A",
-      "sources": [
-        "paper",
-        "phone"
+      "actualGameplay": false,
+      "headlines": [
+        "Dnes má vaša",
+        "obývačka",
+        "tajomstvo."
       ],
-      "headline": "Papierové stopy.Príbeh v mobile.",
       "linkSticker": null
     },
     {
       "file": "pixelkovia_ad_final_story_9x16.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 924918,
-      "sha256": "c087e1c4c41846d6522512b3c60af98cdc1beb5a920d33de5de4ea53ee4cd40f",
+      "bytes": 2778502,
+      "sha256": "e9f248f5f7d93e155552923f71495b74ebfcbd7a33020b0fd3f5e49a79765751",
       "design": "A",
-      "sources": [
-        "paper",
-        "phone"
+      "actualGameplay": false,
+      "headlines": [
+        "Dnes má vaša",
+        "obývačka",
+        "tajomstvo."
       ],
-      "headline": "Papierové stopy.Príbeh v mobile.",
       "linkSticker": {
         "x": 250,
-        "y": 1530,
+        "y": 1517,
         "width": 580,
-        "height": 95
+        "height": 104,
+        "placement": "Replace the printed CTA with a native link sticker in the social editor; set ad destination in Ads Manager."
+      }
+    },
+    {
+      "file": "pixelkovia_ad_game_story_9x16.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 2428924,
+      "sha256": "e291f7a4b18a8bccb102fe607c52b2f8ee67789907d14a54dc97b8dcc72a5b3b",
+      "design": "A",
+      "actualGameplay": true,
+      "headlines": [
+        "Pozrite, čo",
+        "hráte spolu."
+      ],
+      "linkSticker": {
+        "x": 250,
+        "y": 1517,
+        "width": 580,
+        "height": 104,
+        "placement": "Replace the printed CTA with a native link sticker in the social editor; set ad destination in Ads Manager."
       }
     }
   ]

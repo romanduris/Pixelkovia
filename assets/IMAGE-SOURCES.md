@@ -12,6 +12,7 @@ Postavičky v `characters/` sú schválená súprava siedmich živých elektroni
 - `atlas/`: sedem portrétov pre aktuálny Atlas.
 - `finale-production/start-a.png` a `end-empty-room.png`: aktuálne výrobné podklady záverečného videa. Návod a sťahovanie sú v storyboarde pri finále.
 - `brand/`: ikony odvodené od schváleného Pika.
+- `social/paid-test-2026-11-12/sources/`: tri nové generované reklamné scény rodinného hrania a pátrania v obyčajnom byte, plus samostatná póza Pixiho s ceruzkou. Postavy vychádzajú zo schválených portrétov; ľudia a miestnosti sú ilustračné. Produktová Story používa aj nezmenený schválený skutočný `sales/game-lock-partial.webp`. [Prompty a referencie](social/paid-test-2026-11-12/PROMPTS.json), [výstupy a pôvod](social/paid-test-2026-11-12/README.md). Sociálne autorské podklady sa nenasadzujú do aplikácie.
 
 Zdrojom generovaných ilustrácií bol vstavaný imagegen s referenciami schválených postáv. Webové varianty sú optimalizované pre zobrazenie a tlač. Licencia fontu Caveat je v `fonts/OFL-Caveat.txt`.
 

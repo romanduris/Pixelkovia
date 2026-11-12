@@ -1,0 +1,142 @@
+[
+  {
+    "text": "Pixelkovia",
+    "x": 110,
+    "y": 249,
+    "width": 185,
+    "height": 50,
+    "size": 37,
+    "max": 400,
+    "type": "brand"
+  },
+  {
+    "text": "STRATENÝ SIGNÁL",
+    "x": 804.5,
+    "y": 263,
+    "width": 211.5,
+    "height": 29,
+    "size": 22,
+    "max": 420,
+    "type": "brand"
+  },
+  {
+    "text": "RODINNÁ HRA NA DOMA",
+    "x": 64,
+    "y": 323,
+    "width": 318.3125,
+    "height": 33,
+    "size": 25,
+    "max": 952,
+    "type": "category"
+  },
+  {
+    "text": "Pozrite, čo",
+    "x": 64,
+    "y": 331,
+    "width": 457,
+    "height": 120,
+    "size": 88,
+    "max": 952,
+    "type": "headline"
+  },
+  {
+    "text": "hráte spolu.",
+    "x": 64,
+    "y": 421,
+    "width": 462,
+    "height": 146,
+    "size": 116,
+    "max": 952,
+    "type": "headline"
+  },
+  {
+    "text": "Skutočný záber",
+    "x": 520,
+    "y": 673,
+    "width": 269,
+    "height": 64,
+    "size": 51,
+    "max": 475,
+    "type": "copy"
+  },
+  {
+    "text": "z hry",
+    "x": 554,
+    "y": 725,
+    "width": 98,
+    "height": 70,
+    "size": 55,
+    "max": 400,
+    "type": "copy"
+  },
+  {
+    "text": "Ťukáte. Hľadáte.",
+    "x": 520,
+    "y": 1308,
+    "width": 258,
+    "height": 44,
+    "size": 32,
+    "max": 496,
+    "type": "copy"
+  },
+  {
+    "text": "Prídete na to spolu.",
+    "x": 520,
+    "y": 1353,
+    "width": 301,
+    "height": 44,
+    "size": 32,
+    "max": 496,
+    "type": "copy"
+  },
+  {
+    "text": "7 záhad",
+    "x": 64,
+    "y": 1434,
+    "width": 122,
+    "height": 45,
+    "size": 33,
+    "max": 230,
+    "type": "fact"
+  },
+  {
+    "text": "7–13 rokov",
+    "x": 420,
+    "y": 1434,
+    "width": 170,
+    "height": 45,
+    "size": 33,
+    "max": 320,
+    "type": "fact"
+  },
+  {
+    "text": "60–90 min",
+    "x": 844,
+    "y": 1434,
+    "width": 172,
+    "height": 45,
+    "size": 33,
+    "max": 300,
+    "type": "fact"
+  },
+  {
+    "text": "Pozrite sa, ako sa hrá",
+    "x": 364,
+    "y": 1543,
+    "width": 352,
+    "height": 46,
+    "size": 34,
+    "max": 800,
+    "type": "cta"
+  },
+  {
+    "text": "pixelkovia.rodulab.com",
+    "x": 379,
+    "y": 1634,
+    "width": 322,
+    "height": 39,
+    "size": 30,
+    "max": 952,
+    "type": "url"
+  }
+]

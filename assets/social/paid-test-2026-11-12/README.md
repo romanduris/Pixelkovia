@@ -1,82 +1,106 @@
-# Pixelkovia · hlavná kreatíva pre prvý platený test
+# Pixelkovia · Dnes má vaša obývačka tajomstvo.
 
-**Vybraný finál: smer A — Papierové stopy. Príbeh v mobile.**
+Prepracovaná reklamná séria z 12. novembra 2026: tri celistvé scény v jednej výtvarnej réžii, dva vertikálne výstupy a editovateľná sadzba. Nahrádza pôvodné fotografické návrhy v tomto adresári.
 
-Pripravené na kontrolu vlastníkom. Nič nebolo publikované ani naplánované na Facebooku/Instagrame, nevznikla kampaň a nebola zapnutá reklama. Verejný web, checkout, administrácia, ceny a hra zostali bez obsahových zmien. Nové marketingové súbory nie sú súčasťou verejného allowlistu aplikácie.
+**Pripravené na kontrolu vlastníkom. Sociálne príspevky ani platené reklamy neboli publikované, naplánované alebo zapnuté.** Predajný web, ceny, checkout a samotná hra sa obsahovo nemenia. Tento adresár zostáva mimo verejného aj chráneného aplikačného exportu.
 
-## Otvoriť výstupy
+## Otvoriť hotové vizuály
 
-| Súbor | Rozmery | Použitie |
+- **[Galéria všetkých výstupov](OTVORIT-NAHLAD.html)** – lokálny prehľad s odkazmi na plné PNG a editovateľné SVG.
+- **[Prehľad troch motívov](pixelkovia_ad_concepts_overview.png)** – spoločná porovnávacia tabuľa.
+
+| Motív / výstup | Súbor | Rozmery |
 | --- | --- | --- |
-| [Prehľad troch smerov](pixelkovia_ad_concepts_overview.png) | 1280 × 750 | Porovnanie, nie reklamný export |
-| [Koncept A](pixelkovia_ad_concept_A_feed_4x5.png) | 1080 × 1350 | Čistý produktový smer; vybraný do finálu |
-| [Koncept B](pixelkovia_ad_concept_B_feed_4x5.png) | 1080 × 1350 | Atmosféra spoločného riešenia; fotografia cez plochu a detail mobilu |
-| [Koncept C](pixelkovia_ad_concept_C_feed_4x5.png) | 1080 × 1350 | Výraznejší brand; kruhový detail papiera, šikmý mobil, pôvodný Piko |
-| **[Finálny feed 4:5](pixelkovia_ad_final_feed_4x5.png)** | **1080 × 1350** | Hlavný reklamný poster, koncept A |
-| **[Finálna story 9:16](pixelkovia_ad_final_story_9x16.png)** | **1080 × 1920** | Samostatne presádzaná vertikálna adaptácia A |
+| A · Dnes má vaša obývačka tajomstvo. | [Feed A](pixelkovia_ad_concept_A_feed_4x5.png) | 1080 × 1350 |
+| B · Jeden mobil. Všetci v hre. | [Feed B](pixelkovia_ad_concept_B_feed_4x5.png) | 1080 × 1350 |
+| C · Čo ukrýva vaša obývačka? | [Feed C](pixelkovia_ad_concept_C_feed_4x5.png) | 1080 × 1350 |
+| Odporúčaný hlavný feed · motív A | [Finálny feed](pixelkovia_ad_final_feed_4x5.png) | 1080 × 1350 |
+| Tajomstvo v obývačke · A | [Hlavná Story](pixelkovia_ad_final_story_9x16.png) | 1080 × 1920 |
+| Pozrite, čo hráte spolu. · skutočná ukážka | [Produktová Story](pixelkovia_ad_game_story_9x16.png) | 1080 × 1920 |
 
-Finálny feed je zámerne totožný s vybraným konceptom A. Mobilné náhľady pri šírke 360 px sú v `previews/`. Plné PNG, nie prehľad ani malé náhľady, sú určené na nahratie do reklamy.
+Prehľad a súbory v `previews/` slúžia na kontrolu. Do reklamy patria plné PNG. Odporúčanie A je kreatívny výber, nie výsledok merania predaja.
 
-## Tri nadpisy a výber
+## Réžia a háčiky
 
-1. **Papierové stopy. Príbeh v mobile.** — vybraný. Hneď vysvetľuje dve hlavné časti produktu; reálne ruky a papier pritom ukazujú spoločné riešenie.
-2. **Dobrodružstvo začína doma.** — emocionálny smer B, s veľkou autentickou fotografiou spoločného hrania.
-3. **7 záhad. Jeden tím.** — spoločný cieľ a značka, smer C s malým pôvodným Pikom.
+**A · Tajomstvo v obývačke.** Deti a rodič riešia úlohu pri drevenom stole. Teplá lampa, modrý večer za oknom a jemná stopa svietiacich štvorčekov spájajú papier s mobilom. Piko sedí na hrane stola s nohami vo vzduchu, Guardy vykúka spoza jeho okraja. Nová póza Pixiho s ceruzkou dokončuje podčiarknutie rukopisného slova „tajomstvo“. Vrchná časť funguje ako plagát, stred ukazuje spoločné hranie, spodná časť uzatvára vek, trvanie a výzvu.
 
-A dostáva prednosť pre prvý kontakt s rodičom, ktorý značku nepozná. Označenie „Rodinná hra na doma“ určí kategóriu; hlavný nadpis vysvetlí mechaniku; fotografie sú dôkazom fyzického aj mobilného produktu. Papier má vo finále približne 60 % šírky fotografickej plochy, mobil približne 40 %. Fotografie majú rovnakú výšku, bez prekrývania papiera telefónom. Vek a trvanie sú spolu v jednom riadku. CTA vedie k vysvetleniu hry, bez neoverených zliav, recenzií alebo časového nátlaku.
+**B · Jeden mobil. Všetci v hre.** Intímnejší záber cez ramená detí, jeden veľký mobil a rodičia zapojení do riešenia. Guardy sedí na obale telefónu, Piko sa drží okraja stola. Nadpis pomenúva spoločný zážitok; doplnkový rukopis „Spolu až do finále.“ mu dáva smer.
 
-Ide o kreatívny výber podľa zrozumiteľnosti a dôveryhodnosti; víťaza podľa predaja môže určiť až skutočný platený test. B a C zostávajú odlišnými hotovými návrhmi na prípadné ďalšie porovnanie.
+**C · Čo ukrýva vaša obývačka?** Deti objavujú papierovú indíciu pri gauči. Piko ukazuje smer z operadla, Pixi vykúka spoza vankúša, Guardy dohliada na nález. Záber vysvetľuje, že dobrodružstvo pokračuje aj mimo displeja. Zobrazený úkryt je reklamná ilustrácia, nie návod ani prezradenie konkrétnej úlohy.
 
-## Obsah a overené údaje
+Všetky scény majú spoločnú tmavomodrú, jantárovú a azúrovú paletu, kontaktové tiene a výtvarne zladené postavy. Typografia používa Manrope, DM Sans a rukopisný Caveat, ktorý nadväzuje na funnel. Dôležité nadpisy a CTA zostávajú čitateľné v náhľadoch pri šírke 360 px.
 
-- Rodinná hra na doma; deti **7–13 rokov** a rodičia.
-- **7 záhad**, fyzické papierové materiály a príbeh/interakcie na jednom spoločnom mobile.
-- **60–90 minút** podľa existujúcej ponuky a `sales-page.js`; nepoužili sme ilustračný návrh 45–60 minút zo zadania.
-- Povinná URL je čitateľná v každom koncepte aj finálnych exportoch: **pixelkovia.rodulab.com**.
-- Finál A a jeho story neobsahujú pridanú ilustráciu postavy ani syntetickú scénu. Ilustrácie na displeji sú súčasťou skutočne fotografovanej hry. C používa iba existujúci schválený portrét Pika, bez prekreslenia a bez deformácie.
+## Pôvod obrázkov a presnosť produktu
 
-## Výber podkladov
+Scény A/B/C a samostatná póza Pixiho vznikli vstavaným **image_gen**. Presné zadania a roly vstupných referencií sú v [PROMPTS.json](PROMPTS.json). Referencie tvorili schválená obývačka, pôvodné portréty a skutočné fotografie hrania. Nové prostredia, ľudia a telefóny v scénach sú **generované reklamné ilustrácie**; neprezentujú sa ako zákaznícke fotografie alebo recenzie. Mená postáv ani predajné texty nie sú zapečené v podkladových ilustráciách.
 
-Vizuálne bol preskúmaný celý počiatočný súbor **138 rastrových obrázkov v assets/** vrátane všetkých **šiestich pôvodných fotografií**. Kontaktné hárky s pôvodnými neošetrenými fotografiami zostali iba v dočasnom pracovnom priestore; nie sú súčasťou odovzdávaných podkladov ani verejného webu.
+Produktová Story navyše obsahuje **nezmenený schválený skutočný záber** `assets/sales/game-lock-partial.webp`, vložený do samostatného vektorového rámu telefónu a označený „Skutočný záber z hry“. Táto ukážka sa neprepisuje ani negeneruje. Telefóny v ostatných ilustračných scénach predstavujú výtvarné zobrazenie hrania, nie presný screenshot rozhrania.
 
-| Pôvodná fotografia | Vyhodnotenie |
+Podklady v `sources/`:
+
+| Súbor | Obsah |
 | --- | --- |
-| `20261107_100223 1.jpg` | Rodičovský portál na tlačenom návode. Obsahuje rodičovské riešenia; pre prvý reklamný poster navyše neukazuje samotné spoločné hranie. Nepoužitá. |
-| `20261108_190754.jpg` | Najsilnejší autentický dôkaz spoločného riešenia: ruky dospelého aj detí a papierová šifra. Použitý existujúci bezpečný fyzický výrez. |
-| `20261108_193034.jpg` | Dieťa ukazuje na tlačený list; prejdený aj existujúci bezpečný výrez. Pre hlavný poster je význam hry menej čitateľný než pri papierovej šifre. Nepoužitá. |
-| `20261108_193537.jpg` | Reálny mobil s aktívnou úlohou a rukami. Použitý nový narovnaný, fyzicky orezaný detail. |
-| `20261108_193739.jpg` | Skutočné písanie do pracovného listu, ale v zábere sú už dopísané odpovede a ďalšie listy s QR. Nepoužitá. |
-| `20261108_195955.jpg` | Autentická emócia pri príbehu v telefóne. Bezpečný výrez stráca čitateľný dôkaz celého mobilu; širší originál ukazuje QR a odpovede. Po porovnaní nebola použitá. |
+| `scene-A-room.webp` | Celistvá scéna spoločného riešenia pri stole |
+| `scene-B-phone.webp` | Celistvá scéna hrania cez ramená detí |
+| `scene-C-discovery.webp` | Celistvá scéna objavovania indície pri gauči |
+| `pixi-lettering.png` | Nová póza schválenej postavy s ceruzkou a skutočným alfa kanálom |
 
-Skutočne vložené podklady:
+Papiere v generovaných scénach majú všeobecné grafické fragmenty. Nepoužívajú celé pôvodné pracovné listy, QR, heslá ani odpovede. Neošetrené fotografie nie sú vložené do SVG alebo do odovzdávaných zdrojov. Pôvodné produktové materiály a sedem úloh zostávajú bez zmeny.
 
-- Papier: `../prelaunch-2026-11-12-to-16/sources/paper-hands.webp`, odvodený z `assets/sales/real-play/play-paper.webp` a pôvodnej fotografie `20261108_190754.jpg`. Časť pomôcky kryjú ruky; nie je tu celé zadanie, QR ani kompletné riešenie.
-- Mobil: `sources/phone-upright.webp`, nový fyzický výrez z `20261108_193537.jpg`, s narovnaním skutočného telefónu. Papierové odpovede v pozadí aj dolný riadok priebežných kódov sú mimo uložených pixelov. Displej nebol nahradený ani vygenerovaný.
-- Piko v C: nezmenený `assets/characters/piko.png`. Pôvod a schválený vzhľad opisuje `assets/IMAGE-SOURCES.md`.
-- Typografia: existujúce **Manrope ExtraBold** a **DM Sans Medium**. OFL licencie sú v `licenses/`.
+Označenie generovaného obsahu je aj v XMP metadátach PNG a v popise SVG. Metadáta nenahrádzajú príslušné označenie pri nahrávaní na sociálnu platformu.
 
-Presné cesty, recept výrezu, rozmery, použitie a kontrolné súčty obsahuje [artwork.json](artwork.json).
+## Texty k reklamám
 
-## Krátky text k hlavnej reklame
+### A · odporúčaný hlavný text
 
-> Papierové stopy. Príbeh v mobile. A spoločné „máme to!“
->
-> Pixelkovia sú rodinné dobrodružstvo na doma: vytlačené indície, jeden spoločný mobil a 7 záhad, ktoré riešite spolu. Pre deti 7–13 rokov a rodičov. Vyhraďte si približne 60–90 minút.
->
-> Pozrite sa, ako sa hrá: https://pixelkovia.rodulab.com/
+**Dnes má vaša obývačka tajomstvo.**
 
-Text je návrh na schválenie, nie publikovaný príspevok. URL vytlačená v PNG sama nevytvára klikateľný odkaz. V reklame nastavte cieľovú stránku; pri ručnej organickej story pridajte natívnu odkazovú nálepku. Vertikálny finál pre ňu necháva voľnú plochu **x 250 / y 1530 / 580 × 95 px**.
+Vytlačíte a ukryjete 7 úloh, vezmete jeden spoločný mobil a pustíte sa do pátrania. Jeden hľadá, druhý si všimne detail — a zrazu zaznie spoločné „máme to!“
 
-## Editovateľné zdroje a kontrola
+Pixelkovia – Stratený signál sú rodinná hra na doma pre deti 7–13 rokov a rodičov. Vyhraďte si približne 60–90 minút na dobrodružstvo, v ktorom hráte ako jeden tím.
 
-`editable/` obsahuje päť SVG s editovateľnou typografiou, vloženými bezpečnými fotografiami a fontmi. Vektory neobsahujú neošetrené originály, skryté celé pracovné listy ani riešenia. Fonty sú vložené pre náhľad v prehliadači; editor bez podpory vložených fontov môže vyžadovať ich inštaláciu zo súčasných projektových zdrojov. Okná obrázkov v SVG zobrazujú iba bezpečné deriváty.
+Pozrite sa, ako sa hrá: https://pixelkovia.rodulab.com/
 
-[render.cjs](render.cjs) je reprodukovateľný zdroj kompozícií. Spustenie z koreňa repozitára:
+Krátky nadpis reklamy: **Vaša obývačka. Vaša rodinná misia.**
+
+### B · spoločný mobil
+
+**Jeden mobil. Všetci v hre.**
+
+Papierové indície, príbeh v telefóne a nápady celej rodiny. V Pixelkovii riešite 7 záhad spolu — od prvej stopy po spoločné finále.
+
+Pre deti 7–13 rokov a rodičov · približne 60–90 minút · doma.
+
+Objavte hru: https://pixelkovia.rodulab.com/
+
+Krátky nadpis reklamy: **7 záhad pre váš tím.**
+
+### C · domáce pátranie
+
+**Čo ukrýva vaša obývačka?**
+
+Po príprave hry možno ďalšiu stopu k spoločnému „máme to!“ Vytlačené úlohy premenia známy byt na miesto pátrania a jeden spoločný mobil vás posúva príbehom ďalej.
+
+Pixelkovia – Stratený signál. Rodinné dobrodružstvo pre deti 7–13 rokov a rodičov na približne 60–90 minút.
+
+Prijmite rodinnú misiu: https://pixelkovia.rodulab.com/
+
+Krátky nadpis reklamy: **Dobrodružstvo čaká doma.**
+
+## Stories a cieľový odkaz
+
+V platenej reklame nastavte cieľ **https://pixelkovia.rodulab.com/** v reklamnom systéme. Vytlačená URL a CTA v obrázku samy nevytvárajú klikateľnú plochu.
+
+Pri organickej Story nahraďte tlačené CTA natívnou odkazovou nálepkou v označenom priestore **x 250 / y 1517 / 580 × 104 px**. Text nálepky napríklad „Pozrieť hru“. Táto plocha je zaznamenaná aj v SVG a `artwork.json`. Dôležité texty sú medzi hornými a dolnými ovládacími prvkami Stories.
+
+## Editácia a export
+
+Šesť SVG v `editable/` obsahuje vložené bezpečné bitmapy a fonty; všetky reklamné texty zostávajú textom. `render.cjs` reprodukuje sadzbu a exportuje plné PNG, mobilné náhľady, spoločný prehľad, lokálnu galériu a kontrolné záznamy. Žiadne generovanie ani sieťové publikovanie pri exporte neprebieha.
 
 ```sh
 PLAYWRIGHT_MODULE=/cesta/k/playwright node assets/social/paid-test-2026-11-12/render.cjs
 ```
 
-`--concepts-only` vytvorí len tri koncepty a prehľad. Skript používa existujúci Sharp z `admin/node_modules` a existujúce projektové fonty. Nevytvára kampaň ani nič nepublikuje.
+Používa existujúci projektový Sharp a fonty. OFL licencie Manrope a DM Sans sú v `licenses/`, Caveat v `assets/fonts/OFL-Caveat.txt`. Pri ručnej zmene SVG sa vyhnite opätovnému spusteniu šablóny, ktorá SVG vytvára nanovo.
 
-Kontrola: rozmery 1080 × 1350 / 1080 × 1920, nepriehľadné PNG v sRGB, kontrolné súčty, ostré exporty, rámce nadpisov a okraje, URL, fyzicky vylúčené QR/odpovede a vizuálne prečítanie všetkých návrhov aj finálov pri mobilnej šírke 360 px. V story je podstatná typografia medzi y 250 a 1675; horná a dolná plocha zostávajú voľnejšie pre ovládanie umiestnenia. Metadata rozlišujú autentickú fotografiu a existujúcu AI ilustráciu v C; pôvod sa nezakrýva.
+Export kontroluje presné rozmery, sRGB, nepriehľadnosť finálnych PNG, bezpečné hranice typografie, minimálnu veľkosť nadpisov a kontrolné súčty. Vizuálna kontrola zahŕňa všetky tri motívy a obe Stories pri mobilnej šírke 360 px, úplnosť postáv, ochranu podkladov a čitateľnosť skutočnej ukážky.
