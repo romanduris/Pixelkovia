@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {normalizePreferences} from '../public/marketing-preferences.js';
 const at=Date.parse('2026-11-10T10:00:00Z');
 test('marketing preferences retain only valid filters and display settings',()=>{
-  const saved=normalizePreferences({selected:{period:'since',from:'2026-11-01',to:'2026-11-02',source:'facebook',device:'mobile',product:'game',campaign:'launch-2026',email:'private@example.invalid'},open:['charts','filters','attribution','charts','invalid'],unique:true,periodPurchases:true,sort:'conversion',direction:'asc',rows:[{email:'private@example.invalid'}]},at);
-  assert.deepEqual(saved,{selected:{period:'since',from:'2026-11-01',source:'facebook',device:'mobile',product:'game',campaign:'launch-2026'},open:['charts','filters','attribution'],unique:true,periodPurchases:true,sort:'conversion',direction:'asc'});
+  const saved=normalizePreferences({selected:{period:'since',from:'2026-11-01',to:'2026-11-02',source:'facebook',device:'mobile',product:'game',campaign:'launch-2026',email:'private@example.invalid'},open:['charts','filters','attribution','charts','invalid'],unique:true,overviewUnique:true,periodPurchases:true,sort:'conversion',direction:'asc',rows:[{email:'private@example.invalid'}]},at);
+  assert.deepEqual(saved,{selected:{period:'since',from:'2026-11-01',source:'facebook',device:'mobile',product:'game',campaign:'launch-2026'},open:['charts','filters','attribution'],unique:true,overviewUnique:true,periodPurchases:true,sort:'conversion',direction:'asc'});
   assert.ok(!JSON.stringify(saved).includes('private'));
   assert.deepEqual(normalizePreferences({...saved,selected:{period:'custom',from:'2026-10-01',to:'2026-11-01'}},at).selected,{period:'custom',from:'2026-10-01',to:'2026-11-01'});
 });

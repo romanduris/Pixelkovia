@@ -100,12 +100,17 @@ test('password-only authentication works in actual Workers/D1 runtime and gates 
   assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
   const authenticated=await mf.dispatchFetch('https://admin.example.invalid/api/admin/dashboard',{headers:{cookie}});assert.equal(authenticated.status,200);
   const marketing=await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing',{headers:{cookie}});assert.equal(marketing.status,200);assert.equal((await marketing.json()).metrics.visits,null);
-  const event={mode:'session',type:'checkout',visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'influencer',campaign:'runtime-campaign',device:'mobile'};
+  const event={mode:'session',type:'checkout',checkoutOpenId:crypto.randomUUID(),browserId:crypto.randomUUID(),visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'influencer',campaign:'runtime-campaign',device:'mobile'};
   const denied=await mf.dispatchFetch('https://admin.example.invalid/api/marketing/event',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify(event)});assert.equal(denied.status,403);
   const consent=await mf.dispatchFetch('https://admin.example.invalid/api/privacy/consent',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:JSON.stringify({version:'2026-11-10',analytics:true,marketing:false})});assert.equal(consent.status,200);
   const consentCookie=consent.headers.get('set-cookie').split(';')[0];
   const record=await mf.dispatchFetch('https://admin.example.invalid/api/marketing/event',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json',cookie:consentCookie},body:JSON.stringify(event)});assert.equal(record.status,200);
   const measured=await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing',{headers:{cookie}});assert.equal(measured.status,200);const funnel=await measured.json();assert.equal(funnel.metrics.visits,1);assert.equal(funnel.metrics.checkouts,1);assert.equal(funnel.rows.find(r=>r.source==='influencer').visits,1);
+  const sendOpening=payload=>mf.dispatchFetch('https://admin.example.invalid/api/marketing/event',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json',cookie:consentCookie},body:JSON.stringify(payload)});
+  assert.equal((await sendOpening(event)).status,200); // same document retry
+  assert.equal((await sendOpening({...event,checkoutOpenId:crypto.randomUUID()})).status,200); // reload
+  const openings=await (await mf.dispatchFetch('https://admin.example.invalid/api/admin/marketing',{headers:{cookie}})).json();
+  assert.equal(openings.periodMetrics.checkouts,2);assert.equal(openings.uniqueMetrics.checkouts,1);assert.equal(openings.uniqueMetrics.visits,1);
   const paymentReport=await mf.dispatchFetch('https://admin.example.invalid/api/admin/payments',{headers:{cookie}});assert.equal(paymentReport.status,200);assert.equal((await paymentReport.json()).health,'attention');
   const eventId='b'.repeat(64);
   await execute(db,"INSERT INTO payment_log VALUES(?,NULL,'server','sdk_error','technical','','unknown','',?)",eventId,Date.now());

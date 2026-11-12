@@ -3,7 +3,7 @@
 (()=>{
   'use strict';
   if(!['/','/index.html','/checkout','/checkout.html'].includes(location.pathname))return;
-  const visitKey='pixelkovia-funnel-session-v1',browserKey='pixelkovia-analytics-browser-v1';let current=null,entryHandled=false;
+  const visitKey='pixelkovia-funnel-session-v1',browserKey='pixelkovia-analytics-browser-v1';let current=null,entryHandled=false,checkoutOpenId=null;
   const read=key=>{try{return JSON.parse(sessionStorage.getItem(key));}catch{return null;}};
   const write=(key,value)=>{try{sessionStorage.setItem(key,JSON.stringify(value));return true;}catch{return false;}};
   function device(){if(navigator.userAgentData?.mobile)return 'mobile';const ua=navigator.userAgent;return /iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?'tablet':/Mobi|iPhone|iPod/i.test(ua)?'mobile':ua?'desktop':'unknown';}
@@ -50,6 +50,9 @@
     try{current=visit();}catch{current=null;}if(!current)return;
     const {visitId,visitorId,browserId,source,campaign,device}=current;
     const payload={visitId,visitorId,browserId,source,campaign,device,type:location.pathname.startsWith('/checkout')?'checkout':'visit',mode:'session'};
+    // One ID per loaded checkout document. Visibility/consent callbacks and
+    // retries reuse it; a reload or new navigation is a new opening.
+    if(payload.type==='checkout')payload.checkoutOpenId=checkoutOpenId??=crypto.randomUUID();
     // Network/storage failure never blocks a purchase or changes its outcome.
     try{void fetch('/api/marketing/event',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true,signal:AbortSignal.timeout(4000)}).catch(()=>{});}catch{}
   }

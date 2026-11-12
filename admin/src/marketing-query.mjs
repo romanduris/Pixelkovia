@@ -52,7 +52,7 @@ export const attemptsCTE=`WITH linked AS (
  coalesce(os.delivery_issues,0) delivery_issues,
  CASE WHEN p.state='refunded' OR os.refund_orders>0 THEN 1 ELSE 0 END refunded,
  coalesce(v.source,'unknown') source,coalesce(v.campaign,'') campaign,coalesce(v.device,'unknown') device,
- m.visit_id,v.visitor_id,v.started_at visit_started_at,v.checkout_at,
+ m.visit_id,v.visitor_id,v.browser_id,v.started_at visit_started_at,v.checkout_at,
  CASE WHEN EXISTS(SELECT 1 FROM json_each(c.selection) WHERE value='episode-1') THEN CASE WHEN EXISTS(SELECT 1 FROM json_each(c.selection) WHERE value IN('story-book-before','story-book-after')) THEN 'combination' ELSE 'game' END ELSE 'books' END product
  FROM checkout_attempts c LEFT JOIN payment_observations p ON p.attempt_id=c.id LEFT JOIN os ON os.attempt_id=c.id
  LEFT JOIN marketing_attribution m ON m.attempt_id=c.id LEFT JOIN marketing_visits v ON v.id=m.visit_id

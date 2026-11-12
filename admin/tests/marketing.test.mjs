@@ -110,6 +110,36 @@ test('attribution requires matching random IDs and existing request key; repeat 
   await pruneMarketing(env,at+367*day);assert.equal((await first(db,'SELECT count(*) n FROM marketing_visits')).n,0);assert.equal((await first(db,'SELECT count(*) n FROM checkout_attempts')).n,1);
  }finally{db.close();}
 });
+test('overview counts repeated checkout documents once each, preserves known legacy opens and deduplicates buying browsers',async()=>{
+ const {db,env}=await setup();try{
+  await execute(db,'UPDATE marketing_state SET unique_started_at=?',at-day);
+  const browser=crypto.randomUUID(),v=input({browserId:browser}),second=input({browserId:browser}),other=input({browserId:crypto.randomUUID(),source:'instagram_ads'}),legacy=input();
+  for(const [i,visit]of [v,second,other,legacy].entries())await marketingEvent(req(),env,visit,at-20000+i);
+  const opening={...v,type:'checkout',checkoutOpenId:crypto.randomUUID()};
+  await marketingEvent(req(),env,opening,at-10000);
+  await marketingEvent(req(),env,opening,at-9000); // callback/retry, same page
+  await marketingEvent(req(),env,{...opening,checkoutOpenId:crypto.randomUUID()},at-8000); // reload
+  for(const visit of [second,other])await marketingEvent(req(),env,{...visit,type:'checkout',checkoutOpenId:crypto.randomUUID()},at-7000);
+  await marketingEvent(req(),env,{...legacy,type:'checkout'},at-6000); // old client
+  await marketingEvent(req(),env,{...opening,visitorId:crypto.randomUUID(),checkoutOpenId:crypto.randomUUID()},at-5000);
+  assert.equal((await first(db,'SELECT count(*) n FROM marketing_checkout_opens')).n,4);
+  await assert.rejects(marketingEvent(req(),env,{...opening,checkoutOpenId:'invalid'},at),e=>e.status===400);
+  for(const visit of [v,v,second])await attempt(db,{visitId:visit.visitId,gift:false,total:1499});
+  await attempt(db,{visitId:other.visitId,gift:false,total:0});
+  const d=await marketingReport(env,new URLSearchParams({period:'today'}),at);
+  assert.equal(d.periodMetrics.visits,4);assert.equal(d.periodMetrics.checkouts,5);assert.equal(d.periodMetrics.purchases,3);
+  assert.equal(d.metrics.conversion,.75);assert.equal(d.uniqueMetrics.visits,2);assert.equal(d.uniqueMetrics.checkouts,2);assert.equal(d.uniqueMetrics.buyers,1);assert.equal(d.uniqueMetrics.conversion,.5);assert.equal(d.uniqueMetrics.partial,true);
+  const filtered=await marketingReport(env,new URLSearchParams({period:'today',source:'facebook_ads'}),at);
+  assert.equal(filtered.periodMetrics.checkouts,4);assert.equal(filtered.uniqueMetrics.visits,1);assert.equal(filtered.uniqueMetrics.checkouts,1);assert.equal(filtered.uniqueMetrics.conversion,1);
+  const unavailable=await marketingReport(env,new URLSearchParams({period:'today',product:'game'}),at);
+  assert.equal(unavailable.uniqueMetrics.visits,null);assert.equal(unavailable.uniqueMetrics.checkouts,null);assert.equal(unavailable.uniqueMetrics.conversion,null);
+  // Visibility callbacks after a session timeout are still the same document.
+  const resumed=crypto.randomUUID();await marketingEvent(req(),env,{...opening,visitId:resumed},at-100);
+  assert.equal((await first(db,'SELECT checkout_at FROM marketing_visits WHERE id=?',resumed)).checkout_at,null);
+  assert.equal((await marketingReport(env,new URLSearchParams({period:'today'}),at)).periodMetrics.checkouts,5);
+  await pruneMarketing(env,at+367*day);assert.equal((await first(db,'SELECT count(*) n FROM marketing_checkout_opens')).n,0);
+ }finally{db.close();}
+});
 test('Bratislava calendar dates handle DST and reject invalid filters',()=>{
  for(const [date,hours] of [['2026-03-29',23],['2026-10-25',25]]){const f=marketingFilters(new URLSearchParams({period:'custom',from:date,to:date}),at);assert.equal((f.end-f.start)/3600000,hours);}
  for(const params of [{period:'bad'},{source:"' OR 1=1"},{campaign:'private@example.invalid'},{period:'custom',from:'2026-02-30',to:'2026-03-01'},{period:'custom',from:'2026-13-01',to:'2026-13-02'},{period:'custom',from:'2026-11-10',to:'2026-11-09'}])assert.throws(()=>marketingFilters(new URLSearchParams(params),at),e=>e.status===400);

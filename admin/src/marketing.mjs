@@ -13,12 +13,15 @@ const day=86400000;
 // No raw URL, referrer, UA, IP, email, form value or arbitrary event properties.
 export async function marketingEvent(request,env,input,at=Date.now()){
   if(input.mode!=='session'||!['visit','checkout'].includes(input.type)||!validId(input.visitId)||!validId(input.visitorId))throw new HttpError(400,'Neplatná analytická udalosť alebo režim návštevnej relácie.');
+  if(input.checkoutOpenId!=null&&(!validId(input.checkoutOpenId)||input.type!=='checkout'))throw new HttpError(400,'Neplatné otvorenie checkoutu.');
   const db=env.TQ_DB,scope='marketing:'+await hash((env.CUSTOMER_AUTH_SECRET||'local')+':'+(request.headers.get('CF-Connecting-IP')||'unknown'));
   const limit=await first(db,`INSERT INTO customer_login_attempts VALUES(?,1,?) ON CONFLICT(scope_key) DO UPDATE SET attempts=CASE WHEN window_start<=? THEN 1 ELSE attempts+1 END,window_start=CASE WHEN window_start<=? THEN excluded.window_start ELSE window_start END RETURNING attempts`,scope,at,at-60000,at-60000);
   if(limit.attempts>60)throw new HttpError(429,'Príliš veľa udalostí.');
   const source=Object.hasOwn(sources,input.source)?input.source:'unknown',device=devices.includes(input.device)?input.device:'unknown';
+  const visitorHash=await hash(input.visitorId);
   await db.batch([
-    db.prepare(`INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET last_at=max(last_at,excluded.last_at),checkout_at=coalesce(checkout_at,excluded.checkout_at),browser_id=coalesce(browser_id,excluded.browser_id) WHERE visitor_id=excluded.visitor_id`).bind(input.visitId,await hash(input.visitorId),source,safeCampaign(input.campaign),device,at,input.type==='checkout'?at:null,at,validId(input.browserId)?await hash('browser:'+input.browserId):null),
+    db.prepare(`INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id) VALUES(?,?,?,?,?,?,CASE WHEN ? IS NULL OR NOT EXISTS(SELECT 1 FROM marketing_checkout_opens WHERE id=?) THEN ? END,?,?) ON CONFLICT(id) DO UPDATE SET last_at=max(last_at,excluded.last_at),checkout_at=coalesce(checkout_at,excluded.checkout_at),browser_id=coalesce(browser_id,excluded.browser_id) WHERE visitor_id=excluded.visitor_id`).bind(input.visitId,visitorHash,source,safeCampaign(input.campaign),device,at,input.checkoutOpenId??null,input.checkoutOpenId??null,input.type==='checkout'?at:null,at,validId(input.browserId)?await hash('browser:'+input.browserId):null),
+    ...(input.checkoutOpenId?[db.prepare('INSERT OR IGNORE INTO marketing_checkout_opens(id,visit_id,opened_at) SELECT ?,id,? FROM marketing_visits WHERE id=? AND visitor_id=?').bind(input.checkoutOpenId,at,input.visitId,visitorHash)]:[]),
     db.prepare('UPDATE marketing_state SET last_event_at=? WHERE id=1').bind(at)
   ]);
   return {recorded:true};
@@ -42,7 +45,13 @@ export async function marketingReport(env,params,at=Date.now()){
   const visits=await first(db,`SELECT count(*) visits,count(DISTINCT CASE WHEN checkout_at IS NOT NULL THEN visitor_id END) checkouts FROM marketing_visits v WHERE v.started_at>=? AND v.started_at<?`+vf.sql,observedStart,f.end,...vf.values);
   // Calendar-window counters do not require a recorded visitor attribution.
   const periodCommerce=await first(db,attemptsCTE+` SELECT count(DISTINCT CASE WHEN stripe_session_id IS NOT NULL AND created_at>=? AND created_at<? THEN id END) attempts,count(DISTINCT CASE WHEN free=1 AND paid_at>=? AND paid_at<? THEN id END) free_purchases FROM a WHERE 1=1`+filter.sql,...cteValues,f.start,f.end,f.start,f.end,...filter.values);
-  const periodCheckout=await first(db,`SELECT count(DISTINCT visitor_id) checkouts FROM marketing_visits v WHERE v.checkout_at>=? AND v.checkout_at<?`+vf.sql,f.start,f.end,...vf.values);
+  // Include each recorded page opening and the known historical first opening
+  // only when it is not already represented by a page-opening event.
+  const periodCheckout=await first(db,`WITH openings AS (
+    SELECT visit_id,opened_at FROM marketing_checkout_opens
+    UNION ALL SELECT id,checkout_at FROM marketing_visits v WHERE checkout_at IS NOT NULL
+      AND NOT EXISTS(SELECT 1 FROM marketing_checkout_opens e WHERE e.visit_id=v.id AND e.opened_at=v.checkout_at)
+  ) SELECT count(*) checkouts,count(DISTINCT v.browser_id) unique_checkouts FROM openings e JOIN marketing_visits v ON v.id=e.visit_id WHERE e.opened_at>=? AND e.opened_at<?`+vf.sql,f.start,f.end,...vf.values);
   const cohorts=await query(db,attemptsCTE+` SELECT source,count(DISTINCT CASE WHEN stripe_session_id IS NOT NULL THEN id END) attempts,count(DISTINCT CASE WHEN paid=1 THEN id END) purchases FROM a WHERE visit_started_at>=? AND visit_started_at<?`+filter.sql+` GROUP BY source`,...cteValues,observedStart,f.end,...filter.values);
   const visitSources=await query(db,`SELECT source,count(*) visits,count(DISTINCT CASE WHEN checkout_at IS NOT NULL THEN visitor_id END) checkouts FROM marketing_visits v WHERE v.started_at>=? AND v.started_at<?`+vf.sql+` GROUP BY source`,observedStart,f.end,...vf.values);
   const calendarSources=await query(db,attemptsCTE+` SELECT source,count(*) purchases FROM a WHERE paid=1 AND paid_at>=? AND paid_at<?`+filter.sql+` GROUP BY source`,...cteValues,f.start,f.end,...filter.values);
@@ -69,7 +78,11 @@ export async function marketingReport(env,params,at=Date.now()){
     return {source:key,label,visits:n,purchases:collectionInRange?(c?.purchases||0):null,periodPurchases:p?.purchases||0,conversion:!conversionReason&&n>0?(c?.purchases||0)/n:null};
   });
   const adsReport=await metaAdsReport(env,f,{enabled:collectionEnabled,startedAt:state.started_at,lastEventAt:state.last_event_at},at);
-  return {generatedAt:at,collectionEnabled,periodMetrics,charts:await dailyMarketing(db,f,state,at),filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
+  const charts=await dailyMarketing(db,f,state,at);
+  const uniqueBuyers=await first(db,attemptsCTE+` SELECT count(DISTINCT browser_id) buyers FROM a WHERE paid=1 AND visit_started_at>=? AND visit_started_at<?`+filter.sql,...cteValues,Math.max(observedStart,state.unique_started_at??at+1),f.end,...filter.values);
+  const uniqueReason=conversionReason||(!charts.uniqueVisitors?'Kohorta nemá žiadne namerané unikátne prehliadače.':null);
+  const uniqueMetrics={visits:charts.uniqueVisitors,checkouts:charts.uniqueVisitors==null?null:periodCheckout.unique_checkouts,buyers:charts.uniqueVisitors==null?null:uniqueBuyers.buyers,conversion:uniqueReason?null:uniqueBuyers.buyers/charts.uniqueVisitors,conversionReason:uniqueReason,partial:charts.uniquePartial};
+  return {generatedAt:at,collectionEnabled,periodMetrics,uniqueMetrics,charts,checkoutOpensStartedAt:state.checkout_opens_started_at,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
     metrics:{visits:visitAvailable?visits.visits:null,checkouts:collectionInRange&&!f.product?visits.checkouts:null,purchases:metric.purchases,revenueCents:metric.revenue,orders:metric.orders,gameAccesses:metric.game_accesses,refunds:metric.refunds,accessIssues:metric.access_issues,accessIssueOrders:metric.access_issue_orders,attributedPurchases:metric.attributed,technicalSignals:issues.signals,technicalAttempts:issues.attempts,conversion:conversionReason?null:cohortTotal.purchases/visits.visits},
     cohort:{attempts:collectionInRange?cohortTotal.attempts:null,purchases:collectionInRange?cohortTotal.purchases:null},rows,campaigns:[...new Set([...campaigns.map(r=>r.campaign),...adsReport.ads.campaigns.map(c=>c.utm)])].sort(),conversionReason,
     ...adsReport,coverage:null,
