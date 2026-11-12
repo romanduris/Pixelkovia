@@ -1,4 +1,4 @@
-# Dokončiť Meta Ads výdavky a overenie Purchase
+# Meta Ads výdavky a overenie Purchase
 
 Stav k 12. 11. 2026. Používateľ obnovil napojenie Meta Ads výdavkov a CAC a požiadal aj o overenie trvalého uloženia projektových credentials pre ďalšie Codespaces. Purchase potvrdil skúšobnou platbou 10. 11. Predreklamný obsah, UTM rozbeh a Cloudflare/mobilné prevádzkové kontroly zostávajú odložené. Toto zadanie nepovoľuje spustenie ani zmeny reklám.
 
@@ -10,18 +10,18 @@ Stav k 12. 11. 2026. Používateľ obnovil napojenie Meta Ads výdavkov a CAC a 
 - Nákup používa existujúce overenie zaplatenej Stripe Session, sumu zo servera v EUR a ochranu pred duplicitami. Vlastník 10. 11. potvrdil overenie Purchase skutočnou skúšobnou platbou. Presná suma a osobitný scenár darčeka neboli v tomto potvrdení uvedené; ich serverové pravidlá sú pokryté automatizovanými testami.
 - Automatické udalosti a Automatic Advanced Matching sú podľa používateľových snímok vypnuté. Conversions API nie je nakonfigurované.
 - Aplikácia **Pixelkovia – reporting**, ID `1418601830255498`, používa Marketing API a patrí portfóliu Pixelkovia. Snímka detailu aplikácie potvrdila systémového používateľa **Pixelkovia**, ID `61596128686573`, s rolou Vyvíjať aplikáciu. Generovanie tokenu už ponúklo `ads_read`; vlastník zvolil platnosť Never a dostal pokyn vybrať iba `ads_read`.
-- Produkčné Cloudflare API 12. 11. potvrdilo secret `META_ADS_ACCESS_TOKEN`. GitHub API potvrdilo osobný Codespaces secret a jeho prístup iba k `romanduris/Pixelkovia`; aktuálne otvorené prostredie ho ešte nemá načítaný. Automatický import 12. 11. o 10:20 (Europe/Bratislava) skončil bezpečnou chybou „Meta API je nedostupné alebo nevrátilo platnú odpoveď.“ D1 nemá úspešný import ani riadky výdavkov. Táto všeobecná chyba nepotvrdzuje chybný token ani chýbajúce oprávnenie.
+- Cloudflare aj GitHub API potvrdili trvalé uloženie `META_ADS_ACCESS_TOKEN`; osobný Codespaces secret má prístup iba k `romanduris/Pixelkovia`. Živý import 12. 11. 2026 o **10:39:21 (Europe/Bratislava)** potvrdil účet `1141555698571585`, EUR a Europe/Bratislava, zaznamenal pokrytie všetkých **14 dní od 30. 10. do 12. 11. 2026** a skončil bez chyby. Meta nevrátila žiadne riadky výdavkov, teda overený súčet je **0 €**. Vlastník následne potvrdil rovnakých 0 € v Ads Manageri za toto obdobie.
 
-## Zostávajúce TODO
+## Dokončený checklist
 
 - [x] Vytvoriť samostatnú firemnú aplikáciu pre Marketing API: Pixelkovia – reporting.
 - [x] Preveriť dostupné environment premenné, repository aj osobné Codespaces a Cloudflare secrets. Kontrola 12. 11. potvrdila produkčný Meta secret aj osobnú GitHub kópiu s povolením pre Pixelkoviu; [inventár ostatných credentials](../docs/project-secrets.md).
-- [x] Vytvoriť systémového používateľa a priradiť mu rolu v aplikácii; generovanie tokenu už ponúka `ads_read`. Vlastník dostal pokyn udeliť reklamnému účtu iba Zobraziť úspešnosť; skutočný API prístup k účtu sa ešte musí overiť.
+- [x] Vytvoriť systémového používateľa a priradiť mu rolu v aplikácii aj prístup k reklamnému účtu na čítanie výdavkov. Generovanie tokenu ponúklo `ads_read`; živý GET účtu a insights následne úspešne overil skutočný prístup.
 - [x] Uložiť `META_ADS_ACCESS_TOKEN` ako produkčný Cloudflare secret; overené cez API zoznamu secrets (HTTP 200).
 - [x] Uložiť Meta token do trvalých GitHub Codespaces secrets. Vlastník použil osobný secret; API potvrdilo prístup iba pre `romanduris/Pixelkovia`. Prítomnosť v oboch úložiskách nepotvrdzuje rovnosť hodnôt. Token nevkladať do chatu, frontendu, Git histórie ani logov.
 - [x] Implementovať import skutočných výdavkov podľa dňa a kampane cez Marketing API do existujúceho backendu/D1. Zosúladiť menu, časové pásmo a filtre; opakovaný import nesmie násobiť náklady. Chýbajúci prístup alebo chyba API nesmú vyzerať ako nulové výdavky.
 - [x] Implementovať explicitné priradenie Meta kampane k existujúcemu utm_campaign v administrácii a zaviesť výpočet CAC nad porovnateľnými nákladmi a priradenými platenými nákupmi. Pri chýbajúcej atribúcii alebo nepodporovanom rozdelení podľa produktu/zariadenia uviesť obmedzenie alebo Nedostupné, neodhadovať hodnoty.
-- [ ] Po doplnení tokenu overiť živý import, obnovu dát a výpočty proti Meta Ads Manageru. Nasadenie implementácie bez tokenu toto overenie nenahrádza. Nezapínať, nevytvárať ani neupravovať reklamy v rámci napojenia reportingu.
+- [x] Overiť živý import a porovnať výdavky s Ads Managerom: import vyššie uvedených 14 dní úspešný, 0 € potvrdil aj vlastník v Ads Manageri. Opakované importy, aktualizáciu, chyby, atómové uloženie a CAC overujú automatizované testy. Živý nenulový CAC zatiaľ nemožno porovnať, keďže neboli importované kampane ani výdavky a chýba porovnateľná reklamná nákupná kohorta. Reklamy sa týmto napojením nezapínajú ani nemenia.
 - [x] Overiť Purchase pri skutočnej platbe: vlastník 10. 11. 2026 potvrdil „3 som overil (skúsil som platbu)“. Ide o potvrdenie vlastníka; pri tejto implementácii sa nevytváral ďalší platený nákup.
 
 Conversions API je samostatná prípadná úloha. Token z jeho sekcie nenahrádza automaticky autorizovaný prístup na čítanie reklamných výdavkov. CAPI nesmie obchádzať odmietnutie marketingového súhlasu.
@@ -29,13 +29,13 @@ Conversions API je samostatná prípadná úloha. Token z jeho sekcie nenahrádz
 ## Implementácia a bezpečné doplnenie prístupu
 
 - Diagnostika rozlišuje neplatný formát tokenu, zlyhanie pred HTTP odpoveďou, časový limit a neplatný JSON s HTTP statusom. Vonkajšie medzery tokenu sa pri volaní odstránia; vnútorné medzery a zalomenia sa odmietnu bez vypísania hodnoty. Pridelené oprávnenia sa nemenia.
-- Príčina prvých zlyhaní bola reprodukovaná v workerd: `redirect: 'error'` nie je podporovaný a vyvolal TypeError ešte pred HTTP volaním. Volanie používa `redirect: 'manual'` a všetky HTTP 3xx výslovne odmieta pred parsovaním odpovede. Runtime regresný test volá skutočný nasadený handler a globálny fetch s izolovaným outbound poskytovateľom; overuje úspešný import aj odmietnutie presmerovania bez odoslania credentials na iný host. Po nasadení opravy ešte treba potvrdiť živý výsledok.
+- Príčina prvých zlyhaní bola reprodukovaná v workerd: `redirect: 'error'` nie je podporovaný a vyvolal TypeError ešte pred HTTP volaním. Volanie používa `redirect: 'manual'` a všetky HTTP 3xx výslovne odmieta pred parsovaním odpovede. Runtime regresný test volá skutočný nasadený handler a globálny fetch s izolovaným outbound poskytovateľom; overuje úspešný import aj odmietnutie presmerovania bez odoslania credentials na iný host. Po nasadení opravy bol potvrdený úspešný živý import.
 - Backend: `admin/src/meta-ads.mjs`, existujúci Worker/D1, migrácia `0020_meta_ads.sql`. Graph API v26.0, účet pevne `1141555698571585`; iba GET account/insights.
 - Administrácia → Predajný funnel → Reklamné náklady: rozbaliť, obnoviť celé zvolené obdobie a priradiť existujúce `utm_campaign`. Zmena priradenia nemení reklamné odkazy ani historické návštevy.
 - Cron skúša import raz za hodinu (prvýkrát 30 dní, následne posledných 7 dní vrátane dneška). Staršie obdobie sa obnoví tlačidlom, najviac 366 dní.
 - Chýbajúci secret, API chyba, neúplné dni a dnešný import starší než dve hodiny znamenajú Nedostupné; chyby obsahujú bezpečné HTTP/Meta kódy bez surových odpovedí a tokenov.
 - Token je v produkčnom Cloudflare Workeri a v osobných GitHub Codespaces secrets s prístupom iba k `romanduris/Pixelkovia`. Nevkladať ho do chatu ani do zdrojových súborov. Trvalá osobná GitHub kópia slúži aj ďalším Codespaces vlastníka pre tento repozitár; ostatné zálohované položky sú repository secrets.
-- Po doplnení tokenu treba živým GET overiť účet, EUR a časové pásmo Europe/Bratislava alebo Europe/Prague, načítať výdavky a porovnať ich s Ads Managerom. Samotné uloženie tokenu túto kontrolu nenahrádza. Produkčný cron `*/10 * * * *` a nasadený kód so `scheduledMetaAds` boli 12. 11. overené cez Cloudflare API.
+- Živý GET účtu a insights, EUR, časové pásmo aj nulový súčet boli 12. 11. overené. Produkčný cron `*/10 * * * *` a nasadený kód so `scheduledMetaAds` boli potvrdené cez Cloudflare API; import má vlastný hodinový odstup. Aktuálny otvorený Codespace ešte nemusí mať novopridaný osobný secret načítaný, produkčný import od neho nezávisí.
 
 ## Čo je viditeľné po odmietnutí súhlasu
 

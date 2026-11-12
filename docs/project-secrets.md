@@ -37,7 +37,7 @@ Ostatných desať prítomných GitHub položiek je uložených ako repository Co
 
 - Meta token bol uložený do [osobných Codespaces secrets](https://github.com/settings/codespaces) a API potvrdilo prístup k Pixelkovii. V aktuálne otvorenom prostredí ešte nie je načítaný; podľa potreby Codespace zastaviť a znovu spustiť. Rovnaký názov v Cloudflare sa do GitHubu nesynchronizuje automaticky. Cloudflare secrets API vracia iba názvy, nie uložený token.
 - Administrátorský pepper a heslový záznam zostávajú zachované v produkčnom Workeri. Ak vlastník má ich pôvodnú bezpečnú kópiu, doplniť rovnaké hodnoty do repository Codespaces secrets. Nevytvárať náhrady ani neotáčať heslo len kvôli zálohe. Bez pôvodných hodnôt nemáme potvrdenú obnovu rovnakého prihlásenia do úplne nového Workera; nasadenia na existujúci Worker ich zachovávajú.
-- Platnosť Meta tokenu, účet a živý import overiť podľa [Meta checklistu](../MD/DOKONCIT-meta-ads-a-purchase.md). Uloženie v oboch službách je potvrdené, úspešný import zatiaľ nie.
+- Meta token úspešne overil účet a živý import 12. 11. o 10:39:21 (Europe/Bratislava). Za 30. 10. – 12. 11. boli importované všetky dni s výdavkami 0 €; vlastník potvrdil rovnakú sumu v Ads Manageri. Podrobnosti sú v [uzavretom Meta checkliste](../MD/DOKONCIT-meta-ads-a-purchase.md).
 
 Názvy možno skontrolovať bez zobrazenia hodnôt:
 
