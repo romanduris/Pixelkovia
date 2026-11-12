@@ -39,7 +39,7 @@ test('additional sources include Meta and preserve filtered and unavailable metr
  assert.equal(unavailable.visits,null);assert.equal(unavailable.purchases,null);assert.equal(unavailable.conversion,null);assert.equal(unavailable.periodPurchases,5);
 });
 
-test('slim stacked bars show every daily total, keep unknown days distinct from zero and fit long ranges',()=>{
+test('responsive stacked bars show every daily total, keep unknown days distinct from zero and fit long ranges',()=>{
  const values=[2,null,0,4,0],days=values.map((value,i)=>({date:'2026-11-'+String(i+1).padStart(2,'0'),visits:value,uniqueVisitors:value,sources:[{source:'facebook',visits:value,uniqueVisitors:value}]}));
  const html=chartContent({charts:{days}},false);
  assert.deepEqual([...html.matchAll(/data-marketing-day-count="[^"]+"[^>]*>([^<]+)</g)].map(match=>match[1]),['2','—','0','4','0']);

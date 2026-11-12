@@ -19,7 +19,7 @@ export function paymentLink(d){
 }
 function chartSvg(days,unique,width=640,selected=days.length-1){
  const key=unique?'uniqueVisitors':'visits',height=width<600?152:218,left=30,right=8;
- const step=(width-left-right)/Math.max(1,days.length),barWidth=Math.min(9,step*.55);
+ const step=(width-left-right)/Math.max(1,days.length),barWidth=Math.min(27,step*.55);
  const longest=Math.max(1,...days.map(day=>String(day[key]??'').length));
  const vertical=step<longest*6+5,font=vertical?Math.max(5,Math.min(8,Math.floor(step))):10;
  // Dense labels point upward. Reserve room for staggered labels while keeping

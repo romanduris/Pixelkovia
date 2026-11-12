@@ -1,0 +1,600 @@
+[
+  {
+    "file": "2026-11-12-feed-A.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 72,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "STRATENÝ SIGNÁL",
+        "x": 80,
+        "y": 146,
+        "width": 234,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "7–13 ROKOV",
+        "x": 815.5,
+        "y": 78,
+        "width": 125,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Dobrodružstvozačína doma.",
+        "x": 80,
+        "y": 201,
+        "width": 683,
+        "height": 236,
+        "size": 93,
+        "type": "heading"
+      },
+      {
+        "text": "Papierové stopy. Príbeh v mobile.",
+        "x": 80,
+        "y": 433,
+        "width": 508,
+        "height": 43,
+        "size": 33,
+        "type": "body"
+      },
+      {
+        "text": "SKUTOČNÉ HRANIE",
+        "x": 175,
+        "y": 1038,
+        "width": 196,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "7 záhad. Jeden spoločný príbeh.",
+        "x": 80,
+        "y": 1162,
+        "width": 481,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 80,
+        "y": 1260,
+        "width": 268,
+        "height": 33,
+        "size": 25,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-12-feed-B.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 72,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "STRATENÝ SIGNÁL",
+        "x": 80,
+        "y": 146,
+        "width": 234,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Veľký svet.U vás doma.",
+        "x": 80,
+        "y": 207,
+        "width": 621,
+        "height": 266,
+        "size": 106,
+        "type": "heading"
+      },
+      {
+        "text": "Keď sa obývačka zmení na dobrodružstvo.",
+        "x": 80,
+        "y": 472,
+        "width": 617,
+        "height": 41,
+        "size": 31,
+        "type": "body"
+      },
+      {
+        "text": "PAPIER + MOBIL",
+        "x": 749.5,
+        "y": 1073,
+        "width": 161,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Príbeh, do ktorého vstúpite spolu.",
+        "x": 80,
+        "y": 1162,
+        "width": 503,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 80,
+        "y": 1260,
+        "width": 268,
+        "height": 33,
+        "size": 25,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-13-story.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 252,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "JEDNODUCHÁ PRÍPRAVA",
+        "x": 80,
+        "y": 326,
+        "width": 308,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Vytlačiť.Ukryť. Hrať.",
+        "x": 80,
+        "y": 379,
+        "width": 542,
+        "height": 240,
+        "size": 95,
+        "type": "heading"
+      },
+      {
+        "text": "Pripravený návod vás prevediecelou prípravou.",
+        "x": 80,
+        "y": 637,
+        "width": 470,
+        "height": 87,
+        "size": 33,
+        "type": "body"
+      },
+      {
+        "text": "01",
+        "x": 405,
+        "y": 802,
+        "width": 27,
+        "height": 34,
+        "size": 26,
+        "type": "body"
+      },
+      {
+        "text": "Vytlačiť",
+        "x": 405,
+        "y": 838,
+        "width": 210,
+        "height": 72,
+        "size": 53,
+        "type": "heading"
+      },
+      {
+        "text": "Materiály na domácu tlač.",
+        "x": 405,
+        "y": 918,
+        "width": 351,
+        "height": 38,
+        "size": 29,
+        "type": "body"
+      },
+      {
+        "text": "02",
+        "x": 405,
+        "y": 1007,
+        "width": 33,
+        "height": 34,
+        "size": 26,
+        "type": "body"
+      },
+      {
+        "text": "Ukryť",
+        "x": 405,
+        "y": 1043,
+        "width": 146,
+        "height": 72,
+        "size": 53,
+        "type": "heading"
+      },
+      {
+        "text": "Indície podľa návodu.",
+        "x": 405,
+        "y": 1123,
+        "width": 287,
+        "height": 38,
+        "size": 29,
+        "type": "body"
+      },
+      {
+        "text": "03",
+        "x": 405,
+        "y": 1212,
+        "width": 33,
+        "height": 34,
+        "size": 26,
+        "type": "body"
+      },
+      {
+        "text": "Hrať",
+        "x": 405,
+        "y": 1248,
+        "width": 117,
+        "height": 72,
+        "size": 53,
+        "type": "heading"
+      },
+      {
+        "text": "Vyrazte na spoločné pátranie.",
+        "x": 405,
+        "y": 1328,
+        "width": 406,
+        "height": 38,
+        "size": 29,
+        "type": "body"
+      },
+      {
+        "text": "Objavte rodinné dobrodružstvo",
+        "x": 308.5,
+        "y": 1439,
+        "width": 463,
+        "height": 41,
+        "size": 31,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 398.5,
+        "y": 1634,
+        "width": 283,
+        "height": 34,
+        "size": 26,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-14-story.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 252,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "SVET PLNÝ INDÍCIÍ",
+        "x": 80,
+        "y": 326,
+        "width": 236,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Každá indícia.O krok bližšie.",
+        "x": 80,
+        "y": 396,
+        "width": 599,
+        "height": 226,
+        "size": 88,
+        "type": "heading"
+      },
+      {
+        "text": "K riešeniu, ktoré objavíte spolu.",
+        "x": 80,
+        "y": 648,
+        "width": 466,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "DETAIL SKUTOČNEJ HRY",
+        "x": 172,
+        "y": 1209,
+        "width": 236,
+        "height": 28,
+        "size": 21,
+        "type": "body"
+      },
+      {
+        "text": "Objavte rodinné dobrodružstvo",
+        "x": 308.5,
+        "y": 1439,
+        "width": 463,
+        "height": 41,
+        "size": 31,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 398.5,
+        "y": 1634,
+        "width": 283,
+        "height": 34,
+        "size": 26,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-15-carousel-01.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 72,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "01 / 03 · PAPIER",
+        "x": 80,
+        "y": 146,
+        "width": 206,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Hľadajtestopy.",
+        "x": 80,
+        "y": 203,
+        "width": 473,
+        "height": 274,
+        "size": 110,
+        "type": "heading"
+      },
+      {
+        "text": "Príbeh sa začína mimo obrazovky.",
+        "x": 80,
+        "y": 492,
+        "width": 504,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "Vytlačené indície. Skutočné pátranie.",
+        "x": 80,
+        "y": 1162,
+        "width": 565,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 80,
+        "y": 1260,
+        "width": 268,
+        "height": 33,
+        "size": 25,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-15-carousel-02.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 72,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "02 / 03 · MOBIL",
+        "x": 80,
+        "y": 146,
+        "width": 206,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Odhaľujtepríbeh.",
+        "x": 80,
+        "y": 207,
+        "width": 532,
+        "height": 266,
+        "size": 106,
+        "type": "heading"
+      },
+      {
+        "text": "Jeden spoločný mobil vás sprevádza hrou.",
+        "x": 80,
+        "y": 487,
+        "width": 620,
+        "height": 41,
+        "size": 31,
+        "type": "body"
+      },
+      {
+        "text": "Správy, príbeh a interaktívne úlohy.",
+        "x": 80,
+        "y": 1162,
+        "width": 524,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 80,
+        "y": 1260,
+        "width": 268,
+        "height": 33,
+        "size": 25,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-15-carousel-03.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 72,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "03 / 03 · SPOLOČNÉ DOBRODRUŽSTVO",
+        "x": 80,
+        "y": 146,
+        "width": 499,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Zvládnetevšetkých",
+        "x": 80,
+        "y": 204,
+        "width": 456,
+        "height": 230,
+        "size": 92,
+        "type": "heading"
+      },
+      {
+        "text": "7 záhad?",
+        "x": 80,
+        "y": 459,
+        "width": 560,
+        "height": 181,
+        "size": 132,
+        "type": "heading"
+      },
+      {
+        "text": "KAŽDÝ NÁPAD SA POČÍTA",
+        "x": 670.5,
+        "y": 1062,
+        "width": 261,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Papier. Mobil. A spoločné „máme to!“",
+        "x": 80,
+        "y": 1162,
+        "width": 552,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 80,
+        "y": 1260,
+        "width": 268,
+        "height": 33,
+        "size": 25,
+        "type": "body"
+      }
+    ]
+  },
+  {
+    "file": "2026-11-16-feed.png",
+    "text": [
+      {
+        "text": "Pixelkovia",
+        "x": 127,
+        "y": 72,
+        "width": 180,
+        "height": 49,
+        "size": 36,
+        "type": "heading"
+      },
+      {
+        "text": "STRATENÝ SIGNÁL",
+        "x": 80,
+        "y": 146,
+        "width": 234,
+        "height": 29,
+        "size": 22,
+        "type": "body"
+      },
+      {
+        "text": "Dobrodružstvosa blíži.",
+        "x": 80,
+        "y": 200,
+        "width": 759,
+        "height": 259,
+        "size": 103,
+        "type": "heading"
+      },
+      {
+        "text": "Rodinná hra pre deti 7–13 rokov.",
+        "x": 80,
+        "y": 472,
+        "width": 522,
+        "height": 46,
+        "size": 35,
+        "type": "body"
+      },
+      {
+        "text": "Pripravte sa na spoločný zážitok.",
+        "x": 80,
+        "y": 1162,
+        "width": 489,
+        "height": 42,
+        "size": 32,
+        "type": "body"
+      },
+      {
+        "text": "pixelkovia.rodulab.com",
+        "x": 80,
+        "y": 1260,
+        "width": 268,
+        "height": 33,
+        "size": 25,
+        "type": "body"
+      }
+    ]
+  }
+]

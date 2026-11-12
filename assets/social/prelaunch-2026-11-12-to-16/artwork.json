@@ -1,0 +1,253 @@
+{
+  "status": "draft-for-owner-approval",
+  "publication": "Not published or scheduled on social media. No website deployment.",
+  "launchDateConfirmed": false,
+  "illustrations": "Existing approved AI-generated brand illustrations; no new generated artwork. Genuine owner-supplied photographs are identified separately.",
+  "sources": [
+    {
+      "name": "team-clue.webp",
+      "file": "assets/sales/real-play/play-team.webp",
+      "crop": {
+        "left": 0,
+        "top": 780,
+        "width": 900,
+        "height": 600
+      },
+      "note": "Finger pointing at an excerpt of an authentic printed clue. QR to the right and complete worksheet/return strip below are physically excluded.",
+      "sourceSha256": "fd1b026164c040700b748ee078959cb2122d864dea7332e71eaf83d571177b98",
+      "sha256": "9ebb3128b5e16e736e4cb811531f140ba58a4a002423000d178bee70e906ae2c",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "name": "phone-action.webp",
+      "file": "assets/sales/real-play/play-phone.webp",
+      "crop": {
+        "left": 300,
+        "top": 290,
+        "width": 850,
+        "height": 440
+      },
+      "note": "Only the active memory-game area and hands. QR/background worksheets and bottom progress/answer row are outside the physical crop.",
+      "sourceSha256": "57fdf72e53b563f83bcece147eb1027bcfa892b758ce4f78c2cbf8d85861654a",
+      "sha256": "12793ad512635b7c2abd3a978f87864ae3d0904f196fc73f79b0b8191543b042",
+      "width": 850,
+      "height": 440
+    },
+    {
+      "name": "paper-hands.webp",
+      "file": "assets/sales/real-play/play-paper.webp",
+      "crop": {
+        "left": 80,
+        "top": 100,
+        "width": 1080,
+        "height": 1250
+      },
+      "note": "Authentic hands and partially covered paper wheels; no instructions, complete worksheet, QR or solution.",
+      "sourceSha256": "037fd5a07dc00ba5cfb021c1807f4889366bc828c75bfa1fc8621514b38bd846",
+      "sha256": "dc63b08e6b85750f3d0feb665a49d2e742df36d7e5d53fa25ec20b94105631d8",
+      "width": 1080,
+      "height": 1250
+    },
+    {
+      "name": "paper-detail.webp",
+      "file": "assets/sales/real-play/play-paper.webp",
+      "crop": {
+        "left": 280,
+        "top": 300,
+        "width": 850,
+        "height": 900
+      },
+      "note": "Macro excerpt of the same physical material, still partly covered by fingers. No complete playable puzzle.",
+      "sourceSha256": "037fd5a07dc00ba5cfb021c1807f4889366bc828c75bfa1fc8621514b38bd846",
+      "sha256": "fc790a9e349cc700b7e44b434b2d6e32a7ab62c582751687be5b2e0a05740eee",
+      "width": 850,
+      "height": 900
+    },
+    {
+      "name": "story-photo.webp",
+      "file": "assets/sales/real-play/play-story.webp",
+      "crop": {
+        "left": 0,
+        "top": 0,
+        "width": 1040,
+        "height": 1250
+      },
+      "note": "Original still photograph of the story on a phone, not a frame extracted from video. Lower/right worksheet and handwritten return signs are physically excluded.",
+      "sourceSha256": "9e4b820b495628bff7b11a868a337c3363f67c0562dbc1302e845ea55145ad55",
+      "sha256": "6d5ecab07f12d2574976eee6ab92b741f0f01d3a759d83f8c87ebace5f16ca62",
+      "width": 1040,
+      "height": 1250
+    },
+    {
+      "name": "guide-steps.png",
+      "file": "assets/social/prelaunch-2026-11-05-to-11-10/sources/parent-guide-excerpt.png",
+      "crop": {
+        "left": 12,
+        "top": 26,
+        "width": 562,
+        "height": 444
+      },
+      "note": "Preparation steps only; QR to the right and all answer/hiding-place instructions below are outside the physical crop.",
+      "sourceSha256": "1b7de99ac620a472e272c84f80c5696cf5a4b06d4ad0280e65b671113b78e62e",
+      "sha256": "bc65bf4ebcc7af77f70d4faaedd7a227e62c9cd7ec8df06c41ffc0b534201beb",
+      "width": 562,
+      "height": 444
+    },
+    {
+      "name": "room-group.webp",
+      "file": "assets/pixelkovia-room-desktop.webp",
+      "crop": {
+        "left": 580,
+        "top": 170,
+        "width": 1020,
+        "height": 730
+      },
+      "note": "Approved illustrated living room and all seven original characters, uniformly scaled in layouts. This is brand illustration, not a customer photograph.",
+      "sourceSha256": "af47090dec74e4613fee1a6e2a562ae7cd918d38ea012699dac8eeff826dcb15",
+      "sha256": "4ad2e1d96d65e8d37b0fd11c5e803a7ca08d28eb6944ea124c3994b226d4cb1c",
+      "width": 1020,
+      "height": 730
+    },
+    {
+      "name": "piko.png",
+      "file": "assets/characters/piko.png",
+      "sha256": "20e183d5348ff1e7fa844a555ef553f58d113d24920a2f033457ea3b77ea91db",
+      "note": "Unchanged approved transparent original, including its original metadata; uniform scaling only."
+    },
+    {
+      "name": "pixi.png",
+      "file": "assets/characters/pixi.png",
+      "sha256": "5bb2179700e9de7ffb8bff2d45c29e3c7717fb12e2c3ce04a0886b7482c5967f",
+      "note": "Unchanged approved transparent original, including its original metadata; uniform scaling only."
+    }
+  ],
+  "exports": [
+    {
+      "file": "2026-11-12-feed-A.png",
+      "publishDate": "2026-11-12",
+      "theme": "Feed A · reálny produkt",
+      "width": 1080,
+      "height": 1350,
+      "sha256": "c56b607dfecb0ee936bcadc9e1a08b05990895cfaa05804b767e4daa7242bb56",
+      "bytes": 739532,
+      "sources": [
+        "phone-action.webp",
+        "paper-hands.webp",
+        "piko.png"
+      ],
+      "linkSticker": null
+    },
+    {
+      "file": "2026-11-12-feed-B.png",
+      "publishDate": "2026-11-12",
+      "theme": "Feed B · fotografia a svet Pixelkov",
+      "width": 1080,
+      "height": 1350,
+      "sha256": "3e6444bd5da48106774ceb4fd369201b14f3a5c4afeb9835d54c2b9a8dd48fdd",
+      "bytes": 1040718,
+      "sources": [
+        "room-group.webp",
+        "paper-hands.webp"
+      ],
+      "linkSticker": null
+    },
+    {
+      "file": "2026-11-13-story.png",
+      "publishDate": "2026-11-13",
+      "theme": "Story · Vytlačiť. Ukryť. Hrať.",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "a94cdac24207e26c4ee8710e940e04418b5eb7414cdb6912db4b6255eed18735",
+      "bytes": 347916,
+      "sources": [
+        "paper-hands.webp",
+        "guide-steps.png",
+        "phone-action.webp",
+        "piko.png"
+      ],
+      "linkSticker": {
+        "x": 220,
+        "y": 1510,
+        "width": 640,
+        "height": 130
+      }
+    },
+    {
+      "file": "2026-11-14-story.png",
+      "publishDate": "2026-11-14",
+      "theme": "Story · Svet plný indícií",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "fe9ee4cabb241469ae585a2da0811a5ed69a4ee0ca5a10936225084f890d2a93",
+      "bytes": 757719,
+      "sources": [
+        "paper-detail.webp",
+        "pixi.png"
+      ],
+      "linkSticker": {
+        "x": 220,
+        "y": 1510,
+        "width": 640,
+        "height": 130
+      }
+    },
+    {
+      "file": "2026-11-15-carousel-01.png",
+      "publishDate": "2026-11-15",
+      "theme": "Carousel 1/3 · Papier",
+      "width": 1080,
+      "height": 1350,
+      "sha256": "6fd6661df7383fc12ea197bb307f08f5cba9a637ee6da18171713e88830a8a78",
+      "bytes": 550977,
+      "sources": [
+        "team-clue.webp",
+        "paper-hands.webp"
+      ],
+      "linkSticker": null
+    },
+    {
+      "file": "2026-11-15-carousel-02.png",
+      "publishDate": "2026-11-15",
+      "theme": "Carousel 2/3 · Mobil",
+      "width": 1080,
+      "height": 1350,
+      "sha256": "3bbc23b71cc2d579810cca0ea8b1006b1e368e7eab03a73026c8a06d158ae528",
+      "bytes": 834983,
+      "sources": [
+        "story-photo.webp",
+        "phone-action.webp",
+        "piko.png"
+      ],
+      "linkSticker": null
+    },
+    {
+      "file": "2026-11-15-carousel-03.png",
+      "publishDate": "2026-11-15",
+      "theme": "Carousel 3/3 · Spoločné dobrodružstvo",
+      "width": 1080,
+      "height": 1350,
+      "sha256": "d4e018cdcffd8b939b23ce0ece6514ef2a2077ae12a8a32211d0b7e99f08b0bd",
+      "bytes": 926087,
+      "sources": [
+        "room-group.webp"
+      ],
+      "linkSticker": null
+    },
+    {
+      "file": "2026-11-16-feed.png",
+      "publishDate": "2026-11-16",
+      "theme": "Feed · Dobrodružstvo sa blíži",
+      "width": 1080,
+      "height": 1350,
+      "sha256": "0e59ba7974348d5c3f32ee01dfab29738ad69756ae5c5a0c13031264037d4b9d",
+      "bytes": 639244,
+      "sources": [
+        "paper-hands.webp",
+        "phone-action.webp",
+        "piko.png"
+      ],
+      "linkSticker": null
+    }
+  ]
+}
