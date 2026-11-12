@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {groupedSources} from '../public/marketing.js';
-import {groupChartDay} from '../public/marketing-charts.js';
+import {groupChartDay,chartContent} from '../public/marketing-charts.js';
 const row=(source,visits,purchases,periodPurchases)=>({source,label:source,visits,purchases,periodPurchases,conversion:visits?purchases/visits:null});
 test('social parents sum disjoint sources and calculate weighted conversion, hiding influencer only in the table',()=>{
  const rows=[row('facebook_ads',4,2,3),row('facebook',6,1,2),row('instagram_ads',1,0,0),row('instagram',2,1,2),row('meta',1,0,0),row('influencer',9,4,5),row('unknown',2,0,1)];
@@ -37,4 +37,17 @@ test('additional sources include Meta and preserve filtered and unavailable metr
  const filtered=groupedSources({rows:[rows[2]],conversionReason:null});assert.equal(filtered[0].children.length,1);assert.equal(filtered[0].visits,5);
  const unavailable=groupedSources({rows:[row('direct',null,null,1),rows[1]],conversionReason:'Unavailable'})[0];
  assert.equal(unavailable.visits,null);assert.equal(unavailable.purchases,null);assert.equal(unavailable.conversion,null);assert.equal(unavailable.periodPurchases,5);
+});
+
+test('line chart keeps missing days as gaps, retains zeroes and supports one-day and 90-day ranges',()=>{
+ const values=[2,null,0,4,0],days=values.map((value,i)=>({date:'2026-11-'+String(i+1).padStart(2,'0'),visits:value,uniqueVisitors:value,sources:[{source:'facebook',visits:value,uniqueVisitors:value}]}));
+ const html=chartContent({charts:{days}},false);
+ const path=html.match(/class="chart-line chart-source-facebook" d="([^"]*)"/)[1];
+ assert.equal((path.match(/M/g)||[]).length,2,'a missing day breaks the line instead of turning into zero');
+ assert.equal((path.match(/L/g)||[]).length,2,'measured zeroes still belong to the measured run');
+ assert.equal((html.match(/data-marketing-day=/g)||[]).length,5);
+ assert.ok(!html.includes('chart-unavailable'));assert.ok(!html.includes('marketing-chart-scroll'));
+ const one=chartContent({charts:{days:[days[0]]}},false);assert.ok(!one.includes('NaN'));assert.match(one,/data-marketing-count="2026-11-01">2/);
+ const long=chartContent({charts:{days:Array.from({length:90},(_,i)=>({...days[0],date:new Date(Date.UTC(2026,7,i+1)).toISOString().slice(0,10)}))}},false);
+ assert.equal((long.match(/data-marketing-day=/g)||[]).length,90);assert.match(long,/viewBox="0 0 640 218"/);
 });

@@ -11,55 +11,86 @@ export function groupChartDay(day){
  // Source-level unique counts are already disjoint per day in the server report.
  return {...day,sources};
 }
-let scrollObserver;
+let chartObserver,chartFrame,selectedDate;
 export function paymentLink(d){
  const params=new URLSearchParams({scope:'funnel',period:'custom',from:d.filters.from,to:d.filters.to,asOf:String(d.generatedAt)});
  for(const key of ['source','campaign','device','product'])if(d.filters[key])params.set(key,d.filters[key]);
  return '#payments?'+params;
 }
-function chartSvg(days,unique){
- const key=unique?'uniqueVisitors':'visits';
- // Keep every daily total legible, including longer ranges that scroll horizontally.
- const width=Math.max(760,days.length*26),height=260,left=44,bottom=222,top=28,step=(width-left-14)/Math.max(1,days.length);
- const max=Math.max(4,Math.ceil(Math.max(0,...days.map(day=>day[key]||0))/4)*4),y=value=>bottom-value/max*(bottom-top);
- const axes=Array.from({length:5},(_,i)=>{const value=max*i/4,at=y(value);return `<line class="chart-grid" x1="${left}" x2="${width-14}" y1="${at}" y2="${at}"/><text class="chart-axis" x="${left-8}" y="${at+4}" text-anchor="end">${num(value)}</text>`;}).join('');
- const bars=days.map((day,i)=>{
-  const x=left+step*i,barWidth=Math.max(2,step-Math.min(6,step*.3)),at=x+(step-barWidth)/2;
-  let shapes='';
-  if(day[key]==null)shapes=`<rect class="chart-unavailable" x="${at}" y="${top}" width="${barWidth}" height="${bottom-top}"/>`;
-  else {let total=0;for(const source of day.sources){const value=source[key]||0;if(value){shapes+=`<rect class="chart-source-${source.source}" x="${at}" y="${y(total+value)}" width="${barWidth}" height="${value/max*(bottom-top)}"/>`;total+=value;}}if(!total)shapes=`<line class="chart-zero" x1="${at}" x2="${at+barWidth}" y1="${bottom}" y2="${bottom}"/>`;}
-  const partial=unique?day.uniquePartial:day.partial;
-  // Never crowd the final date against the preceding tick.
-  const interval=Math.max(1,Math.ceil(days.length/8));
-  const tick=i===days.length-1||(i%interval===0&&days.length-1-i>=Math.max(1,interval*.65));
-  const label=tick?`<text class="chart-axis" x="${x+step/2}" y="248" text-anchor="middle">${shortDate(day.date)}</text>`:'';
-  const count=day[key]==null?'—':num(day[key]);
-  const totalLabel=`<text class="chart-total${day[key]==null?' chart-total-unavailable':''}" x="${x+step/2}" y="${day[key]==null?top-8:y(day[key])-8}" text-anchor="middle" data-marketing-count="${day.date}">${count}</text>`;
-  const description=`${day.date}: ${num(day[key])} ${unique?'unikátnych prehliadačov':'návštev'}${partial?', čiastočné meranie':''}`;
-  return `<g class="marketing-chart-day" tabindex="${i===0?'0':'-1'}" role="img" aria-label="${esc(description)}" data-marketing-day="${day.date}" data-marketing-day-index="${i}"><title>${esc(description)}</title><rect class="chart-hit" x="${x}" y="${top-20}" width="${step}" height="${bottom-top+20}"/>${shapes}${totalLabel}${label}</g>`;
+function chartSvg(days,unique,width=640,selected=days.length-1){
+ const key=unique?'uniqueVisitors':'visits',height=width<600?152:218,left=34,right=12,top=16,bottom=height-27;
+ const peak=Math.max(0,...days.flatMap(day=>day.sources.map(source=>source[key]||0)));
+ const max=Math.max(2,Math.ceil(peak/2)*2),x=i=>days.length===1?(left+width-right)/2:left+i*(width-left-right)/(days.length-1),y=value=>bottom-value/max*(bottom-top);
+ const compact=value=>new Intl.NumberFormat('sk-SK',{notation:'compact',maximumFractionDigits:1}).format(value);
+ const axes=[0,max/2,max].map(value=>`<line class="chart-gridline" x1="${left}" x2="${width-right}" y1="${y(value)}" y2="${y(value)}"/><text class="chart-axis" x="${left-9}" y="${y(value)+4}" text-anchor="end">${compact(value)}</text>`).join('');
+ const lines=sourceGroups.map(([source])=>{
+  let path='',previous=false;
+  const dots=[];
+  days.forEach((day,i)=>{
+   const value=day.sources.find(row=>row.source===source)?.[key];
+   if(day[key]==null||value==null){previous=false;return;}
+   path+=(previous?'L':'M')+x(i)+' '+y(value)+' ';previous=true;
+   const isolated=(i===0||days[i-1][key]==null)&&(i===days.length-1||days[i+1][key]==null);
+   if(isolated)dots.push(`<circle class="chart-source-${source} chart-point" cx="${x(i)}" cy="${y(value)}" r="3"/>`);
+  });
+  return `<path class="chart-line chart-source-${source}" d="${path.trim()}"/>${dots.join('')}`;
  }).join('');
- return `<div class="marketing-chart-scroll" tabindex="0" role="region" aria-label="Denná návštevnosť podľa zdroja; na úzkej obrazovke posúvajte vodorovne"><svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Návštevnosť podľa zdroja" role="group">${axes}${bars}</svg></div>`;
+ const ticks=[...new Set(Array.from({length:Math.min(4,days.length)},(_,i)=>Math.round(i*(days.length-1)/Math.max(1,Math.min(4,days.length)-1))))];
+ const labels=ticks.map(i=>`<text class="chart-axis" x="${x(i)}" y="${height-5}" text-anchor="${i===0?'start':i===days.length-1?'end':'middle'}">${shortDate(days[i].date)}</text>`).join('');
+ const targets=days.map((day,i)=>{
+  const from=i===0?left:(x(i-1)+x(i))/2,to=i===days.length-1?width-right:(x(i)+x(i+1))/2;
+  const description=`${day.date}: ${num(day[key])} ${unique?'unikátnych prehliadačov':'návštev'}${(unique?day.uniquePartial:day.partial)?', čiastočné meranie':''}`;
+  return `<g class="marketing-chart-day" tabindex="${i===selected?'0':'-1'}" role="img" aria-label="${esc(description)}" data-marketing-day="${day.date}" data-marketing-day-index="${i}"><title>${esc(description)}</title><rect class="chart-hit" x="${from}" y="${top-8}" width="${Math.max(1,to-from)}" height="${bottom-top+16}"/></g>`;
+ }).join('');
+ const day=days[selected],markers=day[key]==null?'':`<line class="chart-selection-line" x1="${x(selected)}" x2="${x(selected)}" y1="${top}" y2="${bottom}"/>`+day.sources.map(source=>`<circle class="chart-point chart-source-${source.source}" cx="${x(selected)}" cy="${y(source[key]||0)}" r="3.5"/>`).join('');
+ return `<svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Denná návštevnosť podľa zdroja, čas v Bratislave. Vyberte deň dotykom alebo šípkami." role="group">${axes}${lines}${markers}${labels}${targets}</svg>`;
+}
+function measuredRange(d,unique){
+ const key=unique?'uniqueVisitors':'visits',all=(d.charts?.days||[]).map(groupChartDay);
+ const first=all.findIndex(day=>day[key]!=null),last=all.findLastIndex(day=>day[key]!=null);
+ return {days:first<0?all:all.slice(first,last+1),trimmed:first>0};
+}
+const coverageText=(day,unique,range)=>day[unique?'uniqueVisitors':'visits']==null?'Bez merania':(unique?day.uniquePartial:day.partial)?'Čiastočné meranie':range.trimmed?'Meranie od '+shortDate(range.days[0].date):'';
+const chosenIndex=days=>{const found=days.findIndex(day=>day.date===selectedDate);return found<0?days.length-1:found;};
+function legend(day,key){
+ return `<ul class="marketing-chart-legend" aria-label="Zdroje návštevnosti vo vybraný deň">${day.sources.map(source=>`<li data-chart-source="${source.source}" aria-label="${esc(source.label+': '+num(source[key]))}"><i class="chart-source-${source.source}" aria-hidden="true"></i><span>${esc(source.label)}</span><strong>${source[key]==null?'—':num(source[key])}</strong></li>`).join('')}</ul>`;
 }
 export function chartContent(d,unique){
- const charts=d.charts,days=(charts?.days||[]).map(groupChartDay),key=unique?'uniqueVisitors':'visits';
- const available=days.some(day=>day[key]!=null);
- const caption=unique?'Unikátne prehliadače':'Návštevné relácie';
+ const charts=d.charts,range=measuredRange(d,unique),days=range.days,key=unique?'uniqueVisitors':'visits';
+ const available=days.some(day=>day[key]!=null),selected=chosenIndex(days),day=days[selected];
+ const caption=unique?'Unikátne prehliadače':'Návštevy';
  const start=charts?.uniqueStartedAt?new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(charts.uniqueStartedAt):null;
  const empty=`<div class="marketing-chart-empty" role="status"><strong>Zatiaľ bez údajov</strong><p>${unique?`Unikátne prehliadače meriame${start?' od '+esc(start):' od zapnutia nového merania'}. Staršie návštevy sa spätne nerozlišujú.`:'Pre zvolené obdobie a filtre nemáme nameranú návštevnosť.'}</p></div>`;
- return `<figure class="marketing-chart"><figcaption><h3>Návštevnosť po dňoch a zdrojoch</h3><span>${caption} · Bratislava</span></figcaption>${available?`<ul class="marketing-chart-legend" aria-label="Zdroje návštevnosti">${sourceGroups.map(([source,label])=>`<li><i class="chart-source-${source}" aria-hidden="true"></i>${esc(label)}</li>`).join('')}</ul>`:''}${available?chartSvg(days,unique):empty}${available?'<p class="marketing-chart-readout" aria-live="polite">Vyberte deň kurzorom, dotykom alebo šípkami na klávesnici.</p>':''}</figure>`;
+ if(!available)return `<figure class="marketing-chart"><figcaption class="sr-only">${caption} po dňoch a zdrojoch · Bratislava</figcaption>${empty}</figure>`;
+ const coverage=coverageText(day,unique,range);
+ return `<figure class="marketing-chart"><figcaption class="sr-only">${caption} po dňoch a zdrojoch · Bratislava</figcaption><div class="marketing-chart-readout" aria-live="polite" aria-atomic="true"><div class="marketing-chart-day-nav"><button type="button" data-chart-step="-1" aria-label="Predchádzajúci deň"${selected===0?' disabled':''}>‹</button><div><time datetime="${day.date}">${day.date.slice(8,10)}. ${day.date.slice(5,7)}. ${day.date.slice(0,4)}</time><small class="marketing-chart-coverage"${coverage?'':' hidden'}>${coverage}</small></div><button type="button" data-chart-step="1" aria-label="Nasledujúci deň"${selected===days.length-1?' disabled':''}>›</button></div><div class="marketing-chart-total"><strong data-marketing-count="${day.date}"${day[key]==null?' class="is-unavailable"':''}>${num(day[key])}</strong><span>${caption}</span></div></div><div class="marketing-chart-plot">${chartSvg(days,unique,640,selected)}</div>${legend(day,key)}</figure>`;
 }
 export function bindChartDays(root,d,unique){
- scrollObserver?.disconnect();
- scrollObserver=new ResizeObserver(entries=>entries.forEach(({target})=>{if(!target.isConnected)scrollObserver.unobserve(target);else target.scrollLeft=Math.max(0,target.scrollWidth-target.clientWidth);}));
- root.querySelectorAll('.marketing-chart-scroll').forEach(element=>scrollObserver.observe(element));
- const key=unique?'uniqueVisitors':'visits';
- const reveal=target=>{
-  const raw=d.charts?.days.find(day=>day.date===target.dataset.marketingDay);if(!raw)return;
-  const day=groupChartDay(raw),sources=day.sources.filter(row=>row[key]>0).map(row=>row.label+': '+num(row[key])).join(' · ');
-  target.closest('figure').querySelector('.marketing-chart-readout').textContent=`${day.date} · ${unique?'Unikátne prehliadače':'Návštevy'}: ${num(day[key])}${sources?' · '+sources:''}${(unique?day.uniquePartial:day.partial)?' · čiastočné meranie':''}`;
+ chartObserver?.disconnect();cancelAnimationFrame(chartFrame);
+ const figure=root.querySelector('.marketing-chart'),plot=figure?.querySelector('.marketing-chart-plot');if(!plot)return;
+ const range=measuredRange(d,unique),days=range.days,key=unique?'uniqueVisitors':'visits';let selected=chosenIndex(days),width=640;
+ const draw=()=>{
+  const hadFocus=plot.contains(document.activeElement);
+  plot.innerHTML=chartSvg(days,unique,width,selected);
+  if(hadFocus)plot.querySelector('[tabindex="0"]').focus({preventScroll:true});
  };
- root.querySelectorAll('[data-marketing-day]').forEach(target=>{
-  target.addEventListener('pointerenter',()=>reveal(target));target.addEventListener('click',()=>reveal(target));target.addEventListener('focus',()=>reveal(target));
-  target.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const all=[...target.closest('svg').querySelectorAll('[data-marketing-day]')],index=Number(target.dataset.marketingDayIndex),next=event.key==='Home'?0:event.key==='End'?all.length-1:Math.max(0,Math.min(all.length-1,index+(event.key==='ArrowRight'?1:-1)));all.forEach(el=>el.setAttribute('tabindex','-1'));all[next].setAttribute('tabindex','0');all[next].focus();});
+ const reveal=index=>{
+  selected=Math.max(0,Math.min(days.length-1,index));const day=days[selected];selectedDate=day.date;
+  const time=figure.querySelector('time');time.dateTime=day.date;time.textContent=`${day.date.slice(8,10)}. ${day.date.slice(5,7)}. ${day.date.slice(0,4)}`;
+  const total=figure.querySelector('[data-marketing-count]');total.dataset.marketingCount=day.date;total.textContent=num(day[key]);total.classList.toggle('is-unavailable',day[key]==null);
+  const note=coverageText(day,unique,range),coverage=figure.querySelector('.marketing-chart-coverage');coverage.hidden=!note;coverage.textContent=note;
+  figure.querySelector('[data-chart-step="-1"]').disabled=selected===0;figure.querySelector('[data-chart-step="1"]').disabled=selected===days.length-1;
+  figure.querySelector('.marketing-chart-legend').outerHTML=legend(day,key);draw();
+ };
+ figure.querySelectorAll('[data-chart-step]').forEach(button=>button.addEventListener('click',()=>reveal(selected+Number(button.dataset.chartStep))));
+ plot.addEventListener('pointermove',event=>{if(event.pointerType==='touch')return;const target=event.target.closest('[data-marketing-day]');if(target&&Number(target.dataset.marketingDayIndex)!==selected)reveal(Number(target.dataset.marketingDayIndex));});
+ plot.addEventListener('click',event=>{const target=event.target.closest('[data-marketing-day]');if(target)reveal(Number(target.dataset.marketingDayIndex));});
+ plot.addEventListener('focusin',event=>{const target=event.target.closest('[data-marketing-day]');if(target&&Number(target.dataset.marketingDayIndex)!==selected)reveal(Number(target.dataset.marketingDayIndex));});
+ plot.addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();
+  reveal(event.key==='Home'?0:event.key==='End'?days.length-1:selected+(event.key==='ArrowRight'?1:-1));
+  plot.querySelector('[tabindex="0"]').focus({preventScroll:true});
  });
+ chartObserver=new ResizeObserver(entries=>entries.forEach(({contentRect})=>{const next=Math.floor(contentRect.width);if(next>=200&&next!==width){width=next;cancelAnimationFrame(chartFrame);chartFrame=requestAnimationFrame(()=>{if(plot.isConnected)draw();});}}));
+ chartObserver.observe(plot);
 }
