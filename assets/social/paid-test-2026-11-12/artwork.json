@@ -1,0 +1,130 @@
+{
+  "status": "prepared-for-owner-review",
+  "socialPublication": false,
+  "adActivation": false,
+  "selectedConcept": "A",
+  "photography": "Genuine owner-supplied still photos. Cropping, rotation and normal exposure correction only. No synthetic people, screens or gameplay.",
+  "illustrations": "Concept C only: unchanged approved AI-generated Piko portrait. A/final use no added character or scene illustration.",
+  "review": {
+    "existingAssetImagesAtStart": 138,
+    "originalPhotos": 6,
+    "scope": "All pre-existing raster images under assets, before creating this folder."
+  },
+  "sources": [
+    {
+      "key": "phone",
+      "file": "sources/phone-upright.webp",
+      "original": "assets/Photo/20261108_193537.jpg",
+      "originalSha256": "723ff7b67ab39531ec8dd99a2aa3348f8f8a4b4619b7723127a646dae0452073",
+      "sha256": "7b64006aec35f380a7aa4fa5603304a8ee8bc7ecba0ebabf91a3fde59407100e",
+      "recipe": {
+        "orient": true,
+        "initialCrop": {
+          "left": 1330,
+          "top": 800,
+          "width": 1050,
+          "height": 1220
+        },
+        "rotationDegrees": 22,
+        "workingWidth": 1600,
+        "physicalCrop": {
+          "left": 432,
+          "top": 160,
+          "width": 672,
+          "height": 824
+        }
+      },
+      "safety": "Only device top, memory cards and hands. QR, handwritten background answers and lower progress/code strip are physically absent."
+    },
+    {
+      "key": "paper",
+      "file": "assets/social/prelaunch-2026-11-12-to-16/sources/paper-hands.webp",
+      "sha256": "dc63b08e6b85750f3d0feb665a49d2e742df36d7e5d53fa25ec20b94105631d8",
+      "safety": "Hands partly cover the paper wheels; no complete instructions, QR or solution."
+    },
+    {
+      "key": "piko",
+      "file": "assets/characters/piko.png",
+      "sha256": "20e183d5348ff1e7fa844a555ef553f58d113d24920a2f033457ea3b77ea91db",
+      "safety": "Unchanged approved portrait; uniform scaling only."
+    }
+  ],
+  "exports": [
+    {
+      "file": "pixelkovia_ad_concept_A_feed_4x5.png",
+      "width": 1080,
+      "height": 1350,
+      "bytes": 847765,
+      "sha256": "b7ebe5f1f13f82d47299bec656be7f9c9ea8e617a8dd9fdf573dd57c4003693f",
+      "design": "A",
+      "sources": [
+        "paper",
+        "phone"
+      ],
+      "headline": "Papierové stopy.Príbeh v mobile.",
+      "linkSticker": null
+    },
+    {
+      "file": "pixelkovia_ad_concept_B_feed_4x5.png",
+      "width": 1080,
+      "height": 1350,
+      "bytes": 1121483,
+      "sha256": "1ea23462a5bc437a56259d394c603bfd0555a3255063108a5dd30427a15913a2",
+      "design": "B",
+      "sources": [
+        "paper",
+        "phone"
+      ],
+      "headline": "Dobrodružstvozačína doma.",
+      "linkSticker": null
+    },
+    {
+      "file": "pixelkovia_ad_concept_C_feed_4x5.png",
+      "width": 1080,
+      "height": 1350,
+      "bytes": 772416,
+      "sha256": "b0430c1b0c98c89f30aea8756b2cc948f203157cd0ff09c60e68e6afc5b7ebd9",
+      "design": "C",
+      "sources": [
+        "paper",
+        "phone",
+        "piko"
+      ],
+      "headline": "7 záhad.Jeden tím.",
+      "linkSticker": null
+    },
+    {
+      "file": "pixelkovia_ad_final_feed_4x5.png",
+      "width": 1080,
+      "height": 1350,
+      "bytes": 847765,
+      "sha256": "b7ebe5f1f13f82d47299bec656be7f9c9ea8e617a8dd9fdf573dd57c4003693f",
+      "design": "A",
+      "sources": [
+        "paper",
+        "phone"
+      ],
+      "headline": "Papierové stopy.Príbeh v mobile.",
+      "linkSticker": null
+    },
+    {
+      "file": "pixelkovia_ad_final_story_9x16.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 924918,
+      "sha256": "c087e1c4c41846d6522512b3c60af98cdc1beb5a920d33de5de4ea53ee4cd40f",
+      "design": "A",
+      "sources": [
+        "paper",
+        "phone"
+      ],
+      "headline": "Papierové stopy.Príbeh v mobile.",
+      "linkSticker": {
+        "x": 250,
+        "y": 1530,
+        "width": 580,
+        "height": 95
+      }
+    }
+  ]
+}

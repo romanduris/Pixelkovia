@@ -1,0 +1,72 @@
+[
+  {
+    "text": "Pixelkovia",
+    "x": 110,
+    "y": 59,
+    "width": 169,
+    "height": 46,
+    "size": 34,
+    "max": 380,
+    "type": "brand"
+  },
+  {
+    "text": "STRATENÝ SIGNÁL",
+    "x": 794.5,
+    "y": 69,
+    "width": 221.5,
+    "height": 30,
+    "size": 23,
+    "max": 430,
+    "type": "brand"
+  },
+  {
+    "text": "7 záhad.Jeden tím.",
+    "x": 64,
+    "y": 166,
+    "width": 542,
+    "height": 262,
+    "size": 105,
+    "max": 952,
+    "type": "headline"
+  },
+  {
+    "text": "Rodinné dobrodružstvo doma.",
+    "x": 64,
+    "y": 434,
+    "width": 449,
+    "height": 42,
+    "size": 32,
+    "max": 952,
+    "type": "copy"
+  },
+  {
+    "text": "7 záhad  ·  7–13 rokov  ·  60–90 min",
+    "x": 301.5,
+    "y": 1087,
+    "width": 477,
+    "height": 41,
+    "size": 31,
+    "max": 936,
+    "type": "copy"
+  },
+  {
+    "text": "Pozrite sa, ako sa hrá",
+    "x": 112,
+    "y": 1184,
+    "width": 328,
+    "height": 44,
+    "size": 32,
+    "max": 800,
+    "type": "copy"
+  },
+  {
+    "text": "pixelkovia.rodulab.com",
+    "x": 388.5,
+    "y": 1273,
+    "width": 303,
+    "height": 37,
+    "size": 28,
+    "max": 900,
+    "type": "url"
+  }
+]

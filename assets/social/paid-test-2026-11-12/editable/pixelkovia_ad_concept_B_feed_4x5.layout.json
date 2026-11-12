@@ -1,0 +1,72 @@
+[
+  {
+    "text": "Pixelkovia",
+    "x": 110,
+    "y": 59,
+    "width": 169,
+    "height": 46,
+    "size": 34,
+    "max": 380,
+    "type": "brand"
+  },
+  {
+    "text": "STRATENÝ SIGNÁL",
+    "x": 794.5,
+    "y": 69,
+    "width": 221.5,
+    "height": 30,
+    "size": 23,
+    "max": 430,
+    "type": "brand"
+  },
+  {
+    "text": "Dobrodružstvozačína doma.",
+    "x": 64,
+    "y": 163,
+    "width": 670,
+    "height": 234,
+    "size": 91,
+    "max": 952,
+    "type": "headline"
+  },
+  {
+    "text": "Rodinná hra pre deti 7–13 rokov.",
+    "x": 64,
+    "y": 406,
+    "width": 475,
+    "height": 42,
+    "size": 32,
+    "max": 952,
+    "type": "copy"
+  },
+  {
+    "text": "Papier. Mobil. Spoločné pátranie.",
+    "x": 64,
+    "y": 1107,
+    "width": 477,
+    "height": 41,
+    "size": 31,
+    "max": 952,
+    "type": "copy"
+  },
+  {
+    "text": "Objavte hru",
+    "x": 112,
+    "y": 1199,
+    "width": 181,
+    "height": 44,
+    "size": 32,
+    "max": 800,
+    "type": "copy"
+  },
+  {
+    "text": "pixelkovia.rodulab.com",
+    "x": 388.5,
+    "y": 1273,
+    "width": 303,
+    "height": 37,
+    "size": 28,
+    "max": 952,
+    "type": "url"
+  }
+]
