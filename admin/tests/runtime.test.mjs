@@ -4,13 +4,18 @@ import {createOrder} from '../src/game-service.mjs';import {checklist} from '../
 import Stripe from 'stripe';
 import {recordPaymentProgress} from '../src/payment-progress.mjs';
 import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
-test('shipped Meta API fetch works in workerd and refuses redirects before forwarding credentials',async()=>{
- for(const redirect of [false,true]){
-  const calls=[];
-  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-fetch-runtime-'+redirect},bindings:{ENVIRONMENT:'local',META_ADS_ACCESS_TOKEN:'runtime-meta-secret-fixture'},outboundService:async request=>{
+test('shipped Meta API fetch works in workerd, recovers malformed spend and refuses redirects before forwarding credentials',async()=>{
+ for(const scenario of ['empty','spend-retry','redirect']){
+  const calls=[];let insightReads=0;
+  const redirect=scenario==='redirect';
+  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-fetch-runtime-'+scenario},bindings:{ENVIRONMENT:'local',META_ADS_ACCESS_TOKEN:'runtime-meta-secret-fixture'},outboundService:async request=>{
    const url=new URL(request.url);calls.push(url.href);
    assert.equal(url.origin,'https://graph.facebook.com');assert.equal(request.headers.get('Authorization'),'Bearer runtime-meta-secret-fixture');
    if(redirect)return new Response(null,{status:302,headers:{location:'https://untrusted.invalid/runtime-meta-secret-fixture'}});
+   if(scenario==='spend-retry'&&url.pathname.endsWith('/insights')){
+    const date=JSON.parse(url.searchParams.get('time_range')).until;insightReads++;
+    return Response.json({data:[{account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Runtime recovery',date_start:date,date_stop:date,publisher_platform:'facebook',spend:insightReads===1?'0.731':'0.73',impressions:'107'}]});
+   }
    return Response.json(url.pathname.endsWith('/insights')?{data:[]}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'});
   }}));
   try{
@@ -19,10 +24,11 @@ test('shipped Meta API fetch works in workerd and refuses redirects before forwa
    const from=new Date(Date.now()-2*86400000).toISOString().slice(0,10),to=new Date(Date.now()-86400000).toISOString().slice(0,10);
    const response=await mf.dispatchFetch('http://localhost/api/admin/marketing/ads/sync',{method:'POST',headers:{origin:'http://localhost','content-type':'application/json'},body:JSON.stringify({from,to})});
    const body=await response.json();assert.equal(response.status,redirect?502:200,JSON.stringify(body));
-   assert.equal(calls.length,redirect?1:2);assert.ok(!JSON.stringify(body).includes('runtime-meta-secret-fixture'));
+   assert.equal(calls.length,redirect?1:scenario==='spend-retry'?3:2);assert.ok(!JSON.stringify(body).includes('runtime-meta-secret-fixture'));
    const state=await first(db,'SELECT last_success_at,last_error FROM meta_ads_state');
    if(redirect){assert.match(state.last_error,/HTTP 302.*presmerovanie/);assert.equal(state.last_success_at,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,0);}
    else{assert.ok(state.last_success_at);assert.equal(state.last_error,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_impression_days WHERE synced_at IS NOT NULL')).n,2);}
+   if(scenario==='spend-retry'){assert.equal(insightReads,2);assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,73);assert.equal((await first(db,'SELECT sum(impressions) n FROM meta_ads_impressions')).n,107);}
   }finally{await mf.dispose();}
  }
 });

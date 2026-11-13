@@ -46,6 +46,29 @@ test('failed second page preserves old spend and coverage; provider errors expos
   const report=await metaAdsReport(env,filters(),collection,at+62000);assert.equal(report.costs,null);assert.match(report.costReason,/190/);assert.ok(!JSON.stringify(report).includes(env.META_ADS_ACCESS_TOKEN));
  }finally{db.close();}
 });
+test('a transient malformed spend retries the entire read once without retaining rejected pages',async()=>{
+ const {db,env}=setup();try{
+  const cursors=[];
+  env.META_ADS_FETCH=api([],{insights:url=>{
+   cursors.push(url.searchParams.get('after'));
+   if(cursors.length===1)return Response.json({data:[row({spend:'99.99'})],paging:{next:'https://graph.facebook.com/next',cursors:{after:'second-page'}}});
+   if(cursors.length===2)return Response.json({data:[row({publisher_platform:'instagram',spend:'0.091'})]});
+   return Response.json({data:[row({spend:'0.73',impressions:'107'}),row({publisher_platform:'instagram',spend:'0.09',impressions:'13'})]});
+  }}).fetch;
+  await syncMetaAds(env,range,at);
+  assert.deepEqual(cursors,[null,'second-page',null]);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,82);
+  assert.equal((await first(db,'SELECT sum(impressions) n FROM meta_ads_impressions')).n,120);
+  assert.equal((await first(db,'SELECT last_error FROM meta_ads_state')).last_error,null);
+  let requests=0;
+  env.META_ADS_FETCH=api([],{insights:()=>{requests++;return Response.json({data:[row({spend:'private token test-token-never-in-url'})]});}}).fetch;
+  await assert.rejects(syncMetaAds(env,range,at+61000),error=>error.status===502&&/nepodporovaný text/.test(error.message)&&!error.message.includes('test-token'));
+  assert.equal(requests,2,'persistent corruption is bounded to two reads');
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,82);
+  assert.equal((await first(db,'SELECT min(synced_at) n FROM meta_ads_days')).n,at);
+  assert.equal((await first(db,'SELECT last_success_at FROM meta_ads_state')).last_success_at,at);
+ }finally{db.close();}
+});
 test('wrong account, currency, timezone, duplicate rows, invalid amounts and broken pagination cannot publish partial data',async()=>{
  for(const options of [
   {account:{account_id:'999'}},{account:{currency:'USD'}},{account:{timezone_name:'America/Los_Angeles'}},
@@ -107,6 +130,23 @@ test('concurrent imports and automatic retries are bounded without disturbing a 
   assert.equal((await first(db,'SELECT last_success_at FROM meta_ads_state')).last_success_at,at);
   await assert.rejects(syncMetaAds({...env,META_ADS_ACCESS_TOKEN:''},range,at+61000),e=>e.status===503);
   assert.deepEqual(await scheduledMetaAds({...env,META_ADS_ACCESS_TOKEN:''},at+61000),{skipped:true});
+ }finally{db.close();}
+});
+test('failed scheduled imports retry after ten minutes and successful imports return to hourly refreshes',async()=>{
+ const {db,env}=setup();try{
+  await syncMetaAds(env,range,at);
+  env.META_ADS_FETCH=api([row({spend:'0.123456'})]).fetch;
+  const failedAt=at+3600000;
+  assert.deepEqual(await scheduledMetaAds(env,failedAt),{failed:true});
+  assert.match((await first(db,'SELECT last_error FROM meta_ads_state')).last_error,/6 desatinných miest/);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);
+  const recovery=api([row({spend:'0.82',impressions:'120'})]);env.META_ADS_FETCH=recovery.fetch;
+  assert.deepEqual(await scheduledMetaAds(env,failedAt+599999),{skipped:true});assert.equal(recovery.calls.length,0);
+  assert.equal((await scheduledMetaAds(env,failedAt+600000)).imported,true);
+  assert.equal((await first(db,'SELECT last_error FROM meta_ads_state')).last_error,null);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,82);
+  const calls=recovery.calls.length;
+  assert.deepEqual(await scheduledMetaAds(env,failedAt+1200000),{skipped:true});assert.equal(recovery.calls.length,calls);
  }finally{db.close();}
 });
 async function visit(db,source='facebook_ads',campaign='launch-2026',started=at-3600000){

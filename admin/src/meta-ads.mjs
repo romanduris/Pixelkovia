@@ -14,9 +14,17 @@ function dates(from,to){
   const days=[];for(let d=from;d<=to;d=shift(d,1))days.push(d);return days;
 }
 export function spendCents(value){
-  if(typeof value!=='string'||!/^\d{1,12}(?:\.\d{1,2})?$/.test(value))throw new HttpError(502,'Meta vrátila neplatnú sumu výdavkov.');
+  if(typeof value!=='string'||!/^\d{1,12}(?:\.\d{1,2})?$/.test(value))throw new MetaSpendError(value);
   const [whole,fraction='']=value.split('.'),cents=Number(whole)*100+Number(fraction.padEnd(2,'0'));
   if(!Number.isSafeInteger(cents))throw new HttpError(502,'Meta vrátila príliš veľkú sumu.');return cents;
+}
+class MetaSpendError extends HttpError {
+  constructor(value){
+    // Describe the rejected format, never persist the provider's raw value.
+    const decimal=typeof value==='string'&&/^\d{1,12}\.(\d{1,20})$/.exec(value);
+    const format=decimal?decimal[1].length+' desatinných miest':value==null?'chýbajúca hodnota':typeof value==='string'?'nepodporovaný text':'typ '+typeof value;
+    super(502,'Meta vrátila neplatnú sumu výdavkov ('+format+').');
+  }
 }
 function providerError(status,error){
   const code=Number.isSafeInteger(error?.code)?error.code:null,sub=Number.isSafeInteger(error?.error_subcode)?error.error_subcode:null;
@@ -40,13 +48,36 @@ async function graph(env,path,params,signal){
   return data;
 }
 
+async function insights(env,from,to,days,signal){
+  const rows=[],keys=new Set();let after='';
+  for(let page=0;page<20;page++){
+    const data=await graph(env,'act_'+metaAccount+'/insights',{fields:'account_id,account_currency,campaign_id,campaign_name,date_start,date_stop,spend,impressions',level:'campaign',time_increment:'1',time_range:JSON.stringify({since:from,until:to}),breakdowns:'publisher_platform',limit:'500',...(after?{after}:{})},signal);
+    if(!Array.isArray(data.data))throw new HttpError(502,'Meta nevrátila denný prehľad výdavkov.');
+    for(const r of data.data){
+      if(r.account_id!==metaAccount||r.account_currency!=='EUR'||!id(r.campaign_id)||typeof r.campaign_name!=='string'||r.campaign_name.length>400||!days.includes(r.date_start)||r.date_stop!==r.date_start||typeof r.publisher_platform!=='string'||!/^\w{1,40}$/.test(r.publisher_platform))throw new HttpError(502,'Meta vrátila neplatné alebo neporovnateľné riadky výdavkov.');
+      const key=[r.date_start,r.campaign_id,r.publisher_platform].join(':');
+      if(keys.has(key))throw new HttpError(502,'Meta vrátila duplicitný riadok výdavkov.');keys.add(key);
+      // Missing/malformed impressions must not corrupt or suppress valid costs.
+      const impressions=typeof r.impressions==='string'&&/^\d{1,16}$/.test(r.impressions)&&Number.isSafeInteger(Number(r.impressions))?Number(r.impressions):null;
+      rows.push({day:r.date_start,campaign:r.campaign_id,name:r.campaign_name,platform:r.publisher_platform,cents:spendCents(r.spend),impressions});
+    }
+    if(rows.length>5000)throw new HttpError(502,'Prehľad je príliš veľký; vyberte kratší rozsah.');
+    if(!data.paging?.next)break;
+    // Rebuild the request from a cursor; never follow a token-bearing paging URL.
+    const cursor=data.paging?.cursors?.after;
+    if(page===19||typeof cursor!=='string'||!cursor||cursor===after||cursor.length>2000)throw new HttpError(502,'Meta nevrátila úplný prehľad; pôvodné výdavky zostali zachované.');
+    after=cursor;
+  }
+  return rows;
+}
+
 // Only GETs against the pinned advertising account. No campaign mutations.
 export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={}){
   if(!env.META_ADS_ACCESS_TOKEN){if(automatic)return {skipped:true};throw new HttpError(503,'Chýba serverový secret META_ADS_ACCESS_TOKEN s oprávnením ads_read pre účet '+metaAccount+'.');}
   const today=localDate(at),from=input.from||shift(today,-29),to=input.to||today,days=dates(from,to);
   if(to>today||from<shift(today,-365))throw new HttpError(400,'Vyberte minulé alebo aktuálne dni, najviac 366 dní dozadu.');
   const db=env.TQ_DB,token=crypto.randomUUID();
-  const lock=await first(db,`UPDATE meta_ads_state SET lock_token=?,lock_until=?,last_attempt_at=? WHERE id=1 AND lock_until<=? AND coalesce(last_attempt_at,0)<=? RETURNING id`,token,at+120000,at,at,at-(automatic?hour:60000));
+  const lock=await first(db,`UPDATE meta_ads_state SET lock_token=?,lock_until=?,last_attempt_at=? WHERE id=1 AND lock_until<=? AND coalesce(last_attempt_at,0)<=CASE WHEN last_error IS NOT NULL THEN ? ELSE ? END RETURNING id`,token,at+120000,at,at,at-(automatic?600000:60000),at-(automatic?hour:60000));
   if(!lock){if(automatic)return {skipped:true};throw new HttpError(429,'Import už prebieha alebo bol spustený pred menej než minútou.');}
   try{
     const signal=AbortSignal.timeout(45000);
@@ -55,24 +86,14 @@ export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={
     if(account.currency!=='EUR')throw new HttpError(502,'Reklamný účet musí používať EUR; prevod meny sa neodhaduje.');
     // Prague and Bratislava have identical calendar boundaries and DST rules.
     if(!['Europe/Bratislava','Europe/Prague'].includes(account.timezone_name))throw new HttpError(502,'Časové pásmo reklamného účtu nezodpovedá dňom v Bratislave.');
-    const rows=[],keys=new Set();let after='';
-    for(let page=0;page<20;page++){
-      const data=await graph(env,'act_'+metaAccount+'/insights',{fields:'account_id,account_currency,campaign_id,campaign_name,date_start,date_stop,spend,impressions',level:'campaign',time_increment:'1',time_range:JSON.stringify({since:from,until:to}),breakdowns:'publisher_platform',limit:'500',...(after?{after}:{})},signal);
-      if(!Array.isArray(data.data))throw new HttpError(502,'Meta nevrátila denný prehľad výdavkov.');
-      for(const r of data.data){
-        if(r.account_id!==metaAccount||r.account_currency!=='EUR'||!id(r.campaign_id)||typeof r.campaign_name!=='string'||r.campaign_name.length>400||!days.includes(r.date_start)||r.date_stop!==r.date_start||typeof r.publisher_platform!=='string'||!/^\w{1,40}$/.test(r.publisher_platform))throw new HttpError(502,'Meta vrátila neplatné alebo neporovnateľné riadky výdavkov.');
-        const key=[r.date_start,r.campaign_id,r.publisher_platform].join(':');
-        if(keys.has(key))throw new HttpError(502,'Meta vrátila duplicitný riadok výdavkov.');keys.add(key);
-        // Missing/malformed impressions must not corrupt or suppress valid costs.
-        const impressions=typeof r.impressions==='string'&&/^\d{1,16}$/.test(r.impressions)&&Number.isSafeInteger(Number(r.impressions))?Number(r.impressions):null;
-        rows.push({day:r.date_start,campaign:r.campaign_id,name:r.campaign_name,platform:r.publisher_platform,cents:spendCents(r.spend),impressions});
+    let rows;
+    for(let attempt=0;attempt<2;attempt++){
+      try{rows=await insights(env,from,to,days,signal);break;}
+      catch(error){
+        // A transient malformed spend gets one fresh, fully validated read.
+        // Discard every page from the rejected attempt; the timeout is shared.
+        if(!(error instanceof MetaSpendError)||attempt===1||signal.aborted)throw error;
       }
-      if(rows.length>5000)throw new HttpError(502,'Prehľad je príliš veľký; vyberte kratší rozsah.');
-      if(!data.paging?.next)break;
-      // Rebuild the request from a cursor; never follow a token-bearing paging URL.
-      const cursor=data.paging?.cursors?.after;
-      if(page===19||typeof cursor!=='string'||!cursor||cursor===after||cursor.length>2000)throw new HttpError(502,'Meta nevrátila úplný prehľad; pôvodné výdavky zostali zachované.');
-      after=cursor;
     }
     const statements=[db.prepare('DELETE FROM meta_ads_spend WHERE day>=? AND day<=?').bind(from,to)];
     for(let i=0;i<rows.length;i+=100)statements.push(db.prepare(`INSERT INTO meta_ads_spend(day,campaign_id,campaign_name,platform,spend_cents) SELECT json_extract(value,'$.day'),json_extract(value,'$.campaign'),json_extract(value,'$.name'),json_extract(value,'$.platform'),json_extract(value,'$.cents') FROM json_each(?)`).bind(JSON.stringify(rows.slice(i,i+100))));
