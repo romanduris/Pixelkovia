@@ -116,6 +116,22 @@ const origin='https://pixelkovia.rodulab.com';
   assert.match(await page.locator('#marketing-kpi-revenue strong').innerText(),/15,0/);
   assert.match(await page.locator('#marketing-kpi-revenue small').innerText(),/Reklama: Nedostupné/);
   assert.equal(await page.locator('#marketing-kpi-profit strong').innerText(),'Nedostupné');
+  // Expanded explanations span the full row and must not push bars/counts out of view.
+  await page.locator('.marketing-funnel-step').evaluateAll(els=>els.forEach(el=>el.open=true));
+  for(const width of [1440,390,320]){
+   await page.setViewportSize({width,height:900});
+   const layout=await page.locator('.marketing-funnel').evaluate(root=>{
+    const bounds=root.getBoundingClientRect(),steps=root.querySelector('.marketing-steps');
+    return {overflow:steps.scrollWidth>steps.clientWidth+1,text:[...root.querySelectorAll('.marketing-step-detail p')].map(el=>({width:el.scrollWidth,available:el.clientWidth,height:el.getBoundingClientRect().height,line:parseFloat(getComputedStyle(el).lineHeight)})),totals:[...root.querySelectorAll('.marketing-funnel-step>summary>strong')].map(el=>el.getBoundingClientRect().right<=bounds.right)};
+   });
+   assert.equal(layout.overflow,false,'expanded details fit the grid at '+width);
+   assert.ok(layout.text.every(p=>p.width<=p.available+1&&p.height>p.line),'all explanation text wraps within the row at '+width);
+   assert.ok(layout.totals.every(Boolean),'totals remain inside the panel at '+width);
+   await page.locator('.marketing-funnel').screenshot({path:'/tmp/pixelkovia-wrapped-details-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
+  }
+  await page.locator('.marketing-funnel-step').evaluateAll(els=>els.forEach(el=>el.open=false));
+  assert.equal(await page.locator('.marketing-step-detail p').first().isVisible(),false);
+  await page.setViewportSize({width:1512,height:1080});
   await page.locator('#marketing-overview-unique').check();
   assert.equal(await page.locator('#marketing-kpi-checkout strong').innerText(),'1');
   assert.equal(await page.locator('#marketing-unique').isChecked(),false,'overview toggle is independent of the chart');

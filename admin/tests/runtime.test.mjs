@@ -6,7 +6,7 @@ import {recordPaymentProgress} from '../src/payment-progress.mjs';
 import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
 test('shipped Meta API fetch works in workerd, recovers malformed spend and refuses redirects before forwarding credentials',async()=>{
  for(const scenario of ['empty','spend-retry','redirect']){
-  const calls=[];let insightReads=0;
+  const calls=[];let insightReads=0,rejectedAt;
   const redirect=scenario==='redirect';
   const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-fetch-runtime-'+scenario},bindings:{ENVIRONMENT:'local',META_ADS_ACCESS_TOKEN:'runtime-meta-secret-fixture'},outboundService:async request=>{
    const url=new URL(request.url);calls.push(url.href);
@@ -14,6 +14,8 @@ test('shipped Meta API fetch works in workerd, recovers malformed spend and refu
    if(redirect)return new Response(null,{status:302,headers:{location:'https://untrusted.invalid/runtime-meta-secret-fixture'}});
    if(scenario==='spend-retry'&&url.pathname.endsWith('/insights')){
     const date=JSON.parse(url.searchParams.get('time_range')).until;insightReads++;
+    if(insightReads===1)rejectedAt=Date.now();
+    else assert.ok(Date.now()-rejectedAt>=2900,'the shipped worker waits three seconds before retrying malformed spend');
     return Response.json({data:[{account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Runtime recovery',date_start:date,date_stop:date,publisher_platform:'facebook',spend:insightReads===1?'0.731':'0.73',impressions:'107'}]});
    }
    return Response.json(url.pathname.endsWith('/insights')?{data:[]}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'});

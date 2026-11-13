@@ -71,6 +71,15 @@ async function insights(env,from,to,days,signal){
   return rows;
 }
 
+function waitForRetry(signal){
+  return new Promise((resolve,reject)=>{
+    const abort=()=>{clearTimeout(timer);signal.removeEventListener('abort',abort);reject(new HttpError(502,'Meta API prekročilo časový limit. Skúste import znova.'));};
+    const timer=setTimeout(()=>{signal.removeEventListener('abort',abort);resolve();},3000);
+    signal.addEventListener('abort',abort,{once:true});
+    if(signal.aborted)abort();
+  });
+}
+
 // Only GETs against the pinned advertising account. No campaign mutations.
 export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={}){
   if(!env.META_ADS_ACCESS_TOKEN){if(automatic)return {skipped:true};throw new HttpError(503,'Chýba serverový secret META_ADS_ACCESS_TOKEN s oprávnením ads_read pre účet '+metaAccount+'.');}
@@ -93,6 +102,7 @@ export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={
         // A transient malformed spend gets one fresh, fully validated read.
         // Discard every page from the rejected attempt; the timeout is shared.
         if(!(error instanceof MetaSpendError)||attempt===1||signal.aborted)throw error;
+        await waitForRetry(signal);
       }
     }
     const statements=[db.prepare('DELETE FROM meta_ads_spend WHERE day>=? AND day<=?').bind(from,to)];

@@ -82,6 +82,22 @@ test('wrong account, currency, timezone, duplicate rows, invalid amounts and bro
  }
  assert.equal(spendCents('0.01'),1);assert.equal(spendCents('12.3'),1230);for(const value of ['-1','1e3','NaN','1,23',12])assert.throws(()=>spendCents(value));
 });
+test('the shared import deadline interrupts the retry pause without a second request or partial writes',async t=>{
+ const {db,env}=setup(),controller=new AbortController();
+ t.mock.method(AbortSignal,'timeout',()=>controller.signal);
+ try{
+  await syncMetaAds(env,range,at);
+  let reads=0;
+  env.META_ADS_FETCH=api([],{insights:()=>{
+   reads++;setTimeout(()=>controller.abort(),25);
+   return Response.json({data:[row({spend:'0.123'})]});
+  }}).fetch;
+  await assert.rejects(syncMetaAds(env,range,at+61000),error=>error.status===502&&/časový limit/.test(error.message));
+  assert.equal(reads,1);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);
+  assert.equal((await first(db,'SELECT last_success_at FROM meta_ads_state')).last_success_at,at);
+ }finally{db.close();}
+});
 test('transport and response failures remain distinct and never leak token or provider content',async()=>{
  for(const [fetch,expected]of [
   [async()=>{throw Error('private transport test-token-never-in-url');},/pred prijatím HTTP odpovede/],
