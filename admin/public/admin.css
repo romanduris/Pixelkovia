@@ -604,21 +604,24 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-purchase-link:hover{color:#fff}
 .marketing-chart-panel{border:1px solid var(--m-border);border-radius:8px;background:var(--m-surface);min-width:0;overflow:hidden}
 .marketing-chart-panel>summary{min-height:48px;padding:4px 16px;font-weight:650;font-size:14px;gap:10px}
-.marketing-chart-panel>summary>.marketing-chart-unique{margin-left:auto;min-height:40px;font-size:12px;font-weight:400;color:var(--m-muted);gap:6px}
 .marketing-chart-panel>.marketing-disclosure-body{padding:0 16px 14px}
-.marketing-chart-sites{display:inline-flex;align-items:center;margin-left:auto;border:1px solid var(--m-border);border-radius:6px;overflow:hidden;flex-shrink:0}
-.marketing-dashboard .marketing-chart-sites button{min-height:32px;padding:5px 10px;border:0;border-radius:0;background:transparent;font-size:11px;color:var(--m-muted)}
-.marketing-dashboard .marketing-chart-sites button[aria-pressed="true"]{background:#304b68;color:#eff7ff;box-shadow:inset 0 0 0 1px #7396bb}
-.marketing-chart-panel>summary>.marketing-chart-unique{margin-left:8px}
-.marketing-chart-panel>summary>.marketing-chart-unique[hidden]{display:none}
-.marketing-dashboard[data-marketing-site="rodulab"] :is(.marketing-funnel,.marketing-overview-grid,.marketing-audience,.marketing-quality,.marketing-filter-chips,#marketing-filter-toggle,#marketing-filter-panel){display:none!important}
-.marketing-studio-summary{padding:12px 0 16px;margin-bottom:8px;border-bottom:1px solid var(--m-border)}
-.marketing-studio-summary>span{display:block;color:var(--m-muted);font-size:13px}
-.marketing-studio-summary>strong{display:block;margin:4px 0;font-size:36px;line-height:1.2;color:#edf4ff;font-variant-numeric:tabular-nums}
-.marketing-studio-summary>p{margin:6px 0 0;font-size:12px;line-height:1.7;color:var(--m-muted)}
+.marketing-chart-controls{display:flex;align-items:center;gap:14px;margin-left:auto;font-size:12px;font-weight:400;color:var(--m-muted)}
+.marketing-chart-panel:not([open]) .marketing-chart-controls{display:none}
+.marketing-chart-controls .marketing-chart-unique{min-height:40px;font-size:inherit;gap:6px;white-space:nowrap}
+.marketing-chart-controls .marketing-chart-unique[hidden]{display:none}
+.marketing-chart-site{display:flex;align-items:center;gap:7px;min-height:40px;cursor:pointer;white-space:nowrap}
+.marketing-chart-site input{appearance:none;position:relative;flex-shrink:0;width:30px;height:18px;margin:0;border:1px solid #7396bb;border-radius:12px;background:#263b53;cursor:pointer}
+.marketing-chart-site input::before{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#edf4ff;transition:transform .15s ease}
+.marketing-chart-site input:checked{background:#397fc4}
+.marketing-chart-site input:checked::before{transform:translateX(12px)}
+.marketing-chart-site input:focus-visible{outline:2px solid #91c9fa;outline-offset:3px}
+.marketing-studio-summary{padding:2px 0 8px}
+.marketing-studio-summary>span{display:block;color:var(--m-muted);font-size:12px}
+.marketing-studio-summary strong{font-size:14px;color:#edf4ff;font-variant-numeric:tabular-nums}
+.marketing-studio-summary>p{margin:5px 0 0;font-size:11px;line-height:1.7;color:var(--m-muted)}
 .marketing-studio-note{margin:10px 0 0;padding-top:10px;border-top:1px solid var(--m-border);font-size:11px;line-height:1.7;color:var(--m-muted)}
 .chart-source-studio{--chart-color:#91c9fa;fill:var(--chart-color);background:var(--chart-color)}
-@media(max-width:650px){.marketing-chart-panel>summary{flex-wrap:wrap}.marketing-chart-panel>summary>.marketing-chart-sites{order:3;margin:0 0 5px;width:100%}.marketing-chart-sites button{flex:1}.marketing-chart-panel>summary>.marketing-chart-unique{margin-left:auto}}
+@media(max-width:360px){.marketing-chart-panel>summary{flex-wrap:wrap;column-gap:6px;row-gap:0}.marketing-chart-controls{order:3;justify-content:flex-end;width:100%;gap:12px}}
 .marketing-chart{margin:0;min-width:0}
 .marketing-chart-readout{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:50px;margin:0 0 6px;padding:3px 0;color:#d9e5f3}
 .marketing-chart-day-nav{display:flex;align-items:center;gap:6px;min-width:0}
@@ -653,7 +656,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .chart-day-total.is-selected{fill:#fff}
 @media(max-width:750px){
  .marketing-chart-panel>summary{padding:3px 12px;font-size:13px;min-height:46px}
- .marketing-chart-panel>summary>.marketing-chart-unique{font-size:11px}
+ .marketing-chart-controls{font-size:11px;gap:10px}
  .marketing-chart-panel>.marketing-disclosure-body{padding:0 12px 12px}
  .marketing-chart-readout{min-height:46px;margin-bottom:2px}
  .marketing-chart-total{display:grid;gap:1px}.marketing-chart-total strong{font-size:22px}.marketing-chart-total>span{font-size:10px}

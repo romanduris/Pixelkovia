@@ -16,6 +16,13 @@ test('studio counts only successful document visits and forwards no visitor info
   await Promise.all(pending);assert.equal(response.status,200);assert.equal(forwarded.length,1);
   assert.equal(forwarded[0].url,'https://rodulab.com/api/studio/visit');assert.equal(forwarded[0].method,'POST');assert.deepEqual([...forwarded[0].headers],[['x-rodulab-visit','document']]);assert.equal(await forwarded[0].text(),'');
   for(const req of [document('/',{method:'HEAD'}),document('/assets/mark.svg'),document('/',{headers:{Accept:'text/html','User-Agent':'Googlebot'}}),document('/',{headers:{Accept:'text/html',Purpose:'prefetch'}}),document('/',{headers:{Accept:'text/html','Sec-Purpose':'prefetch;prerender'}}),document('/',{headers:{Accept:'application/json'}})])assert.equal(!!countableVisit(req,html()),false);
+  for(const host of ['pixelkovia.rodulab.com','livingstones.rodulab.com','btsflightscaner.rodulab.com','www.rodulab.com','rodulab.com.example']){
+    const request=new Request('https://'+host+'/',document());
+    assert.equal(!!countableVisit(request,html()),false,'only the exact studio hostname counts: '+host);
+    await gateway.fetch(request,env,{waitUntil:p=>pending.push(p)});
+  }
+  for(const path of ['/projects','/Pixelkovia','/index.html','/assets/social.jpg'])assert.equal(!!countableVisit(document(path),html()),false,'only the studio homepage counts: '+path);
+  await Promise.all(pending);assert.equal(forwarded.length,1,'subdomains cannot increment the studio counter');
   assert.equal(!!countableVisit(document(),new Response('',{status:503})),false);
   assert.equal((await gateway.fetch(document('/api/studio/visit',{method:'POST'}),env)).status,404);assert.equal(forwarded.length,1);
 });
@@ -27,7 +34,7 @@ test('studio aggregate handles concurrent increments and Bratislava midnight wit
     assert.deepEqual(db.sqlite.prepare('SELECT * FROM studio_traffic_daily ORDER BY day').all().map(row=>({...row})),[{day:'2026-11-10',visits:20},{day:'2026-11-11',visits:1}]);
     assert.deepEqual(db.sqlite.prepare('PRAGMA table_info(studio_traffic_daily)').all().map(column=>column.name),['day','visits']);
     assert.equal(db.sqlite.prepare('SELECT COUNT(*) n FROM marketing_visits').get().n,0);
-    for(const request of [new Request('https://pixelkovia.rodulab.com/api/studio/visit',{method:'POST',headers:{'X-RoduLab-Visit':'document'}}),new Request('https://rodulab.com/api/studio/visit',{method:'POST'})])await assert.rejects(()=>recordStudioVisit(request,env),e=>e.status===404);
+    for(const request of [...['pixelkovia.rodulab.com','livingstones.rodulab.com','btsflightscaner.rodulab.com'].map(host=>new Request('https://'+host+'/api/studio/visit',{method:'POST',headers:{'X-RoduLab-Visit':'document'}})),new Request('https://rodulab.com/api/studio/visit',{method:'POST'})])await assert.rejects(()=>recordStudioVisit(request,env),e=>e.status===404);
   }finally{db.close();}
 });
 test('studio report distinguishes unknown history from measured zero and ignores Pixelkovia acquisition filters',async()=>{
