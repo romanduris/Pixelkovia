@@ -1,6 +1,6 @@
 # Pixelkovia · Dnes má vaša obývačka tajomstvo.
 
-Prepracovaná reklamná séria z 12. novembra 2026: tri celistvé scény v jednej výtvarnej réžii, dva vertikálne výstupy a editovateľná sadzba. Nahrádza pôvodné fotografické návrhy v tomto adresári.
+Reklamná séria z 12. novembra 2026, aktualizovaná 13. novembra: hlavný motív má tri samostatne generované scény pre **1:1, 9:16 a 1,19:1** a vlastnú editovateľnú sadzbu v každom formáte. Story má celú obývačku od stropu po podlahu; žiadny z troch finálnych výstupov nevzniká dopĺňaním prázdnych okrajov. Pôvodné koncepty A/B/C a osobitná produktová Story zostávajú dostupné.
 
 **Pripravené na kontrolu vlastníkom. Sociálne príspevky ani platené reklamy neboli publikované, naplánované alebo zapnuté.** Predajný web, ceny, checkout a samotná hra sa obsahovo nemenia. Tento adresár zostáva mimo verejného aj chráneného aplikačného exportu.
 
@@ -14,11 +14,14 @@ Prepracovaná reklamná séria z 12. novembra 2026: tri celistvé scény v jedne
 | A · Dnes má vaša obývačka tajomstvo. | [Feed A](pixelkovia_ad_concept_A_feed_4x5.png) | 1080 × 1350 |
 | B · Jeden mobil. Všetci v hre. | [Feed B](pixelkovia_ad_concept_B_feed_4x5.png) | 1080 × 1350 |
 | C · Čo ukrýva vaša obývačka? | [Feed C](pixelkovia_ad_concept_C_feed_4x5.png) | 1080 × 1350 |
-| Odporúčaný hlavný feed · motív A | [Finálny feed](pixelkovia_ad_final_feed_4x5.png) | 1080 × 1350 |
-| Tajomstvo v obývačke · A | [Hlavná Story](pixelkovia_ad_final_story_9x16.png) | 1080 × 1920 |
+| Hlavný feed · samostatná štvorcová scéna A | [Finálny štvorec 1:1](pixelkovia_ad_final_square_1x1.png) | 1080 × 1080 |
+| Tajomstvo v obývačke · natívna vertikálna scéna | [Hlavná Story 9:16](pixelkovia_ad_final_story_9x16.png) | 1080 × 1920 |
+| Hlavný motív · rodina napravo, nadpis naľavo | [Horizontálny 1,19:1](pixelkovia_ad_final_landscape_1_19x1.png) | 1190 × 1000 |
 | Pozrite, čo hráte spolu. · skutočná ukážka | [Produktová Story](pixelkovia_ad_game_story_9x16.png) | 1080 × 1920 |
 
 Prehľad a súbory v `previews/` slúžia na kontrolu. Do reklamy patria plné PNG. Odporúčanie A je kreatívny výber, nie výsledok merania predaja.
+
+Horizontálny pomer je **1,19:1 podľa zadania**, nie 1,91:1. Duplicitný finálny export 4:5 bol nahradený štvorcom; jeho totožná pôvodná podoba zostáva ako koncept A. Nové pozadia sú samostatné generované kompozície, jemne prevedené na presné exportné rozmery bez pásov alebo naťahovania. Texty, značka, údaje a CTA zostávajú v SVG oddelené od pozadia.
 
 ## Réžia a háčiky
 
@@ -32,7 +35,7 @@ Všetky scény majú spoločnú tmavomodrú, jantárovú a azúrovú paletu, kon
 
 ## Pôvod obrázkov a presnosť produktu
 
-Scény A/B/C a samostatná póza Pixiho vznikli vstavaným **image_gen**. Presné zadania a roly vstupných referencií sú v [PROMPTS.json](PROMPTS.json). Referencie tvorili schválená obývačka, pôvodné portréty a skutočné fotografie hrania. Nové prostredia, ľudia a telefóny v scénach sú **generované reklamné ilustrácie**; neprezentujú sa ako zákaznícke fotografie alebo recenzie. Mená postáv ani predajné texty nie sú zapečené v podkladových ilustráciách.
+Scény A/B/C, nové formátové scény a samostatná póza Pixiho vznikli vstavaným **image_gen**. Pôvodné zadania sú v [PROMPTS.json](PROMPTS.json); presné nové prompty a roly referencií v [FORMAT-PROMPTS.json](FORMAT-PROMPTS.json). Referencie tvorili schválená obývačka, pôvodné portréty a skutočné fotografie hrania; nové formáty vychádzajú z hotového motívu A. Nové prostredia, ľudia a telefóny v scénach sú **generované reklamné ilustrácie**; neprezentujú sa ako zákaznícke fotografie alebo recenzie. Mená postáv ani predajné texty nie sú zapečené v podkladových ilustráciách.
 
 Produktová Story navyše obsahuje **nezmenený schválený skutočný záber** `assets/sales/game-lock-partial.webp`, vložený do samostatného vektorového rámu telefónu a označený „Skutočný záber z hry“. Táto ukážka sa neprepisuje ani negeneruje. Telefóny v ostatných ilustračných scénach predstavujú výtvarné zobrazenie hrania, nie presný screenshot rozhrania.
 
@@ -43,6 +46,9 @@ Podklady v `sources/`:
 | `scene-A-room.webp` | Celistvá scéna spoločného riešenia pri stole |
 | `scene-B-phone.webp` | Celistvá scéna hrania cez ramená detí |
 | `scene-C-discovery.webp` | Celistvá scéna objavovania indície pri gauči |
+| `scene-A-square.webp` | Nový záber rodiny komponovaný pre štvorec |
+| `scene-A-story.webp` | Nový vertikálny záber celej obývačky, stola a podlahy |
+| `scene-A-landscape-1_19x1.webp` | Nová horizontálna scéna s rodinou napravo a priestorom pre text naľavo |
 | `pixi-lettering.png` | Nová póza schválenej postavy s ceruzkou a skutočným alfa kanálom |
 
 Papiere v generovaných scénach majú všeobecné grafické fragmenty. Nepoužívajú celé pôvodné pracovné listy, QR, heslá ani odpovede. Neošetrené fotografie nie sú vložené do SVG alebo do odovzdávaných zdrojov. Pôvodné produktové materiály a sedem úloh zostávajú bez zmeny.
@@ -95,7 +101,7 @@ Pri organickej Story nahraďte tlačené CTA natívnou odkazovou nálepkou v ozn
 
 ## Editácia a export
 
-Šesť SVG v `editable/` obsahuje vložené bezpečné bitmapy a fonty; všetky reklamné texty zostávajú textom. `render.cjs` reprodukuje sadzbu a exportuje plné PNG, mobilné náhľady, spoločný prehľad, lokálnu galériu a kontrolné záznamy. Žiadne generovanie ani sieťové publikovanie pri exporte neprebieha.
+Sedem SVG v `editable/` obsahuje vložené bezpečné bitmapy a fonty; všetky reklamné texty zostávajú textom. `render.cjs` reprodukuje sadzbu a exportuje plné PNG, mobilné náhľady, spoločný prehľad, lokálnu galériu a kontrolné záznamy. Nové finálne formáty majú samostatné pozadia, veľkosti, pozície nadpisu, informácií a CTA. Žiadne generovanie ani sieťové publikovanie pri exporte neprebieha.
 
 ```sh
 PLAYWRIGHT_MODULE=/cesta/k/playwright node assets/social/paid-test-2026-11-12/render.cjs

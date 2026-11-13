@@ -1,11 +1,13 @@
 {
-  "version": 2,
+  "version": 3,
+  "updated": "2026-11-13",
   "status": "prepared-for-owner-review",
   "socialPublication": false,
   "adActivation": false,
   "selectedConcept": "A",
   "mode": "built-in image_gen",
   "promptFile": "PROMPTS.json",
+  "formatPromptFile": "FORMAT-PROMPTS.json",
   "provenance": "A/B/C are generated advertising illustrations, including the people, rooms and scene phones. They are not documentary customer photographs. The additional product Story alone includes the unchanged approved real game excerpt, labelled explicitly. Typography stays editable in SVG.",
   "safety": "Generated paper has no original task, QR or answer. Only the deliberately approved game-lock-partial.webp is reused as a real screen. Original unredacted photographs are not embedded.",
   "sources": [
@@ -26,6 +28,24 @@
       "file": "sources/scene-C-discovery.webp",
       "sha256": "b18658d72e6b94f7574459cef564957ec0002d7cecbb34755d6c5d0ffa5f8f91",
       "bytes": 720966
+    },
+    {
+      "key": "square",
+      "file": "sources/scene-A-square.webp",
+      "sha256": "0f9d92fb44c6b907b1ffbc943fb4500ccc62075c26a1987303dc67965393426c",
+      "bytes": 562920
+    },
+    {
+      "key": "story",
+      "file": "sources/scene-A-story.webp",
+      "sha256": "f2e211f1a00480896e2df6d34c94a641d002fb8cb501711786fe210622b0565b",
+      "bytes": 552540
+    },
+    {
+      "key": "landscape",
+      "file": "sources/scene-A-landscape-1_19x1.webp",
+      "sha256": "d01ab54ef707900cfd12c12e74cf9bd1dcdeb28979180a6cc74c81d4d0360aa8",
+      "bytes": 399584
     },
     {
       "key": "helper",
@@ -86,13 +106,16 @@
       "linkSticker": null
     },
     {
-      "file": "pixelkovia_ad_final_feed_4x5.png",
+      "file": "pixelkovia_ad_final_square_1x1.png",
       "width": 1080,
-      "height": 1350,
-      "bytes": 2550871,
-      "sha256": "9dcd5cd318a3e47b90553a014829577dab431adb807c8399fbef2b25aea19a8a",
+      "height": 1080,
+      "bytes": 2439476,
+      "sha256": "3dc900cd9f1ef3f2242a3bc7f08ed3414a504a48e55afa02fec14a0c374624d4",
       "design": "A",
       "actualGameplay": false,
+      "ratio": "1:1",
+      "sceneSource": "sources/scene-A-square.webp",
+      "nativeComposition": true,
       "headlines": [
         "Dnes má vaša",
         "obývačka",
@@ -104,10 +127,13 @@
       "file": "pixelkovia_ad_final_story_9x16.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 2778502,
-      "sha256": "e9f248f5f7d93e155552923f71495b74ebfcbd7a33020b0fd3f5e49a79765751",
+      "bytes": 3995973,
+      "sha256": "71f950cfebce8278a2d19a5645c3ae8c33bc3fd432d58312616d39d0122b3420",
       "design": "A",
       "actualGameplay": false,
+      "ratio": "9:16",
+      "sceneSource": "sources/scene-A-story.webp",
+      "nativeComposition": true,
       "headlines": [
         "Dnes má vaša",
         "obývačka",
@@ -120,6 +146,24 @@
         "height": 104,
         "placement": "Replace the printed CTA with a native link sticker in the social editor; set ad destination in Ads Manager."
       }
+    },
+    {
+      "file": "pixelkovia_ad_final_landscape_1_19x1.png",
+      "width": 1190,
+      "height": 1000,
+      "bytes": 2139527,
+      "sha256": "47102209d8d2b8ba697013ae87488de8a9e193a34b3ae8f4d25a3104f7678428",
+      "design": "A",
+      "actualGameplay": false,
+      "ratio": "1.19:1",
+      "sceneSource": "sources/scene-A-landscape-1_19x1.webp",
+      "nativeComposition": true,
+      "headlines": [
+        "Dnes má vaša",
+        "obývačka",
+        "tajomstvo."
+      ],
+      "linkSticker": null
     },
     {
       "file": "pixelkovia_ad_game_story_9x16.png",

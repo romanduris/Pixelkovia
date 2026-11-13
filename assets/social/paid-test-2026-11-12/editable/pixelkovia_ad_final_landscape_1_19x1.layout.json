@@ -1,0 +1,132 @@
+[
+  {
+    "text": "Pixelkovia",
+    "x": 88,
+    "y": 38,
+    "width": 169,
+    "height": 46,
+    "size": 34,
+    "max": 380,
+    "type": "brand"
+  },
+  {
+    "text": "STRATENÝ SIGNÁL",
+    "x": 948.5,
+    "y": 52,
+    "width": 193.5,
+    "height": 26,
+    "size": 20,
+    "max": 370,
+    "type": "brand"
+  },
+  {
+    "text": "RODINNÁ HRA NA DOMA",
+    "x": 48,
+    "y": 102,
+    "width": 270.5,
+    "height": 28,
+    "size": 21,
+    "max": 700,
+    "type": "category"
+  },
+  {
+    "text": "Dnes má vaša",
+    "x": 48,
+    "y": 136,
+    "width": 466,
+    "height": 96,
+    "size": 70,
+    "max": 700,
+    "type": "headline"
+  },
+  {
+    "text": "obývačka",
+    "x": 48,
+    "y": 217,
+    "width": 383,
+    "height": 113,
+    "size": 83,
+    "max": 700,
+    "type": "headline"
+  },
+  {
+    "text": "tajomstvo.",
+    "x": 49,
+    "y": 299,
+    "width": 387,
+    "height": 142,
+    "size": 112,
+    "max": 670,
+    "type": "headline"
+  },
+  {
+    "text": "Papierové indície.",
+    "x": 48,
+    "y": 602,
+    "width": 230,
+    "height": 37,
+    "size": 28,
+    "max": 540,
+    "type": "copy"
+  },
+  {
+    "text": "Príbeh v mobile. Jeden tím.",
+    "x": 48,
+    "y": 647,
+    "width": 342,
+    "height": 35,
+    "size": 27,
+    "max": 540,
+    "type": "copy"
+  },
+  {
+    "text": "7 záhad",
+    "x": 48,
+    "y": 802,
+    "width": 109,
+    "height": 41,
+    "size": 30,
+    "max": 230,
+    "type": "fact"
+  },
+  {
+    "text": "7–13 rokov",
+    "x": 518.5,
+    "y": 802,
+    "width": 153,
+    "height": 41,
+    "size": 30,
+    "max": 300,
+    "type": "fact"
+  },
+  {
+    "text": "60–90 min",
+    "x": 987,
+    "y": 802,
+    "width": 155,
+    "height": 41,
+    "size": 30,
+    "max": 280,
+    "type": "fact"
+  },
+  {
+    "text": "Odhaľte hru",
+    "x": 82,
+    "y": 890,
+    "width": 189,
+    "height": 44,
+    "size": 32,
+    "max": 944,
+    "type": "cta"
+  },
+  {
+    "text": "pixelkovia.rodulab.com",
+    "x": 453.5,
+    "y": 949,
+    "width": 283,
+    "height": 34,
+    "size": 26,
+    "max": 1094,
+    "type": "url"
+  }
+]
