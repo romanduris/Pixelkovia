@@ -2,6 +2,8 @@
 
 Reklamná séria z 12. novembra 2026, aktualizovaná 13. novembra: hlavný motív má tri samostatne generované scény pre **1:1, 9:16 a 1,19:1** a vlastnú editovateľnú sadzbu v každom formáte. Story má celú obývačku od stropu po podlahu; žiadny z troch finálnych výstupov nevzniká dopĺňaním prázdnych okrajov. Pôvodné koncepty A/B/C a osobitná produktová Story zostávajú dostupné.
 
+Všetkých sedem výstupov má odstránené zelené tlačidlo. URL je vyššie pod jemnou zelenou signálovou linkou; tlačidlo pridáva priamo Meta. Scény, tváre, postavy, hlavné texty aj údaje zostali zachované. Táto úprava využíva editovateľné vrstvy a negeneruje nové pozadia.
+
 **Pripravené na kontrolu vlastníkom. Sociálne príspevky ani platené reklamy neboli publikované, naplánované alebo zapnuté.** Predajný web, ceny, checkout a samotná hra sa obsahovo nemenia. Tento adresár zostáva mimo verejného aj chráneného aplikačného exportu.
 
 ## Otvoriť hotové vizuály
@@ -21,17 +23,17 @@ Reklamná séria z 12. novembra 2026, aktualizovaná 13. novembra: hlavný motí
 
 Prehľad a súbory v `previews/` slúžia na kontrolu. Do reklamy patria plné PNG. Odporúčanie A je kreatívny výber, nie výsledok merania predaja.
 
-Horizontálny pomer je **1,19:1 podľa zadania**, nie 1,91:1. Duplicitný finálny export 4:5 bol nahradený štvorcom; jeho totožná pôvodná podoba zostáva ako koncept A. Nové pozadia sú samostatné generované kompozície, jemne prevedené na presné exportné rozmery bez pásov alebo naťahovania. Texty, značka, údaje a CTA zostávajú v SVG oddelené od pozadia.
+Horizontálny pomer tejto série je **1,19:1 podľa pôvodného zadania**. Pre budúce reklamy je v projektovom skille predvolený horizontálny pomer 1,91:1. Duplicitný finálny export 4:5 bol nahradený štvorcom; jeho totožná pôvodná podoba zostáva ako koncept A. Nové pozadia sú samostatné generované kompozície, jemne prevedené na presné exportné rozmery bez pásov alebo naťahovania. Texty, značka, údaje a URL zostávajú v SVG oddelené od pozadia.
 
 ## Réžia a háčiky
 
-**A · Tajomstvo v obývačke.** Deti a rodič riešia úlohu pri drevenom stole. Teplá lampa, modrý večer za oknom a jemná stopa svietiacich štvorčekov spájajú papier s mobilom. Piko sedí na hrane stola s nohami vo vzduchu, Guardy vykúka spoza jeho okraja. Nová póza Pixiho s ceruzkou dokončuje podčiarknutie rukopisného slova „tajomstvo“. Vrchná časť funguje ako plagát, stred ukazuje spoločné hranie, spodná časť uzatvára vek, trvanie a výzvu.
+**A · Tajomstvo v obývačke.** Deti a rodič riešia úlohu pri drevenom stole. Teplá lampa, modrý večer za oknom a jemná stopa svietiacich štvorčekov spájajú papier s mobilom. Piko sedí na hrane stola s nohami vo vzduchu, Guardy vykúka spoza jeho okraja. Nová póza Pixiho s ceruzkou dokončuje podčiarknutie rukopisného slova „tajomstvo“. Vrchná časť funguje ako plagát, stred ukazuje spoločné hranie, spodná časť uzatvára vek, trvanie a adresu webu.
 
 **B · Jeden mobil. Všetci v hre.** Intímnejší záber cez ramená detí, jeden veľký mobil a rodičia zapojení do riešenia. Guardy sedí na obale telefónu, Piko sa drží okraja stola. Nadpis pomenúva spoločný zážitok; doplnkový rukopis „Spolu až do finále.“ mu dáva smer.
 
 **C · Čo ukrýva vaša obývačka?** Deti objavujú papierovú indíciu pri gauči. Piko ukazuje smer z operadla, Pixi vykúka spoza vankúša, Guardy dohliada na nález. Záber vysvetľuje, že dobrodružstvo pokračuje aj mimo displeja. Zobrazený úkryt je reklamná ilustrácia, nie návod ani prezradenie konkrétnej úlohy.
 
-Všetky scény majú spoločnú tmavomodrú, jantárovú a azúrovú paletu, kontaktové tiene a výtvarne zladené postavy. Typografia používa Manrope, DM Sans a rukopisný Caveat, ktorý nadväzuje na funnel. Dôležité nadpisy a CTA zostávajú čitateľné v náhľadoch pri šírke 360 px.
+Všetky scény majú spoločnú tmavomodrú, jantárovú a azúrovú paletu, kontaktové tiene a výtvarne zladené postavy. Typografia používa Manrope, DM Sans a rukopisný Caveat, ktorý nadväzuje na funnel. Nadpisy a adresa webu zostávajú čitateľné v náhľadoch pri šírke 360 px.
 
 ## Pôvod obrázkov a presnosť produktu
 
@@ -95,13 +97,13 @@ Krátky nadpis reklamy: **Dobrodružstvo čaká doma.**
 
 ## Stories a cieľový odkaz
 
-V platenej reklame nastavte cieľ **https://pixelkovia.rodulab.com/** v reklamnom systéme. Vytlačená URL a CTA v obrázku samy nevytvárajú klikateľnú plochu.
+V platenej reklame nastavte cieľ **https://pixelkovia.rodulab.com/** v reklamnom systéme a vyberte natívne tlačidlo Mety. Obrázky neobsahujú vlastné tlačidlo ani jeho popis. Adresa webu je bežný text pod dekoratívnou zelenou linkou; klikateľný cieľ nastavuje reklamný systém.
 
-Pri organickej Story nahraďte tlačené CTA natívnou odkazovou nálepkou v označenom priestore **x 250 / y 1517 / 580 × 104 px**. Text nálepky napríklad „Pozrieť hru“. Táto plocha je zaznamenaná aj v SVG a `artwork.json`. Dôležité texty sú medzi hornými a dolnými ovládacími prvkami Stories.
+Pri organickej Story pridajte odkazovú nálepku priamo v editore sociálnej platformy do voľnej spodnej časti. Jej pozíciu skontrolujte v náhľade, aby neprekrývala texty ani URL. Pôvodná značka priestoru pre nálepku bola zo SVG aj manifestu odstránená. Dôležité texty sú medzi hornými a dolnými ovládacími prvkami Stories.
 
 ## Editácia a export
 
-Sedem SVG v `editable/` obsahuje vložené bezpečné bitmapy a fonty; všetky reklamné texty zostávajú textom. `render.cjs` reprodukuje sadzbu a exportuje plné PNG, mobilné náhľady, spoločný prehľad, lokálnu galériu a kontrolné záznamy. Nové finálne formáty majú samostatné pozadia, veľkosti, pozície nadpisu, informácií a CTA. Žiadne generovanie ani sieťové publikovanie pri exporte neprebieha.
+Sedem SVG v `editable/` obsahuje vložené bezpečné bitmapy a fonty; všetky reklamné texty zostávajú textom. `render.cjs` reprodukuje sadzbu a exportuje plné PNG, mobilné náhľady, spoločný prehľad, lokálnu galériu a kontrolné záznamy. Nové finálne formáty majú samostatné pozadia, veľkosti a pozície nadpisu, informácií a URL. Žiadne generovanie ani sieťové publikovanie pri exporte neprebieha.
 
 ```sh
 PLAYWRIGHT_MODULE=/cesta/k/playwright node assets/social/paid-test-2026-11-12/render.cjs

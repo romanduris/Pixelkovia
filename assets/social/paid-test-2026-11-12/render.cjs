@@ -15,7 +15,8 @@ const input = {
 };
 let data = {}, fonts = '';
 const manifest = {
-  version:3, updated:'2026-11-13', status:'prepared-for-owner-review', socialPublication:false, adActivation:false,
+  version:4, updated:'2026-11-13', status:'prepared-for-owner-review', socialPublication:false, adActivation:false,
+  bakedCTA:false, destination:'https://pixelkovia.rodulab.com/', platformCTA:'Use the native Meta call-to-action button; no button is printed in the artwork.',
   selectedConcept:'A', mode:'built-in image_gen', promptFile:'PROMPTS.json', formatPromptFile:'FORMAT-PROMPTS.json',
   provenance:'A/B/C are generated advertising illustrations, including the people, rooms and scene phones. They are not documentary customer photographs. The additional product Story alone includes the unchanged approved real game excerpt, labelled explicitly. Typography stays editable in SVG.',
   safety:'Generated paper has no original task, QR or answer. Only the deliberately approved game-lock-partial.webp is reused as a real screen. Original unredacted photographs are not embedded.',
@@ -70,9 +71,12 @@ function facts(y) {
     text('60–90 min',1016,y,33,{fill:C.cream,type:'fact',anchor:'end',max:300}) +
     stroke(`M330 ${y-26}v32M748 ${y-26}v32`,'#6c8294',1);
 }
-function cta(y,label='Odhaľte hru',center=false) {
-  return rect(64,y,952,86,C.mint,16) + text(label,center?540:103,y+56,34,{fill:C.navy,max:800,type:'cta',anchor:center?'middle':'start'}) +
-    stroke(`M930 ${y+43}h40m-14-14 14 14-14 14`,C.navy,3);
+function signature(W,margin,y,size) {
+  const middle=W/2,left=margin+40,right=W-margin-40,line=y-44;
+  return `<g id="signal-accent" aria-hidden="true">` +
+    stroke(`M${left} ${line}H${middle-65}l16-6h31l14 12h37l16-6H${right}`,C.mint,2.5,'opacity=".85"') +
+    rect(left-3,line-3,6,6,C.mint,1) + rect(right-3,line-3,6,6,C.mint,1) + '</g>' +
+    text('pixelkovia.rodulab.com',middle,y,size,{family:'DM Sans',fill:C.mint,anchor:'middle',type:'url',max:W-2*margin});
 }
 function defs(H) {
   return `<defs>
@@ -109,14 +113,11 @@ function template(design,story=false,proof=false) {
   } else b += headline(design,offset);
   if (story) {
     b += facts(1469);
-    b += cta(1523,proof?'Pozrite sa, ako sa hrá':'Odhaľte hru',true);
-    b += text('pixelkovia.rodulab.com',540,1664,30,{family:'DM Sans',fill:C.mint,anchor:'middle',type:'url'});
-    b += `<rect id="native-link-sticker-area" x="250" y="1517" width="580" height="104" fill="none"/>`;
+    b += signature(1080,64,1560,30);
   } else {
     b += text(design==='C'?'Hľadajte stopy. Zažite spoločné „máme to!“':'Papierové indície. Príbeh v mobile. Jeden tím.',64,1090,30,{family:'DM Sans',max:952});
     b += facts(1151);
-    b += cta(1190,design==='C'?'Prijmite rodinnú misiu':'Odhaľte hru');
-    b += text('pixelkovia.rodulab.com',540,1321,29,{family:'DM Sans',fill:C.mint,anchor:'middle',type:'url'});
+    b += signature(1080,64,1233,29);
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${H}" viewBox="0 0 1080 ${H}"><title>Pixelkovia · ${proof?'skutočný záber z hry':design==='A'?'tajomstvo v obývačke':design==='B'?'jeden mobil, celý tím':'spoločné pátranie'}</title><desc>Generovaná reklamná ilustrácia. Ľudia ani byt nie sú zákaznícka fotografia.${proof?' Samostatný telefón obsahuje nezmenenú schválenú ukážku skutočnej hry.':''} Editovateľná typografia.</desc><style>${fonts}text{font-synthesis:none}</style>${defs(H)}${b}</svg>`;
 }
@@ -125,7 +126,7 @@ function campaignTemplate(format) {
   const {width:W,height:H,ratio}=formats[format],story=format==='story',wide=format==='landscape';
   const margin=story?64:48,top=story?252:74,headline=story?[409,512,630]:wide?[211,305,407]:[196,283,373];
   const size=story?[86,99,132]:wide?[70,83,112]:[72,84,112];
-  const category=story?312:123,factsY=story?1470:wide?834:892,ctaY=story?1523:wide?875:936,ctaH=story?86:74;
+  const category=story?312:123,factsY=story?1470:wide?834:892;
   let b=`<image data-source="${format}" href="${data[format]}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`;
   b+=rect(0,0,W,story?760:wide?520:470,'url(#campaign-top)');
   // Translucent shading preserves the new room, including the very top/bottom.
@@ -149,11 +150,7 @@ function campaignTemplate(format) {
   b+=text('60–90 min',W-margin,factsY,story?33:30,{anchor:'end',type:'fact',max:280});
   const gap=(W-2*margin)/3;
   b+=stroke(`M${margin+gap-12} ${factsY-25}v30M${margin+2*gap+12} ${factsY-25}v30`,'#8a9baa',1);
-  b+=rect(margin,ctaY,W-2*margin,ctaH,C.mint,16);
-  b+=text('Odhaľte hru',margin+34,ctaY+ctaH/2+12,story?34:32,{fill:C.navy,type:'cta',max:W-2*margin-150});
-  b+=stroke(`M${W-margin-85} ${ctaY+ctaH/2}h40m-14-14 14 14-14 14`,C.navy,3);
-  b+=text('pixelkovia.rodulab.com',W/2,story?1664:wide?975:1050,story?30:26,{family:'DM Sans',fill:C.mint,anchor:'middle',type:'url',max:W-2*margin});
-  if(story)b+='<rect id="native-link-sticker-area" x="250" y="1517" width="580" height="104" fill="none"/>';
+  b+=signature(W,margin,story?1554:wide?916:974,story?30:26);
   const gradients=`<defs><linearGradient id="campaign-top" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${C.navy}" stop-opacity=".56"/><stop offset=".72" stop-color="${C.navy}" stop-opacity=".16"/><stop offset="1" stop-color="${C.navy}" stop-opacity="0"/></linearGradient><linearGradient id="campaign-bottom" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${C.navy}" stop-opacity="0"/><stop offset=".4" stop-color="${C.navy}" stop-opacity=".64"/><stop offset="1" stop-color="${C.navy}" stop-opacity=".72"/></linearGradient><linearGradient id="campaign-left" x1="0" y1="0" x2="1" y2="0"><stop stop-color="${C.navy}" stop-opacity=".38"/><stop offset="1" stop-color="${C.navy}" stop-opacity="0"/></linearGradient></defs>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><title>Pixelkovia · Dnes má vaša obývačka tajomstvo. · ${ratio}</title><desc>Samostatne generovaná reklamná scéna navrhnutá pre ${ratio}, bez doplnených okrajov. Ľudia ani byt nie sú zákaznícka fotografia. Editovateľná typografia.</desc><style>${fonts}text{font-synthesis:none}</style>${gradients}${b}</svg>`;
 }
@@ -179,7 +176,7 @@ async function render(page,name,design,story=false,proof=false,format=null) {
   await sharp(filename).resize({width:360}).png().toFile(path.join(out,'previews',name+'-360.png'));
   const exported=await fs.readFile(filename),meta=await sharp(exported).metadata();
   if(meta.width!==W || meta.height!==H || meta.hasAlpha || meta.space!=='srgb') throw Error('Invalid PNG');
-  manifest.exports.push({file:name+'.png',width:W,height:H,bytes:exported.length,sha256:hash(exported),design,actualGameplay:proof,...format?{ratio:formats[format].ratio,sceneSource:input[format],nativeComposition:true}:{},headlines:layout.filter(b=>b.type==='headline').map(b=>b.text),linkSticker:story?{x:250,y:1517,width:580,height:104,placement:'Replace the printed CTA with a native link sticker in the social editor; set ad destination in Ads Manager.'}:null});
+  manifest.exports.push({file:name+'.png',width:W,height:H,bytes:exported.length,sha256:hash(exported),design,actualGameplay:proof,...format?{ratio:formats[format].ratio,sceneSource:input[format],nativeComposition:true}:{},headlines:layout.filter(b=>b.type==='headline').map(b=>b.text),linkSticker:null});
   console.log(name+'.png · '+W+' × '+H+' · '+Math.round(exported.length/1024)+' KB');
 }
 async function board(page) {

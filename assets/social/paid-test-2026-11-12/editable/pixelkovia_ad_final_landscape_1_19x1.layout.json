@@ -110,19 +110,9 @@
     "type": "fact"
   },
   {
-    "text": "Odhaľte hru",
-    "x": 82,
-    "y": 890,
-    "width": 189,
-    "height": 44,
-    "size": 32,
-    "max": 944,
-    "type": "cta"
-  },
-  {
     "text": "pixelkovia.rodulab.com",
     "x": 453.5,
-    "y": 949,
+    "y": 890,
     "width": 283,
     "height": 34,
     "size": 26,

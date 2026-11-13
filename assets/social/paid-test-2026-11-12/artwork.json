@@ -1,9 +1,12 @@
 {
-  "version": 3,
+  "version": 4,
   "updated": "2026-11-13",
   "status": "prepared-for-owner-review",
   "socialPublication": false,
   "adActivation": false,
+  "bakedCTA": false,
+  "destination": "https://pixelkovia.rodulab.com/",
+  "platformCTA": "Use the native Meta call-to-action button; no button is printed in the artwork.",
   "selectedConcept": "A",
   "mode": "built-in image_gen",
   "promptFile": "PROMPTS.json",
@@ -65,8 +68,8 @@
       "file": "pixelkovia_ad_concept_A_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 2550871,
-      "sha256": "9dcd5cd318a3e47b90553a014829577dab431adb807c8399fbef2b25aea19a8a",
+      "bytes": 2572654,
+      "sha256": "c878b8e4f9b74b7df110a07737336a7b080193c549f39a1e79826963852ee942",
       "design": "A",
       "actualGameplay": false,
       "headlines": [
@@ -80,8 +83,8 @@
       "file": "pixelkovia_ad_concept_B_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 2345790,
-      "sha256": "045467220cc4e3b4682e0eb007ba99cf370847a6f411a31c325d6aa0dd63b8cc",
+      "bytes": 2398512,
+      "sha256": "b4e1cd6fc88cd6256e819891c86e34df941895120b533a277f9630c3c46eb15f",
       "design": "B",
       "actualGameplay": false,
       "headlines": [
@@ -95,8 +98,8 @@
       "file": "pixelkovia_ad_concept_C_feed_4x5.png",
       "width": 1080,
       "height": 1350,
-      "bytes": 2582218,
-      "sha256": "eec016c7ef717e24d16d263cb0bd0b999cb1938ebe0201c301bf2832d82afec1",
+      "bytes": 2632445,
+      "sha256": "e515e1c8b69d4a6a6f68dfeff765227631cd37163b9bea299a0a891e6ed9afb4",
       "design": "C",
       "actualGameplay": false,
       "headlines": [
@@ -109,8 +112,8 @@
       "file": "pixelkovia_ad_final_square_1x1.png",
       "width": 1080,
       "height": 1080,
-      "bytes": 2439476,
-      "sha256": "3dc900cd9f1ef3f2242a3bc7f08ed3414a504a48e55afa02fec14a0c374624d4",
+      "bytes": 2521779,
+      "sha256": "fdfc55aec1c1f0da6cd9afc412c65f089dc192649032acb47321555b8ba89032",
       "design": "A",
       "actualGameplay": false,
       "ratio": "1:1",
@@ -127,8 +130,8 @@
       "file": "pixelkovia_ad_final_story_9x16.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 3995973,
-      "sha256": "71f950cfebce8278a2d19a5645c3ae8c33bc3fd432d58312616d39d0122b3420",
+      "bytes": 4125067,
+      "sha256": "4d034712380d4f8c94ae7a726534938292f93fb5b3499250bc7f013279a37f52",
       "design": "A",
       "actualGameplay": false,
       "ratio": "9:16",
@@ -139,20 +142,14 @@
         "obývačka",
         "tajomstvo."
       ],
-      "linkSticker": {
-        "x": 250,
-        "y": 1517,
-        "width": 580,
-        "height": 104,
-        "placement": "Replace the printed CTA with a native link sticker in the social editor; set ad destination in Ads Manager."
-      }
+      "linkSticker": null
     },
     {
       "file": "pixelkovia_ad_final_landscape_1_19x1.png",
       "width": 1190,
       "height": 1000,
-      "bytes": 2139527,
-      "sha256": "47102209d8d2b8ba697013ae87488de8a9e193a34b3ae8f4d25a3104f7678428",
+      "bytes": 2179543,
+      "sha256": "0b38d75b70138a641f1db7fb0cb912f670c118f4be5b852ee378597c9a7f324e",
       "design": "A",
       "actualGameplay": false,
       "ratio": "1.19:1",
@@ -169,21 +166,15 @@
       "file": "pixelkovia_ad_game_story_9x16.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 2428924,
-      "sha256": "e291f7a4b18a8bccb102fe607c52b2f8ee67789907d14a54dc97b8dcc72a5b3b",
+      "bytes": 2434516,
+      "sha256": "2f1fefd8659cb91858c4318b93e94d1f92474032fe8f351e2be4149e9b30c406",
       "design": "A",
       "actualGameplay": true,
       "headlines": [
         "Pozrite, čo",
         "hráte spolu."
       ],
-      "linkSticker": {
-        "x": 250,
-        "y": 1517,
-        "width": 580,
-        "height": 104,
-        "placement": "Replace the printed CTA with a native link sticker in the social editor; set ad destination in Ads Manager."
-      }
+      "linkSticker": null
     }
   ]
 }

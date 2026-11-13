@@ -120,19 +120,9 @@
     "type": "fact"
   },
   {
-    "text": "Pozrite sa, ako sa hrá",
-    "x": 364,
-    "y": 1543,
-    "width": 352,
-    "height": 46,
-    "size": 34,
-    "max": 800,
-    "type": "cta"
-  },
-  {
     "text": "pixelkovia.rodulab.com",
     "x": 379,
-    "y": 1634,
+    "y": 1530,
     "width": 322,
     "height": 39,
     "size": 30,

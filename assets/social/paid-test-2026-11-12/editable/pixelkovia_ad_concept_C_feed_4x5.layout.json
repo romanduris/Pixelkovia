@@ -90,19 +90,9 @@
     "type": "fact"
   },
   {
-    "text": "Prijmite rodinnú misiu",
-    "x": 103,
-    "y": 1210,
-    "width": 370,
-    "height": 46,
-    "size": 34,
-    "max": 800,
-    "type": "cta"
-  },
-  {
     "text": "pixelkovia.rodulab.com",
     "x": 386,
-    "y": 1292,
+    "y": 1204,
     "width": 308,
     "height": 38,
     "size": 29,
