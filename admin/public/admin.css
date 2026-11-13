@@ -440,6 +440,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-date-range{white-space:nowrap}
 .marketing-date-range.is-campaign{white-space:normal}
 .marketing-freshness{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.marketing-refresh-status{grid-column:1/-1;min-width:0;font-size:12px;color:var(--m-muted);overflow-wrap:anywhere}
 .marketing-freshness svg{flex:none;opacity:.75}
 .marketing-freshness[role=alert]{color:#ffe0a3;font-weight:600}
 .marketing-filter-panel{padding:14px;border:1px solid var(--m-border);border-radius:8px;background:var(--m-surface)}

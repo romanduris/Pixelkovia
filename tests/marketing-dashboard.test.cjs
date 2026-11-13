@@ -6,13 +6,14 @@ const origin='https://pixelkovia.rodulab.com';
  const db=fresh(),env={TQ_DB:db,MARKETING_COLLECTION_ENABLED:'true',ENVIRONMENT:'local',WEB_URL:origin,CUSTOMER_AUTH_SECRET:'a'.repeat(64)};
  await execute(db,'UPDATE marketing_state SET started_at=?',Date.now()-30*86400000);
  const browser=await (process.env.QA_BROWSER==='webkit'?webkit:chromium).launch({headless:process.env.QA_HEADED!=='1',...(process.env.QA_BROWSER==='webkit'?{env:{...process.env,WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS:'1',WEBKIT_DISABLE_COMPOSITING_MODE:'1',WEBKIT_DISABLE_DMABUF_RENDERER:'1',LIBGL_ALWAYS_SOFTWARE:'1',GSK_RENDERER:'cairo',JSC_useJIT:'0'}}:{})});
- const context=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true}),errors=[],events=[],calls=[];let fail=false;
+ const context=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true}),errors=[],events=[],calls=[],syncs=[],requestOrder=[];let fail=false;
  try{
   await context.route('**/*',async route=>{
    const request=route.request(),url=new URL(request.url());if(url.origin!==origin)return route.abort();
    if(url.pathname.startsWith('/api/')){
     if(url.pathname==='/api/admin/marketing'&&fail)return route.fulfill({status:503,json:{error:'Dočasný výpadok'}});
-    if(url.pathname==='/api/admin/marketing')calls.push(url.searchParams.toString());
+    if(url.pathname==='/api/admin/marketing'){calls.push(url.searchParams.toString());requestOrder.push('report');}
+    if(url.pathname==='/api/admin/marketing/ads/sync'){syncs.push(request.postDataJSON());requestOrder.push('sync');}
     if(url.pathname==='/api/marketing/event')events.push(request.postDataJSON());
     const headers={...await request.allHeaders(),origin:'http://127.0.0.1'};
     // WebKit can expose routed headers before attaching its cookie jar.
@@ -370,8 +371,17 @@ const origin='https://pixelkovia.rodulab.com';
     return Response.json(url.pathname.endsWith('/insights')?{data:[{account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'facebook',spend:'12.34',impressions:'1234'}, {account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'instagram',spend:'0.00',impressions:'500'}, {account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'messenger',spend:'0.00',impressions:'66'}]}:{account_id:'1141555698571585',currency:'EUR',timezone_name:'Europe/Bratislava'});
   };
   await page.locator('[data-marketing-period="14"]').click();await ready();
-  await page.locator('#marketing-sync-ads').click();await page.waitForResponse(r=>r.url().includes('/api/admin/marketing?'));await ready();
+  const selectedRange={from:await page.locator('#marketing-filters [name=from]').inputValue(),to:await page.locator('#marketing-filters [name=to]').inputValue()};
+  await page.locator('#refresh-marketing').click();await ready();
+  assert.deepEqual(syncs.at(-1),selectedRange);assert.deepEqual(requestOrder.slice(-2),['sync','report']);
+  assert.equal(await page.locator('#marketing-refresh-status').innerText(),'Údaje Meta boli obnovené.');
   assert.equal(await page.locator('#marketing-kpi-impressions strong').innerText(),'1\u00a0800');assert.match(await page.locator('#marketing-metric-costs strong').innerText(),/12,34/);assert.match(await page.locator('#marketing-kpi-revenue small').innerText(),/Reklama − 12,3/);assert.equal(await page.locator('#marketing-metric-cac strong').innerText(),'Nedostupné');
+  const imported=syncs.length;
+  await page.locator('#refresh-marketing').click();await ready();
+  assert.equal(syncs.length,imported+1);assert.deepEqual(requestOrder.slice(-2),['sync','report']);
+  assert.match(await page.locator('#marketing-refresh-status').innerText(),/minútou/);
+  assert.equal(await page.locator('#refresh-marketing').isEnabled(),true);
+  assert.equal(await page.locator('#marketing-kpi-impressions strong').innerText(),'1\u00a0800');
   assert.match(await page.locator('#marketing-kpi-profit strong').innerText(),/2,7/);
   assert.ok(await page.locator('[data-marketing-detail="kpi-profit"]').evaluate(el=>el.classList.contains('is-positive')));
   // Presentation uses original cents once, including zero, negative and unavailable costs.
@@ -413,7 +423,9 @@ const origin='https://pixelkovia.rodulab.com';
   const enlarged=await page.locator('.marketing-results .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(enlarged[1]>enlarged[0],'financial results stack when enlarged text needs more room');
   await page.locator('.marketing-funnel').screenshot({path:'/tmp/pixelkovia-fb-ig-text200-320-'+(process.env.QA_BROWSER||'chromium')+'.png'});
   metaFailure=true;await execute(db,'UPDATE meta_ads_state SET last_attempt_at=0');
-  await page.locator('#marketing-sync-ads').click();await page.waitForResponse(r=>r.url().includes('/api/admin/marketing?'));await ready();
+  await page.locator('#refresh-marketing').click();await ready();
+  assert.deepEqual(requestOrder.slice(-2),['sync','report']);
+  assert.match(await page.locator('#marketing-refresh-status').innerText(),/190 \/ 463/);
   assert.equal(await page.locator('#marketing-metric-costs strong').innerText(),'Nedostupné');assert.equal(await page.locator('#marketing-metric-cac strong').innerText(),'Nedostupné');assert.match(await page.locator('[data-marketing-detail="metric-costs"]').innerText(),/190 \/ 463/);
   assert.equal(await page.locator('#marketing-kpi-profit strong').innerText(),'Nedostupné');
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);

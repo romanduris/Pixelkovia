@@ -344,7 +344,7 @@ function readPaymentLink(){
   if(state.paymentFunnel){state.paymentDays='all';state.paymentStatus='';state.paymentProduct='';state.paymentMethod='';state.paymentAttention=false;state.paymentAttempt='';}
   else if(wasFunnel){state.paymentDays=paymentLayout.days;state.paymentFrom=paymentLayout.from;}
 }
-async function load(){
+async function load({syncMeta}={}){
   finishPaymentColumnResize(true);clearPaymentColumnDrag();clearPaymentTileDrag();
   paymentLoadingMore=false;paymentUI.loadError='';
   const id=++loadingId,view=currentView();
@@ -357,12 +357,25 @@ async function load(){
   if(view==='marketing')rememberMarketing();
   $('#notice').textContent='';$('#view').setAttribute('aria-busy','true');
   try{
+    let metaMessage='';
+    if(view==='marketing'&&syncMeta){
+      document.querySelectorAll('#refresh-marketing,#marketing-sync-ads,.marketing-ads-campaign button').forEach(button=>button.disabled=true);
+      const button=$('#refresh-marketing');if(button)button.textContent='Načítavam Meta…';
+      try{
+        await api('/api/admin/marketing/ads/sync',null,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(syncMeta)});
+        metaMessage='Údaje Meta boli obnovené.';
+      }catch(error){metaMessage='Meta sa nepodarilo obnoviť: '+error.message;}
+      if(id!==loadingId)return;
+    }
     const p=view==='payments'?paymentParams():view==='marketing'?marketingParams():new URLSearchParams();if(view==='analytics'){p.set('view','journey');for(const [key,value] of Object.entries({page:state.page,email:state.q,attempt:state.analysisAttempt,state:state.status}))p.set(key,value);}
     const data=await api('/api/admin/'+(view==='analytics'?'customers':view),p);if(id!==loadingId)return;
     const paymentSnapshot=view==='payments'?capturePaymentUI():null;
     if(view==='payments'){paymentData=data;state.paymentFunnelKey=JSON.stringify(state.paymentFunnel);}
     $('#view').innerHTML=({analytics,payments,marketing})[view](data);
-    if(view==='marketing')bindMarketing(load);
+    if(view==='marketing'){
+      bindMarketing(load);
+      const status=$('#marketing-refresh-status');status.textContent=metaMessage;status.hidden=!metaMessage;
+    }
     if(view==='payments'){applyPaymentColumnWidths();restorePaymentUI(paymentSnapshot);}else state.page=data.page||state.page;
     document.querySelectorAll('[data-height]').forEach(e=>{e.style.height=Math.max(2,Math.min(75,Number(e.dataset.height)*.75))+'%';});
     document.querySelectorAll('[data-width]').forEach(e=>{e.style.width=e.dataset.width+'%';});
