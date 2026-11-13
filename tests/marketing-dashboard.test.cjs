@@ -30,11 +30,14 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('[data-page]').count(),3);assert.equal(await page.locator('#page-title').innerText(),'Predajný funnel');
   assert.equal(await page.locator('[data-page]').first().getAttribute('data-page'),'marketing','funnel is the first navigation item and the default view');
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
-  assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),7);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').textContent(),/Čakáme na prvú/);
+  assert.ok(await page.locator('.marketing-funnel .marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),7);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').textContent(),/Čakáme na prvú/);
   assert.equal(await page.locator('#marketing-filter-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);
   assert.equal(await page.locator('.marketing-table-wrap tbody tr:visible').count(),3);assert.equal(await page.locator('#marketing-all-sources').count(),0);
   assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('420'));
   assert.equal(await page.locator('.marketing-source-segment').count(),0,'no colored funnel for missing or zero data');
+  assert.equal(await page.locator('.marketing-audience').isVisible(),true);
+  assert.match(await page.locator('.marketing-audience').innerText(),/Nedostupné/);
+  assert.equal(await page.locator('.marketing-audience-track').count(),0,'no invented audience shares before collection');
   await page.locator('.marketing-quality>summary').click();assert.ok(await page.locator('.marketing-period-note').isVisible());await page.keyboard.press('Escape');assert.equal(await page.locator('.marketing-period-note').isVisible(),false);
   await page.locator('#marketing-unique').check();assert.match(await page.locator('.marketing-chart-empty').innerText(),/Zatiaľ bez údajov/);assert.equal(await page.locator('.marketing-chart-svg').count(),0);await page.locator('#marketing-unique').uncheck();
   // The studio has independent anonymous daily totals, with no source groups.
@@ -49,7 +52,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('[data-marketing-count]').textContent(),'7');
   assert.equal(await page.locator('[data-marketing-studio-total]').textContent(),'10');
   assert.equal(await page.locator('.marketing-title h1').textContent(),'Návštevnosť rodulab.com');
-  for(const selector of ['.marketing-funnel','.marketing-overview-grid','.marketing-quality','#marketing-filter-toggle','#marketing-filter-panel'])assert.equal(await page.locator(selector).isVisible(),false,'studio hides Pixelkovia '+selector);
+  for(const selector of ['.marketing-funnel','.marketing-overview-grid','.marketing-audience','.marketing-quality','#marketing-filter-toggle','#marketing-filter-panel'])assert.equal(await page.locator(selector).isVisible(),false,'studio hides Pixelkovia '+selector);
   assert.match(await page.locator('.marketing-studio-summary').textContent(),/Iba úvodná stránka rodulab.com/);
   assert.match(await page.locator('.marketing-studio-note').textContent(),/mená ani jednotlivé návštevy sa neukladajú/);
   assert.equal(await page.locator('.marketing-chart-legend').count(),0);
@@ -126,13 +129,31 @@ const origin='https://pixelkovia.rodulab.com';
   assert.deepEqual(await page.locator('.marketing-chart-legend li>span').allTextContents(),['Facebook','Instagram','Others']);
   // Mixed sources exercise all three stacks with actual report aggregation and day readouts.
   const chartFixtures=[];
-  for(const source of ['facebook','instagram_ads','instagram','meta','direct','unknown','organic','influencer']){
+  const fixtureDevices=['mobile','mobile','tablet','desktop','desktop','desktop','tablet','mobile'],fixtureSystems=['ios','android','ios','windows','macos','linux','android',null];
+  for(const [index,source] of ['facebook','instagram_ads','instagram','meta','direct','unknown','organic','influencer'].entries()){
     const id=crypto.randomUUID();chartFixtures.push(id);const time=Date.now();
-    await execute(db,'INSERT INTO marketing_visits VALUES(?,?,?,?,?,?,?,?,?)',id,'chart-'+id,source,'chart-fixture','mobile',time,null,time,'browser-'+id);
+    await execute(db,'INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id,os) VALUES(?,?,?,?,?,?,?,?,?,?)',id,'chart-'+id,source,'chart-fixture',fixtureDevices[index],time,null,time,'browser-'+id,fixtureSystems[index]);
   }
   await page.locator('#refresh-marketing').click();await ready();
   const latestDay=page.locator('.marketing-chart-day').last();
   assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-facebook','chart-bar chart-source-instagram','chart-bar chart-source-other']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
+  assert.match(await page.locator('.marketing-audience>.marketing-section-heading').innerText(),/Návštevy: 9/);
+  assert.equal(await page.locator('[data-audience-device="mobile"] strong').textContent(),'3');
+  assert.equal(await page.locator('[data-audience-device="tablet"] strong').textContent(),'2');
+  assert.equal(await page.locator('[data-audience-device="desktop"] strong').textContent(),'4');
+  assert.equal(await page.locator('[data-audience-os="ios"] strong').textContent(),'2');
+  assert.equal(await page.locator('[data-audience-os="android"] strong').textContent(),'2');
+  assert.equal(await page.locator('[data-audience-os="unknown"] strong').textContent(),'1');
+  assert.equal(await page.locator('[data-audience-os="ios"] small').textContent(),'22,2 %');
+  assert.equal(await page.locator('.marketing-audience').evaluate(el=>el===el.parentElement.lastElementChild),true,'audience is a separate card at the bottom');
+  const audienceSnapshot=await page.locator('.marketing-audience').innerText();
+  await page.locator('#marketing-overview-unique').check();assert.equal(await page.locator('.marketing-audience').innerText(),audienceSnapshot);await page.locator('#marketing-overview-unique').uncheck();
+  await page.locator('.marketing-audience').evaluate(el=>{const label=document.createElement('p');label.id='audience-qa-label';label.textContent='TESTOVACIE ÚDAJE · QA';label.style.cssText='padding:0 16px 10px;color:#ffe0a3;font-size:11px';el.prepend(label);});
+  for(const width of [1440,390,320]){
+    await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await page.locator('.marketing-audience').screenshot({path:'/tmp/pixelkovia-audience-'+width+'.png'});
+  }
+  await page.locator('#audience-qa-label').evaluate(el=>el.remove());await page.setViewportSize({width:1440,height:900});
   // Mixed data stays isolated: nine Pixelkovia sessions do not increase ten studio opens.
   const pixelkoviaOverview=await page.locator('.marketing-funnel').innerText(),pixelkoviaParams=calls.at(-1);
   await page.locator('[data-traffic-site="rodulab"]').click();
@@ -239,7 +260,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-chip-source').click();await ready();assert.equal(await page.locator('#marketing-chip-source').count(),0);assert.equal(await page.locator('#marketing-kpi-purchases strong').innerText(),'1');
   await page.locator('[name=campaign]').selectOption('launch-2026');await page.locator('[name=device]').selectOption('desktop');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.match(calls.at(-1),/campaign=launch-2026/);assert.match(calls.at(-1),/device=desktop/);
   await page.locator('#marketing-reset').click();await ready();assert.equal(await page.locator('.marketing-filter-chips').count(),0);assert.equal(await page.locator('[data-marketing-period="14"]').getAttribute('aria-pressed'),'true');
-  await page.locator('[name=source]').selectOption('');await page.locator('[name=product]').selectOption('game');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
+  await page.locator('[name=source]').selectOption('');await page.locator('[name=product]').selectOption('game');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');assert.match(await page.locator('.marketing-audience').innerText(),/Pri filtri produktu/);assert.equal(await page.locator('.marketing-audience-track').count(),0);
   await page.locator('[name=product]').selectOption('');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();
   await page.locator('#marketing-summary-attribution').click();await page.locator('#marketing-summary-funnel-details').click();
   await page.locator('#marketing-sort-visits').click();

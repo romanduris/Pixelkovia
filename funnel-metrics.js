@@ -7,6 +7,14 @@
   const read=key=>{try{return JSON.parse(sessionStorage.getItem(key));}catch{return null;}};
   const write=(key,value)=>{try{sessionStorage.setItem(key,JSON.stringify(value));return true;}catch{return false;}};
   function device(){if(navigator.userAgentData?.mobile)return 'mobile';const ua=navigator.userAgent;return /iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?'tablet':/Mobi|iPhone|iPod/i.test(ua)?'mobile':ua?'desktop':'unknown';}
+  function operatingSystem(){
+    const ua=navigator.userAgent||'';
+    if(/iPad|iPhone|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))return 'ios';
+    const platform=navigator.userAgentData?.platform?.toLowerCase(),known={android:'android',windows:'windows',macos:'macos','chrome os':'chromeos',linux:'linux',ios:'ios'};
+    if(Object.hasOwn(known,platform))return known[platform];
+    for(const [pattern,os]of [[/Windows Phone/i,'windows'],[/Android/i,'android'],[/CrOS/i,'chromeos'],[/Windows/i,'windows'],[/Macintosh|Mac OS X/i,'macos'],[/FreeBSD|OpenBSD|NetBSD|BlackBerry|BB10|Tizen|webOS/i,'other'],[/Linux|X11/i,'linux']])if(pattern.test(ua))return os;
+    return 'unknown';
+  }
   function attribution(){
     const p=new URLSearchParams(location.search),s=(p.get('utm_source')||'').trim().toLowerCase(),m=(p.get('utm_medium')||'').trim().toLowerCase();
     const paid=['paid','paid_social','paidsocial','cpc','ppc','paid-social'].includes(m),campaign=p.get('utm_campaign')||'';
@@ -43,13 +51,13 @@
     const newEntry=!entryHandled&&v&&['facebook','facebook_ads','instagram','instagram_ads','meta'].includes(entry.source)&&(v.source!==entry.source||v.campaign!==entry.campaign);
     entryHandled=true;
     if(!v||typeof v!=='object'||!Number.isFinite(v.lastAt)||at-v.lastAt>1800000||at<v.lastAt||newEntry)v={visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),...entry,device:device(),lastAt:at};
-    v.lastAt=at;v.browserId=browserId();if(!write(visitKey,v))return null;return v;
+    v.lastAt=at;v.browserId=browserId();v.os??=operatingSystem();if(!write(visitKey,v))return null;return v;
   }
   function collect(){
     if(!window.PixelkoviaConsent?.allows('analytics')){current=null;if(window.PixelkoviaConsent&&!window.PixelkoviaConsent.pending){try{sessionStorage.removeItem(visitKey);}catch{}try{localStorage.removeItem(browserKey);}catch{}}return;}
     try{current=visit();}catch{current=null;}if(!current)return;
-    const {visitId,visitorId,browserId,source,campaign,device}=current;
-    const payload={visitId,visitorId,browserId,source,campaign,device,type:location.pathname.startsWith('/checkout')?'checkout':'visit',mode:'session'};
+    const {visitId,visitorId,browserId,source,campaign,device,os}=current;
+    const payload={visitId,visitorId,browserId,source,campaign,device,os,type:location.pathname.startsWith('/checkout')?'checkout':'visit',mode:'session'};
     // One ID per loaded checkout document. Visibility/consent callbacks and
     // retries reuse it; a reload or new navigation is a new opening.
     if(payload.type==='checkout')payload.checkoutOpenId=checkoutOpenId??=crypto.randomUUID();

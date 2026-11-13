@@ -5,6 +5,7 @@ import {attemptFor} from './payment-monitor.mjs';
 import {metaAdsReport,metaImpressionsReport} from './meta-ads.mjs';
 import {webFunnelBreakdown} from './marketing-breakdown.mjs';
 import {studioTrafficReport} from './studio-traffic.mjs';
+import {marketingAudience,operatingSystems} from './marketing-audience.mjs';
 
 import {sources,safeCampaign,marketingFilters,attemptsCTE,conditions} from './marketing-query.mjs';
 export {sources,safeCampaign,marketingFilters} from './marketing-query.mjs';
@@ -20,9 +21,10 @@ export async function marketingEvent(request,env,input,at=Date.now()){
   const limit=await first(db,`INSERT INTO customer_login_attempts VALUES(?,1,?) ON CONFLICT(scope_key) DO UPDATE SET attempts=CASE WHEN window_start<=? THEN 1 ELSE attempts+1 END,window_start=CASE WHEN window_start<=? THEN excluded.window_start ELSE window_start END RETURNING attempts`,scope,at,at-60000,at-60000);
   if(limit.attempts>60)throw new HttpError(429,'Príliš veľa udalostí.');
   const source=Object.hasOwn(sources,input.source)?input.source:'unknown',device=devices.includes(input.device)?input.device:'unknown';
+  const os=input.os==null?null:typeof input.os==='string'&&Object.hasOwn(operatingSystems,input.os)?input.os:'unknown';
   const visitorHash=await hash(input.visitorId);
   await db.batch([
-    db.prepare(`INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id) VALUES(?,?,?,?,?,?,CASE WHEN ? IS NULL OR NOT EXISTS(SELECT 1 FROM marketing_checkout_opens WHERE id=?) THEN ? END,?,?) ON CONFLICT(id) DO UPDATE SET last_at=max(last_at,excluded.last_at),checkout_at=coalesce(checkout_at,excluded.checkout_at),browser_id=coalesce(browser_id,excluded.browser_id) WHERE visitor_id=excluded.visitor_id`).bind(input.visitId,visitorHash,source,safeCampaign(input.campaign),device,at,input.checkoutOpenId??null,input.checkoutOpenId??null,input.type==='checkout'?at:null,at,validId(input.browserId)?await hash('browser:'+input.browserId):null),
+    db.prepare(`INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id,os) VALUES(?,?,?,?,?,?,CASE WHEN ? IS NULL OR NOT EXISTS(SELECT 1 FROM marketing_checkout_opens WHERE id=?) THEN ? END,?,?,?) ON CONFLICT(id) DO UPDATE SET last_at=max(last_at,excluded.last_at),checkout_at=coalesce(checkout_at,excluded.checkout_at),browser_id=coalesce(browser_id,excluded.browser_id) WHERE visitor_id=excluded.visitor_id`).bind(input.visitId,visitorHash,source,safeCampaign(input.campaign),device,at,input.checkoutOpenId??null,input.checkoutOpenId??null,input.type==='checkout'?at:null,at,validId(input.browserId)?await hash('browser:'+input.browserId):null,os),
     ...(input.checkoutOpenId?[db.prepare('INSERT OR IGNORE INTO marketing_checkout_opens(id,visit_id,opened_at) SELECT ?,id,? FROM marketing_visits WHERE id=? AND visitor_id=?').bind(input.checkoutOpenId,at,input.visitId,visitorHash)]:[]),
     db.prepare('UPDATE marketing_state SET last_event_at=? WHERE id=1').bind(at)
   ]);
@@ -85,7 +87,8 @@ export async function marketingReport(env,params,at=Date.now()){
   const uniqueReason=conversionReason||(!charts.uniqueVisitors?'Kohorta nemá žiadne namerané unikátne prehliadače.':null);
   const uniqueMetrics={visits:charts.uniqueVisitors,checkouts:charts.uniqueVisitors==null?null:periodCheckout.unique_checkouts,buyers:charts.uniqueVisitors==null?null:uniqueBuyers.buyers,conversion:uniqueReason?null:uniqueBuyers.buyers/charts.uniqueVisitors,conversionReason:uniqueReason,partial:charts.uniquePartial};
   const funnel={...await webFunnelBreakdown(db,{f,state,at,periodMetrics,uniqueMetrics,visitSources,calendarSources}),impressions:await metaImpressionsReport(env,f,adsReport,at)};
-  return {generatedAt:at,collectionEnabled,periodMetrics,uniqueMetrics,funnel,charts,studioTraffic:await studioTrafficReport(db,f,at),checkoutOpensStartedAt:state.checkout_opens_started_at,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
+  const audience=await marketingAudience(db,f,state);
+  return {generatedAt:at,collectionEnabled,periodMetrics,uniqueMetrics,funnel,charts,audience,studioTraffic:await studioTrafficReport(db,f,at),checkoutOpensStartedAt:state.checkout_opens_started_at,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
     metrics:{visits:visitAvailable?visits.visits:null,checkouts:collectionInRange&&!f.product?visits.checkouts:null,purchases:metric.purchases,revenueCents:metric.revenue,orders:metric.orders,gameAccesses:metric.game_accesses,refunds:metric.refunds,accessIssues:metric.access_issues,accessIssueOrders:metric.access_issue_orders,attributedPurchases:metric.attributed,technicalSignals:issues.signals,technicalAttempts:issues.attempts,conversion:conversionReason?null:cohortTotal.purchases/visits.visits},
     cohort:{attempts:collectionInRange?cohortTotal.attempts:null,purchases:collectionInRange?cohortTotal.purchases:null},rows,campaigns:[...new Set([...campaigns.map(r=>r.campaign),...adsReport.ads.campaigns.map(c=>c.utm)])].sort(),conversionReason,
     ...adsReport,coverage:null,

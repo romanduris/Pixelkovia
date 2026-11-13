@@ -110,7 +110,7 @@ test('concurrent imports and automatic retries are bounded without disturbing a 
  }finally{db.close();}
 });
 async function visit(db,source='facebook_ads',campaign='launch-2026',started=at-3600000){
- const id=crypto.randomUUID();await execute(db,'INSERT INTO marketing_visits VALUES(?,?,?,?,?,?,?,?,?)',id,'hashed-visitor',source,campaign,'mobile',started,started,started,null);return id;
+ const id=crypto.randomUUID();await execute(db,'INSERT INTO marketing_visits(id,visitor_id,source,campaign,device,started_at,checkout_at,last_at,browser_id) VALUES(?,?,?,?,?,?,?,?,?)',id,'hashed-visitor',source,campaign,'mobile',started,started,started,null);return id;
 }
 async function paid(db,visitId,{free=false,gift=false,refund=false,paidAt=at-1000}={}){
  const id=crypto.randomUUID();await execute(db,'INSERT INTO checkout_attempts(id,email,name,selection,total_cents,created_at,stripe_session_id,gift_game) VALUES(?,?,?,?,?,?,?,?)',id,'private@example.invalid','Private','["episode-1"]',free?0:gift?2498:1499,at-200000,'cs_test_'+id,+gift);

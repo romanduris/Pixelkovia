@@ -487,6 +487,19 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-disclosure-body a{color:#a6e7d7}
 .marketing-overview-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:14px;align-items:start}
 .marketing-business{display:grid;gap:14px;min-width:0}
+.marketing-audience-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px;padding:4px 16px 16px}
+.marketing-audience-group{min-width:0}
+.marketing-audience-group h3{font-size:12px;font-weight:600;color:#c4d5eb;margin:0 0 8px}
+.marketing-audience-group ul{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.marketing-audience-row{display:grid;grid-template-columns:minmax(0,1fr) auto 66px;gap:12px;align-items:baseline;font-size:13px;line-height:1.5;font-variant-numeric:tabular-nums}
+.marketing-audience-row>span{color:#c4d5eb;overflow-wrap:anywhere}
+.marketing-audience-row strong{font-size:14px;color:#e7f0fc}
+.marketing-audience-row small{text-align:right;font-size:12px;color:var(--m-muted)}
+.marketing-audience-track{display:block;height:5px;margin-top:4px;background:#1c2c43;border-radius:3px;overflow:hidden}
+.marketing-audience-track i{display:block;height:100%;background:#4b9dfb;border-radius:inherit}
+.marketing-audience-group:last-child .marketing-audience-track i{background:#65d1ba}
+.marketing-audience-note{margin:0;padding:12px 16px;border-top:1px solid var(--m-border);font-size:11px;line-height:1.7;color:var(--m-muted)}
+@media(max-width:650px){.marketing-audience-groups{grid-template-columns:1fr;gap:22px}.marketing-audience-row{grid-template-columns:minmax(0,1fr) auto 60px;gap:8px}}
 .marketing-period-toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:#b7c9df;cursor:pointer;min-height:26px}
 .marketing-period-toggle input{accent-color:#afa0ef;width:15px;height:15px;margin:0}
 .marketing-table-wrap{max-width:100%;min-width:0}
@@ -596,7 +609,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-dashboard .marketing-chart-sites button[aria-pressed="true"]{background:#304b68;color:#eff7ff;box-shadow:inset 0 0 0 1px #7396bb}
 .marketing-chart-panel>summary>.marketing-chart-unique{margin-left:8px}
 .marketing-chart-panel>summary>.marketing-chart-unique[hidden]{display:none}
-.marketing-dashboard[data-marketing-site="rodulab"] :is(.marketing-funnel,.marketing-overview-grid,.marketing-quality,.marketing-filter-chips,#marketing-filter-toggle,#marketing-filter-panel){display:none!important}
+.marketing-dashboard[data-marketing-site="rodulab"] :is(.marketing-funnel,.marketing-overview-grid,.marketing-audience,.marketing-quality,.marketing-filter-chips,#marketing-filter-toggle,#marketing-filter-panel){display:none!important}
 .marketing-studio-summary{padding:12px 0 16px;margin-bottom:8px;border-bottom:1px solid var(--m-border)}
 .marketing-studio-summary>span{display:block;color:var(--m-muted);font-size:13px}
 .marketing-studio-summary>strong{display:block;margin:4px 0;font-size:36px;line-height:1.2;color:#edf4ff;font-variant-numeric:tabular-nums}

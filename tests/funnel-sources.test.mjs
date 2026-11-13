@@ -4,10 +4,10 @@ import vm from 'node:vm';
 import fs from 'node:fs';
 import {webcrypto} from 'node:crypto';
 const script=fs.readFileSync(new URL('../funnel-metrics.js',import.meta.url),'utf8');
-function collector({path='/',referrer='',allowed=true}={}){
+function collector({path='/',referrer='',allowed=true,navigator:browser={userAgent:'Desktop'}}={}){
  const events=[],store=new Map(),local=new Map(),listeners={};
  const storage=map=>({getItem:key=>map.get(key)||null,setItem:(key,value)=>map.set(key,value),removeItem:key=>map.delete(key)});
- const context={URL,URLSearchParams,Date,crypto:webcrypto,AbortSignal,navigator:{userAgent:'Desktop'},location:new URL('https://pixelkovia.rodulab.com'+path),sessionStorage:storage(store),localStorage:storage(local),setTimeout,
+ const context={URL,URLSearchParams,Date,crypto:webcrypto,AbortSignal,navigator:browser,location:new URL('https://pixelkovia.rodulab.com'+path),sessionStorage:storage(store),localStorage:storage(local),setTimeout,
   document:{referrer,addEventListener:(type,fn)=>listeners[type]=fn},fetch:async(url,options)=>{events.push(JSON.parse(options.body));return {ok:true};},window:{PixelkoviaConsent:{allows:()=>allowed,pending:false,ready:new Promise(()=>{})}}};
  vm.runInNewContext(script,context);
  return {events,store,local,context,grant(){allowed=true;listeners['pixelkovia:consent']();}};
@@ -25,6 +25,30 @@ test('social sources distinguish tagged ads, ordinary referrals and unknown orig
   ['/', 'https://pixelkovia.rodulab.com/checkout', 'unknown'],['/', '', 'direct'],['/', 'https://www.google.com/', 'organic'],['/', 'not a URL', 'unknown']
  ];
  for(const [path,referrer,source] of cases){const c=collector({path,referrer});assert.equal(c.events[0].source,source,path+' ref='+referrer);assert.equal(c.events[0].campaign,path.includes('campaign-only')?'campaign-only':'');assert.ok(!JSON.stringify([...c.store.values(),...c.local.values(),c.events]).includes('DO_NOT_STORE'));}
+});
+test('coarse device and OS detection handles phones, tablets, desktop iPads and client hints after consent without storing raw user agents',()=>{
+ const mac='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
+ const cases=[
+  [{userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1'},'mobile','ios'],
+  [{userAgent:'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/130.0.0.0 Mobile Safari/537.36'},'mobile','android'],
+  [{userAgent:'Mozilla/5.0 (Linux; Android 13; SM-X700) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36'},'tablet','android'],
+  [{userAgent:'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1'},'tablet','ios'],
+  [{userAgent:mac,maxTouchPoints:5},'tablet','ios'],
+  [{userAgent:mac,maxTouchPoints:0},'desktop','macos'],
+  [{userAgent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36',maxTouchPoints:10},'desktop','windows'],
+  [{userAgent:'Mozilla/5.0 (X11; CrOS x86_64 16000.0.0) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36'},'desktop','chromeos'],
+  [{userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Firefox/130.0'},'desktop','linux'],
+  [{userAgent:'Mozilla/5.0 (X11; Linux x86_64)',userAgentData:{mobile:true,platform:'Android'}},'mobile','android'],
+  [{userAgent:''},'unknown','unknown'],
+  [{userAgent:'Mozilla/5.0'},'desktop','unknown']
+ ];
+ for(const [navigator,device,os]of cases){
+  const c=collector({allowed:false,navigator});assert.equal(c.events.length,0);assert.equal(c.store.size,0);assert.equal(c.local.size,0);
+  c.grant();assert.equal(c.events[0].device,device);assert.equal(c.events[0].os,os);
+  assert.ok(!JSON.stringify([...c.store.values(),...c.local.values(),c.events]).includes('Mozilla/'));
+  const first=c.events[0];c.context.location=new URL('https://pixelkovia.rodulab.com/checkout');vm.runInNewContext(script,c.context);
+  assert.equal(c.events.at(-1).visitId,first.visitId);assert.equal(c.events.at(-1).os,os);
+ }
 });
 test('referral classification waits for consent, retains first touch through checkout and does not store raw referrers',()=>{
  const c=collector({referrer:'https://l.facebook.com/?private=DO_NOT_STORE',allowed:false});
