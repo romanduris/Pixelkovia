@@ -4,6 +4,7 @@ import {dailyMarketing} from './marketing-series.mjs';
 import {attemptFor} from './payment-monitor.mjs';
 import {metaAdsReport,metaImpressionsReport} from './meta-ads.mjs';
 import {webFunnelBreakdown} from './marketing-breakdown.mjs';
+import {studioTrafficReport} from './studio-traffic.mjs';
 
 import {sources,safeCampaign,marketingFilters,attemptsCTE,conditions} from './marketing-query.mjs';
 export {sources,safeCampaign,marketingFilters} from './marketing-query.mjs';
@@ -84,7 +85,7 @@ export async function marketingReport(env,params,at=Date.now()){
   const uniqueReason=conversionReason||(!charts.uniqueVisitors?'Kohorta nemá žiadne namerané unikátne prehliadače.':null);
   const uniqueMetrics={visits:charts.uniqueVisitors,checkouts:charts.uniqueVisitors==null?null:periodCheckout.unique_checkouts,buyers:charts.uniqueVisitors==null?null:uniqueBuyers.buyers,conversion:uniqueReason?null:uniqueBuyers.buyers/charts.uniqueVisitors,conversionReason:uniqueReason,partial:charts.uniquePartial};
   const funnel={...await webFunnelBreakdown(db,{f,state,at,periodMetrics,uniqueMetrics,visitSources,calendarSources}),impressions:await metaImpressionsReport(env,f,adsReport,at)};
-  return {generatedAt:at,collectionEnabled,periodMetrics,uniqueMetrics,funnel,charts,checkoutOpensStartedAt:state.checkout_opens_started_at,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
+  return {generatedAt:at,collectionEnabled,periodMetrics,uniqueMetrics,funnel,charts,studioTraffic:await studioTrafficReport(db,f,at),checkoutOpensStartedAt:state.checkout_opens_started_at,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
     metrics:{visits:visitAvailable?visits.visits:null,checkouts:collectionInRange&&!f.product?visits.checkouts:null,purchases:metric.purchases,revenueCents:metric.revenue,orders:metric.orders,gameAccesses:metric.game_accesses,refunds:metric.refunds,accessIssues:metric.access_issues,accessIssueOrders:metric.access_issue_orders,attributedPurchases:metric.attributed,technicalSignals:issues.signals,technicalAttempts:issues.attempts,conversion:conversionReason?null:cohortTotal.purchases/visits.visits},
     cohort:{attempts:collectionInRange?cohortTotal.attempts:null,purchases:collectionInRange?cohortTotal.purchases:null},rows,campaigns:[...new Set([...campaigns.map(r=>r.campaign),...adsReport.ads.campaigns.map(c=>c.utm)])].sort(),conversionReason,
     ...adsReport,coverage:null,

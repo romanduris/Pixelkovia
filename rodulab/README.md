@@ -18,6 +18,12 @@ Screenshoty boli zachytené zo živých verejných stránok 13. 11. 2026: [Pixel
 
 Gateway povoľuje len explicitné verejné súbory a `POST /api/contact`. Všetky ostatné cesty vracajú 404. Všetky požiadavky prechádzajú gatewayom. Pixelkovia sa naďalej publikuje iba z `dist/funnel/` pôvodným skriptom; štúdio sa tam nekopíruje.
 
+## Denná návštevnosť
+
+Po úspešnom načítaní úvodnej stránky gateway cez súkromný service binding zvýši jediný denný čítač v existujúcej D1. Neukladá návštevné udalosti, cookies, identifikátory, IP adresy, odkazujúce stránky ani UTM. Počítajú sa načítania stránky, vrátane opakovaných; nejde o unikátnych ľudí. HEAD, statické súbory, presmerovania, chyby, prefetch a rozpoznané roboty sa vynechávajú. Zlyhanie čítača neblokuje web.
+
+V administrácii Pixelkovie je Predajný funnel prvou aj predvolenou obrazovkou. Nad grafom Návštevnosť prepínač **Pixelkovia / rodulab.com** mení iba tento graf. RoduLab zobrazuje jednoduché denné počty v čase Bratislavy za zvolené obdobie, bez zdrojov, filtrov produktov a unikátneho režimu. Výber webu sa zachováva medzi obnoveniami. Dátum začiatku je uložený pri migrácii `0023_studio_traffic.sql`; staršie dni zostávajú neznáme, merané dni bez načítania sú nuly.
+
 ## Kontaktný formulár a pošta
 
 Formulár cez service binding používa **existujúci** `treasurequest-admin`, produkčnú D1 a Resend. Správy smerujú iba na súkromnú adresu `SUPPORT_FORWARD_TO`, s adresou návštevníka v `Reply-To`. Odosielateľ `RoduLab <studio@pixelkovia.rodulab.com>` využíva už overenú doménu. API nepovolí zvoliť príjemcu ani odosielateľa z prehliadača. Obsah správ a kontakty sa neukladajú do D1 ani logov; ochrana proti zneužitiu používa honeypot, overenie pôvodu, obmedzenú dĺžku, tri pokusy za desať minút na denný hash IP a globálny limit 100 pokusov denne. Opakovaný rovnaký pokus má Resend idempotency key.
@@ -26,4 +32,4 @@ Príjem správ poslaných **priamo** na `info@rodulab.com` naďalej spravuje Web
 
 ## Overenie 13. 11. 2026
 
-Prešlo 141 testov backendu vrátane nového formulára, šesť testov zdrojov funnelu/DNS, kontrola gatewaya a produkčný build. Chromium bol vizuálne aj funkčne overený pri šírkach 320, 390, 768 a 1440 px: obrázky, odkazy, súkromie, zlyhanie formulára, opakovanie s rovnakým kľúčom a úspech. WebKit zobrazil úvod na 390 px, ale interakčné overenie v tomto prostredí blokuje pád jeho stránky; reprodukoval sa aj na samostatnom jednoduchom HTML bez zdrojov štúdia. Interakcie v Safari preto nie sú týmto behom potvrdené.
+Prešlo 146 testov backendu vrátane formulára a dennej návštevnosti, šesť testov zdrojov funnelu/DNS, kontrola gatewaya a produkčný build. Chromium bol vizuálne aj funkčne overený pri šírkach 320, 390, 768 a 1440 px: obrázky, odkazy, súkromie, zlyhanie formulára, opakovanie s rovnakým kľúčom a úspech. WebKit zobrazil úvod na 390 px, ale interakčné overenie v tomto prostredí blokuje pád jeho stránky; reprodukoval sa aj na samostatnom jednoduchom HTML bez zdrojov štúdia. Interakcie v Safari preto nie sú týmto behom potvrdené.

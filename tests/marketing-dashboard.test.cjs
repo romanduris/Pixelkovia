@@ -26,8 +26,9 @@ const origin='https://pixelkovia.rodulab.com';
   });
   const page=await context.newPage();await page.clock.install();page.on('pageerror',e=>errors.push(e.message));
   const ready=()=>page.waitForFunction(()=>document.querySelector('#view')?.getAttribute('aria-busy')==='false');
-  await page.goto(origin+'/admin#marketing');await ready();
+  await page.goto(origin+'/admin');await ready();
   assert.equal(await page.locator('[data-page]').count(),3);assert.equal(await page.locator('#page-title').innerText(),'Predajný funnel');
+  assert.equal(await page.locator('[data-page]').first().getAttribute('data-page'),'marketing','funnel is the first navigation item and the default view');
   assert.equal(await page.locator('.marketing-kpis .marketing-kpi strong').first().innerText(),'Nedostupné');
   assert.ok(await page.locator('.marketing-empty').isVisible());assert.equal(await page.locator('.marketing-kpis .marketing-kpi').count(),7);assert.equal(await page.locator('.marketing-stages').count(),0);assert.match(await page.locator('.marketing-quality').textContent(),/Čakáme na prvú/);
   assert.equal(await page.locator('#marketing-filter-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);
@@ -36,6 +37,28 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('.marketing-source-segment').count(),0,'no colored funnel for missing or zero data');
   await page.locator('.marketing-quality>summary').click();assert.ok(await page.locator('.marketing-period-note').isVisible());await page.keyboard.press('Escape');assert.equal(await page.locator('.marketing-period-note').isVisible(),false);
   await page.locator('#marketing-unique').check();assert.match(await page.locator('.marketing-chart-empty').innerText(),/Zatiaľ bez údajov/);assert.equal(await page.locator('.marketing-chart-svg').count(),0);await page.locator('#marketing-unique').uncheck();
+  // The studio has independent anonymous daily totals, with no source groups.
+  const {localDate}=await import('../admin/src/marketing-query.mjs'),studioAt=Date.now();
+  await execute(db,'UPDATE studio_traffic_state SET started_at=?',studioAt-3*86400000);
+  for(const [time,count]of [[studioAt-86400000,3],[studioAt,7]])await execute(db,'INSERT INTO studio_traffic_daily VALUES(?,?)',localDate(time),count);
+  await page.locator('#refresh-marketing').click();await ready();
+  await page.locator('#marketing-summary-charts').click();assert.equal(await page.locator('#marketing-charts').evaluate(el=>el.open),false);
+  await page.locator('[data-traffic-site="rodulab"]').click();
+  assert.ok(await page.locator('#marketing-charts').evaluate(el=>el.open),'switch opens the graph');
+  assert.equal(await page.locator('#marketing-unique').isVisible(),false);
+  assert.equal(await page.locator('[data-marketing-count]').textContent(),'7');
+  assert.equal(await page.locator('.marketing-chart-legend').count(),0);
+  assert.equal(await page.locator('.chart-source-studio').count(),2);
+  await page.locator('[data-chart-step="-1"]').click();assert.equal(await page.locator('[data-marketing-count]').textContent(),'3');
+  await page.locator('[data-chart-step="1"]').click();
+  await page.reload();await ready();assert.equal(await page.locator('[data-traffic-site="rodulab"]').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('[data-marketing-count]').textContent(),'7');
+  for(const width of [1440,390,320]){
+   await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+   await page.locator('#marketing-charts').screenshot({path:'/tmp/rodulab-daily-chart-'+width+'.png'});
+  }
+  await page.setViewportSize({width:1440,height:900});await page.locator('[data-traffic-site="pixelkovia"]').click();
+  assert.ok(await page.locator('#marketing-unique').isVisible());assert.equal(await page.locator('.marketing-chart-empty').count(),1);
   // A fresh visitor is unmeasured until explicit analytics consent; marketing stays off.
   let ids;
   for(const path of ['/?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch-2026','/checkout']){
@@ -215,7 +238,7 @@ const origin='https://pixelkovia.rodulab.com';
    if(width>=1440){const positions=await page.locator('.marketing-steps .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(positions.every((top,i)=>!i||top>positions[i-1]),'four horizontal funnel rows on desktop');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
    await page.waitForFunction(()=>{const plot=document.querySelector('.marketing-chart-plot'),svg=plot?.querySelector('svg');return plot&&svg&&Math.abs(Number(svg.getAttribute('width'))-plot.clientWidth)<2;});
    assert.ok(await page.locator('.marketing-chart-plot').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'chart fits its container '+width);
-   if(width<=750){assert.ok((await page.locator('#marketing-charts').boundingBox()).height<320,'compact phone chart '+width);}
+   if(width<=750){const height=(await page.locator('#marketing-charts').boundingBox()).height;assert.ok(height<360,'compact phone chart with website switch '+width+' ('+height+'px)');}
    await page.locator('#marketing-charts').screenshot({path:'/tmp/pixelkovia-slim-bars-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png'});
    assert.ok(await page.locator('#marketing-overview-unique').isVisible());
    assert.equal(await page.locator('#marketing-kpi-checkout small').count(),0);assert.ok(await page.locator('#marketing-kpi-revenue small').isVisible());

@@ -17,7 +17,7 @@ export function paymentLink(d){
  for(const key of ['source','campaign','device','product'])if(d.filters[key])params.set(key,d.filters[key]);
  return '#payments?'+params;
 }
-function chartSvg(days,unique,width=640,selected=days.length-1){
+function chartSvg(days,unique,width=640,selected=days.length-1,plain=false){
  const key=unique?'uniqueVisitors':'visits',height=width<600?152:218,left=30,right=8;
  const step=(width-left-right)/Math.max(1,days.length),barWidth=Math.min(27,step*.55);
  const longest=Math.max(1,...days.map(day=>String(day[key]??'').length));
@@ -54,10 +54,10 @@ function chartSvg(days,unique,width=640,selected=days.length-1){
  }).join('');
  const ticks=showDates?[...new Set(Array.from({length:Math.min(4,days.length)},(_,i)=>Math.round(i*(days.length-1)/Math.max(1,Math.min(4,days.length)-1))))]:[];
  const labels=ticks.map(i=>`<text class="chart-axis chart-date" x="${x(i)}" y="${height-5}" text-anchor="middle">${shortDate(days[i].date)}</text>`).join('');
- return `<svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Denná návštevnosť podľa zdroja, čas v Bratislave. Vyberte deň dotykom alebo šípkami." role="group">${axes}${bars}${totals.join('')}${labels}</svg>`;
+ return `<svg class="marketing-chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-label="Denná návštevnosť ${plain?'rodulab.com':'podľa zdroja'}, čas v Bratislave. Vyberte deň dotykom alebo šípkami." role="group">${axes}${bars}${totals.join('')}${labels}</svg>`;
 }
 function measuredRange(d,unique){
- const key=unique?'uniqueVisitors':'visits',all=(d.charts?.days||[]).map(groupChartDay);
+ const key=unique?'uniqueVisitors':'visits',all=(d.charts?.days||[]).map(day=>d.charts.site==='rodulab'?day:groupChartDay(day));
  const first=all.findIndex(day=>day[key]!=null),last=all.findLastIndex(day=>day[key]!=null);
  return {days:first<0?all:all.slice(first,last+1),trimmed:first>0};
 }
@@ -67,14 +67,16 @@ function legend(day,key){
  return `<ul class="marketing-chart-legend" aria-label="Zdroje návštevnosti vo vybraný deň">${day.sources.map(source=>`<li data-chart-source="${source.source}" aria-label="${esc(source.label+': '+num(source[key]))}"><i class="chart-source-${source.source}" aria-hidden="true"></i><span>${esc(source.label)}</span><strong>${source[key]==null?'—':num(source[key])}</strong></li>`).join('')}</ul>`;
 }
 export function chartContent(d,unique){
- const charts=d.charts,range=measuredRange(d,unique),days=range.days,key=unique?'uniqueVisitors':'visits';
+ const charts=d.charts,plain=charts?.site==='rodulab',range=measuredRange(d,unique),days=range.days,key=unique?'uniqueVisitors':'visits';
  const available=days.some(day=>day[key]!=null),selected=chosenIndex(days),day=days[selected];
  const caption=unique?'Unikátne prehliadače':'Návštevy';
  const start=charts?.uniqueStartedAt?new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(charts.uniqueStartedAt):null;
- const empty=`<div class="marketing-chart-empty" role="status"><strong>Zatiaľ bez údajov</strong><p>${unique?`Unikátne prehliadače meriame${start?' od '+esc(start):' od zapnutia nového merania'}. Staršie návštevy sa spätne nerozlišujú.`:'Pre zvolené obdobie a filtre nemáme nameranú návštevnosť.'}</p></div>`;
+ const studioStart=plain&&charts.startedAt?new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(charts.startedAt):null;
+ const note=plain?`<p class="marketing-studio-note">Každé otvorenie rodulab.com je jedna návšteva. Opakované otvorenia sa počítajú znova. ${studioStart?'Meranie od '+esc(studioStart)+'. ':''}Filtre zdrojov a produktov sa na tento graf nevzťahujú.</p>`:'';
+ const empty=`<div class="marketing-chart-empty" role="status"><strong>Zatiaľ bez údajov</strong><p>${plain?`Návštevy rodulab.com meriame${studioStart?' od '+esc(studioStart):' od zapnutia nového merania'}. Staršiu návštevnosť nepoznáme.`:unique?`Unikátne prehliadače meriame${start?' od '+esc(start):' od zapnutia nového merania'}. Staršie návštevy sa spätne nerozlišujú.`:'Pre zvolené obdobie a filtre nemáme nameranú návštevnosť.'}</p></div>`;
  if(!available)return `<figure class="marketing-chart"><figcaption class="sr-only">${caption} po dňoch a zdrojoch · Bratislava</figcaption>${empty}</figure>`;
  const coverage=coverageText(day,unique,range);
- return `<figure class="marketing-chart"><figcaption class="sr-only">${caption} po dňoch a zdrojoch · Bratislava</figcaption><div class="marketing-chart-readout" aria-live="polite" aria-atomic="true"><div class="marketing-chart-day-nav"><button type="button" data-chart-step="-1" aria-label="Predchádzajúci deň"${selected===0?' disabled':''}>‹</button><div><time datetime="${day.date}">${day.date.slice(8,10)}. ${day.date.slice(5,7)}. ${day.date.slice(0,4)}</time><small class="marketing-chart-coverage"${coverage?'':' hidden'}>${coverage}</small></div><button type="button" data-chart-step="1" aria-label="Nasledujúci deň"${selected===days.length-1?' disabled':''}>›</button></div><div class="marketing-chart-total"><strong data-marketing-count="${day.date}"${day[key]==null?' class="is-unavailable"':''}>${num(day[key])}</strong><span>${caption}</span></div></div><div class="marketing-chart-plot">${chartSvg(days,unique,640,selected)}</div>${legend(day,key)}</figure>`;
+ return `<figure class="marketing-chart"><figcaption class="sr-only">${caption} ${plain?'rodulab.com po dňoch':'po dňoch a zdrojoch'} · Bratislava</figcaption><div class="marketing-chart-readout" aria-live="polite" aria-atomic="true"><div class="marketing-chart-day-nav"><button type="button" data-chart-step="-1" aria-label="Predchádzajúci deň"${selected===0?' disabled':''}>‹</button><div><time datetime="${day.date}">${day.date.slice(8,10)}. ${day.date.slice(5,7)}. ${day.date.slice(0,4)}</time><small class="marketing-chart-coverage"${coverage?'':' hidden'}>${coverage}</small></div><button type="button" data-chart-step="1" aria-label="Nasledujúci deň"${selected===days.length-1?' disabled':''}>›</button></div><div class="marketing-chart-total"><strong data-marketing-count="${day.date}"${day[key]==null?' class="is-unavailable"':''}>${num(day[key])}</strong><span>${caption}</span></div></div><div class="marketing-chart-plot">${chartSvg(days,unique,640,selected,plain)}</div>${plain?note:legend(day,key)}</figure>`;
 }
 export function bindChartDays(root,d,unique){
  chartObserver?.disconnect();cancelAnimationFrame(chartFrame);
@@ -82,7 +84,7 @@ export function bindChartDays(root,d,unique){
  const range=measuredRange(d,unique),days=range.days,key=unique?'uniqueVisitors':'visits';let selected=chosenIndex(days),width=640;
  const draw=()=>{
   const hadFocus=plot.contains(document.activeElement);
-  plot.innerHTML=chartSvg(days,unique,width,selected);
+  plot.innerHTML=chartSvg(days,unique,width,selected,d.charts?.site==='rodulab');
   if(hadFocus)plot.querySelector('[tabindex="0"]').focus({preventScroll:true});
  };
  const reveal=index=>{
@@ -91,7 +93,7 @@ export function bindChartDays(root,d,unique){
   const total=figure.querySelector('[data-marketing-count]');total.dataset.marketingCount=day.date;total.textContent=num(day[key]);total.classList.toggle('is-unavailable',day[key]==null);
   const note=coverageText(day,unique,range),coverage=figure.querySelector('.marketing-chart-coverage');coverage.hidden=!note;coverage.textContent=note;
   figure.querySelector('[data-chart-step="-1"]').disabled=selected===0;figure.querySelector('[data-chart-step="1"]').disabled=selected===days.length-1;
-  figure.querySelector('.marketing-chart-legend').outerHTML=legend(day,key);draw();
+  const sourceLegend=figure.querySelector('.marketing-chart-legend');if(sourceLegend)sourceLegend.outerHTML=legend(day,key);draw();
  };
  figure.querySelectorAll('[data-chart-step]').forEach(button=>button.addEventListener('click',()=>reveal(selected+Number(button.dataset.chartStep))));
  plot.addEventListener('pointermove',event=>{if(event.pointerType==='touch')return;const target=event.target.closest('[data-marketing-day]');if(target&&Number(target.dataset.marketingDayIndex)!==selected)reveal(Number(target.dataset.marketingDayIndex));});

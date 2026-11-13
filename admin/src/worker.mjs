@@ -12,6 +12,7 @@ import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,relea
 import {browserPaymentEvent,paymentReport,paymentLog,attemptFor,reviewPaymentEvent} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
 import {studioContact} from './studio-contact.mjs';
+import {recordStudioVisit} from './studio-traffic.mjs';
 import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
 import {consentState,saveConsent,readConsent,prunePrivacy} from './privacy.mjs';
 import {claimMetaPurchase} from './meta-purchase.mjs';
@@ -102,6 +103,7 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await releaseCheckout(env,paymentInput));}
     if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env,context));
     if(path==='/api/support/webhook'&&request.method==='POST')return json(await supportWebhook(request,env));
+    if(path==='/api/studio/visit'&&request.method==='POST'){await recordStudioVisit(request,env);return new Response(null,{status:204,headers:{'Cache-Control':'no-store'}});}
     if(path==='/api/studio/contact'&&request.method==='POST'){
       const result=await studioContact(request,env);
       if(request.headers.get('Accept')?.includes('application/json'))return json(result);

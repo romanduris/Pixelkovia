@@ -6,7 +6,7 @@ form.addEventListener('submit',async event=>{
     form.elements.password.value='';
     const result=await response.json();
     if(!response.ok)throw Error(result.error||'Prihlásenie sa nepodarilo.');
-    location.replace('/admin');
+    location.replace('/admin#marketing');
   }catch(error){status.textContent=error.message;form.elements.password.focus();}
   finally{button.disabled=false;}
 });

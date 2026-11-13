@@ -4,7 +4,7 @@ const today=at=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',ye
 const validDate=value=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;
 const detailIds=['charts','filters','funnel-details','attribution','checks','quality','source-facebook','source-instagram','source-other',...['impressions','visits','checkout','attempts','purchases','conversion','revenue','profit'].map(id=>'kpi-'+id),...['revenue','costs','cac','addons','technical','access','refunds'].map(id=>'metric-'+id)];
 export function normalizePreferences(saved,at=Date.now()){
-  const result={selected:{period:'14'},open:['charts'],unique:false,overviewUnique:false,sort:'visits',direction:'desc'};
+  const result={selected:{period:'14'},open:['charts'],unique:false,overviewUnique:false,trafficSite:'pixelkovia',sort:'visits',direction:'desc'};
   if(!saved||typeof saved!=='object'||Array.isArray(saved))return result;
   const f=saved.selected||{},current=today(at);
   if(['today','7','14','30','90'].includes(f.period))result.selected.period=f.period;
@@ -17,6 +17,7 @@ export function normalizePreferences(saved,at=Date.now()){
   if(typeof f.campaign==='string'&&/^[a-zA-Z0-9_. -]{1,80}$/.test(f.campaign))result.selected.campaign=f.campaign;
   if(Array.isArray(saved.open))result.open=[...new Set(saved.open.filter(id=>detailIds.includes(id)))];
   for(const key of ['unique','overviewUnique'])if(typeof saved[key]==='boolean')result[key]=saved[key];
+  if(saved.trafficSite==='rodulab')result.trafficSite='rodulab';
   if(['label','visits','purchases','conversion'].includes(saved.sort))result.sort=saved.sort;
   if(saved.direction==='asc')result.direction='asc';
   return result;
