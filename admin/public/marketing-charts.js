@@ -35,7 +35,8 @@ function chartSvg(days,unique,width=640,selected=days.length-1,plain=false){
   const center=x(i),at=center-barWidth/2;
   let shapes='',total=0;
   if(day[key]!=null){
-   for(const source of day.sources){const value=source[key]||0;if(value){shapes+=`<rect class="chart-bar chart-source-${source.source}" x="${at}" y="${y(total+value)}" width="${barWidth}" height="${value/max*(bottom-top)}"/>`;total+=value;}}
+   // Build upward from Others through Instagram to Facebook.
+   for(const source of day.sources.slice().reverse()){const value=source[key]||0;if(value){shapes+=`<rect class="chart-bar chart-source-${source.source}" x="${at}" y="${y(total+value)}" width="${barWidth}" height="${value/max*(bottom-top)}"/>`;total+=value;}}
    if(!total)shapes=`<line class="chart-zero" x1="${at}" x2="${at+barWidth}" y1="${bottom}" y2="${bottom}"/>`;
   }
   const count=day[key]==null?'—':num(day[key]),labelHeight=vertical?count.length*font*.65:font;

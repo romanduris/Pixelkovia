@@ -136,7 +136,7 @@ const origin='https://pixelkovia.rodulab.com';
   }
   await page.locator('#refresh-marketing').click();await ready();
   const latestDay=page.locator('.marketing-chart-day').last();
-  assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-facebook','chart-bar chart-source-instagram','chart-bar chart-source-other']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
+  assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-other','chart-bar chart-source-instagram','chart-bar chart-source-facebook']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
   assert.match(await page.locator('.marketing-audience>.marketing-section-heading').innerText(),/Návštevy: 9/);
   assert.equal(await page.locator('[data-audience-device="mobile"] strong').textContent(),'3');
   assert.equal(await page.locator('[data-audience-device="tablet"] strong').textContent(),'2');

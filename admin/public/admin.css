@@ -644,7 +644,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-chart-day:focus{outline:none}.marketing-chart-day:focus .chart-hit{fill:#a6c4ee0a;stroke:#adc8e655;stroke-width:1}
 .chart-source-facebook{--chart-color:#459bff;fill:var(--chart-color);background:var(--chart-color)}
 .chart-source-instagram{--chart-color:#ff52b9;fill:var(--chart-color);background:var(--chart-color)}
-.chart-source-other{--chart-color:#35e087;fill:var(--chart-color);background:var(--chart-color)}
+.chart-source-other{--chart-color:#a6b0c2;fill:var(--chart-color);background:var(--chart-color)}
 .chart-bar{pointer-events:none}
 .chart-zero{stroke:#90a8c2;stroke-width:2;pointer-events:none}
 .chart-day-total{font-family:Arial,sans-serif;font-weight:600;fill:#dce8f8;pointer-events:none}
