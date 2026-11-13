@@ -11,7 +11,6 @@ export async function recordStudioVisit(request,env,at=Date.now()){
 }
 export async function studioTrafficReport(db,filters,at=Date.now()){
   const state=await first(db,'SELECT started_at FROM studio_traffic_state WHERE id=1');
-  if(filters.window)return {site:'rodulab',generatedAt:at,startedAt:state?.started_at??null,days:[],total:null,reason:'Návštevy rodulab.com sú uložené po celých dňoch. Pre presný časový rozsah Kamp.1 nie sú dostupné; vyberte bežné denné obdobie.'};
   const rows=await query(db,'SELECT day,visits FROM studio_traffic_daily WHERE day>=? AND day<=? ORDER BY day',filters.from,filters.to);
   const counts=new Map(rows.map(row=>[row.day,row.visits]));
   const days=calendarDays(filters).map(day=>{

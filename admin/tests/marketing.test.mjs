@@ -7,6 +7,7 @@ import worker from '../src/worker.mjs';
 import {paymentReport} from '../src/payment-monitor.mjs';
 import {calendarDays} from '../src/marketing-series.mjs';
 import {paymentLink} from '../public/marketing-charts.js';
+import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
 const origin='https://pixelkovia.rodulab.com',at=Date.UTC(2026,10,10,12),day=86400000;
 const req=()=>new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin,'content-type':'application/json'}});
 const input=(extra={})=>({type:'visit',mode:'session',visitId:crypto.randomUUID(),visitorId:crypto.randomUUID(),source:'facebook_ads',campaign:'launch-2026',device:'mobile',...extra});
@@ -177,8 +178,8 @@ test('since-date reports start at Bratislava midnight and keep extending to the 
  for(const from of ['', '2026-02-30','2026-11-11','2025-11-09'])assert.throws(()=>marketingFilters(new URLSearchParams({period:'since',from}),at),e=>e.status===400);
 });
 
-test('Kamp.1 uses fixed Bratislava times, an empty window before launch and contiguous partial calendar days',()=>{
- const start=Date.parse('2026-11-13T13:30:00Z'),end=Date.parse('2026-11-16T12:00:00Z');
+test('Kamp.1 includes Friday through Monday as whole Bratislava calendar days',()=>{
+ const start=Date.parse('2026-11-12T23:00:00Z'),end=Date.parse('2026-11-16T23:00:00Z');
  const params=new URLSearchParams({period:'campaign1',from:'2000-01-01',to:'2099-01-01',source:'facebook_ads'});
  const before=marketingFilters(params,start-1);assert.equal(before.start,start);assert.equal(before.end,start);assert.deepEqual(calendarDays(before),[]);
  const during=marketingFilters(params,start+86400000);assert.equal(during.start,start);assert.equal(during.end,start+86400000+1);assert.equal(during.source,'facebook_ads');
@@ -189,26 +190,37 @@ test('Kamp.1 uses fixed Bratislava times, an empty window before launch and cont
  assert.equal(days[0].start,start);assert.equal(days[0].end,Date.parse('2026-11-13T23:00:00Z'));assert.equal(days.at(-1).end,end);
  for(let i=1;i<days.length;i++)assert.equal(days[i].start,days[i-1].end);
  assert.equal(days.reduce((sum,d)=>sum+d.end-d.start,0),end-start);
+ assert.ok(days.every(d=>d.end-d.start===day));
 });
 
-test('Kamp.1 keeps report, audience and payment drill-down inside the exact interval and daily aggregates unavailable',async t=>{
- const {db,env}=await setup(),start=Date.parse('2026-11-13T13:30:00Z'),end=Date.parse('2026-11-16T12:00:00Z'),snapshot=end+60000;
+test('Kamp.1 aligns all four full days across funnel, Meta, studio, audience and payment drill-down',async t=>{
+ const {db,env}=await setup(),start=Date.parse('2026-11-12T23:00:00Z'),end=Date.parse('2026-11-16T23:00:00Z'),snapshot=end+60000;
  t.mock.method(Date,'now',()=>snapshot);
  try{
   await execute(db,'UPDATE marketing_state SET unique_started_at=?',start-day);
   const included=[];
-  for(const [index,time]of [start-1,start,start+3600000,end-1,end].entries()){
-   const v=input({browserId:crypto.randomUUID(),os:'android'});await marketingEvent(req(),env,{...v,type:'checkout',checkoutOpenId:crypto.randomUUID()},time);
-   const id=await attempt(db,{visitId:v.visitId,created:time,paid:time,gift:false,total:1499});if(index>0&&index<4)included.push(id);
+  for(const time of [start-1,start,start+8*3600000,start+day+3600000,start+2*day+3600000,end-3*3600000,end-1,end]){
+   const v=input({campaign:'123',browserId:crypto.randomUUID(),os:'android'});await marketingEvent(req(),env,{...v,type:'checkout',checkoutOpenId:crypto.randomUUID()},time);
+   const id=await attempt(db,{visitId:v.visitId,created:time,paid:time,gift:false,total:1499});if(time>=start&&time<end)included.push(id);
   }
-  const report=await marketingReport({...env,META_ADS_ACCESS_TOKEN:'test-only'},new URLSearchParams({period:'campaign1'}),snapshot);
-  assert.equal(report.metrics.visits,3);assert.equal(report.periodMetrics.checkouts,3);assert.equal(report.metrics.purchases,3);assert.equal(report.metrics.revenueCents,4497);
-  assert.equal(report.audience.total,3);assert.equal(report.uniqueMetrics.visits,3);assert.deepEqual(report.charts.days.map(d=>d.visits),[2,0,0,1]);
-  assert.equal(report.costs,null);assert.equal(report.cac,null);assert.equal(report.funnel.impressions.total,null);assert.match(report.costReason,/denné súčty/);
-  assert.equal(report.studioTraffic.total,null);assert.deepEqual(report.studioTraffic.days,[]);assert.match(report.studioTraffic.reason,/po celých dňoch/);
+  const dates=['2026-11-13','2026-11-14','2026-11-15','2026-11-16'];
+  const metaEnv={...env,META_ADS_ACCESS_TOKEN:'test-only',META_ADS_FETCH:async url=>Response.json(url.pathname.endsWith('/insights')?{data:dates.filter(date=>date<=JSON.parse(url.searchParams.get('time_range')).until).map(date=>({account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Campaign',date_start:date,date_stop:date,publisher_platform:'facebook',spend:'0.25',impressions:'10'}))}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'})};
+  const ongoingAt=start+12*3600000;
+  await syncMetaAds(metaEnv,{from:dates[0],to:dates[0]},ongoingAt);
+  const ongoing=await marketingReport(metaEnv,new URLSearchParams({period:'campaign1'}),ongoingAt);
+  assert.equal(ongoing.filters.to,dates[0]);assert.equal(ongoing.filters.window.end,end);assert.equal(ongoing.charts.days.length,1);
+  assert.equal(ongoing.costs,25);assert.equal(ongoing.funnel.impressions.total,10);assert.equal(ongoing.funnel.impressions.partial,true);
+  await syncMetaAds(metaEnv,{from:dates[0],to:dates.at(-1)},snapshot);
+  await execute(db,'UPDATE studio_traffic_state SET started_at=?',start-day);
+  for(const [index,date]of dates.entries())await execute(db,'INSERT INTO studio_traffic_daily VALUES(?,?)',date,index+1);
+  const report=await marketingReport(metaEnv,new URLSearchParams({period:'campaign1'}),snapshot);
+  assert.equal(report.metrics.visits,6);assert.equal(report.periodMetrics.checkouts,6);assert.equal(report.metrics.purchases,6);assert.equal(report.metrics.revenueCents,8994);
+  assert.equal(report.audience.total,6);assert.equal(report.uniqueMetrics.visits,6);assert.deepEqual(report.charts.days.map(d=>d.visits),[2,1,1,2]);
+  assert.equal(report.costs,100);assert.equal(report.cac,100/6);assert.equal(report.funnel.impressions.total,40);
+  assert.equal(report.studioTraffic.total,10);assert.deepEqual(report.studioTraffic.days.map(d=>d.visits),[1,2,3,4]);
   const link=paymentLink(report),params=new URLSearchParams(link.split('?')[1]);assert.equal(params.get('period'),'campaign1');
   const payments=await paymentReport(env,params,true);
-  assert.equal(payments.matchingTotal,3);assert.deepEqual(payments.rows.map(a=>a.id).sort(),included.sort());
+  assert.equal(payments.matchingTotal,6);assert.deepEqual(payments.rows.map(a=>a.id).sort(),included.sort());
   assert.equal(payments.funnel.start,report.filters.start);assert.equal(payments.funnel.end,report.filters.end);
  }finally{db.close();}
 });

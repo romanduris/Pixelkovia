@@ -270,7 +270,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.match(calls.at(-1),/period=campaign1/);
   assert.equal(await page.locator('[data-marketing-period="campaign1"]').getAttribute('aria-pressed'),'true');
   for(const selector of ['.marketing-date-range','.marketing-overview-period']){
-   const label=await page.locator(selector).innerText();assert.match(label,/13\. 11\. 2026.*14:30/);assert.match(label,/16\. 11\. 2026.*13:00/);
+   const label=await page.locator(selector).innerText();assert.equal(label,'13. 11. 2026 – 16. 11. 2026');
   }
   await page.reload();await ready();assert.match(calls.at(-1),/period=campaign1/);
   assert.equal(await page.locator('[data-marketing-period="campaign1"]').getAttribute('aria-pressed'),'true');
@@ -282,7 +282,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.setViewportSize({width:1440,height:900});
   assert.match(await page.locator('.marketing-purchase-link').getAttribute('href'),/period=campaign1/);
   await page.locator('.marketing-purchase-link').click();await page.waitForURL('**/admin#payments?**');await ready();
-  const campaignPayments=await page.locator('.payment-funnel-scope').innerText();assert.match(campaignPayments,/Kamp\.1/);assert.match(campaignPayments,/14:30/);assert.match(campaignPayments,/13:00/);
+  const campaignPayments=await page.locator('.payment-funnel-scope strong').innerText();assert.match(campaignPayments,/Kamp\.1 · 13\. 11\. 2026 – 16\. 11\. 2026/);
   await page.getByRole('link',{name:'Späť na funnel'}).click();await ready();
   for(const period of ['today','7','14','30','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
   await page.setViewportSize({width:320,height:900});

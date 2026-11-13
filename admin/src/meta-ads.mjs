@@ -111,7 +111,6 @@ export async function metaAdsReport(env,f,collection,at=Date.now()){
   const campaigns=await query(db,`SELECT s.campaign_id id,max(s.campaign_name) name,coalesce(m.utm_campaign,s.campaign_id) utm FROM meta_ads_spend s LEFT JOIN meta_ads_campaigns m USING(campaign_id) GROUP BY s.campaign_id ORDER BY s.campaign_id`);
   const base={costs:null,cac:null,costReason:'',cacReason:'',ads:{configured:!!env.META_ADS_ACCESS_TOKEN,accountId:metaAccount,lastSuccessAt:state.last_success_at,lastAttemptAt:state.last_attempt_at,error:state.last_error,campaigns,attributedPurchases:null}};
   const unavailable=reason=>({...base,costReason:reason,cacReason:reason});
-  if(f.window)return unavailable('Meta import obsahuje denné súčty. Výdavky, zobrazenia reklamy a CAC pre presný časový rozsah Kamp.1 nie sú dostupné.');
   if(!env.META_ADS_ACCESS_TOKEN)return unavailable('Chýba serverový prístup Meta Ads (META_ADS_ACCESS_TOKEN / ads_read).');
   if(state.last_error)return unavailable(state.last_error+' Posledný úspešný import: '+(state.last_success_at?dateLabel(state.last_success_at):'zatiaľ žiadny')+'.');
   if(!state.last_success_at)return unavailable('Výdavky ešte neboli úspešne importované.');

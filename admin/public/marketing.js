@@ -6,6 +6,7 @@ const pct=value=>value==null?'Nedostupné':num(value*100)+' %';
 const money=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-SK',{style:'currency',currency:'EUR'}).format(value/100);
 const overviewMoney=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-SK',{style:'currency',currency:'EUR',minimumFractionDigits:1,maximumFractionDigits:1}).format(value/100);
 const date=value=>value==null?'Zatiaľ nezaznamenané':new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(value);
+const calendarDate=value=>new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeZone:'Europe/Bratislava'}).format(value);
 const clock=value=>new Intl.DateTimeFormat('sk-SK',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Bratislava'}).format(value);
 const compactRange=(from,to,year)=>{
   const day=(value,withYear=false)=>`${Number(value.slice(8))}. ${Number(value.slice(5,7))}.${withYear?' '+value.slice(0,4):''}`;
@@ -119,7 +120,7 @@ export function marketing(d){
   const m=d.metrics,p=d.periodMetrics,f=d.filters,checks=d.checks||[];
   const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(d.generatedAt);
   const earliest=new Date(Date.parse(today)-365*86400000).toISOString().slice(0,10);
-  const campaignRange=f.window?`${date(f.window.start)} – ${date(f.window.end)}`:'';
+  const campaignRange=f.window?`${calendarDate(f.window.start)} – ${calendarDate(f.window.end-1)}`:'';
   const campaignStatus=f.window?(d.generatedAt<f.window.start?'Kampaň sa ešte nezačala':d.generatedAt<f.window.end?'Kampaň prebieha':'Kampaň ukončená'):'';
   const stale=Date.now()-d.generatedAt>300000;
   const checksFailed=checks.some(c=>!c.ok),checksUnknown=checks.length<2,checksStale=checks.some(c=>d.generatedAt-c.checked_at>1800000);
