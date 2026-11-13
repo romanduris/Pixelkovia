@@ -22,7 +22,7 @@ Gateway povoľuje len explicitné verejné súbory a `POST /api/contact`. Všetk
 
 Po úspešnom načítaní úvodnej stránky gateway cez súkromný service binding zvýši jediný denný čítač v existujúcej D1. Neukladá návštevné udalosti, cookies, identifikátory, IP adresy, odkazujúce stránky ani UTM. Počítajú sa načítania stránky, vrátane opakovaných; nejde o unikátnych ľudí. HEAD, statické súbory, presmerovania, chyby, prefetch a rozpoznané roboty sa vynechávajú. Zlyhanie čítača neblokuje web.
 
-V administrácii Pixelkovie je Predajný funnel prvou aj predvolenou obrazovkou. Nad grafom Návštevnosť prepínač **Pixelkovia / rodulab.com** mení iba tento graf. RoduLab zobrazuje jednoduché denné počty v čase Bratislavy za zvolené obdobie, bez zdrojov, filtrov produktov a unikátneho režimu. Výber webu sa zachováva medzi obnoveniami. Dátum začiatku je uložený pri migrácii `0023_studio_traffic.sql`; staršie dni zostávajú neznáme, merané dni bez načítania sú nuly.
+V administrácii Pixelkovie je Predajný funnel prvou aj predvolenou obrazovkou. Prepínač **Pixelkovia / rodulab.com** pri výbere štúdia zobrazí iba jeho súčet otvorení za obdobie a denné počty v čase Bratislavy. Metriky, zdroje, obchodné údaje a upozornenia Pixelkovie sú v tomto zobrazení skryté. Po návrate na Pixelkoviu zostávajú jej metriky, filtre a nastavenia zachované. RoduLab počíta výhradne úvodnú stránku `rodulab.com/`; Pixelkovia, Livingstones ani iné subdomény sa nepripočítavajú. Počet zahŕňa aj opakované otvorenia a vlastné návštevy; jednotlivé návštevy ani identitu návštevníkov nepoznáme. Výber webu sa zachováva medzi obnoveniami. Dátum začiatku je uložený pri migrácii `0023_studio_traffic.sql`; staršie dni zostávajú neznáme, merané dni bez načítania sú nuly.
 
 ## Kontaktný formulár a pošta
 

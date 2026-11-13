@@ -47,17 +47,27 @@ const origin='https://pixelkovia.rodulab.com';
   assert.ok(await page.locator('#marketing-charts').evaluate(el=>el.open),'switch opens the graph');
   assert.equal(await page.locator('#marketing-unique').isVisible(),false);
   assert.equal(await page.locator('[data-marketing-count]').textContent(),'7');
+  assert.equal(await page.locator('[data-marketing-studio-total]').textContent(),'10');
+  assert.equal(await page.locator('.marketing-title h1').textContent(),'Návštevnosť rodulab.com');
+  for(const selector of ['.marketing-funnel','.marketing-overview-grid','.marketing-quality','#marketing-filter-toggle','#marketing-filter-panel'])assert.equal(await page.locator(selector).isVisible(),false,'studio hides Pixelkovia '+selector);
+  assert.match(await page.locator('.marketing-studio-summary').textContent(),/Iba úvodná stránka rodulab.com/);
+  assert.match(await page.locator('.marketing-studio-note').textContent(),/mená ani jednotlivé návštevy sa neukladajú/);
   assert.equal(await page.locator('.marketing-chart-legend').count(),0);
   assert.equal(await page.locator('.chart-source-studio').count(),2);
   await page.locator('[data-chart-step="-1"]').click();assert.equal(await page.locator('[data-marketing-count]').textContent(),'3');
   await page.locator('[data-chart-step="1"]').click();
   await page.reload();await ready();assert.equal(await page.locator('[data-traffic-site="rodulab"]').getAttribute('aria-pressed'),'true');
   assert.equal(await page.locator('[data-marketing-count]').textContent(),'7');
+  assert.equal(await page.locator('.marketing-funnel').isVisible(),false,'studio isolation survives reload');
   for(const width of [1440,390,320]){
    await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
-   await page.locator('#marketing-charts').screenshot({path:'/tmp/rodulab-daily-chart-'+width+'.png'});
+   await page.locator('.marketing-dashboard').screenshot({path:'/tmp/rodulab-daily-chart-'+width+'.png'});
   }
   await page.setViewportSize({width:1440,height:900});await page.locator('[data-traffic-site="pixelkovia"]').click();
+  assert.equal(await page.locator('.marketing-funnel').isVisible(),true);
+  assert.equal(await page.locator('.marketing-overview-grid').isVisible(),true);
+  assert.equal(await page.locator('.marketing-title h1').textContent(),'Predajný funnel');
+  assert.equal(await page.locator('[data-marketing-studio-total]').count(),0);
   assert.ok(await page.locator('#marketing-unique').isVisible());assert.equal(await page.locator('.marketing-chart-empty').count(),1);
   // A fresh visitor is unmeasured until explicit analytics consent; marketing stays off.
   let ids;
@@ -123,6 +133,19 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#refresh-marketing').click();await ready();
   const latestDay=page.locator('.marketing-chart-day').last();
   assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-facebook','chart-bar chart-source-instagram','chart-bar chart-source-other']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
+  // Mixed data stays isolated: nine Pixelkovia sessions do not increase ten studio opens.
+  const pixelkoviaOverview=await page.locator('.marketing-funnel').innerText(),pixelkoviaParams=calls.at(-1);
+  await page.locator('[data-traffic-site="rodulab"]').click();
+  assert.equal(await page.locator('[data-marketing-studio-total]').textContent(),'10');
+  assert.equal(await page.locator('.marketing-funnel').isVisible(),false);
+  assert.equal(await page.locator('.marketing-chart-legend').count(),0);
+  assert.ok(!(await page.locator('.marketing-dashboard').innerText()).includes('Nákupy'));
+  await page.locator('#refresh-marketing').click();await ready();
+  assert.equal(await page.locator('[data-marketing-studio-total]').textContent(),'10');
+  assert.equal(calls.at(-1),pixelkoviaParams,'switching preserves Pixelkovia filters');
+  await page.locator('[data-traffic-site="pixelkovia"]').click();
+  assert.equal(await page.locator('.marketing-funnel').innerText(),pixelkoviaOverview,'Pixelkovia overview is unchanged after a studio refresh');
+  assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
   assert.deepEqual(await page.locator('[data-marketing-detail="kpi-visits"] [data-funnel-source] b').allTextContents(),['1','1','7']);
   const webWidths=await page.locator('.marketing-funnel-step:not(:first-child) .marketing-source-track').evaluateAll(els=>els.map(el=>parseFloat(el.style.width)));
   assert.ok(Math.abs(webWidths[1]/webWidths[0]-2/9)<.001);assert.ok(Math.abs(webWidths[2]/webWidths[0]-1/9)<.001,'bar lengths use volumes, not decorative steps');
