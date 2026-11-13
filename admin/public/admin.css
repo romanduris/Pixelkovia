@@ -599,7 +599,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-since-date.is-active{border-color:#789bc5;background:#243b55;color:#fff}
 @media(max-width:1100px){.marketing-toolbar{grid-template-columns:1fr}.marketing-toolbar-actions{justify-content:flex-start}}
 @media(max-width:750px){.marketing-since-date{flex:1 1 100%;justify-content:space-between}.marketing-since-date input{min-height:38px;font-size:14px}}
-.marketing-purchase-link{color:#b8eada;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;display:inline-flex;align-items:center;min-width:44px;min-height:44px}
+.marketing-purchase-link{color:#b8eada;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;display:inline-flex;align-items:center;justify-content:flex-end;min-width:44px;min-height:44px}
 .marketing-purchase-link:hover{color:#fff}
 .marketing-chart-panel{border:1px solid var(--m-border);border-radius:8px;background:var(--m-surface);min-width:0;overflow:hidden}
 .marketing-chart-panel>summary{min-height:48px;padding:4px 16px;font-weight:650;font-size:14px;gap:10px}
