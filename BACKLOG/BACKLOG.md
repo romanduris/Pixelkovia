@@ -18,7 +18,7 @@
 
 ## P2 – Nápady na posúdenie (nie schválené na implementáciu)
 
-- [ ] **RoduLab – jednoduchý zastrešujúci web (po PoC).** Potvrdený názov **RoduLab** (bez „s“) a doména **rodulab.com**. Neskôr pripraviť stručnú dôveryhodnú stránku interaktívneho/digitálneho štúdia: kto sme, čo robíme, kontakt a krátke prezentácie projektov **Pixelkovia, BTS Radar a Living Stones (kamienky)**. Pri každom uviesť len overené skutočnosti a pravdivý stav (hotový projekt vs. experiment); bez fiktívnych klientov, referencií alebo tvrdenia o registrovanej firme. Teraz nie je prioritou – najskôr predaj Pixelkovie.
+- [ ] **RoduLab – preposielanie info@rodulab.com do Gmailu.** Samostatný web Digital Product Studio a formulár používajú existujúci backend/Resend so súkromným `SUPPORT_FORWARD_TO`. Príjem správ poslaných priamo na `info@rodulab.com` zatiaľ zostáva na Websupporte; preposielanie vlastník 13. 11. 2026 dovolil odložiť, ak nestačí existujúci prístup. Cloudflare Email Routing vracia HTTP 403 `Authentication error`, Websupport credentials nie sú dostupné. Zachovať hlavné MX a existujúcu poštu; dokončiť až s príslušným prístupom. [Prevádzkový postup](../rodulab/README.md).
 - [ ] **Možnosť „bumoferu“ – preskúmať, či to chceme.** Pracovný názov podľa poznámky; najprv upresniť význam, prínos pre hráča, náročnosť a rozhodnúť áno/nie. Bez automatickej implementácie.
 - [ ] **Vianočný darčekový nákup / darčekový poukaz.** Preskúmať jednoduché darovanie hry ako vianočného darčeka, prípadne nadväznosť na druhú licenciu.
 

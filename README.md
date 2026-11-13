@@ -1,6 +1,8 @@
 # Pixelkovia
 
-Jediná aktívna aplikácia: **https://pixelkovia.rodulab.com**.
+Jediná aktívna aplikácia Pixelkovie: **https://pixelkovia.rodulab.com**.
+
+Samostatný zastrešujúci web štúdia **[RoduLab](https://rodulab.com)** má zdroje a postup nasadenia v [rodulab/README.md](rodulab/README.md). Publikuje sa izolovane z `dist/rodulab/` do vlastného Pages projektu; kontaktný formulár používa existujúci backend a súkromné e-mailové napojenie.
 
 - `/` a `/checkout`: predaj hry, dvoch kníh a bezplatného Atlasu.
 - `/Supervisor`: rodičovský portál, samostatné prihlasovacie údaje pre každý nákup, PDF materiály, knižnica, tri potvrdenia prípravy, rozbaľovací zoznam siedmich úkrytov, postup úlohami a hodnotenie. Príprava aj jednotlivé úkryty sa ukladajú na server ku konkrétnej hre. Umiestnenia sa pri zostavení preberajú z rodičovského návodu a zostávajú za plateným prístupom.

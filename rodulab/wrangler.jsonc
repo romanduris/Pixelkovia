@@ -1,0 +1,6 @@
+{
+  "name": "rodulab-studio",
+  "pages_build_output_dir": "../dist/rodulab",
+  "compatibility_date": "2026-10-18",
+  "services": [{"binding":"BACKEND","service":"treasurequest-admin"}]
+}

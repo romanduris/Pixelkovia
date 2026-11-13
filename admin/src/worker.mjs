@@ -11,6 +11,7 @@ import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './custome
 import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,releaseCheckout,paymentWebhook,sendPending,auditPayments} from './commerce.mjs';
 import {browserPaymentEvent,paymentReport,paymentLog,attemptFor,reviewPaymentEvent} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
+import {studioContact} from './studio-contact.mjs';
 import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
 import {consentState,saveConsent,readConsent,prunePrivacy} from './privacy.mjs';
 import {claimMetaPurchase} from './meta-purchase.mjs';
@@ -101,6 +102,11 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(path==='/api/checkout/release'&&request.method==='POST'){sameOrigin(request);paymentInput=await body(request);return json(await releaseCheckout(env,paymentInput));}
     if(path==='/api/stripe/webhook'&&request.method==='POST')return json(await paymentWebhook(request,env,context));
     if(path==='/api/support/webhook'&&request.method==='POST')return json(await supportWebhook(request,env));
+    if(path==='/api/studio/contact'&&request.method==='POST'){
+      const result=await studioContact(request,env);
+      if(request.headers.get('Accept')?.includes('application/json'))return json(result);
+      return new Response('<!doctype html><html lang="sk"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Správa odoslaná — RoduLab</title><body style="font:18px system-ui;max-width:600px;margin:15vh auto;padding:24px;background:#f6f5f0;color:#20211e"><h1>Správa je u nás.</h1><p>Ďakujeme, ozveme sa vám e-mailom.</p><a href="https://rodulab.com/#kontakt">Späť do štúdia →</a></body></html>',{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
+    }
     if(path==='/api/customer/login'&&request.method==='POST'){
       sameOrigin(request);const login=await customerLogin(request,env,await body(request));
       const response=json(login.status===200?{authenticated:true}:{error:login.error},login.status);
