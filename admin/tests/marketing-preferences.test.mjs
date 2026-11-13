@@ -21,3 +21,7 @@ test('traffic website selection persists only the two supported websites',()=>{
  assert.equal(normalizePreferences({trafficSite:'rodulab'},at).trafficSite,'rodulab');
  for(const trafficSite of ['evil.example','',null,42])assert.equal(normalizePreferences({trafficSite},at).trafficSite,'pixelkovia');
 });
+test('Kamp.1 persists across reloads and the removed 90-day choice recovers to the default',()=>{
+ assert.deepEqual(normalizePreferences({selected:{period:'campaign1',source:'facebook_ads'}},at).selected,{period:'campaign1',source:'facebook_ads'});
+ assert.deepEqual(normalizePreferences({selected:{period:'90',device:'mobile'}},at).selected,{period:'14',device:'mobile'});
+});

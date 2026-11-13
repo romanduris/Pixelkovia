@@ -7,7 +7,7 @@ export function normalizePreferences(saved,at=Date.now()){
   const result={selected:{period:'14'},open:['charts'],unique:false,overviewUnique:false,trafficSite:'pixelkovia',sort:'visits',direction:'desc'};
   if(!saved||typeof saved!=='object'||Array.isArray(saved))return result;
   const f=saved.selected||{},current=today(at);
-  if(['today','7','14','30','90'].includes(f.period))result.selected.period=f.period;
+  if(['today','7','14','30','campaign1'].includes(f.period))result.selected.period=f.period;
   if(['since','custom'].includes(f.period)&&validDate(f.from)&&f.from<=current){
     const last=f.period==='since'?current:f.to;
     if(validDate(last)&&last>=f.from&&Date.parse(last)-Date.parse(f.from)<=365*day)result.selected={period:f.period,from:f.from,...f.period==='custom'?{to:last}:{}};

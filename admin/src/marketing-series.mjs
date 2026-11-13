@@ -4,7 +4,7 @@ import {sources,localDate,midnight,conditions} from './marketing-query.mjs';
 // Explicit local-midnight boundaries handle both 23-hour and 25-hour days.
 export function calendarDays(f){
  const result=[];let start=f.start;
- while(start<f.end){const date=localDate(start),next=midnight(localDate(start+36*3600000));result.push({date,start,end:Math.min(next,f.end)});start=next;}
+ while(start<f.end){const date=localDate(start),next=midnight(localDate(midnight(date)+36*3600000));result.push({date,start,end:Math.min(next,f.end)});start=next;}
  return result;
 }
 export async function dailyMarketing(db,f,state,at){

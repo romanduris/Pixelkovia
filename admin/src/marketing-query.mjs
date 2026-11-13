@@ -15,8 +15,11 @@ export function midnight(date){
   return value;
 }
 export function marketingFilters(params,at=Date.now()){
-  const period=params.get('period')||'14',today=localDate(at);let start,end;
-  if(period==='since'){
+  const period=params.get('period')||'14',today=localDate(at);let start,end,window;
+  if(period==='campaign1'){
+    window={label:'Kamp.1',start:Date.parse('2026-11-13T14:30:00+01:00'),end:Date.parse('2026-11-16T13:00:00+01:00')};
+    start=window.start;end=Math.max(start,Math.min(window.end,at+1));
+  }else if(period==='since'){
     start=midnight(params.get('from')||'');end=at+1;
     if(start>at||Date.parse(today)-Date.parse(params.get('from'))>365*day)throw new HttpError(400,'Vyberte minulý alebo dnešný dátum, najviac 366 dní dozadu.');
   }else if(period==='custom'){
@@ -28,7 +31,7 @@ export function marketingFilters(params,at=Date.now()){
   }
   const source=params.get('source')||'',device=params.get('device')||'',product=params.get('product')||'',campaign=params.get('campaign')||'';
   if((source&&!Object.hasOwn(sources,source))||(device&&!devices.includes(device))||!['','game','books','combination'].includes(product)||(campaign&&safeCampaign(campaign)!==campaign))throw new HttpError(400,'Neplatný filter.');
-  return {period,from:localDate(start),to:localDate(Math.min(end-1,at)),start,end:Math.min(end,at+1),source,device,product,campaign};
+  return {period,from:localDate(start),to:localDate(window?Math.max(start,end-1):Math.min(end-1,at)),start,end:window?end:Math.min(end,at+1),source,device,product,campaign,...window?{window}:{}};
 }
 // Each row is one Stripe Session / transaction, including a gift purchase.
 // Orders, entitlements and access emails are aggregated separately, before joins.

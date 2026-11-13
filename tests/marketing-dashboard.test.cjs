@@ -155,7 +155,7 @@ const origin='https://pixelkovia.rodulab.com';
   }
   await page.locator('#audience-qa-label').evaluate(el=>el.remove());await page.setViewportSize({width:1440,height:900});
   // Mixed data stays isolated: nine Pixelkovia sessions do not increase ten studio opens.
-  const pixelkoviaOverview=await page.locator('.marketing-funnel').innerText(),pixelkoviaParams=calls.at(-1);
+  const pixelkoviaOverview=await page.locator('.marketing-funnel').textContent(),pixelkoviaParams=calls.at(-1);
   await page.locator('[data-traffic-site="rodulab"]').click();
   assert.equal(await page.locator('[data-marketing-studio-total]').textContent(),'10');
   assert.equal(await page.locator('.marketing-funnel').isVisible(),false);
@@ -165,7 +165,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('[data-marketing-studio-total]').textContent(),'10');
   assert.equal(calls.at(-1),pixelkoviaParams,'switching preserves Pixelkovia filters');
   await page.locator('[data-traffic-site="pixelkovia"]').click();
-  assert.equal(await page.locator('.marketing-funnel').innerText(),pixelkoviaOverview,'Pixelkovia overview is unchanged after a studio refresh');
+  assert.equal(await page.locator('.marketing-funnel').textContent(),pixelkoviaOverview,'Pixelkovia overview is unchanged after a studio refresh');
   assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
   assert.deepEqual(await page.locator('[data-marketing-detail="kpi-visits"] [data-funnel-source] b').allTextContents(),['1','1','7']);
   const webWidths=await page.locator('.marketing-funnel-step:not(:first-child) .marketing-source-track').evaluateAll(els=>els.map(el=>parseFloat(el.style.width)));
@@ -264,9 +264,29 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('[name=product]').selectOption('');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();
   await page.locator('#marketing-summary-attribution').click();await page.locator('#marketing-summary-funnel-details').click();
   await page.locator('#marketing-sort-visits').click();
-  for(const period of ['today','7','14','30','90','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
+  assert.deepEqual(await page.locator('[data-marketing-period]').allTextContents(),['1d','7d','14d','30d','Kamp.1']);
+  assert.equal(await page.locator('[name=period] option[value="90"]').count(),0);
+  await page.locator('[data-marketing-period="campaign1"]').click();await ready();
+  assert.match(calls.at(-1),/period=campaign1/);
+  assert.equal(await page.locator('[data-marketing-period="campaign1"]').getAttribute('aria-pressed'),'true');
+  for(const selector of ['.marketing-date-range','.marketing-overview-period']){
+   const label=await page.locator(selector).innerText();assert.match(label,/13\. 11\. 2026.*14:30/);assert.match(label,/16\. 11\. 2026.*13:00/);
+  }
+  await page.reload();await ready();assert.match(calls.at(-1),/period=campaign1/);
+  assert.equal(await page.locator('[data-marketing-period="campaign1"]').getAttribute('aria-pressed'),'true');
+  for(const width of [1440,390,320]){
+   await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'campaign toolbar fits '+width);
+   assert.ok(await page.locator('[data-marketing-period="campaign1"]').evaluate(el=>el.scrollWidth<=el.clientWidth),'campaign label fits '+width);
+   await page.locator('.marketing-dashboard').screenshot({path:'/tmp/pixelkovia-campaign1-'+width+'.png'});
+  }
+  await page.setViewportSize({width:1440,height:900});
+  assert.match(await page.locator('.marketing-purchase-link').getAttribute('href'),/period=campaign1/);
+  await page.locator('.marketing-purchase-link').click();await page.waitForURL('**/admin#payments?**');await ready();
+  const campaignPayments=await page.locator('.payment-funnel-scope').innerText();assert.match(campaignPayments,/Kamp\.1/);assert.match(campaignPayments,/14:30/);assert.match(campaignPayments,/13:00/);
+  await page.getByRole('link',{name:'Späť na funnel'}).click();await ready();
+  for(const period of ['today','7','14','30','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
   await page.setViewportSize({width:320,height:900});
-  for(const period of ['today','7','14','30','90']){
+  for(const period of ['today','7','14','30']){
    await page.locator('[data-marketing-period="'+period+'"]').tap();await ready();
    assert.ok(await page.locator('[data-marketing-day]').count()<=(period==='today'?1:Number(period)));assert.equal(await page.locator('[data-marketing-day-count]').count(),await page.locator('[data-marketing-day]').count());
    await page.mouse.move(0,0);await page.locator('.marketing-chart-day[tabindex="0"]').focus();await page.keyboard.press('Home');

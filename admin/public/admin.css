@@ -438,6 +438,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
 .marketing-toolbar-actions{justify-content:flex-end;flex-wrap:wrap}
 .marketing-toolbar-meta{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#8fa5bf;font-size:11px;line-height:1.4;font-variant-numeric:tabular-nums}
 .marketing-date-range{white-space:nowrap}
+.marketing-date-range.is-campaign{white-space:normal}
 .marketing-freshness{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .marketing-freshness svg{flex:none;opacity:.75}
 .marketing-freshness[role=alert]{color:#ffe0a3;font-weight:600}
@@ -666,7 +667,7 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
   .marketing-title{grid-column:1;grid-row:1}.marketing-title h1{font-size:18px}
   .marketing-toolbar-actions{display:contents}
   .marketing-period-controls{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:8px}
-  .marketing-period-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));min-width:0;gap:3px}
+  .marketing-period-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(56px,1.35fr);min-width:0;gap:3px}
   .marketing-period-buttons button{width:100%;min-width:0;min-height:40px;margin:0;padding:6px 4px;font-size:12px}
   .marketing-period-controls .marketing-since-date{position:relative;width:44px;height:44px;justify-content:center;padding:0}
   .marketing-since-date>span{display:none}.marketing-date-icon{display:block}
