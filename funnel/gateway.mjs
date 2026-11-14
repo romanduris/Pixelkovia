@@ -23,7 +23,7 @@ export default {async fetch(request,env){
     const privateFile=PRIVATE_FILES[path];
     if(path==='/admin'||(path.startsWith('/admin/')&&!privateFile)){
       const mapped=path==='/admin'?'/':path.slice('/admin'.length);
-      if(!['/','/login','/login.html','/login.css','/login.js','/admin.css','/admin.js','/marketing.js','/marketing-charts.js','/marketing-preferences.js','/payment-methods/apple-pay.svg','/payment-methods/google-pay.svg','/payment-methods/card.svg'].includes(mapped))return notFound();
+      if(!['/','/login','/login.html','/login.css','/login.js','/admin.css','/admin.js','/marketing.js','/marketing-charts.js','/marketing-preferences.js','/marketing-diagnostics.js','/payment-methods/apple-pay.svg','/payment-methods/google-pay.svg','/payment-methods/card.svg'].includes(mapped))return notFound();
       const r=await backend(env,request,mapped);const result=new Response(r.body,r),location=r.headers.get('Location');
       if(location?.startsWith('/'))result.headers.set('Location',location==='/'?'/admin':'/admin'+location);
       return secured(result,true);

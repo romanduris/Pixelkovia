@@ -8,7 +8,7 @@ function collector({path='/',referrer='',allowed=true,navigator:browser={userAge
  const events=[],store=new Map(),local=new Map(),listeners={};
  const storage=map=>({getItem:key=>map.get(key)||null,setItem:(key,value)=>map.set(key,value),removeItem:key=>map.delete(key)});
  const context={URL,URLSearchParams,Date,crypto:webcrypto,AbortSignal,navigator:browser,location:new URL('https://pixelkovia.rodulab.com'+path),sessionStorage:storage(store),localStorage:storage(local),setTimeout,
-  document:{referrer,addEventListener:(type,fn)=>listeners[type]=fn},fetch:async(url,options)=>{events.push(JSON.parse(options.body));return {ok:true};},window:{PixelkoviaConsent:{allows:()=>allowed,pending:false,ready:new Promise(()=>{})}}};
+  document:{referrer,readyState:'complete',addEventListener:(type,fn)=>listeners[type]=fn},fetch:async(url,options)=>{events.push(JSON.parse(options.body));return {ok:true};},window:{addEventListener(){},PixelkoviaConsent:{allows:()=>allowed,pending:false,ready:new Promise(()=>{})}}};
  vm.runInNewContext(script,context);
  return {events,store,local,context,grant(){allowed=true;listeners['pixelkovia:consent']();}};
 }
@@ -69,4 +69,11 @@ test('a different social acquisition starts a new visit without relabelling the 
  const ad=c.events.at(-1);assert.equal(ad.source,'facebook_ads');assert.notEqual(ad.visitId,facebook.visitId);assert.equal(first.source,'unknown');assert.equal(facebook.source,'facebook');
  vm.runInNewContext(script,c.context);assert.equal(c.events.at(-1).visitId,ad.visitId,'reload keeps the acquisition');
  c.context.location=new URL('https://pixelkovia.rodulab.com/checkout');c.context.document.referrer='https://pixelkovia.rodulab.com/';vm.runInNewContext(script,c.context);assert.equal(c.events.at(-1).visitId,ad.visitId);assert.equal(c.events.at(-1).source,'facebook_ads');
+});
+test('a tagged Audience Network entry starts its own visit while preserving unknown financial source and checkout continuity',()=>{
+ const c=collector({path:'/?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch'}),first=c.events[0];
+ c.context.location=new URL('https://pixelkovia.rodulab.com/?utm_source=an&utm_medium=paid_social&utm_campaign=launch');vm.runInNewContext(script,c.context);
+ const network=c.events.at(-1);assert.notEqual(network.visitId,first.visitId);assert.equal(network.source,'unknown');assert.equal(network.entrySource,'audience_network_ads');assert.equal(first.source,'facebook_ads');
+ vm.runInNewContext(script,c.context);assert.equal(c.events.at(-1).visitId,network.visitId);
+ c.context.location=new URL('https://pixelkovia.rodulab.com/checkout');vm.runInNewContext(script,c.context);assert.equal(c.events.at(-1).visitId,network.visitId);assert.equal(c.events.at(-1).entrySource,'audience_network_ads');
 });

@@ -4,7 +4,9 @@
  const path=location.pathname.replace(/\.html$/,'');
  if(!['/','/index','/checkout'].includes(path))return;
  const page=path==='/checkout'?'/checkout':'/';
- let frame=null,ready=false,pending=null,busy=false,failedAt=0;
+ let frame=null,ready=false,pending=null,busy=false,failedAt=0,loadTimer=null;
+ const diagnostic={};
+ function observe(key){diagnostic[key]=true;document.dispatchEvent(new CustomEvent('pixelkovia:meta-diagnostic'));}
  const allowed=()=>window.PixelkoviaConsent?.allows('marketing')===true;
  function clearCookies(){
   const parts=location.hostname.split('.'),domains=new Set(['',location.hostname,'.'+location.hostname]);
@@ -14,6 +16,7 @@
   }
  }
  function stop(){
+  clearTimeout(loadTimer);
   frame?.contentWindow?.postMessage({type:'pixelkovia-meta-stop'},location.origin);frame?.remove();frame=null;ready=false;pending=null;clearCookies();
  }
  function start(){
@@ -23,8 +26,10 @@
   const click=new URLSearchParams(location.search).get('fbclid');
   if(/^[A-Za-z0-9_-]{10,500}$/.test(click||''))document.cookie=`_fbc=fb.1.${Date.now()}.${click}; Max-Age=7776000; Path=/; SameSite=Lax; Secure`;
   frame=document.createElement('iframe');frame.hidden=true;frame.title='Marketingové meranie po súhlase';frame.referrerPolicy='no-referrer';frame.src='/assets/meta-pixel';
+  frame.addEventListener('error',()=>observe('metaFailed'));
   frame.addEventListener('load',()=>{if(allowed())frame?.contentWindow?.postMessage({type:'pixelkovia-meta-init',page,pixelId:window.PixelkoviaConsent.pixelId},location.origin);});
   document.body.append(frame);
+  observe('metaRequested');clearTimeout(loadTimer);loadTimer=setTimeout(()=>{if(allowed()&&!ready)observe('metaTimeout');},12000);
  }
  async function sendPurchase(){
   if(!ready||!allowed()||!pending||busy)return;
@@ -40,10 +45,11 @@
  }
  window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==frame?.contentWindow)return;
-  if(event.data?.type==='pixelkovia-meta-ready'&&allowed()){ready=true;void sendPurchase();}
-  if(event.data?.type==='pixelkovia-meta-failed'){failedAt=Date.now();frame?.remove();frame=null;ready=false;}
+  if(event.data?.type==='pixelkovia-meta-pageview-attempt'&&allowed())observe('metaAttempted');
+  if(event.data?.type==='pixelkovia-meta-ready'&&allowed()){clearTimeout(loadTimer);ready=true;void sendPurchase();}
+  if(event.data?.type==='pixelkovia-meta-failed'){observe('metaFailed');clearTimeout(loadTimer);failedAt=Date.now();frame?.remove();frame=null;ready=false;}
  });
- window.PixelkoviaMeta={purchase(sessionId){if(/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(sessionId||'')){pending=sessionId;if(allowed())void sendPurchase();}}};
+ window.PixelkoviaMeta={get diagnostic(){return {...diagnostic};},purchase(sessionId){if(/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(sessionId||'')){pending=sessionId;if(allowed())void sendPurchase();}}};
  document.addEventListener('pixelkovia:consent',start);
  void window.PixelkoviaConsent?.ready.then(start);
 })();

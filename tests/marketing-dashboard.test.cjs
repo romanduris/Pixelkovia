@@ -334,7 +334,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-filter-toggle').click();
   for(const width of [1440,1920,768,480,430,390,375,360,320]){
    await page.setViewportSize({width,height:width===1920?1080:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no page overflow '+width);
-   assert.equal(await page.locator('#marketing-filter-toggle').isVisible(),width>750);assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-table-wrap').isVisible());
+   assert.equal(await page.locator('#marketing-filter-toggle').isVisible(),width>750);assert.ok(await page.locator('#marketing-since').isVisible());assert.equal(await page.locator('#marketing-filter-panel').isVisible(),false);assert.ok(await page.locator('.marketing-sources .marketing-table-wrap').isVisible());
    if(width>=1440){const positions=await page.locator('.marketing-steps .marketing-kpi').evaluateAll(els=>els.map(el=>el.getBoundingClientRect().top));assert.ok(positions.every((top,i)=>!i||top>positions[i-1]),'four horizontal funnel rows on desktop');assert.ok(await page.locator('#marketing-charts').isVisible(),'charts are placed before source and commercial summaries');}
    await page.waitForFunction(()=>{const plot=document.querySelector('.marketing-chart-plot'),svg=plot?.querySelector('svg');return plot&&svg&&Math.abs(Number(svg.getAttribute('width'))-plot.clientWidth)<2;});
    assert.ok(await page.locator('.marketing-chart-plot').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'chart fits its container '+width);

@@ -2,7 +2,7 @@ export const preferenceKey='pixelkovia-admin-marketing-layout-v1';
 const day=86400000;
 const today=at=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(at);
 const validDate=value=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;
-const detailIds=['charts','filters','funnel-details','attribution','checks','quality','source-facebook','source-instagram','source-other',...['impressions','visits','checkout','attempts','purchases','conversion','revenue','profit'].map(id=>'kpi-'+id),...['revenue','costs','cac','addons','technical','access','refunds'].map(id=>'metric-'+id)];
+const detailIds=['visit-diagnostics','charts','filters','funnel-details','attribution','checks','quality','source-facebook','source-instagram','source-other',...['impressions','visits','checkout','attempts','purchases','conversion','revenue','profit'].map(id=>'kpi-'+id),...['revenue','costs','cac','addons','technical','access','refunds'].map(id=>'metric-'+id)];
 export function normalizePreferences(saved,at=Date.now()){
   const result={selected:{period:'14'},open:['charts'],unique:false,overviewUnique:false,trafficSite:'pixelkovia',sort:'visits',direction:'desc'};
   if(!saved||typeof saved!=='object'||Array.isArray(saved))return result;

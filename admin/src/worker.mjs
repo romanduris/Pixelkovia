@@ -81,8 +81,9 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(path==='/api/marketing/purchase'&&request.method==='POST'){sameOrigin(request);return json(await claimMetaPurchase(request,env,await body(request)));}
     if(path==='/api/marketing/event'&&request.method==='POST'){
       sameOrigin(request);if(env.MARKETING_COLLECTION_ENABLED!=='true')throw new HttpError(410,'Zber návštev v prehliadači je vypnutý.');
-      if(!(await readConsent(request,env))?.analytics)throw new HttpError(403,'Analytické meranie nie je povolené.');
-      return json(await marketingEvent(request,env,await body(request)));
+      const consent=await readConsent(request,env);
+      if(!consent?.analytics)throw new HttpError(403,'Analytické meranie nie je povolené.');
+      return json(await marketingEvent(request,env,await body(request),Date.now(),consent));
     }
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
     if(path==='/api/checkout/status'&&request.method==='GET'){

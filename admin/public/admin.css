@@ -826,3 +826,24 @@ td strong.payment-category-technical{color:#ffacb8}td strong.payment-category-ba
  .marketing-funnel-step .marketing-kpi-label{grid-column:1/-1}
  .marketing-funnel-step>summary{row-gap:5px}
 }
+/* The visit diagnostics stays collapsed inside the existing dashboard. */
+.marketing-diagnostics{min-width:0}
+.marketing-diagnostics-content{min-width:0;padding:4px 16px 16px;font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.marketing-diagnostics-content h3{font-size:14px;margin:24px 0 10px;color:var(--text,#e6edf3)}
+.marketing-diagnostics-content p{margin:10px 0}
+.marketing-diagnostic-select{display:grid;gap:6px;max-width:280px;margin-bottom:12px}
+.marketing-diagnostic-select select{min-height:40px;width:100%}
+.marketing-diagnostic-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:12px 0}
+.marketing-diagnostic-flow li{display:grid;gap:8px;padding:12px;border:1px solid var(--border,#344350);border-radius:8px}
+.marketing-diagnostic-flow strong{font-size:18px}
+.marketing-diagnostic-note,.marketing-diagnostic-warnings{border-left:3px solid #d6a251;padding-left:18px}
+.marketing-diagnostics .marketing-table-wrap{max-width:100%;overflow-x:auto}
+.marketing-diagnostics table{width:100%;min-width:540px;font-size:12px;border-collapse:collapse}
+.marketing-diagnostics td,.marketing-diagnostics th{padding:10px;text-align:right;border-bottom:1px solid var(--border,#344350);vertical-align:top}
+.marketing-diagnostics th:first-child{text-align:left}
+.marketing-diagnostic-days{margin-top:18px}
+.marketing-diagnostic-days table{min-width:1080px}
+.marketing-diagnostic-days th{white-space:nowrap}
+.marketing-diagnostics .marketing-diagnostic-meta{min-width:700px}
+.marketing-diagnostic-days summary{cursor:pointer;min-height:40px;align-content:center}
+@media(max-width:600px){.marketing-diagnostics-content{padding:4px 12px 12px}.marketing-diagnostic-flow{grid-template-columns:repeat(2,minmax(0,1fr))}}

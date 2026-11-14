@@ -27,6 +27,14 @@ function centsFromUnits(units){
   if(!Number.isSafeInteger(cents))throw new HttpError(502,'Meta vrátila príliš veľkú sumu.');return cents;
 }
 const count=value=>typeof value==='string'&&/^\d{1,16}$/.test(value)&&Number.isSafeInteger(Number(value))?Number(value):null;
+function actionCount(value,type){
+  // Action lists are sparse: an omitted type/list in a successful Insights
+  // response means no reported action. Malformed lists are unavailable.
+  if(value===undefined)return 0;
+  if(!Array.isArray(value)||value.some(r=>!r||typeof r!=='object'||typeof r.action_type!=='string'))return null;
+  const rows=value.filter(r=>r?.action_type===type);
+  return rows.length===0?0:rows.length===1?count(rows[0].value):null;
+}
 class MetaSpendError extends HttpError {
   constructor(value){
     // Describe the rejected format, never persist the provider's raw value.
@@ -68,7 +76,7 @@ async function graph(env,path,params,signal){
 async function insights(env,from,to,days,signal){
   const rows=[],keys=new Set();let after='';
   for(let page=0;page<20;page++){
-    const data=await graph(env,'act_'+metaAccount+'/insights',{fields:'account_id,account_currency,campaign_id,campaign_name,date_start,date_stop,spend,impressions',level:'campaign',time_increment:'1',time_range:JSON.stringify({since:from,until:to}),breakdowns:'publisher_platform',limit:'500',...(after?{after}:{})},signal);
+    const data=await graph(env,'act_'+metaAccount+'/insights',{fields:'account_id,account_currency,campaign_id,campaign_name,date_start,date_stop,spend,impressions,inline_link_clicks,outbound_clicks,actions',level:'campaign',time_increment:'1',time_range:JSON.stringify({since:from,until:to}),breakdowns:'publisher_platform',limit:'500',...(after?{after}:{})},signal);
     if(!Array.isArray(data.data))throw new HttpError(502,'Meta nevrátila denný prehľad výdavkov.');
     for(const r of data.data){
       if(r.account_id!==metaAccount||r.account_currency!=='EUR'||!id(r.campaign_id)||typeof r.campaign_name!=='string'||r.campaign_name.length>400||!days.includes(r.date_start)||r.date_stop!==r.date_start||typeof r.publisher_platform!=='string'||!/^\w{1,40}$/.test(r.publisher_platform))throw new HttpError(502,'Meta vrátila neplatné alebo neporovnateľné riadky výdavkov.');
@@ -76,7 +84,7 @@ async function insights(env,from,to,days,signal){
       if(keys.has(key))throw new HttpError(502,'Meta vrátila duplicitný riadok výdavkov.');keys.add(key);
       // Missing/malformed impressions must not corrupt or suppress valid costs.
       const impressions=count(r.impressions);
-      rows.push({day:r.date_start,campaign:r.campaign_id,name:r.campaign_name,platform:r.publisher_platform,cents:spendCents(r.spend),amount:r.spend,impressions});
+      rows.push({day:r.date_start,campaign:r.campaign_id,name:r.campaign_name,platform:r.publisher_platform,cents:spendCents(r.spend),amount:r.spend,impressions,linkClicks:count(r.inline_link_clicks),outboundClicks:actionCount(r.outbound_clicks,'outbound_click'),landingViews:actionCount(r.actions,'landing_page_view')});
     }
     if(rows.length>5000)throw new HttpError(502,'Prehľad je príliš veľký; vyberte kratší rozsah.');
     if(!data.paging?.next)break;
@@ -130,6 +138,9 @@ export async function syncMetaAds(env,input={},at=Date.now(),{automatic=false}={
     statements.push(db.prepare('DELETE FROM meta_ads_impressions WHERE day>=? AND day<=?').bind(from,to));
     for(let i=0;i<rows.length;i+=100)statements.push(db.prepare(`INSERT INTO meta_ads_impressions SELECT json_extract(value,'$.day'),json_extract(value,'$.campaign'),json_extract(value,'$.platform'),json_extract(value,'$.impressions') FROM json_each(?) WHERE json_extract(value,'$.impressions') IS NOT NULL`).bind(JSON.stringify(rows.slice(i,i+100))));
     statements.push(db.prepare(`INSERT INTO meta_ads_impression_days SELECT value,? FROM json_each(?) WHERE 1 ON CONFLICT(day) DO UPDATE SET synced_at=excluded.synced_at`).bind(rows.every(r=>r.impressions!==null)?at:null,JSON.stringify(days)));
+    statements.push(db.prepare('DELETE FROM meta_ads_traffic WHERE day>=? AND day<=?').bind(from,to));
+    for(let i=0;i<rows.length;i+=100)statements.push(db.prepare(`INSERT INTO meta_ads_traffic SELECT json_extract(value,'$.day'),json_extract(value,'$.campaign'),json_extract(value,'$.platform'),json_extract(value,'$.linkClicks'),json_extract(value,'$.outboundClicks'),json_extract(value,'$.landingViews') FROM json_each(?)`).bind(JSON.stringify(rows.slice(i,i+100))));
+    statements.push(db.prepare(`INSERT INTO meta_ads_traffic_days SELECT value,? FROM json_each(?) WHERE 1 ON CONFLICT(day) DO UPDATE SET synced_at=excluded.synced_at`).bind(at,JSON.stringify(days)));
     statements.push(db.prepare(`UPDATE meta_ads_state SET currency='EUR',timezone=?,last_success_at=?,last_error=NULL,lock_token=NULL,lock_until=0 WHERE id=1 AND lock_token=?`).bind(account.timezone_name,at,token));
     statements.push(db.prepare('DELETE FROM meta_ads_reach WHERE last_attempt_at<? AND lock_until<=?').bind(at-90*day,at));
     // Complete range replacement and coverage are a single D1 transaction.
@@ -146,7 +157,8 @@ export async function scheduledMetaAds(env,at=Date.now()){
   const today=localDate(at);
   const state=await first(env.TQ_DB,'SELECT last_success_at FROM meta_ads_state WHERE id=1');
   const impressions=await first(env.TQ_DB,'SELECT 1 FROM meta_ads_impression_days WHERE synced_at IS NOT NULL LIMIT 1');
-  try{return await syncMetaAds(env,{from:shift(today,state.last_success_at&&impressions?-6:-29),to:today},at,{automatic:true});}
+  const traffic=await first(env.TQ_DB,'SELECT 1 FROM meta_ads_traffic_days LIMIT 1');
+  try{return await syncMetaAds(env,{from:shift(today,state.last_success_at&&impressions&&traffic?-6:-29),to:today},at,{automatic:true});}
   catch{return {failed:true};} // The sanitized failure is visible in the admin report.
 }
 export async function saveMetaCampaign(env,input){
@@ -210,6 +222,32 @@ export async function metaImpressionsReport(env,f,costReport,at=Date.now()){
   for(const row of selected){result.total+=row.impressions;result[['facebook','instagram'].includes(row.platform)?row.platform:'other']+=row.impressions;}
   if(!Number.isSafeInteger(result.total))return unavailable('Počet zobrazení je mimo podporovaného číselného rozsahu.');
   return result;
+}
+
+export async function metaTrafficReport(env,f,costReport,at=Date.now()){
+  const unavailable=reason=>({total:null,platforms:[],days:[],syncedAt:null,reason});
+  const scopeReason=metaScopeReason(env,f,costReport);
+  if(scopeReason)return unavailable(scopeReason);
+  const coverage=await query(env.TQ_DB,'SELECT * FROM meta_ads_traffic_days WHERE day>=? AND day<=?',f.from,f.to);
+  if(coverage.length!==dates(f.from,f.to).length)return unavailable('Pre časť obdobia chýba import kliknutí a LPV. Použite existujúce obnovenie Meta údajov za obdobie. Staré výdavky nepreukazujú tieto metriky.');
+  const platform=f.source==='facebook_ads'?'facebook':f.source==='instagram_ads'?'instagram':'';
+  const rows=(await query(env.TQ_DB,`SELECT s.*,i.impressions,t.link_clicks,t.outbound_clicks,t.landing_views,p.amount,coalesce(m.utm_campaign,s.campaign_id) utm
+    FROM meta_ads_spend s LEFT JOIN meta_ads_traffic t USING(day,campaign_id,platform)
+    LEFT JOIN meta_ads_impressions i USING(day,campaign_id,platform) LEFT JOIN meta_ads_spend_amounts p USING(day,campaign_id,platform)
+    LEFT JOIN meta_ads_campaigns m USING(campaign_id) WHERE s.day>=? AND s.day<=?${platform?' AND s.platform=?':''}`,
+    f.from,f.to,...(platform?[platform]:[]))).filter(r=>!f.campaign||r.utm===f.campaign);
+  const aggregate=selected=>({
+    ...Object.fromEntries(['impressions','link_clicks','outbound_clicks','landing_views'].map(k=>{
+      const total=selected.reduce((n,r)=>n+(r[k]||0),0);
+      return [k,selected.some(r=>r[k]==null)||!Number.isSafeInteger(total)?null:total];
+    })),
+    spendCents:centsFromUnits(selected.reduce((n,r)=>n+(r.amount==null?BigInt(r.spend_cents)*centScale:spendUnits(r.amount)),0n))
+  });
+  const labels={facebook:'Facebook',instagram:'Instagram',audience_network:'Audience Network',messenger:'Messenger',threads:'Threads'};
+  const platforms=[...new Set(['facebook','instagram',...rows.map(r=>r.platform)])].filter(p=>!platform||p===platform).map(p=>({platform:p,label:labels[p]||p,...aggregate(rows.filter(r=>r.platform===p))}));
+  return {total:aggregate(rows),platforms,days:dates(f.from,f.to).map(date=>({date,...aggregate(rows.filter(r=>r.day===date))})),
+    syncedAt:Math.min(...coverage.map(r=>r.synced_at)),stale:!!costReport.ads.error||coverage.some(r=>r.day===localDate(at)&&at-r.synced_at>2*hour),partial:f.to===localDate(at),
+    reason:'Meta Ads Insights, rovnaký denný import a predvolené atribučné nastavenia API. LPV = landing_page_view; omni_landing_page_view nepripočítavame. Akcia nevrátená v úspešnom riedkom zozname Meta znamená 0; chybná hodnota je Neznáme. Dnešok je priebežný.'};
 }
 
 function metaScopeReason(env,f,costReport){
