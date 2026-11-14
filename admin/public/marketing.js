@@ -8,6 +8,10 @@ const overviewMoney=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-S
 const date=value=>value==null?'Zatiaľ nezaznamenané':new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Bratislava'}).format(value);
 const calendarDate=value=>new Intl.DateTimeFormat('sk-SK',{dateStyle:'medium',timeZone:'Europe/Bratislava'}).format(value);
 const clock=value=>new Intl.DateTimeFormat('sk-SK',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Bratislava'}).format(value);
+const metaTime=value=>{
+  const parts=Object.fromEntries(new Intl.DateTimeFormat('sk-SK',{day:'numeric',month:'numeric',hour:'numeric',minute:'2-digit',hourCycle:'h23',timeZone:'Europe/Bratislava'}).formatToParts(value).map(p=>[p.type,p.value]));
+  return `${parts.day}.${parts.month} ${parts.hour}:${parts.minute}`;
+};
 const compactRange=(from,to,year)=>{
   const day=(value,withYear=false)=>`${Number(value.slice(8))}. ${Number(value.slice(5,7))}.${withYear?' '+value.slice(0,4):''}`;
   if(from===to)return day(from,from.slice(0,4)!==year);
@@ -38,33 +42,40 @@ const open=id=>ui.open.has(id)?' open':'';
 const disclosure=(id,label,content,extra='')=>`<details class="marketing-disclosure ${extra}" id="marketing-${id}" data-marketing-detail="${id}"${open(id)}><summary id="marketing-summary-${id}">${label}<span aria-hidden="true">⌄</span></summary><div class="marketing-disclosure-body">${content}</div></details>`;
 const kpi=(id,label,value,context,note,href,tone='')=>`<details class="marketing-kpi ${tone}" data-marketing-detail="kpi-${id}"${open('kpi-'+id)}><summary id="marketing-kpi-${id}"><span class="marketing-kpi-label">${label}<span class="marketing-info" aria-hidden="true">i</span><span class="sr-only"> · definícia metriky</span></span><strong${value==='Nedostupné'?' class="is-unavailable"':''}>${href?`<a class="marketing-purchase-link" href="${esc(href)}" aria-label="Zobraziť ${esc(value)} platených nákupov s rovnakými filtrami" title="Otvoriť zodpovedajúce platby">${esc(value)}</a>`:esc(value)}</strong><small>${esc(context)}</small></summary><p>${esc(note)}</p></details>`;
 const metric=(id,label,value,note,extra='',content='')=>`<details class="marketing-metric ${extra}" data-marketing-detail="metric-${id}"${open('metric-'+id)}><summary id="marketing-metric-${id}"><span>${label}<span class="marketing-info" aria-hidden="true">i</span></span><strong>${esc(value)}</strong></summary><p>${esc(note)}</p>${content}</details>`;
-function funnelStep(id,label,data,context,note,reference,href){
+function funnelStep(id,label,data,context,note,reference,href,impressions){
+  const reach=id==='impressions';
   const value=num(data.total),tags=[['facebook','FB'],['instagram','IG'],['other','Ost.']];
-  const known=data.total!=null&&tags.every(([key])=>Number.isFinite(data[key])&&data[key]>=0)&&tags.reduce((sum,[key])=>sum+data[key],0)===data.total;
+  const known=data.total!=null&&(reach||tags.every(([key])=>Number.isFinite(data[key])&&data[key]>=0)&&tags.reduce((sum,[key])=>sum+data[key],0)===data.total);
   const width=known&&data.total>0&&reference>0?Math.min(100,data.total/reference*100):0;
-  const bars=width?tags.filter(([key])=>data[key]>0).map(([key])=>`<span class="marketing-source-segment funnel-source-${key}" style="width:${data[key]/data.total*100}%"><span>${num(data[key])}</span></span>`).join(''):'';
-  const description=known?tags.map(([key,name])=>name+': '+num(data[key])).join(' · '):'Rozdelenie zdrojov je nedostupné';
+  const bars=width?(reach?'<span class="marketing-reach-fill"></span>':tags.filter(([key])=>data[key]>0).map(([key])=>`<span class="marketing-source-segment funnel-source-${key}" style="width:${data[key]/data.total*100}%"><span>${num(data[key])}</span></span>`).join('')):'';
+  const description=reach?'Reach: '+value:known?tags.map(([key,name])=>name+': '+num(data[key])).join(' · '):'Rozdelenie zdrojov je nedostupné';
   const content=`<span class="marketing-source-strip" role="img" aria-label="${esc(description)}"><span class="marketing-source-track${!known?' is-unavailable':''}"${width?` style="width:${width}%;min-width:4px"`:''}>${bars}</span></span>`;
-  const counts=`<span class="marketing-source-counts">${tags.map(([key,name])=>`<span data-funnel-source="${key}"><i class="funnel-source-${key}" aria-hidden="true"></i>${name} <b>${known?num(data[key]):'Nedostupné'}</b></span>`).join('')}</span>`;
-  const scaleNote=id==='impressions'?'Zobrazenia reklamy majú samostatnú mierku.':'Dĺžka voči najväčšiemu dostupnému webovému kroku; ide o objemy, nie spoločnú kohortu.';
-  return `<details class="marketing-kpi marketing-funnel-step" data-marketing-detail="kpi-${id}"${open('kpi-'+id)}><summary id="marketing-kpi-${id}"><span class="marketing-kpi-label">${label}<span class="marketing-info${data.partial?' is-partial':''}" aria-hidden="true">i</span><span class="sr-only"> · definícia metriky a atribúcie${data.partial?' · čiastočné meranie':''}</span></span>${content}<strong${data.total==null?' class="is-unavailable"':''}>${href?`<a class="marketing-purchase-link" href="${esc(href)}" aria-label="Zobraziť ${esc(value)} platených nákupov s rovnakými filtrami">${value}</a>`:value}</strong></summary><div class="marketing-step-detail"><p>${esc(context+'. '+note+' '+(data.reason||''))}${data.partial?' Dostupná je iba čiastočná alebo priebežná časť merania.':''} ${scaleNote} Minimálna viditeľná dĺžka 4 px môže zväčšiť veľmi malé hodnoty.</p>${counts}</div></details>`;
+  const sourceData=reach?impressions:data,sourceKnown=sourceData?.total!=null;
+  const counts=`${reach?'<div>Rozpis impressions podľa platformy (samostatný denný import):</div>':''}<span class="marketing-source-counts">${tags.map(([key,name])=>`<span data-funnel-source="${key}"><i class="funnel-source-${key}" aria-hidden="true"></i>${name} <b>${sourceKnown?num(sourceData[key]):'Nedostupné'}</b></span>`).join('')}</span>`;
+  const scaleNote=reach?'Reach má samostatnú mierku a jednotnú farbu: dosahy FB/IG sa pre prekrývajúce sa publikum nesčítavajú.':'Dĺžka voči najväčšiemu dostupnému webovému kroku; ide o objemy, nie spoločnú kohortu.';
+  const heading=`<span class="marketing-kpi-label">${label}<span class="marketing-info${data.partial||data.stale?' is-partial':''}" aria-hidden="true">i</span><span class="sr-only"> · definícia metriky a atribúcie${data.partial?' · čiastočné meranie':''}</span></span>`;
+  const timestamp=reach?`<small class="marketing-meta-time${data.stale?' is-stale':''}" title="${esc(data.stale?data.reason:'Údaje Meta · '+date(data.syncedAt)+' · Bratislava')}">${data.syncedAt?`<time datetime="${new Date(data.syncedAt).toISOString()}">${metaTime(data.syncedAt)}</time>${data.stale?' · staršie':''}`:'Čaká na Meta'}</small>`:'';
+  const total=`<strong${data.total==null?' class="is-unavailable"':''}>${href?`<a class="marketing-purchase-link" href="${esc(href)}" aria-label="Zobraziť ${esc(value)} platených nákupov s rovnakými filtrami">${value}</a>`:value}</strong>`;
+  const amount=reach?`<span class="marketing-funnel-value">${total}<small class="marketing-impressions-count"${data.impressions==null&&impressions?.syncedAt?` title="${esc('Samostatný import impressions: '+date(impressions.syncedAt))}"`:''}>${num(data.impressions??impressions?.total)} impressions</small></span>`:total;
+  return `<details class="marketing-kpi marketing-funnel-step" data-marketing-detail="kpi-${id}"${open('kpi-'+id)}><summary id="marketing-kpi-${id}">${reach?`<span class="marketing-funnel-label">${heading}${timestamp}</span>`:heading}${content}${amount}</summary><div class="marketing-step-detail"><p>${esc(context+'. '+note+' '+(data.reason||''))}${data.partial?' Dostupná je iba čiastočná alebo priebežná časť merania.':''} ${scaleNote} Minimálna viditeľná dĺžka 4 px môže zväčšiť veľmi malé hodnoty.</p>${counts}</div></details>`;
 }
 function overviewMetrics(d){
   const p=d.periodMetrics,m=d.metrics,u=d.uniqueMetrics,unique=ui.overviewUnique,f=d.funnel;
   const conversionNote=unique?(u.conversionReason||`Unikátne prehliadače s priradeným plateným nákupom / unikátne prehliadače návštevnej kohorty (${num(u.buyers)} / ${num(u.visits)}). Viac nákupov jedného prehliadača sa v tomto pomere počíta raz. Nákupy a tržby vedľa zostávajú overenými transakciami za celé obdobie. ${u.partial?'Iba identifikovaná časť návštev.':''}`):(d.conversionReason||`Nákupy priradené nameraným návštevám / tieto návštevy. ${d.partialPeriod?'Iba nameraná časť obdobia od '+date(d.observedStart)+'.':'Celá zvolená návštevná kohorta.'}`);
   const visits=unique?f.uniqueVisits:f.visits,checkouts=unique?f.uniqueCheckouts:f.checkouts;
-  // Impressions have their own scale; web volumes share a reference, never a drop-off rate.
+  // Reach has its own scale; web volumes share a reference, never a drop-off rate.
   const webReference=Math.max(visits.total||0,checkouts.total||0,f.purchases.total||0);
   const profit=m.revenueCents!=null&&d.costs!=null?m.revenueCents-d.costs:null;
-  const adsContext=f.impressions.syncedAt?'Meta · '+clock(f.impressions.syncedAt)+(f.impressions.partial?' · priebežné':''):'Meta · bez údajov';
-  const steps=funnelStep('impressions','Zobrazenia',f.impressions,adsContext,'Zobrazenia reklamy podľa Meta publisher_platform. Posledný úplný import: '+date(f.impressions.syncedAt)+'. Nejde o unikátnych ľudí ani návštevy.',f.impressions.total)
+  const reach=f.reach||{total:null,impressions:null,syncedAt:null,reason:'Reach zatiaľ nebol načítaný.'};
+  const adsContext=reach.syncedAt?'Meta · '+date(reach.syncedAt)+(reach.partial?' · priebežné':''):'Meta · bez údajov';
+  const steps=funnelStep('impressions','Reach',reach,adsContext,'Dosah reklamy za celé obdobie. Impressions pod počtom zahŕňajú aj opakované zobrazenia.',reach.total,null,f.impressions)
     +funnelStep('visits','Stránka',visits,(unique?'Unikátne prehliadače':'Návštevy webu')+(visits.partial?' · čiastočné':''),'Návštevné relácie podľa začiatku v období; nie všetky zobrazenia alebo obnovenia stránky. '+(!d.collectionEnabled?'Zber je vypnutý; ide o historické záznamy.':''),webReference)
     +funnelStep('checkout','Checkout',checkouts,'Platobné pokusy: '+num(p.attempts),'Zaznamenané otvorenia stránky checkoutu v období; opakované otvorenia meriame od '+date(d.checkoutOpensStartedAt)+'. Platobný pokus je vytvorená Stripe relácia, nie potvrdenie banky.',webReference)
     +funnelStep('purchases','Nákupy',f.purchases,'Platené · zdarma '+num(p.freePurchases),'Počet overených zaplatených transakcií sa pri prepnutí unikátneho režimu nemení. Bezplatné objednávky nevstupujú do platených nákupov ani konverzie.',webReference,paymentLink(d));
   const legend=`<p class="marketing-funnel-legend"><span><i class="funnel-source-facebook" aria-hidden="true"></i>FB Ads</span><span><i class="funnel-source-instagram" aria-hidden="true"></i>IG Ads</span><span><i class="funnel-source-other" aria-hidden="true"></i>Ostatné / neznáme</span></p>`;
   return `<div class="marketing-steps" aria-label="Reklama, návšteva, checkout a nákup">${steps}</div>${legend}<div class="marketing-results">`+kpi('conversion','Konverzia',pct(unique?u.conversion:m.conversion),unique?'Kupujúci / prehliadače':'Nákupy z návštev / návštevy',conversionNote)
-    +kpi('revenue','Tržby',overviewMoney(m.revenueCents),d.costs==null?'Reklama: Nedostupné':'Reklama − '+overviewMoney(d.costs),'Hrubé inkaso pred refundáciami, poplatkami a reklamnými nákladmi, podľa dátumu overenej úhrady. '+(d.costReason||'Reklamné náklady sa vykazujú samostatne; nejde o zisk.'))
-    +kpi('profit','Zisk',overviewMoney(profit),'Tržby − reklama','Hrubé tržby mínus reklamné náklady v pôvodných centoch, za rovnaké obdobie a filtre. Nejde o čistý účtovný zisk; refundácie, platobné poplatky ani iné náklady sa tu neodpočítavajú. '+(d.costReason||''),null,profit>0?'is-positive':profit<0?'is-negative':'')+`</div>`;
+    +kpi('revenue','Tržby',overviewMoney(m.revenueCents),d.costs==null?'Reklama: Nedostupné':'Reklama − '+overviewMoney(d.costs)+(d.ads?.stale?' · staršie údaje':''),'Hrubé inkaso pred refundáciami, poplatkami a reklamnými nákladmi, podľa dátumu overenej úhrady. '+(d.costReason||'Reklamné náklady sa vykazujú samostatne; nejde o zisk.'))
+    +kpi('profit','Zisk',overviewMoney(profit),'Tržby − reklama'+(d.ads?.stale?' · staršie údaje':''),'Hrubé tržby mínus reklamné náklady v pôvodných centoch, za rovnaké obdobie a filtre. Nejde o čistý účtovný zisk; refundácie, platobné poplatky ani iné náklady sa tu neodpočítavajú. '+(d.costReason||''),null,profit>0?'is-positive':profit<0?'is-negative':'')+`</div>`;
 }
 const sourceColumns=[['label','Zdroj'],['visits','Návštevy'],['purchases','Nákupy z návštev'],['conversion','Konverzia']];
 export function groupedSources(d){

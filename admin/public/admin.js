@@ -363,7 +363,6 @@ async function load({syncMeta}={}){
       const button=$('#refresh-marketing');if(button)button.textContent='Načítavam Meta…';
       try{
         await api('/api/admin/marketing/ads/sync',null,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(syncMeta)});
-        metaMessage='Údaje Meta boli obnovené.';
       }catch(error){metaMessage='Meta sa nepodarilo obnoviť: '+error.message;}
       if(id!==loadingId)return;
     }

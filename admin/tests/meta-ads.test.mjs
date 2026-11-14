@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {fresh,LocalD1} from './support.mjs';
 import {readFile,readdir} from 'node:fs/promises';
 import {first,query,execute} from '../src/db.mjs';
-import {syncMetaAds,scheduledMetaAds,metaAdsReport,metaImpressionsReport,saveMetaCampaign,metaAccount,spendCents} from '../src/meta-ads.mjs';
+import {syncMetaAds,scheduledMetaAds,metaAdsReport,metaImpressionsReport,metaReachReport,saveMetaCampaign,metaAccount,spendCents} from '../src/meta-ads.mjs';
 import {marketingFilters,midnight} from '../src/marketing-query.mjs';
 import worker from '../src/worker.mjs';
-const at=Date.parse('2026-11-10T12:00:00Z'),day=86400000;
+const at=Date.parse('2026-11-10T12:00:00Z'),day=86400000,hour=3600000;
 const range={from:'2026-11-09',to:'2026-11-10'};
 const row=(extra={})=>({account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Launch',date_start:'2026-11-10',date_stop:'2026-11-10',publisher_platform:'facebook',spend:'12.34',...extra});
 function api(rows=[row()],options={}){
@@ -43,7 +43,7 @@ test('failed second page preserves old spend and coverage; provider errors expos
   env.META_ADS_FETCH=api([],{insights:url=>Response.json(url.searchParams.has('after')?{error:{code:190,error_subcode:463,message:'private token test-token-never-in-url'}}:{data:[row({spend:'99.99'})],paging:{next:'https://graph.facebook.com/next',cursors:{after:'two'}}},{status:url.searchParams.has('after')?400:200})}).fetch;
   await assert.rejects(syncMetaAds(env,range,at+61000),e=>e.status===502&&/190 \/ 463/.test(e.message)&&!e.message.includes('test-token'));
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);assert.deepEqual(await query(db,'SELECT * FROM meta_ads_days'),before);
-  const report=await metaAdsReport(env,filters(),collection,at+62000);assert.equal(report.costs,null);assert.match(report.costReason,/190/);assert.ok(!JSON.stringify(report).includes(env.META_ADS_ACCESS_TOKEN));
+  const report=await metaAdsReport(env,filters(),collection,at+62000);assert.equal(report.costs,1234);assert.equal(report.ads.stale,true);assert.equal(report.cac,null);assert.match(report.costReason,/190/);assert.ok(!JSON.stringify(report).includes(env.META_ADS_ACCESS_TOKEN));
  }finally{db.close();}
 });
 test('a transient malformed spend retries the entire read once without retaining rejected pages',async()=>{
@@ -52,7 +52,7 @@ test('a transient malformed spend retries the entire read once without retaining
   env.META_ADS_FETCH=api([],{insights:url=>{
    cursors.push(url.searchParams.get('after'));
    if(cursors.length===1)return Response.json({data:[row({spend:'99.99'})],paging:{next:'https://graph.facebook.com/next',cursors:{after:'second-page'}}});
-   if(cursors.length===2)return Response.json({data:[row({publisher_platform:'instagram',spend:'0.091'})]});
+   if(cursors.length===2)return Response.json({data:[row({publisher_platform:'instagram',spend:'invalid'})]});
    return Response.json({data:[row({spend:'0.73',impressions:'107'}),row({publisher_platform:'instagram',spend:'0.09',impressions:'13'})]});
   }}).fetch;
   await syncMetaAds(env,range,at);
@@ -73,7 +73,7 @@ test('wrong account, currency, timezone, duplicate rows, invalid amounts and bro
  for(const options of [
   {account:{account_id:'999'}},{account:{currency:'USD'}},{account:{timezone_name:'America/Los_Angeles'}},
   {insights:()=>Response.json({data:[row(),row()]})},
-  {insights:()=>Response.json({data:[row({spend:'1.234'})]})},
+  {insights:()=>Response.json({data:[row({spend:'1.2.3'})]})},
   {insights:()=>Response.json({data:[row({account_id:'999'})]})},
   {insights:()=>Response.json({data:[row({date_start:'2026-11-08',date_stop:'2026-11-08'})]})},
   {insights:()=>Response.json({data:[row()],paging:{next:'https://other.invalid'}})}
@@ -90,7 +90,7 @@ test('the shared import deadline interrupts the retry pause without a second req
   let reads=0;
   env.META_ADS_FETCH=api([],{insights:()=>{
    reads++;setTimeout(()=>controller.abort(),25);
-   return Response.json({data:[row({spend:'0.123'})]});
+   return Response.json({data:[row({spend:'invalid'})]});
   }}).fetch;
   await assert.rejects(syncMetaAds(env,range,at+61000),error=>error.status===502&&/časový limit/.test(error.message));
   assert.equal(reads,1);
@@ -128,12 +128,14 @@ test('token paste trims outer whitespace but rejects embedded whitespace before 
 test('a D1 write failure rolls back range replacement and coverage together',async()=>{
  const {db,env}=setup();try{
   await syncMetaAds(env,range,at);
+  const amounts=await query(db,'SELECT * FROM meta_ads_spend_amounts');
   db.sqlite.exec("CREATE TRIGGER fail_meta_coverage BEFORE INSERT ON meta_ads_days BEGIN SELECT RAISE(ABORT,'private database failure'); END");
   env.META_ADS_FETCH=api([row({spend:'99.99'})]).fetch;
   await assert.rejects(syncMetaAds(env,range,at+61000),e=>e.status===502&&!e.message.includes('private database'));
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);
   assert.equal((await first(db,'SELECT min(synced_at) n FROM meta_ads_days')).n,at);
   assert.equal((await first(db,'SELECT last_success_at FROM meta_ads_state')).last_success_at,at);
+  assert.deepEqual(await query(db,'SELECT * FROM meta_ads_spend_amounts'),amounts);
  }finally{db.close();}
 });
 test('concurrent imports and automatic retries are bounded without disturbing a successful run',async()=>{
@@ -151,10 +153,10 @@ test('concurrent imports and automatic retries are bounded without disturbing a 
 test('failed scheduled imports retry after ten minutes and successful imports return to hourly refreshes',async()=>{
  const {db,env}=setup();try{
   await syncMetaAds(env,range,at);
-  env.META_ADS_FETCH=api([row({spend:'0.123456'})]).fetch;
+  env.META_ADS_FETCH=api([row({spend:'invalid'})]).fetch;
   const failedAt=at+3600000;
   assert.deepEqual(await scheduledMetaAds(env,failedAt),{failed:true});
-  assert.match((await first(db,'SELECT last_error FROM meta_ads_state')).last_error,/6 desatinných miest/);
+  assert.match((await first(db,'SELECT last_error FROM meta_ads_state')).last_error,/nepodporovaný text/);
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1234);
   const recovery=api([row({spend:'0.82',impressions:'120'})]);env.META_ADS_FETCH=recovery.fetch;
   assert.deepEqual(await scheduledMetaAds(env,failedAt+599999),{skipped:true});assert.equal(recovery.calls.length,0);
@@ -195,7 +197,7 @@ test('unknown costs, partial collection, missing mapping, platform and unsupport
   const fb=await visit(db);await paid(db,fb);
   for(const extra of [{device:'mobile'},{product:'game'},{source:'facebook'},{source:'meta'},{campaign:'unmapped'}]){const r=await metaAdsReport(env,filters(extra),collection,at);assert.equal(r.costs,null);assert.equal(r.cac,null);}
   let r=await metaAdsReport(env,marketingFilters(new URLSearchParams({period:'14'}),at),collection,at);assert.equal(r.costs,null);assert.match(r.costReason,/chýba úspešný import/);
-  r=await metaAdsReport(env,filters(),collection,at+3*3600000);assert.equal(r.costs,null);assert.match(r.costReason,/staršie/);
+  r=await metaAdsReport(env,filters(),collection,at+3*3600000);assert.equal(r.costs,1234);assert.equal(r.ads.stale,true);assert.match(r.costReason,/staršie/);
   for(const c of [{...collection,enabled:false},{...collection,startedAt:midnight(range.from)+1},{...collection,lastEventAt:null}]){r=await metaAdsReport(env,filters(),c,at);assert.equal(r.costs,1234);assert.equal(r.cac,null);}
   await visit(db,'facebook_ads','unmapped');r=await metaAdsReport(env,filters(),collection,at);assert.equal(r.cac,null);assert.match(r.cacReason,/priradenie/);
   env.META_ADS_FETCH=api([row({publisher_platform:'audience_network'})]).fetch;await syncMetaAds(env,range,at+61000);r=await metaAdsReport(env,filters(),collection,at+62000);assert.equal(r.costs,1234);assert.equal(r.cac,null);assert.match(r.cacReason,/iným Meta platformám/);
@@ -235,7 +237,7 @@ test('impressions reuse the spend import, require their own coverage and respect
   for(const filter of [{source:'facebook'},{device:'mobile'},{product:'books'},{campaign:'unmapped'}]){
    const f=filters(filter);assert.equal((await metaImpressionsReport(env,f,await metaAdsReport(env,f,collection,at+62000),at+62000)).total,null);
   }
-  const stale=await metaAdsReport(env,filters(),collection,at+3*3600000);assert.equal((await metaImpressionsReport(env,filters(),stale,at+3*3600000)).total,null);
+  const stale=await metaAdsReport(env,filters(),collection,at+3*3600000),saved=await metaImpressionsReport(env,filters(),stale,at+3*3600000);assert.equal(saved.total,110);assert.equal(saved.stale,true);assert.equal(saved.syncedAt,at+61000);
   const fields=mock.calls.find(c=>c.url.pathname.endsWith('/insights')).url.searchParams.get('fields');assert.ok(fields.split(',').includes('impressions'));
   env.META_ADS_FETCH=api([]).fetch;await syncMetaAds(env,range,at+122000);
   costs=await metaAdsReport(env,filters(),collection,at+123000);
@@ -280,4 +282,111 @@ test('impression migration preserves existing amounts and remains compatible wit
   await execute(db,'INSERT INTO meta_ads_days VALUES(?,?)','2026-11-09',at);
   assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,1334);
  }finally{db.close();}
+});
+
+test('real six-decimal Meta amounts import once; selected sums round once without floating point drift',async()=>{
+ const {db,env,mock}=setup([
+  row({spend:'0.290694',impressions:'163',publisher_platform:'audience_network'}),
+  row({spend:'2.482083',impressions:'102'}),
+  row({spend:'0.268333',impressions:'14',publisher_platform:'instagram'})
+ ]);try{
+  await syncMetaAds(env,range,at);
+  assert.equal(mock.calls.length,2,'valid fractional cents never trigger a retry');
+  assert.equal((await metaAdsReport(env,filters(),collection,at)).costs,304);
+  assert.equal((await metaImpressionsReport(env,filters(),await metaAdsReport(env,filters(),collection,at),at)).total,279);
+  assert.deepEqual((await query(db,'SELECT amount FROM meta_ads_spend_amounts ORDER BY platform')).map(r=>r.amount),['0.290694','2.482083','0.268333']);
+  env.META_ADS_FETCH=api([row({spend:'0.004'}),row({spend:'0.004',publisher_platform:'instagram'})]).fetch;
+  await syncMetaAds(env,range,at+61000);
+  assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,0);
+  assert.equal((await metaAdsReport(env,filters(),collection,at+62000)).costs,1,'0.004 + 0.004 rounds to one cent after summing');
+  assert.equal((await metaAdsReport(env,filters({source:'facebook_ads'}),collection,at+62000)).costs,0,'a platform filter rounds only its selected amount');
+  for(const [amount,cents]of [['0.005',1],['1.005',101],['0.00499999999999999999',0],['999999999999.99999999999999999999',100000000000000]])assert.equal(spendCents(amount),cents);
+  env.META_ADS_FETCH=api([]).fetch;await syncMetaAds(env,range,at+122000);
+  assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_spend_amounts')).n,0);
+ }finally{db.close();}
+});
+
+test('transient Meta HTTP failures retry, retain all saved metrics on failure and recover automatically',async()=>{
+ const {db,env}=setup([row({impressions:'100'})]);try{
+  await syncMetaAds(env,range,at);
+  let attempts=0;
+  env.META_ADS_FETCH=api([],{insights:()=>++attempts===1?Response.json({error:{code:2,is_transient:true}},{status:503}):Response.json({data:[row({spend:'0.123456',impressions:'110'})]})}).fetch;
+  await syncMetaAds(env,range,at+61000);assert.equal(attempts,2);
+  env.META_ADS_FETCH=async()=>Response.json({error:{code:190,error_subcode:463,message:'private token test-token-never-in-url'}},{status:400});
+  await assert.rejects(syncMetaAds(env,range,at+122000));
+  const report=await metaAdsReport(env,filters(),collection,at+123000),impressions=await metaImpressionsReport(env,filters(),report,at+123000);
+  assert.equal(report.costs,12);assert.equal(report.ads.stale,true);assert.equal(report.ads.syncedAt,at+61000);
+  assert.equal(impressions.total,110);assert.equal(impressions.stale,true);assert.equal(impressions.syncedAt,at+61000);
+  assert.ok(!JSON.stringify({report,impressions}).includes('test-token'));
+  env.META_ADS_FETCH=api([row({spend:'0.234567',impressions:'120'})]).fetch;
+  assert.equal((await scheduledMetaAds(env,at+722000)).imported,true);
+  const fresh=await metaAdsReport(env,filters(),collection,at+723000);
+  assert.equal(fresh.ads.stale,false);assert.equal(fresh.ads.error,null);assert.equal(fresh.costs,23);
+ }finally{db.close();}
+});
+
+function reachApi(total='75',impressions='180'){
+ const calls=[];
+ return {calls,fetch:async(url,init)=>{
+  calls.push({url:new URL(url),init});
+  const {since,until}=JSON.parse(url.searchParams.get('time_range'));
+  return Response.json({data:total===null?[]:[{account_id:metaAccount,date_start:since,date_stop:until,reach:total,impressions}]});
+ }};
+}
+const reachCosts=(extra={})=>({ads:{campaigns:[],lastSuccessAt:null,...extra}});
+test('Reach uses one deduplicated account-level query over the exact range and caches it',async()=>{
+ const {db,env}=setup(),mock=reachApi();env.META_ADS_FETCH=mock.fetch;
+ try{
+  const r=await metaReachReport(env,filters(),reachCosts(),at);
+  assert.equal(r.total,75);assert.equal(r.impressions,180);assert.equal(r.syncedAt,at);assert.equal(r.stale,false);
+  assert.equal(mock.calls.length,1);
+  const {url,init}=mock.calls[0];assert.equal(url.searchParams.get('level'),'account');
+  assert.equal(url.searchParams.has('time_increment'),false);assert.equal(url.searchParams.has('breakdowns'),false);
+  assert.deepEqual(JSON.parse(url.searchParams.get('time_range')),{since:range.from,until:range.to});
+  assert.equal(init.headers.Authorization,'Bearer '+env.META_ADS_ACCESS_TOKEN);assert.ok(!url.href.includes(env.META_ADS_ACCESS_TOKEN));
+  assert.equal((await metaReachReport(env,filters(),reachCosts(),at+30000)).total,75);assert.equal(mock.calls.length,1);
+  await metaReachReport(env,filters(),reachCosts({lastSuccessAt:at+61000}),at+62000);assert.equal(mock.calls.length,2,'a successful manual/cron import invalidates an older Reach snapshot');
+  await metaReachReport(env,filters(),reachCosts({lastSuccessAt:at+61000}),at+63000);assert.equal(mock.calls.length,2);
+ }finally{db.close();}
+});
+test('Reach isolates dates, platforms and all mapped campaign IDs without summing overlapping audiences',async()=>{
+ const {db,env}=setup(),mock=reachApi();env.META_ADS_FETCH=mock.fetch;
+ const costs=reachCosts({campaigns:[{id:'123',utm:'launch'},{id:'456',utm:'launch'}]});
+ try{
+  await metaReachReport(env,filters({campaign:'launch',source:'instagram_ads'}),costs,at);
+  assert.deepEqual(JSON.parse(mock.calls[0].url.searchParams.get('filtering')),[{field:'publisher_platform',operator:'IN',value:['instagram']},{field:'campaign.id',operator:'IN',value:['123','456']}]);
+  await metaReachReport(env,filters({campaign:'launch',source:'facebook_ads'}),costs,at);
+  await metaReachReport(env,filters(),costs,at);
+  await metaReachReport(env,filters({from:range.to}),costs,at);assert.equal(mock.calls.length,4);
+  for(const filter of [{device:'mobile'},{product:'game'},{source:'facebook'},{campaign:'unknown'}])assert.equal((await metaReachReport(env,filters(filter),costs,at)).total,null);
+  assert.equal(mock.calls.length,4,'unsupported scopes never produce guessed zeroes or API calls');
+  const empty=reachApi(null);env.META_ADS_FETCH=empty.fetch;
+  const r=await metaReachReport(env,filters({source:'instagram_ads'}),costs,at);assert.equal(r.total,0);assert.equal(r.impressions,0);assert.equal(r.syncedAt,at);
+ }finally{db.close();}
+});
+test('Reach failures keep the original timestamp and retry after ten minutes; invalid first reads stay unavailable',async()=>{
+ const {db,env}=setup();env.META_ADS_FETCH=reachApi().fetch;
+ try{
+  await metaReachReport(env,filters(),reachCosts(),at);
+  let failures=0;env.META_ADS_FETCH=async()=>{failures++;return Response.json({error:{code:190,message:'private test-token-never-in-url'}},{status:400});};
+  const r=await metaReachReport(env,filters(),reachCosts(),at+hour);
+  assert.equal(r.total,75);assert.equal(r.impressions,180);assert.equal(r.syncedAt,at);assert.equal(r.stale,true);assert.match(r.reason,/190/);
+  assert.ok(!JSON.stringify(r).includes('test-token'));
+  await metaReachReport(env,filters(),reachCosts(),at+hour+599999);assert.equal(failures,1);
+  env.META_ADS_FETCH=reachApi('80','200').fetch;
+  const recovered=await metaReachReport(env,filters(),reachCosts(),at+hour+600000);assert.equal(recovered.total,80);assert.equal(recovered.stale,false);
+  env.META_ADS_FETCH=reachApi('not-a-number').fetch;
+  const missing=await metaReachReport(env,filters({source:'facebook_ads'}),reachCosts(),at);assert.equal(missing.total,null);assert.equal(missing.syncedAt,null);
+ }finally{db.close();}
+});
+test('simultaneous Reach reads share a database lock and cannot publish an incomplete snapshot',async()=>{
+ const {db,env}=setup(),mock=reachApi();let release,ready;
+ const barrier=new Promise(r=>release=r),started=new Promise(r=>ready=r);
+ env.META_ADS_FETCH=async(...args)=>{ready();await barrier;return mock.fetch(...args);};
+ try{
+  const pending=metaReachReport(env,filters(),reachCosts(),at);await started;
+  const concurrent=await metaReachReport(env,filters(),reachCosts(),at+1);assert.equal(concurrent.total,null);
+  release();assert.equal((await pending).total,75);assert.equal(mock.calls.length,1);
+  assert.equal((await first(db,'SELECT lock_until FROM meta_ads_reach')).lock_until,0);
+ }finally{release?.();db.close();}
 });

@@ -5,18 +5,22 @@ import Stripe from 'stripe';
 import {recordPaymentProgress} from '../src/payment-progress.mjs';
 import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
 test('shipped Meta API fetch works in workerd, recovers malformed spend and refuses redirects before forwarding credentials',async()=>{
- for(const scenario of ['empty','spend-retry','redirect']){
+ for(const scenario of ['empty','fractional','spend-retry','redirect']){
   const calls=[];let insightReads=0,rejectedAt;
   const redirect=scenario==='redirect';
   const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:new URL('../.build-check/worker.js',import.meta.url).pathname,compatibilityDate:'2026-10-18',d1Databases:{TQ_DB:'meta-fetch-runtime-'+scenario},bindings:{ENVIRONMENT:'local',META_ADS_ACCESS_TOKEN:'runtime-meta-secret-fixture'},outboundService:async request=>{
    const url=new URL(request.url);calls.push(url.href);
    assert.equal(url.origin,'https://graph.facebook.com');assert.equal(request.headers.get('Authorization'),'Bearer runtime-meta-secret-fixture');
    if(redirect)return new Response(null,{status:302,headers:{location:'https://untrusted.invalid/runtime-meta-secret-fixture'}});
-   if(scenario==='spend-retry'&&url.pathname.endsWith('/insights')){
+   if(['spend-retry','fractional'].includes(scenario)&&url.pathname.endsWith('/insights')){
+    if(url.searchParams.get('level')==='account'){
+     const range=JSON.parse(url.searchParams.get('time_range'));
+     return Response.json({data:[{account_id:metaAccount,date_start:range.since,date_stop:range.until,reach:'80',impressions:'107'}]});
+    }
     const date=JSON.parse(url.searchParams.get('time_range')).until;insightReads++;
     if(insightReads===1)rejectedAt=Date.now();
     else assert.ok(Date.now()-rejectedAt>=2900,'the shipped worker waits three seconds before retrying malformed spend');
-    return Response.json({data:[{account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Runtime recovery',date_start:date,date_stop:date,publisher_platform:'facebook',spend:insightReads===1?'0.731':'0.73',impressions:'107'}]});
+    return Response.json({data:[{account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Runtime recovery',date_start:date,date_stop:date,publisher_platform:'facebook',spend:scenario==='fractional'?'0.731234':insightReads===1?'invalid':'0.73',impressions:'107'}]});
    }
    return Response.json(url.pathname.endsWith('/insights')?{data:[]}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'});
   }}));
@@ -31,6 +35,11 @@ test('shipped Meta API fetch works in workerd, recovers malformed spend and refu
    if(redirect){assert.match(state.last_error,/HTTP 302.*presmerovanie/);assert.equal(state.last_success_at,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,0);}
    else{assert.ok(state.last_success_at);assert.equal(state.last_error,null);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_days')).n,2);assert.equal((await first(db,'SELECT count(*) n FROM meta_ads_impression_days WHERE synced_at IS NOT NULL')).n,2);}
    if(scenario==='spend-retry'){assert.equal(insightReads,2);assert.equal((await first(db,'SELECT sum(spend_cents) n FROM meta_ads_spend')).n,73);assert.equal((await first(db,'SELECT sum(impressions) n FROM meta_ads_impressions')).n,107);}
+   if(scenario==='fractional'){
+    assert.equal(insightReads,1);assert.equal((await first(db,'SELECT amount FROM meta_ads_spend_amounts')).amount,'0.731234');
+    const report=await mf.dispatchFetch('http://localhost/api/admin/marketing?period=custom&from='+from+'&to='+to);
+    assert.equal(report.status,200);const data=await report.json();assert.equal(data.costs,73);assert.equal(data.funnel.reach.total,80);assert.equal(data.funnel.reach.impressions,107);
+   }
   }finally{await mf.dispose();}
  }
 });
