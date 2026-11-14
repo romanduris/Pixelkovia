@@ -389,7 +389,8 @@ const origin='https://pixelkovia.rodulab.com';
     const day=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Bratislava',year:'numeric',month:'2-digit',day:'2-digit'}).format(Date.now());
     if(url.searchParams.get('level')==='account'){
       const range=JSON.parse(url.searchParams.get('time_range'));
-      return Response.json({data:[{account_id:'1141555698571585',date_start:range.since,date_stop:range.until,reach:'1200',impressions:'1800'}]});
+      const platform=JSON.parse(url.searchParams.get('filtering')||'[]').find(f=>f.field==='publisher_platform')?.value[0];
+      return Response.json({data:[{account_id:'1141555698571585',date_start:range.since,date_stop:range.until,reach:platform==='facebook'?'1000':platform==='instagram'?'500':'1200',impressions:'1800'}]});
     }
     return Response.json(url.pathname.endsWith('/insights')?{data:[{account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'facebook',spend:'12.34',impressions:'1234'}, {account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'instagram',spend:'0.00',impressions:'500'}, {account_id:'1141555698571585',account_currency:'EUR',campaign_id:'123',campaign_name:'Launch <campaign>',date_start:day,date_stop:day,publisher_platform:'messenger',spend:'0.00',impressions:'66'}]}:{account_id:'1141555698571585',currency:'EUR',timezone_name:'Europe/Bratislava'});
   };
@@ -400,6 +401,14 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('#marketing-refresh-status').isVisible(),false);
   assert.equal(await page.locator('#marketing-kpi-impressions strong').innerText(),'1\u00a0200');
   assert.equal(await page.locator('#marketing-kpi-impressions .marketing-impressions-count').innerText(),'1\u00a0800 impressions');
+  const reachSegments=page.locator('#marketing-kpi-impressions .marketing-source-segment');
+  assert.equal(await reachSegments.count(),2);
+  assert.deepEqual(await reachSegments.allTextContents(),['1\u00a0000','500']);
+  assert.equal(await reachSegments.nth(0).evaluate(el=>el.classList.contains('funnel-source-facebook')),true);
+  assert.equal(await reachSegments.nth(1).evaluate(el=>el.classList.contains('funnel-source-instagram')),true);
+  const reachBars=await reachSegments.evaluateAll(els=>els.map(el=>{const b=el.getBoundingClientRect();return {left:b.left,right:b.right,width:b.width,top:b.top};}));
+  assert.ok(Math.abs(reachBars[0].right-reachBars[1].left)<1,'FB and IG touch and form a continuous bar');
+  assert.ok(Math.abs(reachBars[0].top-reachBars[1].top)<1);assert.ok(Math.abs(reachBars[0].width/reachBars[1].width-2)<0.01,'platform widths follow their own values, separately from total Reach');
   assert.match(await page.locator('#marketing-kpi-impressions .marketing-meta-time').innerText(),/^\d{1,2}\.\d{1,2} \d{1,2}:\d{2}$/);
   const labelBox=await page.locator('#marketing-kpi-impressions .marketing-kpi-label').boundingBox(),timeBox=await page.locator('#marketing-kpi-impressions .marketing-meta-time').boundingBox();assert.ok(timeBox.y>=labelBox.y+labelBox.height,'Meta time sits below Reach');
   assert.match(await page.locator('#marketing-metric-costs strong').innerText(),/12,34/);assert.match(await page.locator('#marketing-kpi-revenue small').innerText(),/Reklama − 12,3/);assert.equal(await page.locator('#marketing-metric-cac strong').innerText(),'Nedostupné');

@@ -252,3 +252,24 @@ export async function metaReachReport(env,f,costReport,at=Date.now()){
   const stale=!!cached.last_error||at-cached.synced_at>2*hour;
   return {total:cached.total,impressions:cached.impressions,syncedAt:cached.synced_at,stale,partial:f.to===localDate(at),reason:'Reach je odhadovaný počet ľudí, ktorí videli reklamu aspoň raz za celé vybrané obdobie. Meta ho deduplikuje naprieč dňami, kampaňami a platformami; denné dosahy nesčítavame. Impressions sú všetky zobrazenia reklamy z toho istého súhrnu.'+(stale?' Zobrazené sú posledné úspešné údaje. '+(cached.last_error||'Import je starší než dve hodiny.'):'')};
 }
+
+export async function metaReachBreakdownReport(env,f,costReport,at=Date.now()){
+  const totalPromise=metaReachReport(env,f,costReport,at);
+  if(metaScopeReason(env,f,costReport)||f.start>at)return {...await totalPromise,facebook:null,instagram:null,platformsSyncedAt:null,platformsReason:''};
+  const excluded={total:0,syncedAt:null,stale:false};
+  // Each platform gets its own full-period, deduplicated account query.
+  // Reuse the selected-platform query rather than issuing it twice.
+  const [total,facebook,instagram]=await Promise.all([
+    totalPromise,
+    f.source==='facebook_ads'?totalPromise:f.source?excluded:metaReachReport(env,{...f,source:'facebook_ads'},costReport,at),
+    f.source==='instagram_ads'?totalPromise:f.source?excluded:metaReachReport(env,{...f,source:'instagram_ads'},costReport,at)
+  ]);
+  const snapshots=[total,facebook,instagram],times=snapshots.map(r=>r.syncedAt).filter(t=>t!=null);
+  const platformsReason=[['FB',facebook],['IG',instagram]].filter(([,r])=>r.total==null||r.stale).map(([name,r])=>name+': '+r.reason).join(' ');
+  return {...total,facebook:facebook.total,instagram:instagram.total,
+    syncedAt:times.length?Math.min(...times):null,
+    platformsSyncedAt:facebook.total!=null&&instagram.total!=null?Math.min(...[facebook.syncedAt,instagram.syncedAt].filter(t=>t!=null)):null,
+    stale:snapshots.some(r=>r.stale)||facebook.total==null||instagram.total==null,
+    platformsReason,
+    reason:total.reason+' Segmenty FB a IG zobrazujú samostatné dosahy; ich šírky vyjadrujú pomer týchto hodnôt. Publikum sa prekrýva, preto ich súčet nemusí zodpovedať celkovému Reach napravo. Celok môže zahŕňať aj ďalšie Meta platformy.'+(platformsReason?' '+platformsReason:'')};
+}

@@ -44,15 +44,18 @@ const kpi=(id,label,value,context,note,href,tone='')=>`<details class="marketing
 const metric=(id,label,value,note,extra='',content='')=>`<details class="marketing-metric ${extra}" data-marketing-detail="metric-${id}"${open('metric-'+id)}><summary id="marketing-metric-${id}"><span>${label}<span class="marketing-info" aria-hidden="true">i</span></span><strong>${esc(value)}</strong></summary><p>${esc(note)}</p>${content}</details>`;
 function funnelStep(id,label,data,context,note,reference,href,impressions){
   const reach=id==='impressions';
-  const value=num(data.total),tags=[['facebook','FB'],['instagram','IG'],['other','Ost.']];
-  const known=data.total!=null&&(reach||tags.every(([key])=>Number.isFinite(data[key])&&data[key]>=0)&&tags.reduce((sum,[key])=>sum+data[key],0)===data.total);
-  const width=known&&data.total>0&&reference>0?Math.min(100,data.total/reference*100):0;
-  const bars=width?(reach?'<span class="marketing-reach-fill"></span>':tags.filter(([key])=>data[key]>0).map(([key])=>`<span class="marketing-source-segment funnel-source-${key}" style="width:${data[key]/data.total*100}%"><span>${num(data[key])}</span></span>`).join('')):'';
-  const description=reach?'Reach: '+value:known?tags.map(([key,name])=>name+': '+num(data[key])).join(' · '):'Rozdelenie zdrojov je nedostupné';
+  const value=num(data.total),tags=reach?[['facebook','FB'],['instagram','IG']]:[['facebook','FB'],['instagram','IG'],['other','Ost.']];
+  const platformSum=tags.reduce((sum,[key])=>sum+(data[key]||0),0);
+  const known=tags.every(([key])=>Number.isFinite(data[key])&&data[key]>=0)&&(reach||data.total!=null&&platformSum===data.total);
+  const volume=reach?platformSum:data.total;
+  const width=known&&volume>0?(reach?100:reference>0?Math.min(100,volume/reference*100):0):0;
+  const bars=width?tags.filter(([key])=>data[key]>0).map(([key,name])=>`<span class="marketing-source-segment funnel-source-${key}"${reach?` title="${esc(name+' Reach: '+num(data[key]))}"`:''} style="width:${data[key]/volume*100}%"><span>${num(data[key])}</span></span>`).join(''):'';
+  const description=known?tags.map(([key,name])=>name+': '+num(data[key])).join(' · ')+(reach?' · Celkový Reach: '+value+' · Publikum sa môže prekrývať.':''):'Rozdelenie zdrojov je nedostupné';
   const content=`<span class="marketing-source-strip" role="img" aria-label="${esc(description)}"><span class="marketing-source-track${!known?' is-unavailable':''}"${width?` style="width:${width}%;min-width:4px"`:''}>${bars}</span></span>`;
   const sourceData=reach?impressions:data,sourceKnown=sourceData?.total!=null;
-  const counts=`${reach?'<div>Rozpis impressions podľa platformy (samostatný denný import):</div>':''}<span class="marketing-source-counts">${tags.map(([key,name])=>`<span data-funnel-source="${key}"><i class="funnel-source-${key}" aria-hidden="true"></i>${name} <b>${sourceKnown?num(sourceData[key]):'Nedostupné'}</b></span>`).join('')}</span>`;
-  const scaleNote=reach?'Reach má samostatnú mierku a jednotnú farbu: dosahy FB/IG sa pre prekrývajúce sa publikum nesčítavajú.':'Dĺžka voči najväčšiemu dostupnému webovému kroku; ide o objemy, nie spoločnú kohortu.';
+  const reachCounts=reach?`<div>Reach podľa platformy (publikum sa môže prekrývať):</div><span class="marketing-source-counts">${tags.map(([key,name])=>`<span data-reach-source="${key}"><i class="funnel-source-${key}" aria-hidden="true"></i>${name} <b>${num(data[key])}</b></span>`).join('')}</span>`:'';
+  const counts=`${reachCounts}${reach?'<div>Rozpis impressions podľa platformy (samostatný denný import):</div>':''}<span class="marketing-source-counts">${[['facebook','FB'],['instagram','IG'],['other','Ost.']].map(([key,name])=>`<span data-funnel-source="${key}"><i class="funnel-source-${key}" aria-hidden="true"></i>${name} <b>${sourceKnown?num(sourceData[key]):'Nedostupné'}</b></span>`).join('')}</span>`;
+  const scaleNote=reach?'Dosahy FB a IG sú zobrazené za sebou v spoločnej lište; šírky sa delia podľa ich pomeru. Celkový Reach napravo je samostatný deduplikovaný údaj z Meta.':'Dĺžka voči najväčšiemu dostupnému webovému kroku; ide o objemy, nie spoločnú kohortu.';
   const heading=`<span class="marketing-kpi-label">${label}<span class="marketing-info${data.partial||data.stale?' is-partial':''}" aria-hidden="true">i</span><span class="sr-only"> · definícia metriky a atribúcie${data.partial?' · čiastočné meranie':''}</span></span>`;
   const timestamp=reach?`<small class="marketing-meta-time${data.stale?' is-stale':''}" title="${esc(data.stale?data.reason:'Údaje Meta · '+date(data.syncedAt)+' · Bratislava')}">${data.syncedAt?`<time datetime="${new Date(data.syncedAt).toISOString()}">${metaTime(data.syncedAt)}</time>${data.stale?' · staršie':''}`:'Čaká na Meta'}</small>`:'';
   const total=`<strong${data.total==null?' class="is-unavailable"':''}>${href?`<a class="marketing-purchase-link" href="${esc(href)}" aria-label="Zobraziť ${esc(value)} platených nákupov s rovnakými filtrami">${value}</a>`:value}</strong>`;

@@ -2,7 +2,7 @@ import {HttpError} from './auth.mjs';
 import {first,query,execute,hash} from './db.mjs';
 import {dailyMarketing} from './marketing-series.mjs';
 import {attemptFor} from './payment-monitor.mjs';
-import {metaAdsReport,metaImpressionsReport,metaReachReport} from './meta-ads.mjs';
+import {metaAdsReport,metaImpressionsReport,metaReachBreakdownReport} from './meta-ads.mjs';
 import {webFunnelBreakdown} from './marketing-breakdown.mjs';
 import {studioTrafficReport} from './studio-traffic.mjs';
 import {marketingAudience,operatingSystems} from './marketing-audience.mjs';
@@ -86,7 +86,7 @@ export async function marketingReport(env,params,at=Date.now()){
   const uniqueBuyers=await first(db,attemptsCTE+` SELECT count(DISTINCT browser_id) buyers FROM a WHERE paid=1 AND visit_started_at>=? AND visit_started_at<?`+filter.sql,...cteValues,Math.max(observedStart,state.unique_started_at??at+1),f.end,...filter.values);
   const uniqueReason=conversionReason||(!charts.uniqueVisitors?'Kohorta nemá žiadne namerané unikátne prehliadače.':null);
   const uniqueMetrics={visits:charts.uniqueVisitors,checkouts:charts.uniqueVisitors==null?null:periodCheckout.unique_checkouts,buyers:charts.uniqueVisitors==null?null:uniqueBuyers.buyers,conversion:uniqueReason?null:uniqueBuyers.buyers/charts.uniqueVisitors,conversionReason:uniqueReason,partial:charts.uniquePartial};
-  const funnel={...await webFunnelBreakdown(db,{f,state,at,periodMetrics,uniqueMetrics,visitSources,calendarSources}),impressions:await metaImpressionsReport(env,f,adsReport,at),reach:await metaReachReport(env,f,adsReport,at)};
+  const funnel={...await webFunnelBreakdown(db,{f,state,at,periodMetrics,uniqueMetrics,visitSources,calendarSources}),impressions:await metaImpressionsReport(env,f,adsReport,at),reach:await metaReachBreakdownReport(env,f,adsReport,at)};
   const audience=await marketingAudience(db,f,state);
   return {generatedAt:at,collectionEnabled,periodMetrics,uniqueMetrics,funnel,charts,audience,studioTraffic:await studioTrafficReport(db,f,at),checkoutOpensStartedAt:state.checkout_opens_started_at,filters:f,startedAt:state.started_at,observedStart,partialPeriod:f.start<state.started_at,lastEventAt:state.last_event_at,paymentStartedAt:history?.started_at||null,checks,warnings,
     metrics:{visits:visitAvailable?visits.visits:null,checkouts:collectionInRange&&!f.product?visits.checkouts:null,purchases:metric.purchases,revenueCents:metric.revenue,orders:metric.orders,gameAccesses:metric.game_accesses,refunds:metric.refunds,accessIssues:metric.access_issues,accessIssueOrders:metric.access_issue_orders,attributedPurchases:metric.attributed,technicalSignals:issues.signals,technicalAttempts:issues.attempts,conversion:conversionReason?null:cohortTotal.purchases/visits.visits},

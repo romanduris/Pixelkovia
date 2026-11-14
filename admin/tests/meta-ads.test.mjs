@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {fresh,LocalD1} from './support.mjs';
 import {readFile,readdir} from 'node:fs/promises';
 import {first,query,execute} from '../src/db.mjs';
-import {syncMetaAds,scheduledMetaAds,metaAdsReport,metaImpressionsReport,metaReachReport,saveMetaCampaign,metaAccount,spendCents} from '../src/meta-ads.mjs';
+import {syncMetaAds,scheduledMetaAds,metaAdsReport,metaImpressionsReport,metaReachReport,metaReachBreakdownReport,saveMetaCampaign,metaAccount,spendCents} from '../src/meta-ads.mjs';
 import {marketingFilters,midnight} from '../src/marketing-query.mjs';
 import worker from '../src/worker.mjs';
 const at=Date.parse('2026-11-10T12:00:00Z'),day=86400000,hour=3600000;
@@ -389,4 +389,41 @@ test('simultaneous Reach reads share a database lock and cannot publish an incom
   release();assert.equal((await pending).total,75);assert.equal(mock.calls.length,1);
   assert.equal((await first(db,'SELECT lock_until FROM meta_ads_reach')).lock_until,0);
  }finally{release?.();db.close();}
+});
+
+test('FB and IG full-period Reach remain independent from the deduplicated total and reuse the scope cache',async()=>{
+ const {db,env}=setup(),calls=[];
+ env.META_ADS_FETCH=async(url,init)=>{
+  calls.push({url:new URL(url),init});
+  const platform=JSON.parse(url.searchParams.get('filtering')||'[]').find(f=>f.field==='publisher_platform')?.value[0];
+  const range=JSON.parse(url.searchParams.get('time_range'));
+  return Response.json({data:[{account_id:metaAccount,date_start:range.since,date_stop:range.until,reach:platform==='facebook'?'200':platform==='instagram'?'180':'320',impressions:platform==='facebook'?'400':platform==='instagram'?'291':'691'}]});
+ };
+ try{
+  const r=await metaReachBreakdownReport(env,filters(),reachCosts(),at);
+  assert.deepEqual([r.total,r.facebook,r.instagram,r.impressions],[320,200,180,691]);
+  assert.ok(r.facebook+r.instagram>r.total,'overlapping platform reach must never replace or alter the total');
+  assert.equal(r.syncedAt,at);assert.equal(r.platformsSyncedAt,at);assert.equal(r.stale,false);assert.equal(calls.length,3);
+  for(const {url}of calls){assert.equal(url.searchParams.get('level'),'account');assert.equal(url.searchParams.has('breakdowns'),false);assert.equal(url.searchParams.has('time_increment'),false);assert.deepEqual(JSON.parse(url.searchParams.get('time_range')),{since:range.from,until:range.to});}
+  await metaReachBreakdownReport(env,filters(),reachCosts(),at+30000);assert.equal(calls.length,3);
+  const fb=await metaReachBreakdownReport(env,filters({source:'facebook_ads'}),reachCosts(),at+30000);
+  assert.deepEqual([fb.total,fb.facebook,fb.instagram,fb.impressions],[200,200,0,400]);assert.equal(calls.length,3,'a selected platform reuses the already cached full-period scope');
+  const ig=await metaReachBreakdownReport(env,filters({source:'instagram_ads'}),reachCosts(),at+30000);
+  assert.deepEqual([ig.total,ig.facebook,ig.instagram,ig.impressions],[180,0,180,291]);assert.equal(calls.length,3);
+ }finally{db.close();}
+});
+
+test('failed platform Reach refresh retains its own value and timestamp without changing a fresh total',async()=>{
+ const {db,env}=setup();env.META_ADS_FETCH=reachApi('80','180').fetch;
+ try{
+  await metaReachBreakdownReport(env,filters(),reachCosts(),at);
+  const successful=reachApi('90','200').fetch;
+  env.META_ADS_FETCH=async(url,init)=>JSON.parse(url.searchParams.get('filtering')||'[]').some(f=>f.field==='publisher_platform'&&f.value[0]==='instagram')?Response.json({error:{code:190,message:'private test-token-never-in-url'}},{status:400}):successful(url,init);
+  const r=await metaReachBreakdownReport(env,filters(),reachCosts(),at+hour);
+  assert.deepEqual([r.total,r.facebook,r.instagram,r.impressions],[90,90,80,200]);
+  assert.equal(r.stale,true);assert.equal(r.syncedAt,at);assert.equal(r.platformsSyncedAt,at);assert.match(r.platformsReason,/IG:.*190/);
+  assert.ok(!JSON.stringify(r).includes('test-token'));
+  const invalid=await metaReachBreakdownReport(env,filters({product:'game'}),reachCosts(),at);
+  assert.deepEqual([invalid.total,invalid.facebook,invalid.instagram],[null,null,null]);
+ }finally{db.close();}
 });
