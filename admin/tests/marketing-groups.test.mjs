@@ -42,12 +42,15 @@ test('additional sources include Meta and preserve filtered and unavailable metr
 test('responsive stacked bars show every daily total, keep unknown days distinct from zero and fit long ranges',()=>{
  const values=[2,null,0,4,0],days=values.map((value,i)=>({date:'2026-11-'+String(i+1).padStart(2,'0'),visits:value,uniqueVisitors:value,sources:[{source:'facebook',visits:value,uniqueVisitors:value}]}));
  const html=chartContent({charts:{days}},false);
- assert.deepEqual([...html.matchAll(/data-marketing-day-count="[^"]+"[^>]*>([^<]+)</g)].map(match=>match[1]),['2','—','0','4','0']);
+ assert.deepEqual([...html.matchAll(/data-marketing-day-count="[^"]+"[^>]*>([^<]+)</g)].map(match=>match[1]),['0','4','0','—','2']);
+ assert.deepEqual([...html.matchAll(/data-marketing-day="([^"]+)"/g)].map(match=>match[1]),days.map(day=>day.date).reverse());
  assert.equal((html.match(/class="chart-bar /g)||[]).length,2,'only the two measured positive days have filled bars');
  assert.equal((html.match(/class="chart-zero"/g)||[]).length,2,'measured zeroes have explicit zero marks');
  assert.equal((html.match(/data-marketing-day=/g)||[]).length,5);
  assert.ok(!html.includes('chart-line'));assert.ok(!html.includes('marketing-chart-scroll'));
  const one=chartContent({charts:{days:[days[0]]}},false);assert.ok(!one.includes('NaN'));assert.match(one,/data-marketing-count="2026-11-01">2/);
+ const trimmed=chartContent({charts:{days:[{...days[0],visits:null},...days.slice(2)]}},false);
+ assert.match(trimmed,/Meranie od 03\.11\./,'coverage continues to name the oldest measured day');
  for(const count of [30,90]){
   const long=chartContent({charts:{days:Array.from({length:count},(_,i)=>({...days[0],date:new Date(Date.UTC(2026,7,i+1)).toISOString().slice(0,10)}))}},false);
   assert.equal((long.match(/data-marketing-day=/g)||[]).length,count);assert.equal((long.match(/data-marketing-day-count=/g)||[]).length,count);assert.match(long,/viewBox="0 0 640 218"/);

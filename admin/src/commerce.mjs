@@ -4,6 +4,7 @@ import {paymentLog,orderPaymentLog,paymentFailureKey,paymentFailureType,stripeFa
 import {first,query,statement,execute,uuid,randomToken,hash} from './db.mjs';
 import {credentials,emailAddress} from './customer-auth.mjs';
 import {quote,product,offer} from './catalog.mjs';
+import {queueOrderNotification,sendOrderNotifications} from './order-notifications.mjs';
 const ORIGIN='https://pixelkovia.rodulab.com',enc=new TextEncoder();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stripe=env=>env.STRIPE_CLIENT||new Stripe(env.STRIPE_SECRET_KEY,{apiVersion:'2026-08-26.dahlia',maxNetworkRetries:2,httpClient:Stripe.createFetchHttpClient()});
@@ -197,6 +198,7 @@ export async function fulfill(env,sessionId){
     batch.push(statement(db,'INSERT INTO customers VALUES(?,?,?,?)',customerId,attempt.email,attempt.name||attempt.email,at),statement(db,'INSERT INTO customer_credentials VALUES(?,?,?,?,?)',customerId,c.lookup,c.salt,c.hash,at),statement(db,"INSERT INTO orders SELECT ?,?,?,CASE WHEN EXISTS(SELECT 1 FROM payment_refunds WHERE payment_intent=?) THEN 'refunded' ELSE 'paid' END,?,?,?,?",id,customerId,plan.reference,intentId,plan.total,'EUR',at,at),statement(db,'INSERT INTO checkout_orders VALUES(?,?,?)',attempt.id,plan.kind,id));
     for(const productId of plan.ids){const item=uuid();batch.push(statement(db,'INSERT INTO order_items VALUES(?,?,?,?,?)',item,id,productId,1,plan.prices[productId]),statement(db,"INSERT INTO entitlements(id,customer_id,order_item_id,product_id,granted_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",uuid(),customerId,item,productId,at,id));}
     batch.push(statement(db,"INSERT INTO access_deliveries(order_id,customer_id,encrypted_message,status) SELECT ?,?,?,'queued' WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",id,customerId,message,id),statement(db,"INSERT INTO email_events(id,customer_id,template_key,category,status,created_at) SELECT ?,?,'portal-access','transactional','queued',? WHERE EXISTS(SELECT 1 FROM orders WHERE id=? AND status='paid')",'access-'+id,customerId,at,id));
+    batch.push(queueOrderNotification(db,id,at));
   }
   try{await db.batch(batch);}catch(error){const duplicate=await first(db,'SELECT id FROM orders WHERE external_reference=?',session.id);if(duplicate)return duplicate;throw error;}
   return {id:plans[0].id};
@@ -282,7 +284,8 @@ export async function paymentWebhook(request,env,context){
     }catch{}
     await paymentLog(env,{type:'webhook_error',source:'server',attemptId,code:error.type,dedupe:event.id});throw error;
   }
-  if(context?.waitUntil)context.waitUntil(sendPending(env));else await sendPending(env);
+  const delivery=Promise.all([sendPending(env),sendOrderNotifications(env).catch(()=>console.error('order_notification_delivery_failed'))]);
+  if(context?.waitUntil)context.waitUntil(delivery);else await delivery;
   return {received:true};
 }
 

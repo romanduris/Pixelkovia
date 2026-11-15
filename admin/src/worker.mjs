@@ -12,6 +12,7 @@ import {checkoutConfig,commerceReady,createCheckout,verifiedCheckoutStatus,relea
 import {browserPaymentEvent,paymentReport,paymentLog,attemptFor,reviewPaymentEvent} from './payment-monitor.mjs';
 import {supportWebhook} from './support-mail.mjs';
 import {studioContact} from './studio-contact.mjs';
+import {orderNotificationSettings,saveOrderNotificationSettings,sendOrderNotifications} from './order-notifications.mjs';
 import {recordStudioVisit} from './studio-traffic.mjs';
 import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
 import {consentState,saveConsent,readConsent,prunePrivacy} from './privacy.mjs';
@@ -69,7 +70,7 @@ async function customerApi(request,env,path){
   if(path==='/api/customer/complete'&&request.method==='POST')return json(await gameEvent(db,run,{...input,type:'complete'}));
   throw new HttpError(404,'Endpoint neexistuje.');
 }
-export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),auditPayments(env),pruneMarketing(env),prunePrivacy(env),scheduledMetaAds(env)]);},async fetch(request,env,context){
+export default {async scheduled(event,env){await Promise.allSettled([sendPending(env),sendOrderNotifications(env),auditPayments(env),pruneMarketing(env),prunePrivacy(env),scheduledMetaAds(env)]);},async fetch(request,env,context){
   let paymentInput;
   try{
     const url=new URL(request.url),path=url.pathname;
@@ -142,6 +143,11 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
       throw error;
     }
     sameOrigin(request);
+    if(path==='/api/admin/notifications'){
+      if(request.method==='GET')return json(await orderNotificationSettings(env));
+      if(request.method==='POST')return json(await saveOrderNotificationSettings(env,await body(request)));
+      throw new HttpError(405,'Nepodporovaná metóda.');
+    }
     if(path==='/api/admin/payments/review'&&request.method==='POST')return json(await reviewPaymentEvent(env,await body(request),admin));
     if(path==='/api/admin/marketing/ads/sync'&&request.method==='POST')return json(await syncMetaAds(env,await body(request)));
     if(path==='/api/admin/marketing/ads/campaign'&&request.method==='POST')return json(await saveMetaCampaign(env,await body(request)));

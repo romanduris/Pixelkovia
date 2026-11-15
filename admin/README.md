@@ -28,6 +28,14 @@ Heslá majú PBKDF2-SHA256 so soľou a serverovým pepperom. Relácie obsahujú 
 
 Krátky prístupový e-mail posiela Resend z `Piko@pixelkovia.rodulab.com`. Kým čaká na odoslanie, údaje sú šifrované AES-GCM; po odoslaní sa zašifrovaná správa odstráni. Neúspešné doručenia opakuje desaťminútový cron. Knihy nezávisia od časového okna opakovania hry. Pôvodná hranica opakovania zostáva prvé dokončenie + 24 hodín; nedokončená hra nemá nový automatický limit.
 
+## Upozornenia na nové objednávky
+
+Políčko **Notification** v ľavom menu (na telefóne hore) ovláda spoločné serverové nastavenie. Na žiadosť vlastníka sú upozornenia po nasadení zapnuté. Pixi posiela krátky HTML aj textový e-mail po každej novej overenej objednávke na súkromnú adresu z `SUPPORT_FORWARD_TO`: čas v Bratislave, suma, e-mail kupujúceho a odkaz do hernej analýzy pre daný nákup. Prihlásenie zachová cieľ odkazu. Zákaznícke prístupy naďalej posiela Piko samostatne.
+
+Migrácia `0027_order_notifications.sql` pridáva nastavenie a frontu. Fronta vzniká atómovo s objednávkou; opakovaný webhook ju neduplikuje. Darčeková druhá hra má vlastné upozornenie. Vypnutie zruší čakajúce upozornenia a opätovné zapnutie neposiela historické objednávky. Zlyhania poskytovateľa opakuje existujúci desaťminútový cron s rovnakým idempotency kľúčom. Súkromná adresa ani prístupové heslá sa neukladajú do fronty a API nastavenia adresu nezverejňuje.
+
+Predajný funnel zobrazuje položku a denný graf ako **Web**, počet zobrazení reklamy skracuje na **imp.**. Grafy Pixelkovie aj rodulab.com majú najnovšie dni vľavo; šípka doľava vyberá novší a doprava starší deň.
+
 ## Vývoj a overenie
 
 ```sh

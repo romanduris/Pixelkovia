@@ -13,8 +13,21 @@ const badge=status=>`<span class="status ${escape(status)}">${escape(stateNames[
 const titles={payments:['Platby a chyby','Overené platby a doručenie prístupov.'],analytics:['Herná analýza','Priebeh hier a spätná väzba rodín.'],marketing:['Predajný funnel','Návštevnosť, zdroje kampaní a overené nákupy.']};
 const state={page:1,q:'',analysisAttempt:'',status:'',context:null,expanded:new Set(),details:new Map(),wide:false,paymentDays:'30',paymentFrom:'',paymentStatus:'',paymentProduct:'',paymentMethod:'',paymentAttention:false,paymentAttempt:'',paymentFunnel:null};
 let loadingId=0,detailId=0;
-async function api(path,params,init={}){const response=await fetch(path+(params?.toString()?'?'+params:''),{...init,credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/admin/login');throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
+async function api(path,params,init={}){const response=await fetch(path+(params?.toString()?'?'+params:''),{...init,credentials:'same-origin'});const value=await response.json();if(response.status===401&&state.context?.authMode==='password'){document.querySelector('#view').replaceChildren();location.replace('/admin/login'+location.hash);throw Error('Prihlásenie vypršalo.');}if(!response.ok)throw Error(value.error||'Načítanie zlyhalo.');return value;}
 const empty=message=>`<div class="empty">${escape(message)}</div>`;
+let notificationEnabled=false;
+function showNotificationSettings(value){
+  const input=$('#order-notifications');notificationEnabled=value.enabled;input.checked=value.enabled;input.disabled=!value.configured&&!value.enabled;
+  $('#order-notifications-status').textContent=!value.configured?'E-mailové upozornenia nie sú nastavené.':value.enabled?'E-mail po každej novej objednávke.':'Upozornenia sú vypnuté.';
+}
+async function loadNotificationSettings(){
+  try{showNotificationSettings(await api('/api/admin/notifications'));}catch{const status=$('#order-notifications-status');status.textContent='Nastavenie sa nepodarilo načítať.';}
+}
+$('#order-notifications').addEventListener('change',async event=>{
+  const input=event.target;input.disabled=true;$('#order-notifications-status').textContent='Ukladám…';
+  try{showNotificationSettings(await api('/api/admin/notifications',null,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:input.checked})}));}
+  catch(error){input.checked=notificationEnabled;input.disabled=false;$('#order-notifications-status').textContent=error.message;}
+});
 function table(headers,rows,cls=''){return rows.length?`<div class="table-wrap"><table class="${cls}"><thead><tr>${headers.map(h=>`<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.map(cells=>`<tr>${cells.map((cell,index)=>`<td data-label="${escape(headers[index])}">${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:empty('Pre zvolené filtre zatiaľ nie sú žiadne záznamy.');}
 const paymentMethodNames={card:'Karta',apple_pay:'Apple Pay',google_pay:'Google Pay',wallet:'Iná peňaženka',free:'Zdarma',unknown:'Neznáme'};
 function paymentMethodMark(method){
@@ -675,6 +688,7 @@ document.addEventListener('click',e=>{const menu=$('.payment-column-options');if
 $('#close-detail').addEventListener('click',()=>{detailId++;$('#detail').close();});
 (async()=>{try{
   const context=await api('/api/admin/context');state.context=context;
+  void loadNotificationSettings();
   $('#identity-label').textContent=context.admin;
   if(context.authMode==='password'){
     $('#logout-button').hidden=false;
