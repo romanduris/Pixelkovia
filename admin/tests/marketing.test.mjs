@@ -6,7 +6,7 @@ import {marketingEvent,marketingReport,marketingFilters,linkMarketingAttempt,pru
 import worker from '../src/worker.mjs';
 import {paymentReport} from '../src/payment-monitor.mjs';
 import {calendarDays} from '../src/marketing-series.mjs';
-import {paymentLink} from '../public/marketing-charts.js';
+import {paymentLink,groupChartDay} from '../public/marketing-charts.js';
 import {syncMetaAds,metaAccount} from '../src/meta-ads.mjs';
 const origin='https://pixelkovia.rodulab.com',at=Date.UTC(2026,10,10,12),day=86400000;
 const req=()=>new Request(origin+'/api/marketing/event',{method:'POST',headers:{origin,'content-type':'application/json'}});
@@ -28,7 +28,7 @@ async function attempt(db,{visitId=null,created=at-3600000,paid=at-1000,total=24
  }}
  return id;
 }
-test('four-step breakdown keeps ad sources distinct, counts gifts once and preserves financial and cohort totals',async()=>{
+test('four-step breakdown groups social sources, counts gifts once and preserves financial and cohort totals',async()=>{
  const {db,env}=await setup();try{
   await execute(db,'UPDATE marketing_state SET unique_started_at=?',at-30*day);
   const browser=crypto.randomUUID(),fb=input({browserId:browser}),ig=input({source:'instagram_ads',browserId:browser}),ordinary=input({source:'facebook',browserId:crypto.randomUUID()});
@@ -40,8 +40,8 @@ test('four-step breakdown keeps ad sources distinct, counts gifts once and prese
   await attempt(db,{gift:false,total:1499});await attempt(db,{visitId:fb.visitId,gift:false,total:0});
   const params=new URLSearchParams({period:'today'}),d=await marketingReport(env,params,at);
   const counts=value=>[value.total,value.facebook,value.instagram,value.other];
-  assert.deepEqual(counts(d.funnel.visits),[3,1,1,1]);assert.deepEqual(counts(d.funnel.checkouts),[3,2,1,0]);
-  assert.deepEqual(counts(d.funnel.uniqueVisits),[2,1,0,1]);assert.deepEqual(counts(d.funnel.uniqueCheckouts),[1,1,0,0]);
+  assert.deepEqual(counts(d.funnel.visits),[3,2,1,0]);assert.deepEqual(counts(d.funnel.checkouts),[3,2,1,0]);
+  assert.deepEqual(counts(d.funnel.uniqueVisits),[2,2,0,0]);assert.deepEqual(counts(d.funnel.uniqueCheckouts),[1,1,0,0]);
   assert.deepEqual(counts(d.funnel.purchases),[3,1,1,1]);assert.equal(d.periodMetrics.freePurchases,1);
   assert.equal(d.metrics.revenueCents,5496);assert.equal(d.metrics.purchases,3);assert.equal(d.metrics.refunds,1);assert.equal(d.metrics.orders,4);assert.equal(d.metrics.conversion,2/3);
   assert.equal(d.uniqueMetrics.conversion,1/2);
@@ -49,6 +49,37 @@ test('four-step breakdown keeps ad sources distinct, counts gifts once and prese
   assert.deepEqual(counts(filtered.funnel.uniqueVisits),[1,0,1,0]);assert.deepEqual(counts(filtered.funnel.uniqueCheckouts),[1,0,1,0]);assert.deepEqual(counts(filtered.funnel.purchases),[1,0,1,0]);
   const product=await marketingReport(env,new URLSearchParams({period:'today',product:'game'}),at);assert.equal(product.funnel.visits.total,null);assert.equal(product.funnel.checkouts.facebook,null);assert.equal(product.funnel.purchases.total,3);
   const frozen=await marketingReport({...env,MARKETING_COLLECTION_ENABLED:'false'},params,at);assert.deepEqual(frozen.funnel.purchases,d.funnel.purchases);assert.equal(frozen.metrics.revenueCents,d.metrics.revenueCents);assert.equal(frozen.metrics.conversion,null);
+ }finally{db.close();}
+});
+test('23 campaign visits have the same platform split in the funnel and daily chart, including social links and filters',async()=>{
+ const {db,env}=await setup(),reportAt=Date.UTC(2026,10,15,12);try{
+  await execute(db,'UPDATE marketing_state SET unique_started_at=?',at-30*day);
+  const fixture=[['2026-11-13',{direct:4,facebook_ads:1,unknown:2}],['2026-11-14',{direct:1,facebook:1,facebook_ads:8,instagram_ads:2}],['2026-11-15',{facebook:2,facebook_ads:1,unknown:1}]];
+  let socialLink;
+  for(const [date,sources]of fixture)for(const [source,count]of Object.entries(sources))for(let i=0;i<count;i++){
+   const visit=input({source,browserId:crypto.randomUUID()});
+   await marketingEvent(req(),env,visit,Date.parse(date+'T10:00:00Z')+i);
+   if(source==='facebook')socialLink=visit;
+  }
+  const params=new URLSearchParams({period:'campaign1'}),snapshot=await marketingReport(env,params,reportAt);
+  assert.deepEqual([snapshot.funnel.visits.total,snapshot.funnel.visits.facebook,snapshot.funnel.visits.instagram,snapshot.funnel.visits.other],[23,13,2,8]);
+  assert.deepEqual(snapshot.charts.days.map(d=>d.visits),[7,12,4]);
+  assert.equal(snapshot.rows.find(r=>r.source==='facebook_ads').visits,10,'the detailed table retains ads-only counts');
+  assert.equal(snapshot.rows.find(r=>r.source==='facebook').visits,3);
+  // Ordinary links also use the same platform for checkout and paid attribution.
+  const instagramLink=input({source:'instagram',browserId:crypto.randomUUID()});
+  await marketingEvent(req(),env,{...socialLink,type:'checkout',checkoutOpenId:crypto.randomUUID()},reportAt-5000);
+  await marketingEvent(req(),env,{...instagramLink,type:'checkout',checkoutOpenId:crypto.randomUUID()},reportAt-4000);
+  for(const visit of [socialLink,instagramLink])await attempt(db,{visitId:visit.visitId,created:reportAt-3000,paid:reportAt-1000,gift:false,total:1499,orders:false});
+  for(const source of ['', 'facebook_ads','facebook','instagram_ads','instagram','direct','unknown']){
+   const report=await marketingReport(env,new URLSearchParams({period:'campaign1',source}),reportAt);
+   const days=report.charts.days.map(groupChartDay);
+   for(const [key,metric]of [['visits','visits'],['uniqueVisits','uniqueVisitors']]){
+    assert.equal(report.funnel[key].total,days.reduce((sum,d)=>sum+d[metric],0));
+    for(const platform of ['facebook','instagram','other'])assert.equal(report.funnel[key][platform],days.reduce((sum,d)=>sum+d.sources.find(s=>s.source===platform)[metric],0),`${key}: ${source||'all'} / ${platform}`);
+   }
+   if(!source)for(const key of ['checkouts','uniqueCheckouts','purchases'])assert.deepEqual([report.funnel[key].total,report.funnel[key].facebook,report.funnel[key].instagram,report.funnel[key].other],[2,1,1,0]);
+  }
  }finally{db.close();}
 });
 test('unmeasured visits/conversions and costs stay unavailable; API requires existing admin and same origin',async()=>{

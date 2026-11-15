@@ -1,10 +1,11 @@
+import {sourceGroups,sourceGroup} from './marketing-sources.js';
+export {sourceGroups};
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=value=>value==null?'Nedostupné':new Intl.NumberFormat('sk-SK').format(value);
 const shortDate=value=>value.slice(8,10)+'.'+value.slice(5,7)+'.';
-export const sourceGroups=[['facebook','Facebook',['facebook_ads','facebook']],['instagram','Instagram',['instagram_ads','instagram']],['other','Others',['meta','direct','unknown','organic']]];
 export function groupChartDay(day){
- const sources=sourceGroups.map(([source,label,keys])=>{
-  const rows=day.sources.filter(row=>source==='other'?!sourceGroups.slice(0,2).some(([, ,members])=>members.includes(row.source)):keys.includes(row.source));
+ const sources=sourceGroups.map(([source,label])=>{
+  const rows=day.sources.filter(row=>sourceGroup(row.source)===source);
   const sum=key=>day[key]==null||rows.some(row=>row[key]==null)?null:rows.reduce((total,row)=>total+row[key],0);
   return {source,label,visits:sum('visits'),uniqueVisitors:sum('uniqueVisitors')};
  });

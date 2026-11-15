@@ -172,6 +172,9 @@ const origin='https://pixelkovia.rodulab.com';
   }
   await page.locator('#refresh-marketing').click();await ready();
   const latestDay=page.locator('.marketing-chart-day').last();
+  assert.equal(await page.locator('#marketing-kpi-visits strong').innerText(),'9');
+  assert.deepEqual(await page.locator('#marketing-kpi-visits .marketing-source-segment>span').allTextContents(),['2','2','5'],'funnel includes ordinary FB/IG links in the same platforms as the chart');
+  assert.deepEqual(await page.locator('.marketing-funnel-legend>span').allTextContents(),['Facebook','Instagram','Ostatné / neznáme']);
   assert.deepEqual(await latestDay.locator('.chart-bar').evaluateAll(els=>els.map(el=>el.getAttribute('class'))),['chart-bar chart-source-other','chart-bar chart-source-instagram','chart-bar chart-source-facebook']);assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
   assert.match(await page.locator('.marketing-audience>.marketing-section-heading').innerText(),/Návštevy: 9/);
   assert.equal(await page.locator('[data-audience-device="mobile"] strong').textContent(),'3');
@@ -203,7 +206,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('#marketing-site-switch').uncheck();
   assert.equal(await page.locator('.marketing-funnel').textContent(),pixelkoviaOverview,'Pixelkovia overview is unchanged after a studio refresh');
   assert.equal(await page.locator('[data-marketing-day-count]').last().textContent(),'9');
-  assert.deepEqual(await page.locator('[data-marketing-detail="kpi-visits"] [data-funnel-source] b').allTextContents(),['1','1','7']);
+  assert.deepEqual(await page.locator('[data-marketing-detail="kpi-visits"] [data-funnel-source] b').allTextContents(),['2','2','5']);
   const webWidths=await page.locator('.marketing-funnel-step:not(:first-child) .marketing-source-track').evaluateAll(els=>els.map(el=>parseFloat(el.style.width)));
   assert.ok(Math.abs(webWidths[1]/webWidths[0]-2/9)<.001);assert.ok(Math.abs(webWidths[2]/webWidths[0]-1/9)<.001,'bar lengths use volumes, not decorative steps');
   await page.locator('#marketing-kpi-visits').click();assert.ok(await page.locator('[data-marketing-detail="kpi-visits"] .marketing-source-counts').isVisible());await page.keyboard.press('Escape');
