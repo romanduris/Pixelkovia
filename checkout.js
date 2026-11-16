@@ -1,6 +1,8 @@
 (() => {
   'use strict';
-  const {product,money,offer,quote}=SITE_CONFIG;
+  const {product,money,offer,quote:catalogQuote}=SITE_CONFIG;
+  let approvedGiftVoucher='';
+  const quote=(selected,baseId,atlas,voucher,gift)=>catalogQuote(selected,baseId,atlas,voucher,gift,approvedGiftVoucher);
   const gamePriceCents=product('episode-1').priceCents;
   const {cover,button}=PIXELKOVIA_BOOK_PREVIEWS;
   const complete=quote(offer.bookIds);
@@ -416,13 +418,28 @@
   });
   voucherDialog.addEventListener('close',()=>{document.body.style.overflow=previousOverflow;voucherOpen.focus({preventScroll:true});});
   voucherInput.addEventListener('input',clearVoucherError);
-  document.querySelector('#voucher-form').addEventListener('submit',event=>{
+  document.querySelector('#voucher-form').addEventListener('submit',async event=>{
     event.preventDefault();
-    const q=quote([...selected],baseId,atlasSelected,voucherInput.value,giftSelected);
-    if(!q.voucher){voucherError.textContent=voucherInput.value.trim()?'Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.':'Zadajte kód voucheru.';voucherError.hidden=false;voucherInput.setAttribute('aria-invalid','true');voucherInput.focus();return;}
-    voucherCode=q.voucher;update();voucherDialog.close();
+    const value=voucherInput.value,apply=document.querySelector('.voucher-apply');
+    if(apply.disabled)return;
+    let q=quote([...selected],baseId,atlasSelected,value,giftSelected);
+    if(!value.trim()){voucherError.textContent='Zadajte kód voucheru.';voucherError.hidden=false;voucherInput.setAttribute('aria-invalid','true');voucherInput.focus();return;}
+    if(!q.voucher&&!/^[a-z0-9-]{1,64}$/i.test(value.trim())){voucherError.textContent='Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.';voucherError.hidden=false;voucherInput.setAttribute('aria-invalid','true');voucherInput.focus();return;}
+    try{
+      if(!['free','1e'].includes(value.trim().toLowerCase())){
+        apply.disabled=true;apply.textContent='Overujem…';
+        const result=await post('/api/checkout/voucher',{code:value});
+        if(!voucherDialog.open||voucherInput.value!==value)return;
+        approvedGiftVoucher=result.gift&&result.code===value.trim().toLowerCase()?result.code:'';
+        q=quote([...selected],baseId,atlasSelected,value,giftSelected);
+        if(!q.voucher)throw Error('Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.');
+      }
+      voucherCode=q.voucher;update();voucherDialog.close();
+    }catch(error){
+      if(voucherDialog.open&&voucherInput.value===value){voucherError.textContent=error.status&&error.status<500?error.message:'Voucher sa nepodarilo overiť. Skontrolujte pripojenie a skúste to znova.';voucherError.hidden=false;voucherInput.setAttribute('aria-invalid','true');voucherInput.focus();}
+    }finally{apply.disabled=false;apply.textContent='Uplatniť voucher';}
   });
-  document.querySelector('#voucher-remove').addEventListener('click',()=>{voucherCode='';update();voucherDialog.close();});
+  document.querySelector('#voucher-remove').addEventListener('click',()=>{voucherCode='';approvedGiftVoucher='';update();voucherDialog.close();});
   async function resetOrder(){
     if(checking||preparing||recoveringPayment||embedded?.inFlight)return;
     const change=document.querySelector('#change-order');change.disabled=true;
@@ -453,7 +470,7 @@
   // Checkout exposes no reliable pre-confirmation "wallet opened" event.
   window.addEventListener('pageshow',event=>{if(event.persisted&&(returned||returnedCheckout||purchase?.sessionId)&&!embedded&&!recoveringPayment)void paymentStatus();});
   configurationPromise=api('/api/checkout/config').then(value=>{configuration=value;document.querySelector('#payment-note').textContent=value.enabled?'Bezpečná platba kartou priamo tu. Prístup dostanete automaticky e-mailom.':'Platby teraz nie sú dostupné. Skúste to o chvíľu alebo nám napíšte na miky@pixelkovia.rodulab.com.';update();}).catch(()=>{diagnostic('config_error');document.querySelector('#payment-note').textContent='Platobnú službu sa nepodarilo načítať. Skontrolujte spojenie a obnovte stránku.';});
-  if(purchase?.input){const input=purchase.input;form.elements.email.value=input.email;if(input.baseId===baseId){atlasSelected=input.atlasIncluded;giftSelected=!!input.giftGame;voucherCode=input.voucherCode;input.books.forEach(id=>selected.add(id));}}
+  if(purchase?.input){const input=purchase.input;form.elements.email.value=input.email;if(input.baseId===baseId){atlasSelected=input.atlasIncluded;giftSelected=!!input.giftGame;voucherCode=input.voucherCode;approvedGiftVoucher=input.voucherCode;input.books.forEach(id=>selected.add(id));}}
   update();
   const recovering=returned||returnedCheckout||purchase?.sessionId;
   if(purchase&&!recovering){creating=true;lockOrder(true);update();void preparePayment(purchase.input,{freshVisit:true}).catch(handlePrepareError);}

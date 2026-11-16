@@ -17,6 +17,7 @@ import {recordStudioVisit} from './studio-traffic.mjs';
 import {marketingEvent,linkMarketingAttempt,marketingReport,pruneMarketing} from './marketing.mjs';
 import {consentState,saveConsent,readConsent,prunePrivacy} from './privacy.mjs';
 import {claimMetaPurchase} from './meta-purchase.mjs';
+import {validateVoucher} from './gift-vouchers.mjs';
 import {syncMetaAds,scheduledMetaAds,saveMetaCampaign} from './meta-ads.mjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
@@ -87,6 +88,7 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
       return json(await marketingEvent(request,env,await body(request),Date.now(),consent));
     }
     if(path==='/api/checkout/config'&&request.method==='GET')return json(checkoutConfig(env));
+    if(path==='/api/checkout/voucher'&&request.method==='POST'){sameOrigin(request);return json(await validateVoucher(env,await body(request)));}
     if(path==='/api/checkout/status'&&request.method==='GET'){
       const session=url.searchParams.get('session_id'),checkoutId=url.searchParams.get('checkout_id');
       if(checkoutId?!/^[a-f0-9-]{36}$/.test(checkoutId):!/^cs_(?:test_|live_)[a-zA-Z0-9]{10,200}$/.test(session||''))throw new HttpError(400,'Neplatná platobná relácia.');

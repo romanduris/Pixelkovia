@@ -144,7 +144,7 @@ const paymentPanelOpen=id=>paymentUI.panels.has(id)?' open':'';
 function paymentStatus(row){
   const status=Object.hasOwn(attemptStateNames,row.status)?row.status:'unknown';
   const note=row.state==='refunded'?'Vrátená':row.state==='pending'?'Overuje sa':['paid','free'].includes(row.state)&&status!=='successful'?'Čaká na webhook':'';
-  const label=status==='successful'&&row.voucherCode==='free'&&row.totalCents===0?'Úspešná · zdarma':attemptStateNames[status];
+  const label=status==='successful'&&row.totalCents===0?'Úspešná · zdarma':attemptStateNames[status];
   const shortLabel=({cancelled:'Zrušená',error:'Chyba',successful:'Úspešná'})[status]||attemptStateNames[status];
   return `<span class="payment-status-line"><span class="status attempt-${status}" aria-label="${escape(label)}" title="${escape(row.reason||'Neznáme')}"><span class="payment-status-full">${escape(label)}</span><span class="payment-status-short" aria-hidden="true">${escape(shortLabel)}</span></span>${note?`<small class="payment-status-note">${note}</small>`:''}${row.issues?.length?`<button type="button" class="payment-issue-badge" data-payment-issues="${escape(row.id)}" title="${escape(row.issues.map(i=>i.label).join(' · '))}">!<span class="payment-issue-badge-label"> Pozornosť</span></button>`:''}</span>`;
 }
@@ -180,7 +180,7 @@ function paymentCell(row,id,tableRow=false){
   }
 }
 function paymentCellLine(row,id){
-  const titles={amount:row.totalCents==null?'Neznáme':money(row.totalCents),date:row.createdAt==null?'Neznáme':date(row.createdAt),email:row.email||'Neznáme',products:paymentProducts(row),method:paymentMethodNames[row.method]||'Neznáme',reference:[row.id,row.sessionId].filter(Boolean).join(' / '),status:[row.status==='successful'&&row.voucherCode==='free'&&row.totalCents===0?'Úspešná · zdarma':attemptStateNames[row.status]||'Neznáme',...(row.issues||[]).map(i=>i.label)].join(' · ')};
+  const titles={amount:row.totalCents==null?'Neznáme':money(row.totalCents),date:row.createdAt==null?'Neznáme':date(row.createdAt),email:row.email||'Neznáme',products:paymentProducts(row),method:paymentMethodNames[row.method]||'Neznáme',reference:[row.id,row.sessionId].filter(Boolean).join(' / '),status:[row.status==='successful'&&row.totalCents===0?'Úspešná · zdarma':attemptStateNames[row.status]||'Neznáme',...(row.issues||[]).map(i=>i.label)].join(' · ')};
   return `<span class="payment-cell-line"${titles[id]?` title="${escape(titles[id])}"`:''}>${paymentCell(row,id,true)}</span>`;
 }
 function paymentDelivery(row){
@@ -699,7 +699,7 @@ $('#close-detail').addEventListener('click',()=>{detailId++;$('#detail').close()
   $('#mode-label').textContent=context.environment==='local'?'Lokálne prostredie':context.authMode==='password'?'Prihlásenie heslom':'Overené cez Cloudflare Access';
   if(context.environment==='local'){$('#environment-banner').hidden=false;$('#environment-banner').textContent=context.demo?'LOKÁLNE DEMO · Všetci zákazníci, nákupy a herné relácie sú fiktívne testovacie údaje.':'LOKÁLNY TEST · Bez produkčného prihlásenia. Prázdne dáta sa nenahrádzajú demo zákazníkmi.';}
   if(context.fakeCustomers>0){$('#environment-banner').hidden=false;$('#environment-banner').textContent=`FAKE ÚDAJE · Databáza obsahuje ${context.fakeCustomers} fiktívnych zákazníkov. Prehľady zahŕňajú ich simulované nákupy, tržby a hrania. Nejde o skutočné platby.`;}
-  if(context.webUrl){const base=new URL(context.webUrl);if(base.protocol==='https:')$('#external-links').innerHTML=[['Funnel','/'],['Supervisor','/Supervisor'],['Storyboard','/admin/storyboard']].map(([label,path])=>`<a href="${escape(new URL(path,base).href)}" target="_blank" rel="noopener noreferrer">${label} <span>↗</span></a>`).join('');}
+  if(context.webUrl){const base=new URL(context.webUrl);if(base.protocol==='https:')$('#external-links').innerHTML=[['Funnel','/'],['Supervisor','/Supervisor'],['Storyboard','/admin/storyboard'],['Darčekové poukazy','/admin/vouchers']].map(([label,path])=>`<a href="${escape(new URL(path,base).href)}" target="_blank" rel="noopener noreferrer">${label} <span>↗</span></a>`).join('');}
   readAnalysisLink();readPaymentLink();
   await load();
 }catch(error){$('#notice').textContent=error.message;$('#view').innerHTML=empty('Administrátorské prihlásenie alebo konfigurácia nie sú dostupné.');$('#view').setAttribute('aria-busy','false');}})();

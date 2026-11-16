@@ -208,7 +208,7 @@ export async function paymentReport(env,params,ready){
         sum(o.status='paid' AND d.status='failed') delivery_errors,sum(o.status='paid' AND d.status<>'sent' AND o.created_at<?) delivery_delays,
         sum(d.order_id IS NOT NULL) delivery_count,sum(d.status='sent') sent_count,sum(d.status='failed') failed_count,sum(d.status='queued') queued_count,max(d.sent_at) sent_at
       FROM linked_orders l JOIN orders o ON o.id=l.order_id LEFT JOIN access_deliveries d ON d.order_id=o.id GROUP BY l.attempt_id
-    ) SELECT a.id,a.email,a.stripe_session_id,a.total_cents,a.created_at,a.selection,a.gift_game,a.voucher_code,a.fixed_total_voucher,
+    ) SELECT a.id,a.email,a.stripe_session_id,a.total_cents,a.created_at,a.selection,a.gift_game,a.voucher_code,a.fixed_total_voucher,a.gift_voucher_code,
     a.subtotal_cents,a.bundle_discount_cents,a.voucher_discount_cents,p.state observed_state,p.checked_at,p.paid_at,coalesce(m.method,s.problem_method) method,
     s.webhook_confirmed_at,s.cancelled_at,s.problem_kind,s.problem_type,s.problem_code,
     EXISTS(SELECT 1 FROM payment_log l JOIN payment_event_reviews r ON r.event_id=l.id WHERE l.attempt_id=a.id AND l.type=s.problem_type AND l.created_at=s.problem_at AND r.reviewed_at IS NOT NULL) problem_reviewed,
@@ -249,7 +249,7 @@ export async function paymentReport(env,params,ready){
     if((!attemptStatus||monitorStatus===attemptStatus)&&(!attentionOnly||issues.length)&&(!attemptId||a.id===attemptId))matching.push({
       issues,
       id:a.id,email:a.email||'Neznáme',sessionId:a.stripe_session_id,totalCents:a.total_cents,createdAt:a.created_at,checkedAt:a.checked_at,state:status,status:monitorStatus,reason,failureKind:a.problem_kind||null,method:a.method||'unknown',products:JSON.parse(a.selection),giftGame:!!a.gift_game,
-      voucherCode:a.voucher_code||a.fixed_total_voucher||null,
+      voucherCode:a.gift_voucher_code||a.voucher_code||a.fixed_total_voucher||null,
       subtotalCents:a.subtotal_cents,bundleDiscountCents:a.bundle_discount_cents,voucherDiscountCents:a.voucher_discount_cents,
       providerState:a.observed_state||null,webhookConfirmedAt:a.webhook_confirmed_at||null,
       orderCount:a.order_count,expectedOrderCount:a.gift_game?2:1,orderStates:a.order_states?a.order_states.split(',').sort():[],fulfilledAt:a.fulfilled_at||null,

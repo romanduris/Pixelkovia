@@ -8,8 +8,8 @@ async function files(directory,prefix=''){const list=[];for(const item of await 
 export async function prepareProtected(output){
   const publicFiles=(await files(output)).filter(f=>!f.startsWith('_')).map(f=>'/'+f),inventory={};
   const code=['site-config.js','game-data.js','story-text.js','prep-store.js','print-materials.js','printables.js','site-content.js','cipko-game.js','app.js','game-bridge.js'];
-  const documents=[['/hra','game.html','run'],['/admin/storyboard','storyboard.html','admin'],['/materialy','printables.html','game'],['/kniznica/citat','library-read.html','customer']];
-  const add=async(route,file,role,document=false)=>{const target=path.join(output,'_protected',file);await mkdir(path.dirname(target),{recursive:true});await cp(path.join(root,file),target);inventory[route]={file,role,document};};
+  const documents=[['/hra','game.html','run'],['/admin/storyboard','storyboard.html','admin'],['/admin/vouchers','gift-vouchers.html','admin'],['/materialy','printables.html','game'],['/kniznica/citat','library-read.html','customer']];
+  const add=async(route,file,role,document=false,source=file)=>{const target=path.join(output,'_protected',file);await mkdir(path.dirname(target),{recursive:true});await cp(path.join(root,source),target);inventory[route]={file,role,document};};
   for(const file of code)await add('/'+file,file,'game');
   // Publish only preparation copy from the existing parent guide, behind the
   // same paid-game authorization. No solutions enter the public portal bundle.
@@ -20,6 +20,12 @@ export async function prepareProtected(output){
   await writeFile(path.join(output,'_protected/supervisor-preparation.json'),JSON.stringify(placements)+'\n');
   inventory['/supervisor-preparation.json']={file:'supervisor-preparation.json',role:'game',document:false};
   await add('/signal-print.css','signal-print.css','game');
+  await add('/gift-vouchers.css','gift-vouchers.css','admin');
+  await add('/admin/vouchers.pdf','assets/gift-vouchers/pixelkovia-darcekove-poukazy-A4.pdf','admin');
+  for(const font of ['Manrope-ExtraBold.ttf','DM-Sans-Medium.ttf']){
+    const file='assets/gift-vouchers/'+font;
+    await add('/'+file,file,'admin',false,'assets/social/facebook/sources/fonts/'+font);
+  }
   for(const [route,file,role]of documents)await add(route,file,role,true);
   for(const file of await files(path.join(root,'assets'))){
     // Social authoring files remain in the repository and are not deployed.
@@ -28,7 +34,7 @@ export async function prepareProtected(output){
     if(/^sales\/family-.*\.webp$/.test(file))continue;
     if(!/\.(?:webp|png|svg|mp3|mp4|pdf|ttf|ico)$/.test(file))continue;
     const relative='assets/'+file;if(publicFiles.includes('/'+relative))continue;
-    const role=/^books\/(before|after)-[123]\.webp$/.test(file)?'book-'+file.split('/')[1].split('-')[0]:file.startsWith('finale-production/')&&!file.endsWith('start-a.png')?'admin':'game';
+    const role=file.startsWith('gift-vouchers/')?'admin':/^books\/(before|after)-[123]\.webp$/.test(file)?'book-'+file.split('/')[1].split('-')[0]:file.startsWith('finale-production/')&&!file.endsWith('start-a.png')?'admin':'game';
     await add('/'+relative,relative,role);
   }
   await writeFile(path.join(output,'_routes.json'),JSON.stringify({version:1,include:['/*'],exclude:[]}));

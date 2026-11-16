@@ -24,7 +24,7 @@ module.exports=async(page,{screenshotPrefix}={})=>{
  await page.locator('[name="atlas"]').check();
  if(screenshotPrefix){await page.locator('.checkout-summary').scrollIntoViewIfNeeded();await page.screenshot({path:screenshotPrefix+'-applied.png'});}
  await open.click();assert.equal(await input.inputValue(),'free');assert.ok(await remove.isVisible());
- await input.fill('not-free');await apply.click();assert.ok(await dialog.evaluate(el=>el.open));
+ await input.fill('not-free');await apply.click();await page.waitForFunction(()=>!document.querySelector('.voucher-apply').disabled);assert.ok(await dialog.evaluate(el=>el.open));
  assert.equal(await total.innerText(),'0,00 €','invalid replacement preserves the voucher');
  await page.keyboard.press('Escape');assert.ok(await dialog.isHidden());
  await open.click();await remove.click();assert.equal(await total.innerText(),'19,98 €');assert.ok(await discount.isHidden());
@@ -40,7 +40,7 @@ module.exports=async(page,{screenshotPrefix}={})=>{
  await page.locator('#addon-gift-game').check();assert.equal(await total.innerText(),'1,00 €');assert.equal(await discount.locator('strong').innerText(),'−28,97 €');
  await page.locator('[name="atlas"]').uncheck();assert.equal(await total.innerText(),'1,00 €');await page.locator('[name="atlas"]').check();
  if(screenshotPrefix)await page.screenshot({path:screenshotPrefix+'-one-euro.png'});
- await open.click();await input.fill('unknown');await apply.click();assert.equal(await total.innerText(),'1,00 €');
+ await open.click();await input.fill('unknown');await apply.click();await page.waitForFunction(()=>!document.querySelector('.voucher-apply').disabled);assert.equal(await total.innerText(),'1,00 €');
  await input.fill('free');await apply.click();assert.equal(await total.innerText(),'0,00 €');
  await open.click();await input.fill('1e');await apply.click();assert.equal(await total.innerText(),'1,00 €');
  await open.click();await remove.click();assert.equal(await total.innerText(),'29,97 €');assert.ok(await discount.isHidden());
