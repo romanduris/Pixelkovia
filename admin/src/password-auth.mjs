@@ -1,8 +1,8 @@
 // Password-only admin: server secrets, bounded login attempts and opaque revocable sessions.
 import {first,execute,hash,randomToken} from './db.mjs';
 const encoder=new TextEncoder();
-export const SESSION_MS=8*3600000;
-export const IDLE_MS=30*60000;
+// Keep this device signed in for a bounded 30 days; logout and password rotation revoke it.
+export const SESSION_MS=30*86400000;
 export const WINDOW_MS=15*60000;
 export const ITERATIONS=100000; // Workers' deployed WebCrypto iteration limit; separately peppered.
 const hex=bytes=>Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
@@ -38,7 +38,7 @@ export async function passwordSession(request,env,at=Date.now()){
   if(!record||!env.TQ_DB||!token)return null;
   const digest=await hash(token),session=await first(env.TQ_DB,'SELECT * FROM admin_sessions WHERE token_hash=?',digest);
   if(!session)return null;
-  if(session.password_version!==record.version||session.expires_at<=at||at-session.last_seen_at>=IDLE_MS){await execute(env.TQ_DB,'DELETE FROM admin_sessions WHERE token_hash=?',digest);return null;}
+  if(session.password_version!==record.version||session.expires_at<=at){await execute(env.TQ_DB,'DELETE FROM admin_sessions WHERE token_hash=?',digest);return null;}
   if(at-session.last_seen_at>=60000)await execute(env.TQ_DB,'UPDATE admin_sessions SET last_seen_at=? WHERE token_hash=?',at,digest);
   return {email:'Správca TreasureQuest',authMode:'password',sessionHash:digest};
 }

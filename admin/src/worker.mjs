@@ -4,7 +4,7 @@ import {customerLibrary,readBook,editorBook} from './library-service.mjs';
 import {dashboard,analytics,customers,customerDetail,orders,filters} from './analytics.mjs';
 import {entitlement,readChecklist,saveChecklist,portalVisit,activate,requireRun,gameEvent,publicRun} from './game-service.mjs';
 import {templates} from './email-templates.mjs';
-import {passwordLogin,passwordLogout,sessionCookie,clearCookie} from './password-auth.mjs';
+import {passwordLogin,passwordLogout,passwordSession,sessionCookie,clearCookie} from './password-auth.mjs';
 import {fakeCustomerCount} from './fake-customers.mjs';
 import {customerLogin,customerLogout,customerCookie} from './customer-auth.mjs';
 import {portal,paidProducts,runToken,syncRun,finishRun,feedback} from './customer-portal.mjs';
@@ -124,6 +124,7 @@ export default {async scheduled(event,env){await Promise.allSettled([sendPending
     if(path==='/api/customer/library'||path.startsWith('/api/customer/library/'))return await libraryApi(request,env,path);
     if(path.startsWith('/api/customer/'))return await customerApi(request,env,path);
     if(env.ADMIN_AUTH_MODE==='password' && ['/login','/login.html','/login.css','/login.js'].includes(path) && ['GET','HEAD'].includes(request.method)){
+      if(['/login','/login.html'].includes(path)&&await passwordSession(request,env))return new Response(null,{status:303,headers:{Location:'/','Cache-Control':'no-store'}});
       // Assets resolves extensionless HTML itself; requesting /login.html redirects back to /login.
       const target=new URL(request.url);if(path==='/login.html')target.pathname='/login';
       return secureAsset(await env.ASSETS.fetch(new Request(target,request)));

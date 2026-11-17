@@ -30,7 +30,7 @@ Krátky prístupový e-mail posiela Resend z `Piko@pixelkovia.rodulab.com`. Kým
 
 ## Upozornenia na nové objednávky
 
-Políčko **Notification** v ľavom menu (na telefóne hore) ovláda spoločné serverové nastavenie. Na žiadosť vlastníka sú upozornenia po nasadení zapnuté. Pixi posiela krátky HTML aj textový e-mail po každej novej overenej objednávke na súkromnú adresu z `SUPPORT_FORWARD_TO`: čas v Bratislave, suma, e-mail kupujúceho a odkaz do hernej analýzy pre daný nákup. Prihlásenie zachová cieľ odkazu. Zákaznícke prístupy naďalej posiela Piko samostatne.
+Políčko **Notification** v ľavom menu (na telefóne hore) ovláda spoločné serverové nastavenie. Na žiadosť vlastníka sú upozornenia po nasadení zapnuté. Pixi posiela krátky HTML aj textový e-mail po každej novej overenej objednávke na súkromnú adresu z `SUPPORT_FORWARD_TO`: čas v Bratislave, suma, e-mail kupujúceho a odkaz do hernej analýzy pre daný nákup. Ak je správca prihlásený, odkaz otvorí príslušný nákup; nové prihlásenie otvorí Predajný funnel. Zákaznícke prístupy naďalej posiela Piko samostatne.
 
 Migrácia `0027_order_notifications.sql` pridáva nastavenie a frontu. Fronta vzniká atómovo s objednávkou; opakovaný webhook ju neduplikuje. Darčeková druhá hra má vlastné upozornenie. Vypnutie zruší čakajúce upozornenia a opätovné zapnutie neposiela historické objednávky. Zlyhania poskytovateľa opakuje existujúci desaťminútový cron s rovnakým idempotency kľúčom. Súkromná adresa ani prístupové heslá sa neukladajú do fronty a API nastavenia adresu nezverejňuje.
 
@@ -49,3 +49,7 @@ PLAYWRIGHT_MODULE=/cesta/k/playwright node tests/customer-journey.test.cjs
 ```
 
 Browser test si sám spustí izolovaný Worker a D1 s výslovne testovacími údajmi. Nezapája produkčné platby ani odosielanie. Demo a fixture nástroje sa používajú iba lokálne; produkcia má skutočné objednávky a nezobrazuje fiktívnych zákazníkov.
+
+## Prihlásenie správcu
+
+Prihlásenie na zariadení platí najviac 30 dní od zadania hesla, aj po obnovení stránky a nečinnosti. Server uchováva iba hash odvolateľného tokenu; cookie zostáva HttpOnly, Secure a SameSite=Strict. Odhlásenie a zmena hesla reláciu zrušia. Už prihlásený správca z `/admin/login` prejde priamo na Predajný funnel; úspešné prihlásenie vždy otvorí `/admin#marketing`. Formulár podporuje správcu hesiel cez `username` a `current-password`; samotné automatické doplnenie závisí od prehliadača. Heslo sa v aplikácii neukladá.

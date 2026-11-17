@@ -1,6 +1,6 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
 import {fresh} from './support.mjs';import {first,query} from '../src/db.mjs';
-import {makePasswordSecrets,passwordLogin,passwordSession,passwordLogout,SESSION_MS,IDLE_MS} from '../src/password-auth.mjs';
+import {makePasswordSecrets,passwordLogin,passwordSession,passwordLogout,SESSION_MS} from '../src/password-auth.mjs';
 import worker from '../src/worker.mjs';
 const TEST_PASSWORD='local-test-only-password-84931';
 const request=(path='/',cookie='')=>new Request('https://admin.example.invalid'+path,{headers:{cookie,'CF-Connecting-IP':'192.0.2.22'}});
@@ -26,18 +26,21 @@ test('login is same-origin, omits secrets from JSON, issues HttpOnly secure cook
  assert.equal((await worker.fetch(post('/api/admin/login','https://attacker.example.invalid'),env)).status,403);
  const login=await worker.fetch(post('/api/admin/login'),env);assert.equal(login.status,200);
  assert.deepEqual(await login.json(),{authenticated:true});
- const setCookie=login.headers.get('set-cookie');for(const flag of ['__Host-tq-admin=','HttpOnly','Secure','SameSite=Strict','Path=/'])assert.ok(setCookie.includes(flag));
+ const setCookie=login.headers.get('set-cookie');for(const flag of ['__Host-tq-admin=','HttpOnly','Secure','SameSite=Strict','Path=/','Max-Age=2592000'])assert.ok(setCookie.includes(flag));
  const logout=await worker.fetch(post('/api/admin/logout','https://admin.example.invalid',{cookie:setCookie.split(';')[0]}),env);assert.equal(logout.status,200);assert.ok(logout.headers.get('set-cookie').includes('Max-Age=0'));
  assert.equal((await first(db,'SELECT COUNT(*) count FROM admin_sessions')).count,0);db.close();
 });
-test('per-IP login throttling, eight-hour absolute expiry, idle timeout and password rotation are enforced server-side',async()=>{
+test('per-IP throttling, 30-day absolute expiry and password rotation are enforced server-side',async()=>{
  const db=fresh(),at=Date.now(),env={ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',TQ_DB:db,...await makePasswordSecrets(TEST_PASSWORD)};
  for(let n=0;n<5;n++)assert.equal((await passwordLogin(request(),env,'wrong-long-password-000',at)).status,401);
  const limited=await passwordLogin(request(),env,TEST_PASSWORD,at);assert.equal(limited.status,429);assert.ok(limited.retryAfter>0);
  const rows=await query(db,'SELECT scope_key FROM admin_login_attempts');assert.ok(rows.every(row=>!row.scope_key.includes('192.0.2.22')));
  const good=await passwordLogin(request(),env,TEST_PASSWORD,at+16*60000);assert.equal(good.status,200);
  assert.ok(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+1000));
- assert.equal(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+IDLE_MS+1),null);
+ assert.equal(SESSION_MS,30*86400000);
+ assert.ok(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+86400000),'returning after a day of inactivity stays signed in');
+ assert.ok(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+SESSION_MS-1));
+ assert.equal(await passwordSession(request('/',cookie(good.token)),env,at+16*60000+SESSION_MS),null);
  const next=await passwordLogin(request(),env,TEST_PASSWORD,at+32*60000);assert.equal(next.status,200);
  assert.equal(await passwordSession(request('/',cookie(next.token)),env,at+32*60000+SESSION_MS+1),null);
  const rotating=await passwordLogin(request(),env,TEST_PASSWORD,at+48*60000);assert.equal(rotating.status,200);
@@ -54,4 +57,19 @@ test('global throttle, missing secrets and oversized/malformed password requests
  const large=new Request('https://admin.example.invalid/api/admin/login',{method:'POST',headers:{origin:'https://admin.example.invalid','content-type':'application/json'},body:'x'.repeat(17000)});
  assert.equal((await worker.fetch(large,env)).status,413);
  await assert.rejects(()=>makePasswordSecrets('short'));db.close();
+});
+
+test('login page skips the form only for a valid server session and sends admins to the funnel',async()=>{
+ const db=fresh(),env={ENVIRONMENT:'production',ADMIN_AUTH_MODE:'password',TQ_DB:db,...await makePasswordSecrets(TEST_PASSWORD),ASSETS:{fetch:async()=>new Response('login form')}};
+ try{
+  const good=await passwordLogin(request(),env,TEST_PASSWORD);
+  for(const path of ['/login','/login.html']){
+   const anonymous=await worker.fetch(request(path),env);assert.equal(anonymous.status,200);assert.equal(await anonymous.text(),'login form');
+   const invalid=await worker.fetch(request(path,cookie('a'.repeat(64))),env);assert.equal(invalid.status,200);
+   const authenticated=await worker.fetch(request(path,cookie(good.token)),env);
+   assert.equal(authenticated.status,303);assert.equal(authenticated.headers.get('location'),'/');assert.equal(authenticated.headers.get('cache-control'),'no-store');
+  }
+  await passwordLogout(request('/',cookie(good.token)),env);
+  assert.equal((await worker.fetch(request('/login',cookie(good.token)),env)).status,200);
+ }finally{db.close();}
 });
