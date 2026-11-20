@@ -115,7 +115,7 @@ export async function createCheckout(env,input){
   if(input.giftGame!==undefined&&(typeof input.giftGame!=='boolean'||(input.giftGame&&input.baseId!=='episode-1')))throw new HttpError(400,'Druhú hru možno pridať iba k základnej hre.');
   if(input.uiMode!==undefined&&!['hosted','elements','form'].includes(input.uiMode))throw new HttpError(400,'Neplatný platobný formulár.');
   const gift=await giftVoucher(env.TQ_DB,input.voucherCode);
-  const q=quote([...input.books].sort(),input.baseId,input.atlasIncluded,input.voucherCode,input.giftGame,gift?.code);
+  const q=quote([...input.books].sort(),input.baseId,input.atlasIncluded,input.voucherCode,input.giftGame,gift?.code,gift?.total_cents);
   let id=uuid(),at=Date.now();
   if(input.voucherCode?.trim()&&!q.voucher)throw new HttpError(400,'Tento voucher nepoznáme. Skontrolujte kód a skúste to znova.');
   const ids=[q.baseId,...q.books,...(q.atlasIncluded?[offer.atlasId]:[])];
@@ -196,7 +196,7 @@ export async function fulfill(env,sessionId){
   if(!attempt||session.amount_total!==attempt.total_cents||session.currency!=='eur'||session.livemode!==env.STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_'))throw new HttpError(400,'Platbu sa nepodarilo priradiť k objednávke.');
   if(attempt.total_cents===0&&(attempt.voucher_code!=='free'||session.metadata?.voucher_code!=='free'||!completedFree))throw new HttpError(400,'Objednávku zdarma sa nepodarilo overiť.');
   if(attempt.fixed_total_voucher==='1e'&&(attempt.total_cents!==100||session.metadata?.voucher_code!=='1e'||session.payment_status!=='paid'||session.status!=='complete'))throw new HttpError(400,'Platbu s kupónom sa nepodarilo overiť.');
-  verifyGiftVoucher(session,attempt);
+  verifyGiftVoucher(session,attempt,{fulfilling:true});
   const intentId=typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null;
   await execute(db,'UPDATE checkout_attempts SET payment_intent=? WHERE id=?',intentId,attempt.id);
   if(session.payment_intent?.latest_charge?.refunded===true)await execute(db,'INSERT OR IGNORE INTO payment_refunds VALUES(?,?)',intentId,Date.now());

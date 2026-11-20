@@ -36,5 +36,22 @@ async function fixture(){
    assert.equal((await f.db.prepare('SELECT count(*) n FROM orders').first()).n,2);
   }finally{if(first)await first.close();if(other)await other.close();f.db.close();}
  }
+ for(const width of [390,1360]){
+  const f=await fixture();let first,other;
+  try{
+   first=await open(browser,{width,backend:f.backend});
+   await first.voucher(' LiNhY ');await first.page.waitForFunction(()=>!document.querySelector('#voucher-dialog').open);
+   assert.equal(await first.page.locator('#order-total').innerText(),'1,00 €');
+   assert.match(await first.page.locator('#summary-voucher').innerText(),/nákup za 1,00 €/);
+   await first.page.screenshot({path:'/tmp/pixelkovia-linhy-'+width+'-'+(process.env.QA_BROWSER||'chromium')+'.png',fullPage:true});
+   await first.start();assert.equal(first.f.totalCents,100);assert.equal(await first.page.evaluate(()=>inlineFixture.cardElements),1);
+   const session=[...f.sessions.values()][0];session.status='complete';session.payment_status='paid';
+   const {fulfill}=await import('../admin/src/commerce.mjs');f.env.RESEND_API_KEY='';await fulfill(f.env,session.id);
+   other=await open(browser,{width:390,backend:f.backend});await other.voucher('linhy');
+   await other.page.waitForFunction(()=>!document.querySelector('#voucher-error').hidden);
+   assert.match(await other.page.locator('#voucher-error').innerText(),/poukaz už bol použitý/);
+   assert.equal(f.sessions.size,1);
+  }finally{if(first)await first.close();if(other)await other.close();f.db.close();}
+ }
  console.log('Gift checkout passed on '+(process.env.QA_BROWSER||'chromium')+': mobile/desktop, all add-ons, zero card fields, competing device and spent-code rejection.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

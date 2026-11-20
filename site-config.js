@@ -22,7 +22,7 @@
   const offer = {refundDays:14, contactEmail:'miky@pixelkovia.rodulab.com', refundEmail:'guardy@pixelkovia.rodulab.com', bookIds:['story-book-before','story-book-after'], atlasId:'atlas-pixelkov', completeBundleCents:1998, additionalGameCents:999, campaign:'early-bird'};
   // All prices are calculated in integer cents.
   // Standalone books remain independent; the complete offer applies only to the game.
-  const quote = (selected = [], baseId = 'episode-1', includeAtlas = true, voucherCode = '', includeGift = false, approvedGiftVoucher = '') => {
+  const quote = (selected = [], baseId = 'episode-1', includeAtlas = true, voucherCode = '', includeGift = false, approvedGiftVoucher = '', approvedGiftTotalCents = 0) => {
     if(!offer.bookIds.includes(baseId))baseId='episode-1';
     const books=offer.bookIds.filter(id=>id!==baseId&&selected.includes(id));
     const booksCents=books.reduce((sum,id)=>sum+product(id).priceCents,0);
@@ -35,7 +35,7 @@
     const code=typeof voucherCode==='string'?voucherCode.trim().toLowerCase():'';
     const giftVoucher=code&&/^[a-z0-9-]{1,64}$/.test(code)&&code===approvedGiftVoucher?code:null;
     const voucher=['free','1e'].includes(code)?code:giftVoucher;
-    const totalCents=voucher&&voucher!=='1e'?0:voucher==='1e'?100:beforeVoucherCents;
+    const totalCents=voucher==='1e'?100:voucher==='free'?0:giftVoucher?approvedGiftTotalCents:beforeVoucherCents;
     const voucherDiscountCents=beforeVoucherCents-totalCents;
     const giftTotalCents=voucher?Math.round(totalCents*giftCents/beforeVoucherCents):giftCents;
     return {books, booksCents, baseId, bundleDiscountCents, subtotalCents, atlasIncluded:Boolean(includeAtlas), atlasCents:0, giftGame, giftCents, giftTotalCents, primaryTotalCents:totalCents-giftTotalCents, voucher, voucherDiscountCents, totalCents};

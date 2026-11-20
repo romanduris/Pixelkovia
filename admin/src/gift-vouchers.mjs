@@ -5,7 +5,7 @@ export const normalizeVoucher=value=>typeof value==='string'?value.trim().toLowe
 export const voucherUnavailable=()=>new HttpError(409,'Tento darčekový poukaz už bol použitý alebo sa práve uplatňuje v inej objednávke.');
 export async function giftVoucher(db,value){
   const code=normalizeVoucher(value);
-  return /^[a-z0-9-]{1,64}$/.test(code)?first(db,'SELECT v.code,c.attempt_id reserved_attempt_id,r.attempt_id redeemed_attempt_id,r.redeemed_at FROM gift_vouchers v LEFT JOIN gift_voucher_claims c ON c.code=v.code LEFT JOIN gift_voucher_redemptions r ON r.code=v.code WHERE v.code=?',code):null;
+  return /^[a-z0-9-]{1,64}$/.test(code)?first(db,'SELECT v.code,v.total_cents,c.attempt_id reserved_attempt_id,r.attempt_id redeemed_attempt_id,r.redeemed_at FROM gift_vouchers v LEFT JOIN gift_voucher_claims c ON c.code=v.code LEFT JOIN gift_voucher_redemptions r ON r.code=v.code WHERE v.code=?',code):null;
 }
 export async function validateVoucher(env,input){
   if(typeof input.code!=='string'||input.code.length>64)throw new HttpError(400,'Zadajte platný kód voucheru.');
@@ -16,11 +16,12 @@ export async function validateVoucher(env,input){
   if(row.redeemed_attempt_id)throw voucherUnavailable();
   // Validation does not reserve or consume a gift. Availability is checked
   // again atomically when its Stripe checkout is prepared.
-  return {code:row.code,gift:true};
+  return {code:row.code,gift:true,...(row.total_cents?{totalCents:row.total_cents}:{})};
 }
 export async function releaseGiftVoucher(db,attempt){
   if(attempt.gift_voucher_code)await execute(db,'DELETE FROM gift_voucher_claims WHERE code=? AND attempt_id=? AND NOT EXISTS(SELECT 1 FROM gift_voucher_redemptions WHERE code=?)',attempt.gift_voucher_code,attempt.id,attempt.gift_voucher_code);
 }
-export function verifyGiftVoucher(session,attempt){
+export function verifyGiftVoucher(session,attempt,{fulfilling=false}={}){
+  if(attempt.gift_voucher_code&&attempt.total_cents>0&&(session.metadata?.voucher_code!==attempt.gift_voucher_code||(fulfilling&&(session.status!=='complete'||session.payment_status!=='paid'))))throw new HttpError(400,'Platbu s poukazom sa nepodarilo overiť.');
   if((session.metadata?.gift_voucher_code||null)!==(attempt.gift_voucher_code||null))throw new HttpError(400,'Darčekový poukaz sa nepodarilo overiť.');
 }

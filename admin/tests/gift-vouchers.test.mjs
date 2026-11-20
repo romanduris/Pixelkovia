@@ -24,7 +24,7 @@ function fixture(){
   async expire(id){const s=sessions.get(id);s.status='expired';return s;}
  }}}};
  const input={baseId:'episode-1',books:['story-book-before','story-book-after'],atlasIncluded:true,giftGame:true,email:'gift@example.invalid',voucherCode:' KOVO ',attemptKey:crypto.randomUUID(),uiMode:'elements'};
- const complete=id=>{sessions.get(id).status='complete';};
+ const complete=id=>{const s=sessions.get(id);s.status='complete';if(s.amount_total>0)s.payment_status='paid';};
  return {db,env,input,sessions,complete,lose(){lose=true;},failRead(value){failRead=value;},event(id,eventId='evt_gift'){
   const payload=JSON.stringify({id:eventId,type:'checkout.session.completed',data:{object:{id,payment_status:'no_payment_required'}}});
   return new Request('https://pixelkovia.rodulab.com/api/stripe/webhook',{method:'POST',body:payload,headers:{'stripe-signature':sdk.webhooks.generateTestHeaderString({payload,secret:env.STRIPE_WEBHOOK_SECRET})}});
@@ -121,5 +121,42 @@ test('validation normalizes only server-known codes and never reserves or redeem
   for(const code of ['unknown','<script>','',null,'a'.repeat(65)])await assert.rejects(()=>validateVoucher(f.env,{code}),e=>e.status===400);
   assert.equal((await first(f.db,'SELECT count(*) n FROM gift_voucher_claims')).n,0);
   assert.deepEqual(await validateVoucher(f.env,{code:'free'}),{code:'free',gift:false});
+ }finally{f.db.close();}
+});
+
+test('linhy charges one euro from server data and can be paid and redeemed only once',async()=>{
+ const f=fixture();try{
+  assert.deepEqual(await validateVoucher(f.env,{code:' LiNhY '}),{code:'linhy',gift:true,totalCents:100});
+  const input={...f.input,voucherCode:' LiNhY ',books:[],giftGame:false,totalCents:0,voucherTotalCents:0};
+  const results=await Promise.allSettled([createCheckout(f.env,input),createCheckout(f.env,{...input,email:'other@example.invalid',attemptKey:crypto.randomUUID()})]);
+  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+  assert.equal(results.find(r=>r.status==='rejected').reason.status,409);
+  const a=results.find(r=>r.status==='fulfilled').value,s=f.sessions.get(a.sessionId);
+  assert.equal(a.totalCents,100);assert.equal(s.amount_total,100);assert.equal(s.metadata.voucher_code,'linhy');
+  s.payment_status='unpaid';assert.equal(await fulfill(f.env,s.id),null);
+  s.status='complete';s.payment_status='no_payment_required';assert.equal(await fulfill(f.env,s.id),null);
+  assert.equal((await giftVoucher(f.db,'linhy')).redeemed_attempt_id,null);
+  s.payment_status='paid';s.status='open';await assert.rejects(()=>fulfill(f.env,s.id),e=>e.status===400);
+  s.status='complete';s.metadata.voucher_code='free';await assert.rejects(()=>fulfill(f.env,s.id),e=>e.status===400);
+  s.metadata.voucher_code='linhy';s.amount_total=0;await assert.rejects(()=>fulfill(f.env,s.id),e=>e.status===400);
+  s.amount_total=100;f.env.RESEND_API_KEY='';
+  await paymentWebhook(f.event(s.id),f.env);await paymentWebhook(f.event(s.id,'evt_linhy_retry'),f.env);
+  assert.equal((await first(f.db,'SELECT count(*) n FROM orders')).n,1);
+  assert.equal((await first(f.db,'SELECT total_cents FROM orders')).total_cents,100);
+  assert.equal((await first(f.db,'SELECT count(*) n FROM gift_voucher_redemptions')).n,1);
+  await assert.rejects(()=>validateVoucher(f.env,{code:'linhy'}),e=>e.status===409);
+  f.env.RESEND_API_KEY='fixture';
+  await assert.rejects(()=>createCheckout(f.env,{...input,email:'third@example.invalid',attemptKey:crypto.randomUUID()}),e=>e.status===409);
+ }finally{f.db.close();}
+});
+test('linhy abandoned unpaid checkout releases only after verified expiry',async()=>{
+ const f=fixture();try{
+  const input={...f.input,voucherCode:'linhy',giftGame:false,books:[]};
+  const a=await createCheckout(f.env,input);f.sessions.get(a.sessionId).payment_status='unpaid';
+  f.failRead(true);await assert.rejects(()=>releaseCheckout(f.env,{attemptKey:input.attemptKey}));
+  assert.ok((await giftVoucher(f.db,'linhy')).reserved_attempt_id);
+  f.failRead(false);await releaseCheckout(f.env,{attemptKey:input.attemptKey});
+  assert.equal((await giftVoucher(f.db,'linhy')).reserved_attempt_id,null);
+  assert.equal((await createCheckout(f.env,{...input,attemptKey:crypto.randomUUID()})).totalCents,100);
  }finally{f.db.close();}
 });
