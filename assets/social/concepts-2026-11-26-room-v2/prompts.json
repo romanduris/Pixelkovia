@@ -1,0 +1,91 @@
+{
+  "mode": "built-in image_gen",
+  "date": "2026-11-26",
+  "revision": 2,
+  "format": "4:5 only; other ratios wait for owner selection",
+  "roomAnchor": {
+    "source": "Five images attached by the owner in this turn; room, furniture, colour and atmosphere reference only.",
+    "mechanism": "num_last_images_to_include:5",
+    "output": "sources/room-anchor.webp",
+    "prompt": "Use all five supplied images ONLY as the EXACT ROOM, ARCHITECTURE, FURNITURE, COLOUR AND LIGHTING reference for a new photorealistic campaign. Create a single EMPTY ROOM anchor photograph, PORTRAIT 4:5, target 1122x1402.\nPreserve this recognizable same living room: blue evening light through window and curtains on the LEFT, navy-blue fabric sofa with a thick cream-and-navy knitted throw and burnt orange cushion across middle, tall dark honey-oak BOOKCASE filled with books and a small globe on RIGHT, trailing green houseplants over shelves, warm amber floor/table lamp with woven cream shade at right behind sofa, substantial warm worn wooden coffee table dominating foreground. Deep blue shadows, amber warm practical light, restrained cyan reflected highlights. The intimate cozy evening room must match the references rather than become a different generic living room. Maintain the arrangement and character of the furniture.\nREMOVE every person, mascot, paper, smartphone, magnifier, fictional treasure prop, graphic, text, logo, glowing path and advertisement copy. We need just an empty real photographic room and clear wooden tabletop. Leave top approximately 20–24% as usable dark room wall/curtain backdrop for later advertising lettering, but keep this atmospheric and continuous, not a flat colour panel. Show more tabletop and surrounding room than the close-up reference photographs: wide 35mm editorial interior photograph, believable real wood/fabric/plant detail, ordinary beautiful home, subtle film texture, photorealistic NOT CGI, NOT painterly, NOT hyperprocessed. No text or borders. Full-bleed canvas."
+  },
+  "sceneReferences": {
+    "image1": "sources/room-anchor.webp",
+    "image2": "../concepts-2026-11-26/sources/[matching scene].webp",
+    "roles": "Image1 locks living room/light/architecture. Image2 is human photographic realism and family identity only; no old framing or room."
+  },
+  "baseScenePrompt": "Produce a new FULL-BLEED PHOTOREALISTIC 4:5 lifestyle advertising photograph for Pixelkovia, a family detective adventure played with printed A4 clues and one shared smartphone. Image 1 is the LOCKED ROOM / LIGHTING reference: preserve that EXACT same room, furniture layout and colour atmosphere. Image 2 is ONLY a reference for the humans' convincing photographic skin/hair/anatomy and natural expressions; do NOT copy its close framing, generic room, text, papers or screen.\nROOM: keep the recognizable navy sofa, blue evening window on LEFT, amber lamp and tall warm oak BOOKCASE with books/globe on RIGHT, trailing plants, knitted throw and orange cushion. Same amber-blue cozy evening atmosphere as Image 1, believable practical illumination. Preserve this room, not a different home. Real wood, textiles, gentle film grain; amber and blue lights on skin must be subtle and physically plausible, never orange plastic faces, airbrushing, cinematic CGI or glossy AI stock-photo skin.\nFRAMING / SALES PRIORITY: zoom OUT about 25–30 percent from a close-up family advertisement. Show MORE of the room, table and activity. The GAME and the real materials will be the main subject; people support the scene. People's heads should be visibly SMALLER than in Image 2; the family sits further from camera, in the MIDDLE DISTANCE. Foreground wooden table occupies roughly lower 40–45% of image. Leave top 22–27% as atmospheric dark room/curtain/wall for later lettering, with real room detail visible; not a flat navy panel. Show generous tabletop at both sides for later tiny mascots. The photo fills every canvas edge.\nPRODUCT COMPOSITING SLOTS: show EXACTLY ONE clean completely BLANK WHITE A4 sheet on table, its top edge approximately at 64–68% image height, visible printed area extending down toward 89% height and the rest continuing beyond bottom canvas. Leave it physically clear and in focus. At lower RIGHT show ONE real dark portrait smartphone lying on same table, visibly large (about 18% canvas width, 22% height) with ALL FOUR inner-screen corners visible, completely uniform near-black BLANK screen for exact original game insert. Aim phone screen top around 63–67% height, bottom no lower than 88% height. No hands across its screen. Hands may point NEXT TO the paper but not cover its central area. A simple pencil on empty wood is okay.\nABSOLUTELY NO other papers, round decoders, wheels, puzzle cut-outs, maps, treasure props, graphics, writing, letters, numbers, screen interfaces, logos, headlines, mascots or magical trails. The original actual game materials and small approved mascots will be added separately. Do not invent game components. Anatomically correct natural hands, subtle honest expressions, no exaggerated laughter or giant portrait faces. No borders, watermark or text.",
+  "scenes": [
+    {
+      "id": "A1",
+      "file": "A1-rodina-spolu",
+      "scene": "A father about 38 and a daughter about 9 and boy about 11 lean together at the far side of the wooden coffee table; all three FACES visible but medium-distance and modest in size. Girl quietly notices a clue, father listens with warm restrained smile, boy thinks. Muted slate blue, cream and beige knitwear, no matching outfits."
+    },
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "scene": "A mother about 36 and two children about 8 and 12 at the far side of the coffee table, all three FACES visible. Children sit low near sofa, mother slightly behind between them. They naturally study the blank clue area, one child points beside it. Wider environmental photograph, ordinary family cooperation."
+    },
+    {
+      "id": "A3",
+      "file": "A3-jeden-mobil",
+      "scene": "A mother and father about 40 and one daughter about 10 at far side of coffee table, all three FACES visible at modest scale. The daughter gestures gently toward shared phone without touching its screen; both parents listen and help as equals. Wider room view, calm genuine enjoyment."
+    },
+    {
+      "id": "A4",
+      "file": "A4-mame-to",
+      "scene": "A father about 42 and two children about 8 and 11 sit farther back at the coffee table, all three FACES visible. The boy looks up at dad with a small pleased discovery smile, dad returns the look, girl still thinks over the paper. Show the authentic shared 'we solved it' moment but keep foreground game largest."
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "scene": "A mother about 35 and two children about 9 and 12 sit together near sofa at far side of coffee table; all three FACES visible but smaller than close-up. Daughter softly smiles at her brother's suggestion, mother warmly engaged with clue. Lived-in knitwear, candid early-evening moment, game foreground dominates."
+    },
+    {
+      "id": "B1",
+      "file": "B1-ponad-plece",
+      "scene": "STRICTLY NO visible faces or cheek/nose profiles. Correct elevated OVER-THE-SHOULDER view from BEHIND a mother and two children, backs of heads/shoulders frame lower LEFT and RIGHT edges without dominating. The table and products lie AHEAD of them, beyond their hands and in their forward line of sight. Preserve room behind table: navy sofa, amber right lamp/bookcase, blue left window. Do not put products behind their backs."
+    },
+    {
+      "id": "B2",
+      "file": "B2-ruky-a-indicie",
+      "scene": "STRICTLY NO FACES or side profiles. Close elevated over-the-shoulder view BEHIND two children, with only small cropped backs of heads at lower left/right edges and a parent's forearm reaching from far side of table to point next to blank sheet. Table and exact blank product slots AHEAD of children. More tabletop and room, less human body; natural pale oat/sage sleeves."
+    },
+    {
+      "id": "B3",
+      "file": "B3-spolocny-mobil",
+      "scene": "STRICTLY NO FACES. Higher over-the-shoulder view from BEHIND a father at left and two children at low left/right edges. Only backs of heads, shoulder edges and a few natural hands. The phone on table at right and paper at center-left are in FRONT OF the people, farther from camera than their hands, not behind them. Room atmosphere stays visible above."
+    },
+    {
+      "id": "B4",
+      "file": "B4-rodinny-tim",
+      "scene": "STRICTLY NO FACES. Elevated camera over and BEHIND a mother at low LEFT and children at low right/left edges, naturally leaning forward towards table. Do not line their backs across middle of frame. The clear blank paper and phone sit on table IN FRONT OF THEM, beyond hands; broad unobstructed product view, family secondary. Warm blue/amber room in upper background."
+    },
+    {
+      "id": "B5",
+      "file": "B5-dobrodruzstvo-na-stole",
+      "scene": "STRICTLY NO FACES or side profiles. A higher three-quarter view from BEHIND two children at lower frame edges and just a parent's sleeve/hand at far left side, as if parent quietly helps from beside table. Clear product paper and phone AHEAD of children, not behind their backs. Honey oak tabletop with detailed grain, blue and amber room beyond, muted blue/sage/brown sleeves."
+    }
+  ],
+  "mascots": {
+    "common": "Create a new character pose from the approved cutout reference, preserving PRECISE character identity, silhouette, face, proportions, colours, clothing, soft painted pixel-texture design and all distinctive details. This will be a SMALL miniature magical mascot accent in a photorealistic family adventure advertisement, not its main subject. Render tactile convincing dimensional surfaces, subtle real material grain, warm amber practical light from camera right and very soft blue evening rim light from left, plausible shadows and volumes, while preserving the original softly painted pixel identity. Friendly and witty, restrained expression, not an exaggerated cartoon redesign, no glossy plastic sheen.\nOne SINGLE full-body character only, on a GENUINELY TRANSPARENT background. No scenery, platform, tabletop, phone, chair, props other than the character's specified pencil/clipboard. All limbs and feet visible, 8% clear transparent padding, square canvas. No words, letters, name, label, logo or watermark anywhere.",
+    "poses": [
+      {
+        "id": "guardy-sitting",
+        "ref": "guardy",
+        "pose": "The exact orange ornate SHIELD character with teal necktie and glowing CYAN KEYHOLE sits on an invisible table edge, both little orange legs dangling toward viewer, hands resting beside the body, turned gently three-quarter towards camera RIGHT as if amused by a nearby puzzle. Keep the shield shape and orange limbs; no human torso or costume added."
+      },
+      {
+        "id": "piko-peeking",
+        "ref": "piko",
+        "pose": "The exact BLUE CLOUD-HEADED character with black screen face and cyan >_ expression, navy suit, white shirt and teal tie leans slightly FORWARD and looks down towards camera LEFT as if peeking curiously at a nearby phone. One little blue hand rests on an invisible edge, the other holds its original small plain orange CLIPBOARD with no writing. Both suited legs and shoes visible. Cloud head, not a helmet or human head."
+      },
+      {
+        "id": "pixi-seated",
+        "ref": "pixi",
+        "pose": "The exact YELLOW SQUARE living pixel in cream rounded square frame with orange sides and corner screws sits on an invisible horizontal letter edge, legs bent and feet dangling forward/down. One hand rests lightly beside it on the invisible edge; the other holds a small teal coloured pencil angled DOWN RIGHT as though about to underline the headline. Tilt body a little toward the pencil and the scene below. Keep tiny original segmented dark limbs and square cream shoes, four corner screws, large friendly black eyes. No visible letter or support in the cutout."
+      }
+    ]
+  },
+  "product": "No model-rendered product pixels. Exact assets/sales/game-lock-partial.webp and approved physically cropped public-previews decoder/path are inserted through native perspective SVG layers. Tiny approved character cutouts and all typography remain separate editable layers."
+}

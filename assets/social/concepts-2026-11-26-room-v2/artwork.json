@@ -1,0 +1,931 @@
+{
+  "date": "2026-11-26",
+  "status": "room-v2-for-owner-selection",
+  "ratio": "4:5",
+  "dimensions": [
+    1080,
+    1350
+  ],
+  "mode": "built-in image_gen + native editable SVG layout",
+  "publication": false,
+  "adActivation": false,
+  "destination": "https://pixelkovia.rodulab.com/",
+  "roomReference": "sources/room-anchor.webp",
+  "mascotAssets": [
+    {
+      "type": "guardy-sitting",
+      "file": "sources/mascots/guardy-sitting.png",
+      "sha256": "9a22cecf0a837e1638251e2fcf0cbb68af435e7ba3b64c42e9b785ae06933cba",
+      "embeddedMaxDimension": 384
+    },
+    {
+      "type": "piko-peeking",
+      "file": "sources/mascots/piko-peeking.png",
+      "sha256": "20694fe766bf500a009fe79e735275576e728b916a38f238ab4377e0a177d9ee",
+      "embeddedMaxDimension": 384
+    },
+    {
+      "type": "pixi-seated",
+      "file": "sources/mascots/pixi-seated.png",
+      "sha256": "87049b6cb478a7ed7bdb26793476fd373bf0f72ac0efe6eacc143fb870a48a23",
+      "embeddedMaxDimension": 384
+    }
+  ],
+  "provenance": "Generated illustrative families in the room and amber/blue atmosphere supplied by the owner; not customer photographs or testimonials. Wider views give the game more space. Approved miniature characters appear as small independent accents. Original game screenshot and physically cropped original worksheet previews inserted in perspective, with editable typography. No full worksheets, QR, answers or access credentials embedded.",
+  "screen": {
+    "source": "assets/sales/game-lock-partial.webp",
+    "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6"
+  },
+  "exports": [
+    {
+      "id": "A1",
+      "angle": "Papier + mobil + rodina",
+      "faces": true,
+      "file": "A1-rodina-spolu.png",
+      "editable": "editable/A1-rodina-spolu.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2917410,
+      "sha256": "80de6a9cd0ff9833fca41138d17f05eeeee63f3016011b29f0421dbee12a1ecf",
+      "photograph": "ce3903275874ffd81801a350d3f991a207f6ee1afa51005b28b510d7f12700df",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "A1",
+        "file": "A1-rodina-spolu",
+        "angle": 0,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            420,
+            968
+          ],
+          [
+            708,
+            969
+          ],
+          [
+            783,
+            1235
+          ],
+          [
+            336,
+            1234
+          ]
+        ],
+        "screen": [
+          [
+            779,
+            975
+          ],
+          [
+            890,
+            966
+          ],
+          [
+            990,
+            1153
+          ],
+          [
+            841,
+            1166
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "guardy-sitting",
+            "x": 83,
+            "y": 1003,
+            "w": 132,
+            "layer": "table"
+          },
+          {
+            "type": "pixi-seated",
+            "x": 556,
+            "y": 5,
+            "w": 138,
+            "layer": "letter"
+          }
+        ],
+        "sparkles": [
+          [
+            686,
+            117,
+            4
+          ],
+          [
+            699,
+            129,
+            5
+          ],
+          [
+            711,
+            142,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A2",
+      "angle": "Dobrodružstvo doma",
+      "faces": true,
+      "file": "A2-dobrodruzstvo-doma.png",
+      "editable": "editable/A2-dobrodruzstvo-doma.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2957181,
+      "sha256": "7f231b560a7165679ac3fdb05d3539e71197af527be4d9531d23c9e517d89363",
+      "photograph": "48799428c0a777bde123a0e50735a3d3c3e33c0f65dce76aa2afd3d201881049",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "A2",
+        "file": "A2-dobrodruzstvo-doma",
+        "angle": 1,
+        "paperSource": "path",
+        "paper": [
+          [
+            404,
+            1001
+          ],
+          [
+            665,
+            998
+          ],
+          [
+            755,
+            1268
+          ],
+          [
+            336,
+            1267
+          ]
+        ],
+        "screen": [
+          [
+            734,
+            1006
+          ],
+          [
+            819,
+            1001
+          ],
+          [
+            887,
+            1137
+          ],
+          [
+            778,
+            1144
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "guardy-sitting",
+            "x": 91,
+            "y": 1000,
+            "w": 132,
+            "layer": "table"
+          },
+          {
+            "type": "piko-peeking",
+            "x": 885,
+            "y": 903,
+            "w": 128,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            853,
+            981,
+            4
+          ],
+          [
+            865,
+            973,
+            5
+          ],
+          [
+            875,
+            960,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A3",
+      "angle": "Jeden mobil pre celý tím",
+      "faces": true,
+      "file": "A3-jeden-mobil.png",
+      "editable": "editable/A3-jeden-mobil.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2894137,
+      "sha256": "2f1b79a0b4ca85adb7289e84893b78a3f97f6e0eeffe817c028c61d2d178e58e",
+      "photograph": "d0fbf65de0414b0906b0fd021e941339e3a29f59be936df603756b1be408fe71",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "A3",
+        "file": "A3-jeden-mobil",
+        "angle": 2,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            390,
+            1007
+          ],
+          [
+            662,
+            1007
+          ],
+          [
+            720,
+            1265
+          ],
+          [
+            303,
+            1265
+          ]
+        ],
+        "screen": [
+          [
+            753,
+            1038
+          ],
+          [
+            848,
+            1038
+          ],
+          [
+            914,
+            1170
+          ],
+          [
+            792,
+            1178
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "pixi-seated",
+            "x": 64,
+            "y": 1028,
+            "w": 132,
+            "layer": "table"
+          },
+          {
+            "type": "piko-peeking",
+            "x": 915,
+            "y": 1000,
+            "w": 122,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            888,
+            1047,
+            4
+          ],
+          [
+            900,
+            1038,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A4",
+      "angle": "Spoločné rozlúštenie",
+      "faces": true,
+      "file": "A4-mame-to.png",
+      "editable": "editable/A4-mame-to.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2795166,
+      "sha256": "87763c8c33709760f16d43a22ba43e3dad2d72694799bdda41493d32cc7581a8",
+      "photograph": "0d2e30a9f0fcd59c383df56562391db89b9cd65011a2539284e105524792e7b1",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "A4",
+        "file": "A4-mame-to",
+        "angle": 3,
+        "paperSource": "path",
+        "paper": [
+          [
+            325,
+            950
+          ],
+          [
+            706,
+            950
+          ],
+          [
+            827,
+            1301
+          ],
+          [
+            215,
+            1300
+          ]
+        ],
+        "screen": [
+          [
+            795,
+            960
+          ],
+          [
+            907,
+            948
+          ],
+          [
+            1018,
+            1113
+          ],
+          [
+            870,
+            1134
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "guardy-sitting",
+            "x": 76,
+            "y": 1028,
+            "w": 134,
+            "layer": "table"
+          },
+          {
+            "type": "piko-peeking",
+            "x": 930,
+            "y": 1093,
+            "w": 112,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            919,
+            1128,
+            4
+          ],
+          [
+            908,
+            1119,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A5",
+      "angle": "Rodinný večer",
+      "faces": true,
+      "file": "A5-rodinny-vecer.png",
+      "editable": "editable/A5-rodinny-vecer.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2869335,
+      "sha256": "30ea49d6c2386c17c48f44296188f78b21abeb1a782ee646415a6b870a28cbae",
+      "photograph": "1204753f8ff0b6a04fcb152102183e2ce3ad1f519c8aebc9ebf6e574858a885f",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "A5",
+        "file": "A5-rodinny-vecer",
+        "angle": 4,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            414,
+            955
+          ],
+          [
+            712,
+            956
+          ],
+          [
+            795,
+            1289
+          ],
+          [
+            337,
+            1289
+          ]
+        ],
+        "screen": [
+          [
+            796,
+            984
+          ],
+          [
+            890,
+            977
+          ],
+          [
+            956,
+            1147
+          ],
+          [
+            836,
+            1157
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "pixi-seated",
+            "x": 100,
+            "y": 1029,
+            "w": 132,
+            "layer": "table"
+          },
+          {
+            "type": "piko-peeking",
+            "x": 943,
+            "y": 905,
+            "w": 119,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            923,
+            972,
+            4
+          ],
+          [
+            932,
+            960,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B1",
+      "angle": "Papier + mobil + rodina",
+      "faces": false,
+      "file": "B1-ponad-plece.png",
+      "editable": "editable/B1-ponad-plece.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2878829,
+      "sha256": "f42c5bb4ef607e7ce036512a6a104f1b22e59fc8e1dfb1f7974e902676efc479",
+      "photograph": "4d89654d713adfe9fff56586bdbb88cba8f2777bce48bb5e93691b57fc59ff71",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "B1",
+        "file": "B1-ponad-plece",
+        "angle": 0,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            455,
+            951
+          ],
+          [
+            708,
+            947
+          ],
+          [
+            791,
+            1272
+          ],
+          [
+            401,
+            1272
+          ]
+        ],
+        "screen": [
+          [
+            792,
+            989
+          ],
+          [
+            873,
+            986
+          ],
+          [
+            945,
+            1166
+          ],
+          [
+            836,
+            1177
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "piko-peeking",
+            "x": 688,
+            "y": 814,
+            "w": 116,
+            "layer": "table"
+          },
+          {
+            "type": "guardy-sitting",
+            "x": 267,
+            "y": 653,
+            "w": 97,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            779,
+            924,
+            4
+          ],
+          [
+            790,
+            935,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B2",
+      "angle": "Dobrodružstvo doma",
+      "faces": false,
+      "file": "B2-ruky-a-indicie.png",
+      "editable": "editable/B2-ruky-a-indicie.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2777910,
+      "sha256": "4ae7dcdaabcd3d6ff3798b26e2ae30bcc4e7180c49179659c6fa8025f195e0d8",
+      "photograph": "e71d029fb914ef8630b0f331775b83377d728ad633194e47400b82fc22d0cd48",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "B2",
+        "file": "B2-ruky-a-indicie",
+        "angle": 1,
+        "paperSource": "path",
+        "paper": [
+          [
+            382,
+            992
+          ],
+          [
+            681,
+            991
+          ],
+          [
+            743,
+            1322
+          ],
+          [
+            315,
+            1321
+          ]
+        ],
+        "screen": [
+          [
+            748,
+            996
+          ],
+          [
+            850,
+            989
+          ],
+          [
+            944,
+            1173
+          ],
+          [
+            815,
+            1189
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "guardy-sitting",
+            "x": 619,
+            "y": 813,
+            "w": 115,
+            "layer": "table"
+          },
+          {
+            "type": "pixi-seated",
+            "x": 550,
+            "y": 6,
+            "w": 134,
+            "layer": "letter"
+          }
+        ],
+        "sparkles": [
+          [
+            677,
+            117,
+            4
+          ],
+          [
+            688,
+            129,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B3",
+      "angle": "Jeden mobil pre celý tím",
+      "faces": false,
+      "file": "B3-spolocny-mobil.png",
+      "editable": "editable/B3-spolocny-mobil.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2861334,
+      "sha256": "ef715c41539e6d189968f26b00b49ab22eb81d5aca28ef38b1c0105367646bb1",
+      "photograph": "4d8489a47b0193f5c9de2b6a5e2c836f187e12c610e7b62786edba2092627781",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "B3",
+        "file": "B3-spolocny-mobil",
+        "angle": 2,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            483,
+            952
+          ],
+          [
+            671,
+            953
+          ],
+          [
+            707,
+            1206
+          ],
+          [
+            460,
+            1204
+          ]
+        ],
+        "screen": [
+          [
+            719,
+            986
+          ],
+          [
+            789,
+            983
+          ],
+          [
+            827,
+            1134
+          ],
+          [
+            744,
+            1136
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "piko-peeking",
+            "x": 650,
+            "y": 807,
+            "w": 105,
+            "layer": "table"
+          },
+          {
+            "type": "pixi-seated",
+            "x": 810,
+            "y": 637,
+            "w": 95,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            738,
+            914,
+            4
+          ],
+          [
+            749,
+            923,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B4",
+      "angle": "Spoločné rozlúštenie",
+      "faces": false,
+      "file": "B4-rodinny-tim.png",
+      "editable": "editable/B4-rodinny-tim.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2871476,
+      "sha256": "f8fb19728a64f2e837c9a83e9bd2a959b55daa3c98cc61e1f6f18120dea89b1d",
+      "photograph": "51cab9e48133bad7018c896da9f4b8d1ff7271d5ae1cb6e0641078d7982aa12f",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "B4",
+        "file": "B4-rodinny-tim",
+        "angle": 3,
+        "paperSource": "path",
+        "paper": [
+          [
+            469,
+            925
+          ],
+          [
+            709,
+            927
+          ],
+          [
+            754,
+            1228
+          ],
+          [
+            436,
+            1227
+          ]
+        ],
+        "screen": [
+          [
+            773,
+            947
+          ],
+          [
+            852,
+            947
+          ],
+          [
+            888,
+            1113
+          ],
+          [
+            789,
+            1116
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "guardy-sitting",
+            "x": 620,
+            "y": 760,
+            "w": 114,
+            "layer": "table"
+          },
+          {
+            "type": "pixi-seated",
+            "x": 464,
+            "y": 17,
+            "w": 130,
+            "layer": "letter"
+          }
+        ],
+        "sparkles": [
+          [
+            587,
+            128,
+            4
+          ],
+          [
+            600,
+            138,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B5",
+      "angle": "Rodinný večer",
+      "faces": false,
+      "file": "B5-dobrodruzstvo-na-stole.png",
+      "editable": "editable/B5-dobrodruzstvo-na-stole.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2764498,
+      "sha256": "24290675a1c01ddbdd4e5dfbe99559f43bc5587d1de4edd7fdfe48f98ce4ff96",
+      "photograph": "32c9765b9df05594c0b410b2da92d1e8b3972ae032b71550f6e29ae7ef0babd6",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "B5",
+        "file": "B5-dobrodruzstvo-na-stole",
+        "angle": 4,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            381,
+            950
+          ],
+          [
+            633,
+            947
+          ],
+          [
+            661,
+            1267
+          ],
+          [
+            340,
+            1267
+          ]
+        ],
+        "screen": [
+          [
+            691,
+            991
+          ],
+          [
+            782,
+            991
+          ],
+          [
+            823,
+            1175
+          ],
+          [
+            707,
+            1176
+          ]
+        ],
+        "mascots": [
+          {
+            "type": "guardy-sitting",
+            "x": 295,
+            "y": 638,
+            "w": 95,
+            "layer": "table"
+          },
+          {
+            "type": "piko-peeking",
+            "x": 625,
+            "y": 835,
+            "w": 105,
+            "layer": "table"
+          }
+        ],
+        "sparkles": [
+          [
+            714,
+            931,
+            4
+          ],
+          [
+            723,
+            943,
+            4
+          ]
+        ]
+      }
+    }
+  ]
+}
