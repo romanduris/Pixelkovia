@@ -1,0 +1,309 @@
+{
+  "angles": [
+    {
+      "name": "Papier + mobil + rodina",
+      "headline": [
+        "Papierové indície.",
+        "Príbeh v mobile.",
+        "Rodina v hre."
+      ],
+      "size": 65,
+      "supportY": 365,
+      "support": [
+        "Hľadajte stopy po byte.",
+        "Lúštite a objavujte spolu."
+      ]
+    },
+    {
+      "name": "Dobrodružstvo doma",
+      "headline": [
+        "Z obývačky rovno",
+        "do dobrodružstva."
+      ],
+      "size": 63,
+      "supportY": 300,
+      "support": [
+        "Vytlačené indície, príbeh v mobile",
+        "a jedna spoločná rodinná misia."
+      ]
+    },
+    {
+      "name": "Jeden mobil pre celý tím",
+      "headline": [
+        "Jeden mobil.",
+        "Celá rodina v hre."
+      ],
+      "size": 65,
+      "supportY": 300,
+      "support": [
+        "Papierové stopy vás spoja pri stole.",
+        "Príbeh v mobile vás povedie ďalej."
+      ]
+    },
+    {
+      "name": "Spoločné rozlúštenie",
+      "headline": [
+        "To spoločné",
+        "„máme to!“"
+      ],
+      "size": 76,
+      "supportY": 300,
+      "support": [
+        "Hľadajte a lúštite ako jeden tím.",
+        "Papierové indície. Príbeh v mobile."
+      ]
+    },
+    {
+      "name": "Rodinný večer",
+      "headline": [
+        "Dnes večer hráte",
+        "spolu."
+      ],
+      "size": 69,
+      "supportY": 300,
+      "support": [
+        "Papierové indície. Príbeh v mobile.",
+        "Dobrodružstvo pre deti aj rodičov."
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "A1",
+      "file": "A1-rodina-spolu",
+      "angle": 0,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          414,
+          962
+        ],
+        [
+          675,
+          962
+        ],
+        [
+          756,
+          1240
+        ],
+        [
+          330,
+          1240
+        ]
+      ],
+      "screen": [
+        [
+          700,
+          952
+        ],
+        [
+          774,
+          950
+        ],
+        [
+          814,
+          1053
+        ],
+        [
+          730,
+          1056
+        ]
+      ],
+      "paperRotation": 180,
+      "screenRotation": 180,
+      "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+      "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family.",
+      "headerMascot": {
+        "type": "pixi-seated",
+        "source": "../concepts-2026-11-26-room-v2/sources/mascots/pixi-seated.png",
+        "x": 558,
+        "y": 12,
+        "w": 116
+      }
+    },
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "angle": 1,
+      "paperSource": "path",
+      "paper": [
+        [
+          398,
+          995
+        ],
+        [
+          668,
+          995
+        ],
+        [
+          764,
+          1273
+        ],
+        [
+          329,
+          1273
+        ]
+      ],
+      "screen": [
+        [
+          711,
+          1003
+        ],
+        [
+          775,
+          1001
+        ],
+        [
+          803,
+          1096
+        ],
+        [
+          733,
+          1100
+        ]
+      ],
+      "paperRotation": 180,
+      "screenRotation": 180,
+      "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+      "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+    },
+    {
+      "id": "A3",
+      "file": "A3-jeden-mobil",
+      "angle": 2,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          386,
+          997
+        ],
+        [
+          655,
+          997
+        ],
+        [
+          725,
+          1272
+        ],
+        [
+          294,
+          1272
+        ]
+      ],
+      "screen": [
+        [
+          853,
+          1002
+        ],
+        [
+          912,
+          1000
+        ],
+        [
+          932,
+          1071
+        ],
+        [
+          866,
+          1073
+        ]
+      ],
+      "paperRotation": 180,
+      "screenRotation": 180,
+      "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+      "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+    },
+    {
+      "id": "A4",
+      "file": "A4-mame-to",
+      "angle": 3,
+      "paperSource": "path",
+      "paper": [
+        [
+          322,
+          945
+        ],
+        [
+          635,
+          945
+        ],
+        [
+          768,
+          1307
+        ],
+        [
+          207,
+          1307
+        ]
+      ],
+      "screen": [
+        [
+          687,
+          953
+        ],
+        [
+          769,
+          951
+        ],
+        [
+          799,
+          1055
+        ],
+        [
+          705,
+          1059
+        ]
+      ],
+      "paperRotation": 180,
+      "screenRotation": 180,
+      "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+      "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "angle": 4,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          407,
+          948
+        ],
+        [
+          685,
+          949
+        ],
+        [
+          801,
+          1296
+        ],
+        [
+          328,
+          1296
+        ]
+      ],
+      "screen": [
+        [
+          733,
+          947
+        ],
+        [
+          797,
+          946
+        ],
+        [
+          825,
+          1040
+        ],
+        [
+          755,
+          1042
+        ]
+      ],
+      "paperRotation": 180,
+      "screenRotation": 180,
+      "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+      "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+    }
+  ]
+}

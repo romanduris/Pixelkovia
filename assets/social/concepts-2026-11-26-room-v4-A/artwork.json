@@ -1,0 +1,388 @@
+{
+  "date": "2026-11-26",
+  "revision": 4,
+  "status": "room-v4-A-for-owner-selection",
+  "ratio": "4:5",
+  "dimensions": [
+    1080,
+    1350
+  ],
+  "mode": "built-in image_gen with integrated characters and tabletop objects + native editable SVG layout",
+  "publication": false,
+  "adActivation": false,
+  "destination": "https://pixelkovia.rodulab.com/",
+  "roomReference": "../concepts-2026-11-26-room-v2/sources/room-anchor.webp",
+  "provenance": "Generated illustrative families in the room and amber/blue atmosphere supplied by the owner; not customer photographs or testimonials. Small approved characters and pens are integrated into the source photographs with real object contact, local light, shadow and foreground occlusion. Background characters remain subtle. The smaller phone sits close to the family. Exact original game screenshot and physically cropped worksheet previews are inserted in perspective, both rotated toward the family. The paper print multiplies against the photographed ivory paper to retain local texture, cast shadows and colour; pens, marker and fingers stay in front of the print. The phone content screens against the photographed black glass to preserve reflections within a rounded physical display plane. Typography remains editable. No full worksheets, QR, answers or access credentials embedded.",
+  "screen": {
+    "source": "assets/sales/game-lock-partial.webp",
+    "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6"
+  },
+  "integration": {
+    "paper": "Masked CSS multiply over original photographed paper, retaining warm local light and cast shadows.",
+    "phone": "CSS screen blend over original photographed black glass, rounded 3px physical clip.",
+    "orientation": "Both exact content planes rotate 180 degrees toward the family."
+  },
+  "headerMascot": {
+    "source": "assets/social/concepts-2026-11-26-room-v2/sources/mascots/pixi-seated.png",
+    "sha256": "87049b6cb478a7ed7bdb26793476fd373bf0f72ac0efe6eacc143fb870a48a23"
+  },
+  "exports": [
+    {
+      "id": "A1",
+      "angle": "Papier + mobil + rodina",
+      "faces": true,
+      "file": "A1-rodina-spolu.png",
+      "editable": "editable/A1-rodina-spolu.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2997541,
+      "sha256": "f9e47279cb8734371a267cafd65de2258046d86e34b8c6f57332d3787bbb1bdf",
+      "photograph": "9ef6de34311f5d5af38c35e9afba31ddb9fbff09110508d6cac6d9d8f7d90a3c",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "placement": {
+        "id": "A1",
+        "file": "A1-rodina-spolu",
+        "angle": 0,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            414,
+            962
+          ],
+          [
+            675,
+            962
+          ],
+          [
+            756,
+            1240
+          ],
+          [
+            330,
+            1240
+          ]
+        ],
+        "screen": [
+          [
+            700,
+            952
+          ],
+          [
+            774,
+            950
+          ],
+          [
+            814,
+            1053
+          ],
+          [
+            730,
+            1056
+          ]
+        ],
+        "paperRotation": 180,
+        "screenRotation": 180,
+        "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+        "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family.",
+        "headerMascot": {
+          "type": "pixi-seated",
+          "source": "../concepts-2026-11-26-room-v2/sources/mascots/pixi-seated.png",
+          "x": 558,
+          "y": 12,
+          "w": 116
+        }
+      }
+    },
+    {
+      "id": "A2",
+      "angle": "Dobrodružstvo doma",
+      "faces": true,
+      "file": "A2-dobrodruzstvo-doma.png",
+      "editable": "editable/A2-dobrodruzstvo-doma.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2949566,
+      "sha256": "1e537e119fd3895a8b32e3d4a84d55018e435aa11b0477af02feb85154f3da12",
+      "photograph": "bb1c8af6f180816bf00169ff4f5a3276e3c83e5588bbc9eb348290f5ee4936bd",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "placement": {
+        "id": "A2",
+        "file": "A2-dobrodruzstvo-doma",
+        "angle": 1,
+        "paperSource": "path",
+        "paper": [
+          [
+            398,
+            995
+          ],
+          [
+            668,
+            995
+          ],
+          [
+            764,
+            1273
+          ],
+          [
+            329,
+            1273
+          ]
+        ],
+        "screen": [
+          [
+            711,
+            1003
+          ],
+          [
+            775,
+            1001
+          ],
+          [
+            803,
+            1096
+          ],
+          [
+            733,
+            1100
+          ]
+        ],
+        "paperRotation": 180,
+        "screenRotation": 180,
+        "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+        "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+      }
+    },
+    {
+      "id": "A3",
+      "angle": "Jeden mobil pre celý tím",
+      "faces": true,
+      "file": "A3-jeden-mobil.png",
+      "editable": "editable/A3-jeden-mobil.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2916831,
+      "sha256": "25b3c2ecb15d4c63cd9964c706b411976114dff9891a9c046bd7cb4dcb145f25",
+      "photograph": "102067e8347aac5d8667f61166b44d179ba381c0833f5e075069bca356ff5ab3",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "placement": {
+        "id": "A3",
+        "file": "A3-jeden-mobil",
+        "angle": 2,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            386,
+            997
+          ],
+          [
+            655,
+            997
+          ],
+          [
+            725,
+            1272
+          ],
+          [
+            294,
+            1272
+          ]
+        ],
+        "screen": [
+          [
+            853,
+            1002
+          ],
+          [
+            912,
+            1000
+          ],
+          [
+            932,
+            1071
+          ],
+          [
+            866,
+            1073
+          ]
+        ],
+        "paperRotation": 180,
+        "screenRotation": 180,
+        "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+        "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+      }
+    },
+    {
+      "id": "A4",
+      "angle": "Spoločné rozlúštenie",
+      "faces": true,
+      "file": "A4-mame-to.png",
+      "editable": "editable/A4-mame-to.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2863482,
+      "sha256": "b217b1a49c2496e807da1f7cd85e18fe837958e02de90b56c2eab573a438f26b",
+      "photograph": "57b4ed927c8b37da210e4447c1f5073d0e062cb21412bb1de2ab2a39795f1b79",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "placement": {
+        "id": "A4",
+        "file": "A4-mame-to",
+        "angle": 3,
+        "paperSource": "path",
+        "paper": [
+          [
+            322,
+            945
+          ],
+          [
+            635,
+            945
+          ],
+          [
+            768,
+            1307
+          ],
+          [
+            207,
+            1307
+          ]
+        ],
+        "screen": [
+          [
+            687,
+            953
+          ],
+          [
+            769,
+            951
+          ],
+          [
+            799,
+            1055
+          ],
+          [
+            705,
+            1059
+          ]
+        ],
+        "paperRotation": 180,
+        "screenRotation": 180,
+        "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+        "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+      }
+    },
+    {
+      "id": "A5",
+      "angle": "Rodinný večer",
+      "faces": true,
+      "file": "A5-rodinny-vecer.png",
+      "editable": "editable/A5-rodinny-vecer.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2903424,
+      "sha256": "e2a64f810ef3c7a7d9b12a5b405c1dd33b59daae7265f225e43e0746270af9cd",
+      "photograph": "e020ba7f8616c9be33f74748ee6e6c99f9abdf147e942a7a4a58314d8a35456e",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "placement": {
+        "id": "A5",
+        "file": "A5-rodinny-vecer",
+        "angle": 4,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            407,
+            948
+          ],
+          [
+            685,
+            949
+          ],
+          [
+            801,
+            1296
+          ],
+          [
+            328,
+            1296
+          ]
+        ],
+        "screen": [
+          [
+            733,
+            947
+          ],
+          [
+            797,
+            946
+          ],
+          [
+            825,
+            1040
+          ],
+          [
+            755,
+            1042
+          ]
+        ],
+        "paperRotation": 180,
+        "screenRotation": 180,
+        "mascotIntegration": "Baked into the edited scene with foreground occlusion and real contact shadows.",
+        "materialIntegration": "Photographic paper lighting and contact shadows, occluding stationery, reflective phone glass; original print and game contents face family."
+      }
+    }
+  ]
+}

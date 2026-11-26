@@ -1,0 +1,60 @@
+{
+  "mode": "built-in image_gen",
+  "revision": 4,
+  "date": "2026-11-26",
+  "scope": "five A concepts, 4:5 only",
+  "basePrompt": "Use case: precise-object-edit.\nAsset type: photorealistic family advertisement source photo, portrait 4:5, 1122x1402.\nIMAGE ROLES: Image 1 is the EXACT EDIT TARGET. Preserve this existing photograph, family identities, expressions, anatomy, camera framing, all furniture and approved miniature characters. Image 2 supplies the identity of ONE new TINY background character only.\nKEEP THE SAME ROOM AND MOOD: blue evening window left, navy couch with orange cushion and cream/navy knitted throw, warm amber woven lamp, oak bookcase with globe and plants right, real textured wooden table. Keep realistic skin/hair/knitwear, no airbrushing, no cartoon humans. Preserve clear dark upper 28% for editable text. No crop or zoom.\nLINKED REFINEMENTS:\n1) Make the existing BLUE CLOUD-HEADED suited character at the phone approximately TEN PERCENT SMALLER in both height and width (90% of current size). Preserve the pose, black screen face with cyan >_ expression, dark suit, teal tie and clipboard, and its curiosity towards the phone. Keep its feet/hands in real contact with wood, natural shadows, slightly leaning toward the actual screen. Retain the already successful SECOND CHARACTER peeking naturally from behind the adult/sofa, with hands holding the shoulder/backrest and body occluded. Do not move it to the foreground.\n2) Keep exactly ONE existing white A4 sheet at the SAME POSITION, size and perspective, and exactly ONE small smartphone at its SAME position near the family. The SHEET remains COMPLETELY BLANK for a later exact original cropped worksheet insert; NO generated writing, maze, icons, decoder, letters, QR or maps. The PHONE screen remains BLANK very dark near-black, all FOUR INNER SCREEN CORNERS clearly visible, not covered by fingers or characters. Keep the phone lying naturally on wood, realistic bezel thickness, rounded inner screen corners, subtle non-uniform real glass reflections, contact shadow. Light the sheet naturally in this same room: subtle ivory paper fibres, warm practical light from right and cool light from left, gentle local brightness/shadows, a very slight physical edge lift of 1–2mm at a corner and thin real edge shadow, not a warped or floating sheet. Preserve its flat useful print plane. Objects must feel photographed in the room.\n3) Add one or two ordinary DARK BLUE/BLACK ballpoint pens and ONE coloured felt-tip marker as specified below. Retain the existing wooden pencil. The COLOURED marker lies DIAGONALLY partly OVER a corner of the BLANK PAPER, crossing from wood onto paper with a real soft contact shadow crossing onto the paper. It obscures only a small corner, not the main clue area. Pens naturally rest at slightly different angles on wood, one may partly cross another paper edge. Matte solid coloured pen/marker bodies with no white barrels, no metallic reflections, NO branding/text. Realistic everyday school stationery, not oversized. Everything has consistent perspective, believable contact and cast shadows. Do not draw lines on the paper.\n4) Add exactly ONE ADDITIONAL tiny character matching Image 2, hidden tastefully in the background in the position specified below. Only about 4–6% image height, smaller and less contrasty than the existing shoulder-peeking character. Match the ambient shadow/amber light, partly hide it behind a book/leaf/frame. It should be an enjoyable SECOND-LOOK easter egg, difficult to notice at first glance, not glowing, not brightly outlined, not pasted in front. Keep original soft painted pixel style and silhouette, no generic redesign, no text/name.\nNo extra props, people, papers, phones or characters beyond these. No words, typography, logo, watermark, button, graphic trails. Preserve all successful original composition, original room and human realism.",
+  "scenes": [
+    {
+      "id": "A1",
+      "file": "A1-rodina-spolu",
+      "extra": "cipko",
+      "details": "STATIONERY: one matte navy ballpoint on wood at lower left, and one muted teal felt-tip marker lying diagonally across the lower LEFT corner of the sheet, partly on wood. Keep a generous clear central print area. BACKGROUND EASTER EGG: the green circuit-board character with dark square glasses and gold pins from Image 2 sits at the RIGHT bookcase shelf among book spines near a trailing plant, about 50–60px tall; foliage hides part of it, with soft shadow and low contrast. It blends with the green leaves and warm books.",
+      "references": [
+        "../concepts-2026-11-26-room-v3-A/sources/A1-rodina-spolu.webp",
+        "../../sales/characters/cipko.webp"
+      ]
+    },
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "extra": "miky",
+      "details": "STATIONERY: two thin matte dark blue/black ballpoints on wood at casually different angles and one muted coral-red felt-tip marker crossing the lower RIGHT paper corner diagonally, with its contact shadow clear on the ivory sheet. BACKGROUND EASTER EGG: the tiny cream/teal microphone character from Image 2 stands on the low sideboard next to the small framed photograph behind the mother's shoulder, about 55px tall, partly hidden by the frame and ambient shadow. Quiet warm cream colour, no bright aura.",
+      "references": [
+        "../concepts-2026-11-26-room-v3-A/sources/A2-dobrodruzstvo-doma.webp",
+        "../../sales/characters/miky.webp"
+      ]
+    },
+    {
+      "id": "A3",
+      "file": "A3-jeden-mobil",
+      "extra": "plugy",
+      "details": "STATIONERY: one matte black pen near the paper on wood, one muted violet-purple marker partly crossing the lower LEFT paper edge at a diagonal, natural shadow on the sheet. BACKGROUND EASTER EGG: the tiny cream USB-shaped living character from Image 2, blue segmented arms and orange hands, hangs playfully by ONE hand from the lower RIGHT edge of the woven lampshade, both legs dangling near lamp support, only about 60px tall. No cable tail or added connector. Warm shade light, low contrast, visually tucked behind the family, not a neon floating toy.",
+      "references": [
+        "../concepts-2026-11-26-room-v3-A/sources/A3-jeden-mobil.webp",
+        "../../sales/characters/plugy.webp"
+      ]
+    },
+    {
+      "id": "A4",
+      "file": "A4-mame-to",
+      "extra": "pingy",
+      "details": "STATIONERY: one navy pen and one black pen on wood, and a muted mustard-orange marker crossing the lower RIGHT paper corner diagonally with its actual soft cast shadow. Keep the family pointing area clear. BACKGROUND EASTER EGG: the tiny cream/green envelope character from Image 2 peeks between books and a plant pot on the RIGHT bookcase, about 50–55px tall, lower body partly hidden by a book. Its little message card must NOT emit bright light; it blends into the bookcase's warm shadow and is easy to miss.",
+      "references": [
+        "../concepts-2026-11-26-room-v3-A/sources/A4-mame-to.webp",
+        "../../sales/characters/pingy.webp"
+      ]
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "extra": "cipko",
+      "details": "STATIONERY: one matte navy pen on wood and a muted forest-green marker crossing the lower LEFT paper corner, partly on wood, with natural shadow on paper. BACKGROUND EASTER EGG: the tiny green glasses-wearing circuit-board character from Image 2 is beside a flowerpot on the LEFT windowsill behind the family, approximately 50–60px tall, partly hidden by a broad plant leaf and blue evening shadows. Make it quiet and low contrast, with no glowing tablet or bright rim. Keep the existing yellow square behind the mother's shoulder.",
+      "references": [
+        "../concepts-2026-11-26-room-v3-A/sources/A5-rodinny-vecer.webp",
+        "../../sales/characters/cipko.webp"
+      ]
+    }
+  ],
+  "product": "Exact original cropped decoder/path and game-lock-partial are projected with native SVG, rotated 180 to the family; multiply print inherits photo paper grain, light, stationery cast shadows. Screen uses source glass reflections and rounded inner clip. Header uses existing approved Pixi cutout in A1 only."
+}
