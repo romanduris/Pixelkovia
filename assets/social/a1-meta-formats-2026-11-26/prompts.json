@@ -1,0 +1,103 @@
+{
+  "mode": "built-in image_gen",
+  "date": "2026-11-26",
+  "sourceConcept": "A1 V4 only",
+  "sourcePhoto": "../concepts-2026-11-26-room-v4-A/sources/A1-rodina-spolu.webp",
+  "priority": [
+    "readability",
+    "CTA-safe area",
+    "family emotion",
+    "visual quality",
+    "brand consistency"
+  ],
+  "safeAreas": "7% sides; bottom22% no critical copy; story top15%; same conservative bottom22% used in landscape",
+  "basePrompt": "Use case: compositing / precise-object-edit.\nAsset type: NATIVE FORMAT ADAPTATION of the supplied finished campaign photograph, not a new concept.\nImage 1 is the EXACT A1 V4 SOURCE PHOTO AND FAMILY IDENTITY reference. Recompose/outpaint this same scene into the requested NEW CANVAS ratio. Preserve the same father (beige cable-knit sweater), daughter (slate blue top), boy (beige top), original believable photographic faces, hairstyles, natural gestures and warm shared expression; do not swap identities or invent a new family. Retain the father leaning in, girl pointing next to the clue and thoughtful boy, with all three faces clearly visible.\nKeep this exact blue-and-amber cozy room: navy sofa, orange cushion, knitted cream/navy throw, blue evening window on LEFT, woven amber lamp and oak bookcase/globe/plants on RIGHT. Maintain natural photographic skin/hair/materials, fine wood/fabric texture, no CGI gloss or airbrushed AI faces. Preserve the small orange ornate shield with teal tie peeking behind father's shoulder, the small blue cloud-headed suited character with teal tie and clipboard near the phone, and the tiny subtle green circuit-board character among books. These are exact approved soft painted pixel mascots, secondary accents with original identity, lighting, real contact and occlusion.\nKeep the GAME interaction: exactly ONE blank ivory A4 sheet, ONE small physical smartphone close to the family, pencil, matte navy pen, muted teal marker diagonally crossing the lower-left paper corner with a real soft cast shadow. Hands and marker may overlap a small sheet edge, not the main paper area. Sheet must remain uniform BLANK ivory with photographed light/grain and real edge shadow, NO print/text/maze/QR. Phone screen must remain uniform near-black BLANK glass with subtle natural reflections, all FOUR inner screen corners unobstructed, realistic bezel and rounded glass. The exact real game screen and physically cropped real worksheet are composited later, both face the FAMILY across the table, not the viewer. Do not generate fake game pixels or any other game prop.\nNo advertising lettering, no brand logo, no text, no UI, no fake CTA, no watermark, no border, no empty padding panels. Continuous full-bleed real room and tabletop across the whole canvas. Typography will be added separately in the explicitly reserved areas. The new composition must feel intentionally photographed for its ratio, not merely crop/scale the old ad. Preserve family emotion, realism, paper+phone identity and original lighting style.",
+  "variants": [
+    {
+      "id": "4x5",
+      "file": "koncept_01_4x5",
+      "W": 1080,
+      "H": 1350,
+      "detail": "OUTPUT: EXACT 4:5 portrait canvas, 1080x1350. Recompose the family/table HIGHER and slightly more compact than the source, with extended real wooden table at the BOTTOM for Meta overlays. Upper-left text space from x76–950, y95–460 is a continuous quiet dark navy room/curtain backdrop, not a flat panel. Keep ALL faces below y480, heads centered roughly y580; warm close cooperation at middle of image, no giant portrait crops. Bring the physical table/game close to the family's hands: the complete blank paper roughly x375–690, y790–920 (top and bottom edges all visible); the smaller phone about x715–815,y795–900; blue cloud friend beside it but not on screen. Keep the sheet's natural camera perspective. Everything important in the family game should be above y940. Bottom y1053–1350 is ONLY natural tabletop / room foreground and unimportant stationery edges, no faces, main paper, phone, mascots or writing. Leave a clear darker tabletop strip y945–1040 for later info text. Extend floor/table perspective seamlessly, no repeated texture, no letterboxing."
+    },
+    {
+      "id": "1x1",
+      "file": "koncept_01_1x1",
+      "W": 1080,
+      "H": 1080,
+      "detail": "OUTPUT: EXACT 1:1 SQUARE canvas, 1080x1080. Build a balanced square scene, not a crop of the portrait. Compact quiet navy room/curtain text area across top x76–1004,y76–360, with original room detail still visible at sides. All family faces should be below y385, heads roughly y470–545, naturally interacting and recognizable at useful size (about145–160px high). Raise/recompose the table and game plane close to their hands, not in a long foreground: blank sheet roughly x385–660,y620–725, phone x700–795,y625–720, small blue cloud character beside phone, orange shield peeking behind father. All important family/game objects above y735. Leave a clear softly darker wooden strip y744–835 for later three info labels and URL. The bottom22%,y842–1080, contains ONLY seamless wooden tabletop/room foreground with subtle ordinary texture and no main game objects or mascots. Keep scene intimate and lively, with warmer light on real faces; do not shrink the family into tiny distant portraits to create space."
+    },
+    {
+      "id": "9x16",
+      "file": "koncept_01_9x16",
+      "W": 1080,
+      "H": 1920,
+      "detail": "OUTPUT: EXACT 9:16 vertical STORY canvas, 1080x1920. OUTPAINT the same room above and below and RECOMPOSE the story scene; no padding or stretching. Top y0–288 is only atmospheric navy wall/curtains/room, no faces, game or characters (Meta profile UI). Reserve continuous quiet dark room behind later copy at x76–1004,y300–775. Keep all three family faces in the middle zone roughly y805–1040; useful face scale about170–190px high, natural identical cooperation, father left, daughter center and boy right. Physical paper and phone sit close to their hands: blank sheet roughly x375–685,y1140–1320; small phone x730–825,y1150–1305; blue cloud friend beside it. Entire meaningful activity above y1340. Leave a clear darker tabletop band y1350–1488 for later info/URL. Bottom22%,y1498–1920, is only extended natural wooden table/soft room foreground or carpet, no important objects, people, mascots or text. It should look like a real tall photograph, not huge empty solid colour bars."
+    },
+    {
+      "id": "191x1",
+      "file": "koncept_01_191x1",
+      "W": 1200,
+      "H": 628,
+      "detail": "OUTPUT: EXACT WIDE LANDSCAPE 1.91:1 canvas, 1200x628. OUTPAINT this same cozy room horizontally and arrange scene specifically for this wide ad. LEFT approximately48% (x0–585,y0–405) should be a quiet dark navy wall/blue curtain area for copy, with soft believable room texture and subtle photographic detail, not a separate flat panel. RIGHT half contains the SAME recognizable father, daughter and boy close together at their table, all faces useful scale about90–115px high, roughly x650–1120,y130–290. Father left within group, daughter center, boy right. Printed-game blank sheet clearly visible roughly x730–960,y315–405, with the small dark phone around x990–1050,y325–395 and blue cloud beside it. Keep orange shield behind father and tiny green friend on far-right shelf. Woven lamp and bookcase/globe are behind this family at right, blue window/curtains still part of same room at left. No important face/game below y407. Reserve clear darker wooden strip across x84–1116,y410–488 for info and URL. Bottom y490–628 only seamless wood/table foreground, no meaningful game components. No important text is generated. This is a wide photographic reframe with deliberate left-copy/right-emotion balance, not the portrait stuck onto a wide blurred background."
+    }
+  ],
+  "copy": {
+    "brand": "Pixelkovia",
+    "kicker": "RODINNÁ HRA NA DOMA",
+    "headline": [
+      "Papierové indície.",
+      "Príbeh v mobile.",
+      "Rodina v hre."
+    ],
+    "support": [
+      "Hľadajte stopy po byte.",
+      "Lúštite a objavujte spolu."
+    ],
+    "facts": [
+      "7 hádaniek",
+      "7–13 rokov",
+      "60–90 min"
+    ],
+    "url": "pixelkovia.rodulab.com"
+  },
+  "product": "Only exact approved decoder crop and game-lock-partial screenshot. Native material blend keeps paper/marker shadows and phone reflections; both original content planes180degrees toward family. Header character reuses approved Pixi pose.",
+  "recompositionCorrections": [
+    {
+      "id": "4x5",
+      "W": 1080,
+      "H": 1350,
+      "scale": 0.745,
+      "rect": "x133,y99,width814,height1073",
+      "detail": "The existing whole image must become about25% smaller. Hair starts aroundy423; hands near750; paper and phone fully withiny778–943. Preserve both poses, original blank materials and all pen shadows. Topcopy ends aroundy413; info/URL goy960–1043. Bottomy1053–1350 only real tabletop.",
+      "prompt": "Use case: precise-object-edit / outpainting.\nIMAGE1 is the exact existing photograph to preserve. IMAGE2 is ONLY a geometric LAYOUT MAP, never a visual style reference.\nCreate a 1080x1350 full-bleed PHOTOGRAPH by uniformly zooming OUT from Image1 and outpainting surrounding room/table so the existing image content fits approximately in this target rectangle: x133,y99,width814,height1073 on the final canvas. Keep EVERY original person, face, gesture, paper, phone, pen, small character, light and shadow together in their correct relative scale/positions. Do NOT squash or stretch bodies. Do NOT merely crop. The outer scene must be actual new room/table consistent with original perspective.\nThe frame rectangle in the map indicates where the current entire photograph belongs; the pale rectangle shows the main paper+phone band. Dark blue marked area is QUIET ROOM for later lettering; red bottom is ONLY REAL WOODEN TABLETOP. Do not copy the map's blocks, lines, labels or colours. Final image must contain NO WORDS, NO borders, NO panels, NO collage edges.\nThe existing whole image must become about25% smaller. Hair starts aroundy423; hands near750; paper and phone fully withiny778–943. Preserve both poses, original blank materials and all pen shadows. Topcopy ends aroundy413; info/URL goy960–1043. Bottomy1053–1350 only real tabletop.\nPreserve this EXACT family: beige cable-knit father at left, blue-shirt girl in middle pointing at paper and thoughtful beige-shirt boy at right. Same navy sofa, knitted throw, orange cushion, blue window left and amber lamp/oak bookcase/plants right. Original authentic photographic skin/hair and real materials. Keep the orange ornate shield peeking over shoulder, small cloud-headed suited character near phone and hidden green glasses character on shelf. Keep blank ivory sheet with texture/shadows, navy pen and teal marker over a corner, blank near-black phone glass with 4 clear corners. Original real game images will be inserted later facing the family. No invented text, print, interfaces or QR. Do not change campaign concept or emotional character. All newly extended areas must look like a continuous real cozy room, not empty padding or artificial blur."
+    },
+    {
+      "id": "1x1",
+      "W": 1080,
+      "H": 1080,
+      "scale": 0.55,
+      "rect": "x195,y221,width690,height690",
+      "detail": "Zoom OUT decisively: the entire existing photo must become about55% of its current pixel size, centered in the new square. The same family becomes a wider environmental medium shot, with heads still recognizable, not giant portraits: hair starts aroundy369; paper y657–760; phone aroundy650–730. Topcopy endsy365; clear table for facts/web y780–840. Bottomy842–1080 only real tabletop.",
+      "prompt": "Use case: precise-object-edit / outpainting.\nIMAGE1 is the exact existing photograph to preserve. IMAGE2 is ONLY a geometric LAYOUT MAP, never a visual style reference.\nCreate a 1080x1080 full-bleed PHOTOGRAPH by uniformly zooming OUT from Image1 and outpainting surrounding room/table so the existing image content fits approximately in this target rectangle: x195,y221,width690,height690 on the final canvas. Keep EVERY original person, face, gesture, paper, phone, pen, small character, light and shadow together in their correct relative scale/positions. Do NOT squash or stretch bodies. Do NOT merely crop. The outer scene must be actual new room/table consistent with original perspective.\nThe frame rectangle in the map indicates where the current entire photograph belongs; the pale rectangle shows the main paper+phone band. Dark blue marked area is QUIET ROOM for later lettering; red bottom is ONLY REAL WOODEN TABLETOP. Do not copy the map's blocks, lines, labels or colours. Final image must contain NO WORDS, NO borders, NO panels, NO collage edges.\nZoom OUT decisively: the entire existing photo must become about55% of its current pixel size, centered in the new square. The same family becomes a wider environmental medium shot, with heads still recognizable, not giant portraits: hair starts aroundy369; paper y657–760; phone aroundy650–730. Topcopy endsy365; clear table for facts/web y780–840. Bottomy842–1080 only real tabletop.\nPreserve this EXACT family: beige cable-knit father at left, blue-shirt girl in middle pointing at paper and thoughtful beige-shirt boy at right. Same navy sofa, knitted throw, orange cushion, blue window left and amber lamp/oak bookcase/plants right. Original authentic photographic skin/hair and real materials. Keep the orange ornate shield peeking over shoulder, small cloud-headed suited character near phone and hidden green glasses character on shelf. Keep blank ivory sheet with texture/shadows, navy pen and teal marker over a corner, blank near-black phone glass with 4 clear corners. Original real game images will be inserted later facing the family. No invented text, print, interfaces or QR. Do not change campaign concept or emotional character. All newly extended areas must look like a continuous real cozy room, not empty padding or artificial blur."
+    },
+    {
+      "id": "9x16",
+      "W": 1080,
+      "H": 1920,
+      "scale": 1.03,
+      "rect": "x55,y65,width969,height1722",
+      "detail": "The current941x1672source must be placed approximately atx55,y65,width969,height1722 on1080x1920. This is about10% MORE zoomed out than simply filling the new canvas. Keep all original parts uniform in scale; no stretching. Familyhair starts near683; blank paper bottom around1347; info/web clear strip1360–1488. Top0–288 and bottom1498–1920 must have only room/table, no important subjects.",
+      "prompt": "Use case: precise-object-edit / outpainting.\nIMAGE1 is the exact existing photograph to preserve. IMAGE2 is ONLY a geometric LAYOUT MAP, never a visual style reference.\nCreate a 1080x1920 full-bleed PHOTOGRAPH by uniformly zooming OUT from Image1 and outpainting surrounding room/table so the existing image content fits approximately in this target rectangle: x55,y65,width969,height1722 on the final canvas. Keep EVERY original person, face, gesture, paper, phone, pen, small character, light and shadow together in their correct relative scale/positions. Do NOT squash or stretch bodies. Do NOT merely crop. The outer scene must be actual new room/table consistent with original perspective.\nThe frame rectangle in the map indicates where the current entire photograph belongs; the pale rectangle shows the main paper+phone band. Dark blue marked area is QUIET ROOM for later lettering; red bottom is ONLY REAL WOODEN TABLETOP. Do not copy the map's blocks, lines, labels or colours. Final image must contain NO WORDS, NO borders, NO panels, NO collage edges.\nThe current941x1672source must be placed approximately atx55,y65,width969,height1722 on1080x1920. This is about10% MORE zoomed out than simply filling the new canvas. Keep all original parts uniform in scale; no stretching. Familyhair starts near683; blank paper bottom around1347; info/web clear strip1360–1488. Top0–288 and bottom1498–1920 must have only room/table, no important subjects.\nPreserve this EXACT family: beige cable-knit father at left, blue-shirt girl in middle pointing at paper and thoughtful beige-shirt boy at right. Same navy sofa, knitted throw, orange cushion, blue window left and amber lamp/oak bookcase/plants right. Original authentic photographic skin/hair and real materials. Keep the orange ornate shield peeking over shoulder, small cloud-headed suited character near phone and hidden green glasses character on shelf. Keep blank ivory sheet with texture/shadows, navy pen and teal marker over a corner, blank near-black phone glass with 4 clear corners. Original real game images will be inserted later facing the family. No invented text, print, interfaces or QR. Do not change campaign concept or emotional character. All newly extended areas must look like a continuous real cozy room, not empty padding or artificial blur."
+    },
+    {
+      "id": "191x1",
+      "W": 1200,
+      "H": 628,
+      "scale": 0.6,
+      "rect": "x120,y20,width1040,height544",
+      "detail": "The current1734x907photo should become a1040x544block positioned atx120,y20, with all surrounding space seamlessly outpainted. This zooms the actual family/game out only13% compared to fill. Keep the father and children naturally on the RIGHT; blankpaper ends aroundy479, phone aroundy435; leftx84–584 stays quiet room for all copy including facts and URL. Bottomy490–628 only real tabletop.",
+      "prompt": "Use case: precise-object-edit / outpainting.\nIMAGE1 is the exact existing photograph to preserve. IMAGE2 is ONLY a geometric LAYOUT MAP, never a visual style reference.\nCreate a 1200x628 full-bleed PHOTOGRAPH by uniformly zooming OUT from Image1 and outpainting surrounding room/table so the existing image content fits approximately in this target rectangle: x120,y20,width1040,height544 on the final canvas. Keep EVERY original person, face, gesture, paper, phone, pen, small character, light and shadow together in their correct relative scale/positions. Do NOT squash or stretch bodies. Do NOT merely crop. The outer scene must be actual new room/table consistent with original perspective.\nThe frame rectangle in the map indicates where the current entire photograph belongs; the pale rectangle shows the main paper+phone band. Dark blue marked area is QUIET ROOM for later lettering; red bottom is ONLY REAL WOODEN TABLETOP. Do not copy the map's blocks, lines, labels or colours. Final image must contain NO WORDS, NO borders, NO panels, NO collage edges.\nThe current1734x907photo should become a1040x544block positioned atx120,y20, with all surrounding space seamlessly outpainted. This zooms the actual family/game out only13% compared to fill. Keep the father and children naturally on the RIGHT; blankpaper ends aroundy479, phone aroundy435; leftx84–584 stays quiet room for all copy including facts and URL. Bottomy490–628 only real tabletop.\nPreserve this EXACT family: beige cable-knit father at left, blue-shirt girl in middle pointing at paper and thoughtful beige-shirt boy at right. Same navy sofa, knitted throw, orange cushion, blue window left and amber lamp/oak bookcase/plants right. Original authentic photographic skin/hair and real materials. Keep the orange ornate shield peeking over shoulder, small cloud-headed suited character near phone and hidden green glasses character on shelf. Keep blank ivory sheet with texture/shadows, navy pen and teal marker over a corner, blank near-black phone glass with 4 clear corners. Original real game images will be inserted later facing the family. No invented text, print, interfaces or QR. Do not change campaign concept or emotional character. All newly extended areas must look like a continuous real cozy room, not empty padding or artificial blur."
+    }
+  ]
+}

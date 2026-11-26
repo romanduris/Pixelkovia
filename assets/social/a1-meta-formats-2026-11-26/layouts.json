@@ -1,0 +1,9 @@
+{
+  "coordinateSystem": "Physical TL, TR, BR, BL in each raw generated photo; print and game rotate 180 degrees toward the family. Uniform optical framing only.",
+  "items": [
+    {"id":"4x5","label":"4 : 5 · Feed","W":1080,"H":1350,"file":"koncept_01_4x5","framing":{"scale":1.14,"x":-82.44,"y":-286},"paperQuad":[[438,928],[616,928],[666,1083],[394,1083]],"screenQuad":[[644,924],[692,924],[717,985],[662,988]],"safeArea":{"left":76,"top":95,"right":1004,"bottom":1053}},
+    {"id":"1x1","label":"1 : 1 · Feed","W":1080,"H":1080,"file":"koncept_01_1x1","paperQuad":[[515,800],[729,800],[771,913],[480,913]],"screenQuad":[[759,796],[813,795],[850,863],[781,868]],"safeArea":{"left":76,"top":76,"right":1004,"bottom":842}},
+    {"id":"9x16","label":"9 : 16 · Stories / Reels","W":1080,"H":1920,"file":"koncept_01_9x16","paperQuad":[[378,961],[550,961],[605,1137],[324,1137]],"screenQuad":[[570,952],[619,952],[650,1018],[591,1021]],"safeArea":{"left":76,"top":288,"right":1004,"bottom":1497}},
+    {"id":"191x1","label":"1,91 : 1 · Landscape","W":1200,"H":628,"file":"koncept_01_191x1","framing":{"scale":0.78,"x":-76.26,"y":-79},"paperQuad":[[1122,569],[1333,569],[1376,716],[1070,716]],"screenQuad":[[1367,566],[1425,566],[1460,636],[1391,639]],"safeArea":{"left":84,"top":44,"right":1116,"bottom":490}}
+  ]
+}

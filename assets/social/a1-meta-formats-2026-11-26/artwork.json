@@ -1,0 +1,752 @@
+{
+  "date": "2026-11-26",
+  "sourceConcept": "A1 V4 only",
+  "source": {
+    "file": "assets/social/concepts-2026-11-26-room-v4-A/A1-rodina-spolu.png",
+    "sha256": "f9e47279cb8734371a267cafd65de2258046d86e34b8c6f57332d3787bbb1bdf"
+  },
+  "mode": "built-in image_gen recomposition/outpainting + native editable SVG typography and exact product planes",
+  "adActivation": false,
+  "publication": false,
+  "destination": "https://pixelkovia.rodulab.com/",
+  "provenance": "Adaptations of the same generated illustrative family scene, not customer photographs or testimonials. Original A1 copy, family identity and room atmosphere preserved. Exact physically cropped original worksheet and game screenshot face the family. Local paper light, pen shadows and phone glass reflections retained. No full worksheets, answers or QR embedded.",
+  "safeAreaPolicy": {
+    "sides": "7%",
+    "bottom": "22%",
+    "storyTop": "15%",
+    "landscape": "same conservative 22% bottom reservation"
+  },
+  "headerMascot": {
+    "source": "assets/social/concepts-2026-11-26-room-v2/sources/mascots/pixi-seated.png",
+    "sha256": "87049b6cb478a7ed7bdb26793476fd373bf0f72ac0efe6eacc143fb870a48a23"
+  },
+  "exports": [
+    {
+      "id": "4x5",
+      "label": "4 : 5 · Feed",
+      "file": "koncept_01_4x5.png",
+      "editable": "editable/koncept_01_4x5.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 3282128,
+      "sha256": "5f45b3bc2146bd79685b0000335e6887ada145e499befcfe0631362a580738b7",
+      "safeArea": {
+        "left": 76,
+        "top": 95,
+        "right": 1004,
+        "bottom": 1053
+      },
+      "textBounds": [
+        {
+          "role": "brand",
+          "text": "Pixelkovia",
+          "x": 120,
+          "y": 96,
+          "width": 158,
+          "height": 27,
+          "fontSize": 32
+        },
+        {
+          "role": "kicker",
+          "text": "RODINNÁ HRA NA DOMA",
+          "x": 76,
+          "y": 123,
+          "width": 226,
+          "height": 19,
+          "fontSize": 17
+        },
+        {
+          "role": "headline",
+          "text": "Papierové indície.",
+          "x": 79,
+          "y": 149,
+          "width": 518,
+          "height": 66,
+          "fontSize": 60
+        },
+        {
+          "role": "headline",
+          "text": "Príbeh v mobile.",
+          "x": 79,
+          "y": 215,
+          "width": 464,
+          "height": 52,
+          "fontSize": 60
+        },
+        {
+          "role": "headline",
+          "text": "Rodina v hre.",
+          "x": 81,
+          "y": 278,
+          "width": 355,
+          "height": 61,
+          "fontSize": 80
+        },
+        {
+          "role": "support",
+          "text": "Hľadajte stopy po byte.",
+          "x": 77,
+          "y": 348,
+          "width": 329,
+          "height": 32,
+          "fontSize": 30
+        },
+        {
+          "role": "support",
+          "text": "Lúštite a objavujte spolu.",
+          "x": 77,
+          "y": 382,
+          "width": 351,
+          "height": 32,
+          "fontSize": 30
+        },
+        {
+          "role": "fact",
+          "text": "7 hádaniek",
+          "x": 120,
+          "y": 961,
+          "width": 181,
+          "height": 31,
+          "fontSize": 34
+        },
+        {
+          "role": "fact",
+          "text": "7–13 rokov",
+          "x": 454,
+          "y": 964,
+          "width": 173,
+          "height": 28,
+          "fontSize": 34
+        },
+        {
+          "role": "fact",
+          "text": "60–90 min",
+          "x": 783,
+          "y": 964,
+          "width": 174,
+          "height": 28,
+          "fontSize": 34
+        },
+        {
+          "role": "url",
+          "text": "pixelkovia.rodulab.com",
+          "x": 374,
+          "y": 1011,
+          "width": 332,
+          "height": 32,
+          "fontSize": 31
+        },
+        {
+          "x": 76,
+          "y": 97,
+          "width": 10,
+          "height": 10,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 90,
+          "y": 97,
+          "width": 10,
+          "height": 10,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 76,
+          "y": 111,
+          "width": 10,
+          "height": 10,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 90,
+          "y": 111,
+          "width": 10,
+          "height": 10,
+          "role": "logo",
+          "text": "logo"
+        }
+      ],
+      "productBounds": {
+        "paper": [
+          366.72,
+          771.92,
+          310.08,
+          176.7
+        ],
+        "screen": [
+          651.72,
+          767.36,
+          83.22,
+          72.96
+        ]
+      },
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "photograph": "b53b3a5bb0bbe196513e2d36a54c9417415d98cda5797932ff0419e47de41b07",
+      "photoGeometry": {
+        "width": 1092,
+        "height": 1440,
+        "scale": 1.14,
+        "x": -82.44,
+        "y": -286
+      },
+      "safePreview": "safe-area-review/koncept_01_4x5_kontrola.png"
+    },
+    {
+      "id": "1x1",
+      "label": "1 : 1 · Feed",
+      "file": "koncept_01_1x1.png",
+      "editable": "editable/koncept_01_1x1.svg",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "bytes": 2496861,
+      "sha256": "b9c71bcfe58ee6c45b7a6bb3c82657a1183a23bf75894d288b859548502efdf7",
+      "safeArea": {
+        "left": 76,
+        "top": 76,
+        "right": 1004,
+        "bottom": 842
+      },
+      "textBounds": [
+        {
+          "role": "brand",
+          "text": "Pixelkovia",
+          "x": 118,
+          "y": 79,
+          "width": 143,
+          "height": 25,
+          "fontSize": 29
+        },
+        {
+          "role": "kicker",
+          "text": "RODINNÁ HRA NA DOMA",
+          "x": 76,
+          "y": 113,
+          "width": 226,
+          "height": 19,
+          "fontSize": 17
+        },
+        {
+          "role": "headline",
+          "text": "Papierové indície.",
+          "x": 78,
+          "y": 128,
+          "width": 476,
+          "height": 61,
+          "fontSize": 55
+        },
+        {
+          "role": "headline",
+          "text": "Príbeh v mobile.",
+          "x": 78,
+          "y": 187,
+          "width": 426,
+          "height": 48,
+          "fontSize": 55
+        },
+        {
+          "role": "headline",
+          "text": "Rodina v hre.",
+          "x": 81,
+          "y": 244,
+          "width": 346,
+          "height": 60,
+          "fontSize": 78
+        },
+        {
+          "role": "support",
+          "text": "Hľadajte stopy po byte. Lúštite a objavujte spolu.",
+          "x": 77,
+          "y": 314,
+          "width": 665,
+          "height": 31,
+          "fontSize": 29
+        },
+        {
+          "role": "fact",
+          "text": "7 hádaniek",
+          "x": 84,
+          "y": 690,
+          "width": 160,
+          "height": 28,
+          "fontSize": 30
+        },
+        {
+          "role": "fact",
+          "text": "7–13 rokov",
+          "x": 84,
+          "y": 731,
+          "width": 153,
+          "height": 25,
+          "fontSize": 30
+        },
+        {
+          "role": "fact",
+          "text": "60–90 min",
+          "x": 85,
+          "y": 768,
+          "width": 154,
+          "height": 26,
+          "fontSize": 30
+        },
+        {
+          "role": "url",
+          "text": "pixelkovia.rodulab.com",
+          "x": 385,
+          "y": 812,
+          "width": 310,
+          "height": 30,
+          "fontSize": 29
+        },
+        {
+          "x": 76,
+          "y": 80,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 89,
+          "y": 80,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 76,
+          "y": 93,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 89,
+          "y": 93,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        }
+      ],
+      "productBounds": {
+        "paper": [
+          413.4,
+          689,
+          250.62,
+          97.32
+        ],
+        "screen": [
+          653.68,
+          684.69,
+          78.37,
+          62.87
+        ]
+      },
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "photograph": "8e5c28848d947e86b4a4db25846535d1be79b7ed61f6d9696c5ce8e385158560",
+      "photoGeometry": {
+        "width": 1254,
+        "height": 1254,
+        "scale": 0.861244019138756,
+        "x": 0,
+        "y": 0
+      },
+      "safePreview": "safe-area-review/koncept_01_1x1_kontrola.png"
+    },
+    {
+      "id": "9x16",
+      "label": "9 : 16 · Stories / Reels",
+      "file": "koncept_01_9x16.png",
+      "editable": "editable/koncept_01_9x16.svg",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "bytes": 4016225,
+      "sha256": "86201f6ef2d4d10a7a3dc06546d99e808e2d6c4798122aba78e13ca52bc4d2ad",
+      "safeArea": {
+        "left": 76,
+        "top": 288,
+        "right": 1004,
+        "bottom": 1497
+      },
+      "textBounds": [
+        {
+          "role": "brand",
+          "text": "Pixelkovia",
+          "x": 122,
+          "y": 319,
+          "width": 168,
+          "height": 28,
+          "fontSize": 34
+        },
+        {
+          "role": "kicker",
+          "text": "RODINNÁ HRA NA DOMA",
+          "x": 76,
+          "y": 356,
+          "width": 249,
+          "height": 21,
+          "fontSize": 19
+        },
+        {
+          "role": "headline",
+          "text": "Papierové indície.",
+          "x": 79,
+          "y": 383,
+          "width": 570,
+          "height": 72,
+          "fontSize": 66
+        },
+        {
+          "role": "headline",
+          "text": "Príbeh v mobile.",
+          "x": 79,
+          "y": 455,
+          "width": 511,
+          "height": 57,
+          "fontSize": 66
+        },
+        {
+          "role": "headline",
+          "text": "Rodina v hre.",
+          "x": 81,
+          "y": 526,
+          "width": 373,
+          "height": 65,
+          "fontSize": 84
+        },
+        {
+          "role": "support",
+          "text": "Hľadajte stopy po byte.",
+          "x": 77,
+          "y": 607,
+          "width": 340,
+          "height": 32,
+          "fontSize": 31
+        },
+        {
+          "role": "support",
+          "text": "Lúštite a objavujte spolu.",
+          "x": 77,
+          "y": 641,
+          "width": 362,
+          "height": 32,
+          "fontSize": 31
+        },
+        {
+          "role": "fact",
+          "text": "7 hádaniek",
+          "x": 120,
+          "y": 1383,
+          "width": 181,
+          "height": 31,
+          "fontSize": 34
+        },
+        {
+          "role": "fact",
+          "text": "7–13 rokov",
+          "x": 454,
+          "y": 1386,
+          "width": 173,
+          "height": 28,
+          "fontSize": 34
+        },
+        {
+          "role": "fact",
+          "text": "60–90 min",
+          "x": 783,
+          "y": 1386,
+          "width": 174,
+          "height": 28,
+          "fontSize": 34
+        },
+        {
+          "role": "url",
+          "text": "pixelkovia.rodulab.com",
+          "x": 369,
+          "y": 1447,
+          "width": 342,
+          "height": 34,
+          "fontSize": 32
+        },
+        {
+          "x": 76,
+          "y": 319,
+          "width": 11,
+          "height": 11,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 91,
+          "y": 319,
+          "width": 11,
+          "height": 11,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 76,
+          "y": 334,
+          "width": 11,
+          "height": 11,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 91,
+          "y": 334,
+          "width": 11,
+          "height": 11,
+          "role": "logo",
+          "text": "logo"
+        }
+      ],
+      "productBounds": {
+        "paper": [
+          382.01,
+          1080.85,
+          331.31,
+          207.51
+        ],
+        "screen": [
+          672.05,
+          1070.24,
+          94.32,
+          81.35
+        ]
+      },
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "photograph": "40d091d9556fbdb335361d2e90dd61414ff209ce8ca4547c15f72692878cf0a9",
+      "photoGeometry": {
+        "width": 916,
+        "height": 1717,
+        "scale": 1.1790393013100438,
+        "x": 0,
+        "y": -52.205240174672554
+      },
+      "safePreview": "safe-area-review/koncept_01_9x16_kontrola.png"
+    },
+    {
+      "id": "191x1",
+      "label": "1,91 : 1 · Landscape",
+      "file": "koncept_01_191x1.png",
+      "editable": "editable/koncept_01_191x1.svg",
+      "dimensions": [
+        1200,
+        628
+      ],
+      "bytes": 1644647,
+      "sha256": "a3ef6b26af2143f4413a84448e5b986e0fd07cfd2f57ebe18a6f181ac17b266f",
+      "safeArea": {
+        "left": 84,
+        "top": 44,
+        "right": 1116,
+        "bottom": 490
+      },
+      "textBounds": [
+        {
+          "role": "brand",
+          "text": "Pixelkovia",
+          "x": 126,
+          "y": 61,
+          "width": 143,
+          "height": 25,
+          "fontSize": 29
+        },
+        {
+          "role": "kicker",
+          "text": "RODINNÁ HRA NA DOMA",
+          "x": 84,
+          "y": 94,
+          "width": 226,
+          "height": 19,
+          "fontSize": 17
+        },
+        {
+          "role": "headline",
+          "text": "Papierové indície.",
+          "x": 86,
+          "y": 127,
+          "width": 432,
+          "height": 55,
+          "fontSize": 50
+        },
+        {
+          "role": "headline",
+          "text": "Príbeh v mobile.",
+          "x": 86,
+          "y": 187,
+          "width": 387,
+          "height": 44,
+          "fontSize": 50
+        },
+        {
+          "role": "headline",
+          "text": "Rodina v hre.",
+          "x": 89,
+          "y": 252,
+          "width": 355,
+          "height": 61,
+          "fontSize": 80
+        },
+        {
+          "role": "support",
+          "text": "Hľadajte stopy po byte.",
+          "x": 85,
+          "y": 325,
+          "width": 340,
+          "height": 32,
+          "fontSize": 31
+        },
+        {
+          "role": "support",
+          "text": "Lúštite a objavujte spolu.",
+          "x": 85,
+          "y": 365,
+          "width": 362,
+          "height": 32,
+          "fontSize": 31
+        },
+        {
+          "role": "fact",
+          "text": "7 hádaniek",
+          "x": 91,
+          "y": 414,
+          "width": 160,
+          "height": 28,
+          "fontSize": 30
+        },
+        {
+          "role": "fact",
+          "text": "7–13 rokov",
+          "x": 254,
+          "y": 417,
+          "width": 153,
+          "height": 25,
+          "fontSize": 30
+        },
+        {
+          "role": "fact",
+          "text": "60–90 min",
+          "x": 413,
+          "y": 416,
+          "width": 154,
+          "height": 26,
+          "fontSize": 30
+        },
+        {
+          "role": "url",
+          "text": "pixelkovia.rodulab.com",
+          "x": 173,
+          "y": 457,
+          "width": 322,
+          "height": 31,
+          "fontSize": 30
+        },
+        {
+          "x": 84,
+          "y": 62,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 97,
+          "y": 62,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 84,
+          "y": 75,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        },
+        {
+          "x": 97,
+          "y": 75,
+          "width": 9,
+          "height": 9,
+          "role": "logo",
+          "text": "logo"
+        }
+      ],
+      "productBounds": {
+        "paper": [
+          758.34,
+          364.82,
+          238.68,
+          114.66
+        ],
+        "screen": [
+          990,
+          362.48,
+          72.54,
+          56.94
+        ]
+      },
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d",
+        "rotation": 180
+      },
+      "screen": {
+        "source": "assets/sales/game-lock-partial.webp",
+        "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6",
+        "rotation": 180
+      },
+      "photograph": "b4597fae1700913b7e62922c374fd1fc6580c0fe52d55054445ce28727f8f710",
+      "photoGeometry": {
+        "width": 1734,
+        "height": 907,
+        "scale": 0.78,
+        "x": -76.26,
+        "y": -79
+      },
+      "safePreview": "safe-area-review/koncept_01_191x1_kontrola.png"
+    }
+  ]
+}
