@@ -1,0 +1,71 @@
+{
+  "mode": "built-in image_gen",
+  "revision": 3,
+  "scope": "Only five A concepts; 4:5",
+  "date": "2026-11-26",
+  "basePrompt": "Use case: precise-object-edit.\nAsset type: photorealistic lifestyle advertising photograph, portrait 4:5, same dimensions/framing as Image 1.\nIMAGE ROLES: Image 1 is the EXACT EDIT TARGET (existing family and room photograph, not just inspiration). Image 2 is the approved BLUE CLOUD-HEADED mascot identity. Image 3 is the approved second mascot identity.\nPRESERVE: the exact same family identities, believable photographic faces, expressions, anatomically natural hands, clothes, poses, camera distance, perspective, blue evening window on left, navy sofa, cream/navy knitted throw, burnt-orange cushion, trailing plants, warm amber woven lamp, oak bookcase/globe on right. Keep the exact room and warm amber/blue atmosphere, and the clear dark upper 28% for editable advertising copy. People must remain realistic photographs, not become cartoons or glossy AI faces.\nMAKE ONLY THESE LINKED CHANGES:\n1. Move the ONE physical smartphone nearer to the FAMILY at the far side of the table, alongside the upper right half of the sheet, just in front of their forearms. Reduce the physical phone by approximately 25% from Image 1. It should look like an ordinary 6-inch phone beside real A4 paper, not an oversized tablet. Keep the complete phone visible, lying flat on wood, all FOUR INNER SCREEN CORNERS clear. Screen completely uniform near-black BLANK for later exact game compositing. Point its top edge towards the camera, so its eventual content is upright for the family. No hand or mascot overlapping the inner screen. Keep it close enough for the child's hand to reach without stretching, but do not place it on anyone's sleeve.\n2. Preserve ONE clean BLANK white A4 sheet, same physical sheet/perspective (minor translation only if needed). No writing, icons, wheels, maps, QR or marks on the sheet. The real physically cropped original worksheet will be inserted later and rotated to face the FAMILY. Do not generate game content. No extra sheets.\n3. Integrate TWO SMALL approved mascot characters directly into the physical scene, with natural depth, perspective, correct occlusion by sofa/people, warm-right and cool-left light, soft contact shadows. The mascots are charming living digital friends in the exact original SOFT PAINTED PIXEL-TEXTURED style supplied, not plush toys and not new generic 3D robots. Their original silhouettes, faces, clothing and colours must remain recognizable. These two are secondary playful accents; family activity, paper and phone remain primary. Do not float them above the scene, paste them on the foreground or add them to empty headline space. Keep the blue cloud mascot around 11–13% canvas width and no taller than the nearby phone's long edge. Background mascot smaller, about 8–10% canvas width, with its lower body naturally hidden.\nBLUE CLOUD IDENTITY: exact blue cloud-shaped head, black rectangular face with cyan >_ expression, dark suit, white shirt, teal tie, little blue hands, small orange clipboard without writing. Give a new curious leaning/crouching pose, face angled down to the phone's actual black screen, visibly sharing the family's game. Never staring towards the camera.\nAvoid text, letters, words, names, labels, logos, watermark, added furniture, added hands, giant mascots, magical neon paths. No other change. Full-bleed photo.",
+  "scenes": [
+    {
+      "id": "A1",
+      "file": "A1-rodina-spolu",
+      "secondary": "guardy",
+      "pose": "The blue cloud mascot is at the RIGHT side of the newly smaller phone, leaning down and slightly left, one hand braced on the wooden table beside the phone and the orange clipboard tucked under the other arm. Its head is directly above the top-right phone corner but DOES NOT cover any screen. The orange ornate SHIELD mascot from Image 3, with teal tie and cyan keyhole, peeks over the sofa back just left of the father's shoulder; only upper shield face and two tiny hands above upholstery visible, lower body behind sofa/father. It appears amused by the puzzle, not posing.",
+      "references": [
+        "../concepts-2026-11-26-room-v2/sources/A1-rodina-spolu.webp",
+        "../../sales/characters/piko.webp",
+        "../../sales/characters/guardy.webp"
+      ]
+    },
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "secondary": "pixi",
+      "pose": "The blue cloud mascot crouches to the RIGHT of the smaller phone with head tilted toward the LEFT/down, concentrating comically at its screen like a tiny fourth teammate, hand resting on tabletop clear of screen. The YELLOW square living pixel from Image 3, cream corner-screw frame, dark segmented limbs and cream shoes, sits on the sofa back behind the mother's LEFT shoulder, partly hidden by her bun/shoulder and the upholstered back; only its face, one little hand holding a tiny teal pencil and hints of legs show. Both have real contact and depth; do not obscure any human face.",
+      "references": [
+        "../concepts-2026-11-26-room-v2/sources/A2-dobrodruzstvo-doma.webp",
+        "../../sales/characters/piko.webp",
+        "../../sales/characters/pixi.webp"
+      ]
+    },
+    {
+      "id": "A3",
+      "file": "A3-jeden-mobil",
+      "secondary": "guardy",
+      "pose": "Place the blue cloud mascot in a small crouch just LEFT of the smaller phone, bending forward and to the RIGHT with its black/cyan face clearly looking into the screen, blue hand on wood and clipboard at its side. Leave a physical gap from paper and all four screen corners visible. The orange SHIELD from Image 3 with teal tie and cyan keyhole peeks from the sofa back immediately to the right of the father's shoulder, its lower half hidden behind his shoulder and sofa. One small orange hand grips the sofa edge; warm amused expression as if secretly helping.",
+      "references": [
+        "../concepts-2026-11-26-room-v2/sources/A3-jeden-mobil.webp",
+        "../../sales/characters/piko.webp",
+        "../../sales/characters/guardy.webp"
+      ]
+    },
+    {
+      "id": "A4",
+      "file": "A4-mame-to",
+      "secondary": "guardy",
+      "pose": "The blue cloud mascot is on the FAR SIDE of the smaller phone (nearer family), leaning over its top edge with its curious face turned down towards the screen as if double-checking the answer. Both hands brace on the wooden table either side of the phone, never on screen. Clipboard tucked to its side. The orange SHIELD from Image 3, teal tie and cyan keyhole, sits behind the boy on the RIGHT sofa back; most lower body hidden by the boy's shoulder, upper shield and one small hand visible as if quietly celebrating with the family. Keep original human expressions and discovery glance.",
+      "references": [
+        "../concepts-2026-11-26-room-v2/sources/A4-mame-to.webp",
+        "../../sales/characters/piko.webp",
+        "../../sales/characters/guardy.webp"
+      ]
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "secondary": "pixi",
+      "pose": "The blue cloud mascot kneels beside the RIGHT side of the smaller phone, leans onto one hand on the tabletop, face tilted down/left toward the screen in a slightly inquisitive 'let me see too' posture; orange clipboard tucked under other arm. Keep inner screen wholly clear. The YELLOW square pixel from Image 3, cream frame/corner screws/dark segmented limbs, peeks from behind the mother's LEFT shoulder at the sofa back, only face, one foot and a hand holding a little teal pencil visible, naturally obscured by her sweater/sofa. Keep the scene warm, witty and restrained.",
+      "references": [
+        "../concepts-2026-11-26-room-v2/sources/A5-rodinny-vecer.webp",
+        "../../sales/characters/piko.webp",
+        "../../sales/characters/pixi.webp"
+      ]
+    }
+  ],
+  "product": "Original approved physically cropped decoder/path worksheet and game-lock-partial screenshot inserted as native SVG perspective layers, both rotated 180 degrees to be read by family across table. All wording stays editable.",
+  "corrections": [
+    {
+      "id": "A3",
+      "prompt": "Use case: precise-object-edit. EDIT ONLY THE SMARTPHONE LOCATION in this supplied existing portrait photograph. Keep the exact people, faces, hands, room, lights, furniture, paper, orange shield and blue cloud character identical. Preserve photographic realism and original soft painted pixel character style. The phone is currently too far towards the viewer. Move the SAME small physical phone approximately 100 pixels UP in the image and 100 pixels RIGHT, onto the free wooden tabletop just in front of the father's forearms, to the RIGHT of the blue cloud character, so it is nearer the family. Target phone bounding area roughly x850–960, y970–1080 on the 1122x1402 canvas. Keep its current modest normal smartphone size, portrait orientation, flat on the table, realistic contact shadow, ALL FOUR inner screen corners visible. Entire inner screen uniformly near-BLACK and BLANK for later exact game compositing. Remove its old location completely and restore seamless matching wood there; only ONE phone. The blue character stays at its present position but gently angles its face down/RIGHT toward the newly moved screen; hand can brace on wood, not on active screen. Do not move, print, rotate or alter the white sheet. No new props, no text, no interfaces, no duplicated phone. All other pixels/composition, exact blue/amber atmosphere and family must be preserved."
+    }
+  ]
+}
