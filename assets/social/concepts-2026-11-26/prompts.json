@@ -1,0 +1,92 @@
+{
+  "mode": "built-in image_gen",
+  "date": "2026-11-26",
+  "aspectRatio": "4:5",
+  "generationReferences": [
+    "assets/sales/real-play/play-paper.webp",
+    "assets/sales/real-play/play-phone.webp"
+  ],
+  "referenceRoles": "Physical lighting, hands, home play context. Not identity references. Screens and paper are intentionally empty compositing slots, replaced by original approved game assets in editable SVG.",
+  "basePrompt": "Create a premium but believable PHOTOREALISTIC lifestyle advertising photograph for Pixelkovia, a home family detective adventure with printed A4 clues and one shared smartphone, not a videogame. Portrait 4:5 canvas, target 1080x1350. Warm real Central European home, ordinary lived-in living room, amber practical lamp light mixed with gentle daylight, realistic skin pores and hair flyaways, subtly imperfect clothing, wooden table, natural quiet smiles and concentration rather than stock-photo laughter. Natural 35mm editorial photography, plausible hands with correct anatomy, no synthetic smoothness, no neon, no magic, no toy characters, no fake maps or treasure props.\nCOMPOSITION: reserve upper 27% as softly defocused dark warm navy room negative space for later editable advertising text. People and activity in middle 32–68%. Foreground table in bottom 32%. At lower left/center show ONE clean BLANK WHITE A4 sheet, only its upper portion visible; lower portion runs beyond bottom edge of canvas. The blank sheet must have clearly visible corners/plane, no text or marks, and no fingers covering its central visible area, so real printed game material can be inserted later. At lower right, on SAME table plane, show ONE realistic dark smartphone with a completely PLAIN UNIFORM near-black screen, all four inner screen corners visible, angled towards camera so screen can be replaced accurately with the actual game screenshot later. Phone should be large enough to read as a real product, approximately 19% canvas width and 24% height; no hands across its screen. Both sheet and phone must be in focus. A hand may point NEXT TO the sheet, not overlap its printable area. No extra blank papers.\nThe supplied real hand/phone play photos are references for ordinary physical realism and game context, not identity references. Do not reproduce their text or UI: leave screen and sheet blank as explicit compositing placeholders. Do not render ANY advertising text, logos, watermarks, names or buttons. The photograph must fill the entire canvas to all edges, no framing or borders.",
+  "concepts": [
+    {
+      "id": "A1",
+      "file": "A1-rodina-spolu",
+      "scene": "A relaxed father about 38, daughter about 9 and son about 11 sit close TOGETHER on one side of the table, all THREE FACES clearly visible in middle of photo. The girl has just noticed a clue; subtle delighted half-smile, father listens warmly, boy thinks. The focus is their shared attention and closeness. Soft muted oat and dusty blue clothing. Slightly elevated camera, screen visible on foreground table."
+    },
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "scene": "A mother about 36 and her two children about 8 and 12 huddle at the coffee table in an ordinary cosy living room; all THREE FACES clearly visible. The older child has brought a clue to the table and everyone studies it, small natural smiles. A sofa and bookshelf behind them, a knitted throw. View from front slightly above table, natural warm Saturday afternoon."
+    },
+    {
+      "id": "A3",
+      "file": "A3-jeden-mobil",
+      "scene": "A mother about 40, father about 40 and one daughter about 10 lean towards the shared phone ON the table in foreground. All THREE FACES visible in the middle, engaged and calm, parents not instructing but solving together. Mid shot from front and above, family slightly right of center. The phone remains unobstructed. Honey oak table, soft sage and cream home."
+    },
+    {
+      "id": "A4",
+      "file": "A4-mame-to",
+      "scene": "A father about 42 and two children about 8 and 11 exchange a small shared moment of discovery, all THREE FACES visible. Boy glances up from the paper to dad with authentic pleased smile, girl still concentrated. Natural asymmetry and casual poses; no high fives, no exaggerated smiles. Warm floor lamp and blue dusk through ordinary window."
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "scene": "A mother about 35 and two children about 9 and 12 have a cosy early-evening family game at a living-room table, all THREE FACES visible. Daughter slightly smiling at her brother's suggestion, mother looking at clue with warm attentive expression. Relaxed knitwear, lived-in linen sofa and simple lamp; emotional warmth rather than fantasy spectacle."
+    },
+    {
+      "id": "B1",
+      "file": "B1-ponad-plece",
+      "scene": "STRICTLY NO FACES visible. Elevated over-the-shoulder view from BEHIND a mother and two children about 9 and 11 seated around table, camera sees only BACKS of heads, shoulders and natural hands. All look at real clue and phone area below. No side profiles, no faces in reflections. Dark blurred room in upper 27%; detailed wood table and game placeholders in foreground, hair and knit textures."
+    },
+    {
+      "id": "B2",
+      "file": "B2-ruky-a-indicie",
+      "scene": "STRICTLY NO FACES visible. Close elevated view from BEHIND two children's shoulders with a parent's forearm beside them; only backs of cropped heads, sleeves, hands, wooden table, sheet and phone are visible. Intimate real family teamwork. Mother points beside blank paper edge with one finger. Warm afternoon, textured pale oak, muted green knits. Keep upper 27% dark defocused room/table transition."
+    },
+    {
+      "id": "B3",
+      "file": "B3-spolocny-mobil",
+      "scene": "STRICTLY NO FACES visible. Over-the-shoulder view from BEHIND a father and daughter about 10 and boy about 8, back of heads and shoulders frame table on each side. Shared smartphone in lower right, large readable plane, nobody blocks screen; paper in lower center-left runs out of frame. Camera higher, warm domestic table, fine realistic hair details. All gaze downward at activity."
+    },
+    {
+      "id": "B4",
+      "file": "B4-rodinny-tim",
+      "scene": "STRICTLY NO FACES visible. A candid view from BEHIND two children with a parent seated between them, only back of heads and knit shoulders. They lean naturally towards the paper, one hand lightly rests next to another on table in a subtle teamwork gesture. Paper and phone in foreground. Warm lamplight and soft evening blue in window, believable ordinary home, no silhouettes of faces."
+    },
+    {
+      "id": "B5",
+      "file": "B5-dobrodruzstvo-na-stole",
+      "scene": "STRICTLY NO FACES visible. Higher three-quarter camera from behind a child about 11 in foreground left and sibling about 8 on right with parent beyond them turned fully away from camera; only hair, backs, shoulders and hands. Real home discovery mood, clean wooden table and blank clue/screen prominent. Natural cream/brown home palette, warm small lamp, soft daylight, believable unposed photograph."
+    }
+  ],
+  "corrections": [
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "prompt": "Edit only the small circular paper decoder held by the girl and the adjacent hands: remove this circular paper object completely. Let both her hands rest naturally on the wooden table, one near its edge and the other beside the blank A4 sheet, with plausible relaxed fingers. Keep every face and facial expression, family identity, hair, clothing, photograph, lighting, camera, composition, the completely blank A4 paper and completely blank dark smartphone screen EXACTLY unchanged. Do not add another prop, writing, graphic, letter or icon. Warm photorealistic photograph. Output the same 4:5 canvas."
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "prompt": "Edit only the small circular paper decoder on the wooden table below the boy's pointing index finger: remove this circular object entirely and replace its area with continuous natural wood grain matching the surrounding tabletop. Keep the pointing hand exactly as it is, now pointing at the wooden table beside the large blank A4 sheet. Keep all faces, identities, expressions, hands, clothing, lighting, camera, composition, the completely blank A4 paper and the completely blank dark phone screen EXACTLY unchanged. Do not add any prop, writing, letters, text, icon or graphic. Warm photorealistic photograph. Output the same 4:5 canvas."
+    },
+    {
+      "id": "B4",
+      "prompt": "Create a corrected photorealistic 4:5 family game advertising photograph using Image 1 for the warm home, knit textures and family, and Image 2 ONLY for the correct OVER-THE-SHOULDER camera geometry. The camera looks DOWN from BEHIND and ABOVE a parent and two children towards the tabletop IN FRONT OF THEM. The family is close to camera, their back-of-heads/shoulders frame LEFT AND RIGHT edges. The blank A4 sheet and blank-screen smartphone are BEYOND their hands in their forward line of sight, NOT behind their backs. Their arms reach forwards naturally towards the table. Absolutely no visible faces, eyes, noses, cheek profiles or face reflections. Leave the upper 27% of image as softly blurred warm dark navy wall for later text. Warm ordinary lived-in home, amber lamp, daylight, realistic skin/hands/hair. Lower middle shows ONE blank white A4 paper sheet (bottom cut off by image) and at right ONE dark smartphone with completely uniform blank near-black screen, entire screen plane visible, no fingers covering screen. Keep blank paper's central area unobstructed; hands touch wooden table beside it. Do not add any graphics, writing, printed drawings, circles, decoder wheels, generic maps, logos, mascots or text. Correct believable physical posture and camera perspective matter most. Full bleed photograph, natural 35mm documentary advertising photography.",
+      "referenceRoles": "Original generated B4 was the edit target; corrected over-shoulder geometry was referenced from B3. Rejected initial scene not retained."
+    },
+    {
+      "id": "B1",
+      "file": "B1-ponad-plece",
+      "ref": "B3-spolocny-mobil",
+      "prompt": "Create a new photorealistic 4:5 advertising photograph following the correct OVER-THE-SHOULDER camera geometry of this reference, with a mother and two children solving a paper clue at the table IN FRONT OF THEM. Change the room to a warm lived-in family living room with muted rust cushions and a small amber lamp on right, change parent to mother with loosely tied brown hair and oat knit, child on left navy jumper and child on right dusty rose jumper. Camera is behind and above them; only backs of heads/shoulders and hands along left/right edges, absolutely NO faces or side profiles. Table and all game material are BEYOND their hands, in their forward line of sight. Upper 27% is dark softly defocused wall/room for later headline. Main central/lower tabletop must show ONE completely BLANK white A4 sheet with upper half visible, bottom running past frame edge, and ONE dark modern smartphone at right with completely uniform near-black blank screen, all screen corners visible and no hands over screen. Natural anatomically correct hands resting beside paper. No printed graphics, circles, decoder wheels, generic puzzles, writing, text, logos, mascots or other papers. The blank paper and blank screen are compositing slots for original real product images. Real fine skin, imperfect hair, fabric, oak wood textures, natural warm photography, not fantasy or CGI. Full bleed 4:5."
+    },
+    {
+      "id": "B5",
+      "file": "B5-dobrodruzstvo-na-stole",
+      "ref": "B2-ruky-a-indicie",
+      "prompt": "Create a DISTINCT new photorealistic 4:5 family-advertising photograph following this reference's correct close over-the-shoulder arrangement. Camera slightly higher from behind two children and a father, tightly framed so only BACKS of heads at lower left/right edges, hands and sleeves frame the table. Absolutely NO FACES, side profiles, eyes or face reflections. Table and game must be IN FRONT of the family beyond their hands, visible over shoulders; do not place props behind their backs. Change sleeves to muted warm blue, sage and natural brown, darker honey oak table, soft warm late afternoon light in ordinary home with simple beige sofa. Upper 27% dark navy defocused room negative space for typography. Dominant material area is ONE completely blank WHITE A4 sheet at lower center-left, its bottom half beyond frame, and ONE smartphone at lower right with entirely UNIFORM near-black screen, all inner screen corners visible, no screen occlusion. Hands point next to paper, not covering central printed slot. No circles, decoder wheels, printed patterns, generic clues, maps, writing, symbols, text, logos or characters. These two slots will receive exact real game assets later. Correct natural fingers and believable perspective, real hair/fabric/wood detail, editorial documentary photography. Full bleed 4:5."
+    }
+  ]
+}

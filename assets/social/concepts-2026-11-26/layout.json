@@ -1,0 +1,492 @@
+{
+  "angles": [
+    {
+      "name": "Papier + mobil + rodina",
+      "headline": [
+        "Papierové indície.",
+        "Príbeh v mobile.",
+        "Rodina v hre."
+      ],
+      "size": 65,
+      "supportY": 365,
+      "support": [
+        "Hľadajte stopy po byte.",
+        "Lúštite a objavujte spolu."
+      ]
+    },
+    {
+      "name": "Dobrodružstvo doma",
+      "headline": [
+        "Z obývačky rovno",
+        "do dobrodružstva."
+      ],
+      "size": 63,
+      "supportY": 300,
+      "support": [
+        "Vytlačené indície, príbeh v mobile",
+        "a jedna spoločná rodinná misia."
+      ]
+    },
+    {
+      "name": "Jeden mobil pre celý tím",
+      "headline": [
+        "Jeden mobil.",
+        "Celá rodina v hre."
+      ],
+      "size": 65,
+      "supportY": 300,
+      "support": [
+        "Papierové stopy vás spoja pri stole.",
+        "Príbeh v mobile vás povedie ďalej."
+      ]
+    },
+    {
+      "name": "Spoločné rozlúštenie",
+      "headline": [
+        "To spoločné",
+        "„máme to!“"
+      ],
+      "size": 76,
+      "supportY": 300,
+      "support": [
+        "Hľadajte a lúštite ako jeden tím.",
+        "Papierové indície. Príbeh v mobile."
+      ]
+    },
+    {
+      "name": "Rodinný večer",
+      "headline": [
+        "Dnes večer hráte",
+        "spolu."
+      ],
+      "size": 69,
+      "supportY": 300,
+      "support": [
+        "Papierové indície. Príbeh v mobile.",
+        "Dobrodružstvo pre deti aj rodičov."
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "A1",
+      "file": "A1-rodina-spolu",
+      "angle": 0,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          35,
+          1214
+        ],
+        [
+          697,
+          1158
+        ],
+        [
+          794,
+          1402
+        ],
+        [
+          -30,
+          1459
+        ]
+      ],
+      "screen": [
+        [
+          792,
+          1098
+        ],
+        [
+          943,
+          1080
+        ],
+        [
+          1073,
+          1323
+        ],
+        [
+          872,
+          1343
+        ]
+      ]
+    },
+    {
+      "id": "A2",
+      "file": "A2-dobrodruzstvo-doma",
+      "angle": 1,
+      "paperSource": "path",
+      "paper": [
+        [
+          89,
+          1150
+        ],
+        [
+          664,
+          1132
+        ],
+        [
+          793,
+          1402
+        ],
+        [
+          28,
+          1423
+        ]
+      ],
+      "screen": [
+        [
+          788,
+          1136
+        ],
+        [
+          921,
+          1119
+        ],
+        [
+          1062,
+          1334
+        ],
+        [
+          886,
+          1360
+        ]
+      ]
+    },
+    {
+      "id": "A3",
+      "file": "A3-jeden-mobil",
+      "angle": 2,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          69,
+          1182
+        ],
+        [
+          646,
+          1143
+        ],
+        [
+          794,
+          1402
+        ],
+        [
+          9,
+          1441
+        ]
+      ],
+      "screen": [
+        [
+          735,
+          1155
+        ],
+        [
+          870,
+          1136
+        ],
+        [
+          1050,
+          1336
+        ],
+        [
+          882,
+          1358
+        ]
+      ]
+    },
+    {
+      "id": "A4",
+      "file": "A4-mame-to",
+      "angle": 3,
+      "paperSource": "path",
+      "paper": [
+        [
+          115,
+          1156
+        ],
+        [
+          676,
+          1157
+        ],
+        [
+          775,
+          1402
+        ],
+        [
+          12,
+          1402
+        ]
+      ],
+      "screen": [
+        [
+          779,
+          1127
+        ],
+        [
+          910,
+          1108
+        ],
+        [
+          1052,
+          1317
+        ],
+        [
+          884,
+          1341
+        ]
+      ]
+    },
+    {
+      "id": "A5",
+      "file": "A5-rodinny-vecer",
+      "angle": 4,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          74,
+          1177
+        ],
+        [
+          664,
+          1136
+        ],
+        [
+          788,
+          1402
+        ],
+        [
+          41,
+          1441
+        ]
+      ],
+      "screen": [
+        [
+          774,
+          1125
+        ],
+        [
+          892,
+          1112
+        ],
+        [
+          1017,
+          1341
+        ],
+        [
+          850,
+          1367
+        ]
+      ]
+    },
+    {
+      "id": "B1",
+      "file": "B1-ponad-plece",
+      "angle": 0,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          360,
+          1112
+        ],
+        [
+          724,
+          1046
+        ],
+        [
+          846,
+          1402
+        ],
+        [
+          475,
+          1470
+        ]
+      ],
+      "screen": [
+        [
+          743,
+          930
+        ],
+        [
+          865,
+          917
+        ],
+        [
+          957,
+          1147
+        ],
+        [
+          812,
+          1168
+        ]
+      ]
+    },
+    {
+      "id": "B2",
+      "file": "B2-ruky-a-indicie",
+      "angle": 1,
+      "paperSource": "path",
+      "paper": [
+        [
+          91,
+          981
+        ],
+        [
+          619,
+          924
+        ],
+        [
+          786,
+          1402
+        ],
+        [
+          0,
+          1457
+        ]
+      ],
+      "screen": [
+        [
+          707,
+          888
+        ],
+        [
+          869,
+          853
+        ],
+        [
+          1018,
+          1165
+        ],
+        [
+          830,
+          1203
+        ]
+      ]
+    },
+    {
+      "id": "B3",
+      "file": "B3-spolocny-mobil",
+      "angle": 2,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          338,
+          1115
+        ],
+        [
+          744,
+          1056
+        ],
+        [
+          879,
+          1402
+        ],
+        [
+          323,
+          1482
+        ]
+      ],
+      "screen": [
+        [
+          799,
+          980
+        ],
+        [
+          933,
+          958
+        ],
+        [
+          1021,
+          1205
+        ],
+        [
+          879,
+          1234
+        ]
+      ]
+    },
+    {
+      "id": "B4",
+      "file": "B4-rodinny-tim",
+      "angle": 3,
+      "paperSource": "path",
+      "paper": [
+        [
+          385,
+          669
+        ],
+        [
+          692,
+          668
+        ],
+        [
+          713,
+          943
+        ],
+        [
+          363,
+          944
+        ]
+      ],
+      "screen": [
+        [
+          737,
+          697
+        ],
+        [
+          837,
+          696
+        ],
+        [
+          865,
+          892
+        ],
+        [
+          756,
+          892
+        ]
+      ]
+    },
+    {
+      "id": "B5",
+      "file": "B5-dobrodruzstvo-na-stole",
+      "angle": 4,
+      "paperSource": "decoder",
+      "paper": [
+        [
+          96,
+          954
+        ],
+        [
+          613,
+          918
+        ],
+        [
+          761,
+          1402
+        ],
+        [
+          43,
+          1453
+        ]
+      ],
+      "screen": [
+        [
+          694,
+          880
+        ],
+        [
+          835,
+          856
+        ],
+        [
+          968,
+          1152
+        ],
+        [
+          805,
+          1189
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,620 @@
+{
+  "date": "2026-11-26",
+  "status": "concepts-for-owner-selection",
+  "ratio": "4:5",
+  "dimensions": [
+    1080,
+    1350
+  ],
+  "mode": "built-in image_gen + native editable SVG layout",
+  "publication": false,
+  "adActivation": false,
+  "destination": "https://pixelkovia.rodulab.com/",
+  "provenance": "Generated illustrative families and rooms; not customer photographs or testimonials. Exact existing game screenshot and physically cropped original worksheet previews inserted in perspective as independent SVG image layers. Text is editable. No full worksheets, QR, answers or access credentials embedded.",
+  "screen": {
+    "source": "assets/sales/game-lock-partial.webp",
+    "sha256": "036290ca86f6864c6e4c396b4f0675e83e11ab9ed2c4f8caa114dd716396f7f6"
+  },
+  "exports": [
+    {
+      "id": "A1",
+      "angle": "Papier + mobil + rodina",
+      "faces": true,
+      "file": "A1-rodina-spolu.png",
+      "editable": "editable/A1-rodina-spolu.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2530932,
+      "sha256": "9e37db02303df0a8b2570111ac4b2a3722fdbd480e695c549bba035bb2d1a18f",
+      "photograph": "ea2c1628bba403055cad81c9389f9323461c47863fbfe0feb641412c6742d1c5",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "A1",
+        "file": "A1-rodina-spolu",
+        "angle": 0,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            35,
+            1214
+          ],
+          [
+            697,
+            1158
+          ],
+          [
+            794,
+            1402
+          ],
+          [
+            -30,
+            1459
+          ]
+        ],
+        "screen": [
+          [
+            792,
+            1098
+          ],
+          [
+            943,
+            1080
+          ],
+          [
+            1073,
+            1323
+          ],
+          [
+            872,
+            1343
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A2",
+      "angle": "Dobrodružstvo doma",
+      "faces": true,
+      "file": "A2-dobrodruzstvo-doma.png",
+      "editable": "editable/A2-dobrodruzstvo-doma.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2576708,
+      "sha256": "0bba2a23b4e5dafe37814ccf1d3c47366f81e6f1dc00a5e4b8e1e96c0352978f",
+      "photograph": "caf427d45ca96122cafaa8d682b223ad437cdc3001adeeb1e2b542ebea835f3a",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "A2",
+        "file": "A2-dobrodruzstvo-doma",
+        "angle": 1,
+        "paperSource": "path",
+        "paper": [
+          [
+            89,
+            1150
+          ],
+          [
+            664,
+            1132
+          ],
+          [
+            793,
+            1402
+          ],
+          [
+            28,
+            1423
+          ]
+        ],
+        "screen": [
+          [
+            788,
+            1136
+          ],
+          [
+            921,
+            1119
+          ],
+          [
+            1062,
+            1334
+          ],
+          [
+            886,
+            1360
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A3",
+      "angle": "Jeden mobil pre celý tím",
+      "faces": true,
+      "file": "A3-jeden-mobil.png",
+      "editable": "editable/A3-jeden-mobil.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2602753,
+      "sha256": "5244915b7cf1df98603725f6bf0728363d5805784b6f18c1457ccddafa62ce80",
+      "photograph": "d2767fd423070d9306bb531eac7a92191994b576ae61531f1a385659a5b98870",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "A3",
+        "file": "A3-jeden-mobil",
+        "angle": 2,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            69,
+            1182
+          ],
+          [
+            646,
+            1143
+          ],
+          [
+            794,
+            1402
+          ],
+          [
+            9,
+            1441
+          ]
+        ],
+        "screen": [
+          [
+            735,
+            1155
+          ],
+          [
+            870,
+            1136
+          ],
+          [
+            1050,
+            1336
+          ],
+          [
+            882,
+            1358
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A4",
+      "angle": "Spoločné rozlúštenie",
+      "faces": true,
+      "file": "A4-mame-to.png",
+      "editable": "editable/A4-mame-to.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2478737,
+      "sha256": "dbd377ca82eb4b1daec582b17332589698285d7bd37838d50ca12736c29cb8ea",
+      "photograph": "11d2888fbe781a8be793f369a33321e8322bf243b31174e91a934cc9bc1d7f47",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "A4",
+        "file": "A4-mame-to",
+        "angle": 3,
+        "paperSource": "path",
+        "paper": [
+          [
+            115,
+            1156
+          ],
+          [
+            676,
+            1157
+          ],
+          [
+            775,
+            1402
+          ],
+          [
+            12,
+            1402
+          ]
+        ],
+        "screen": [
+          [
+            779,
+            1127
+          ],
+          [
+            910,
+            1108
+          ],
+          [
+            1052,
+            1317
+          ],
+          [
+            884,
+            1341
+          ]
+        ]
+      }
+    },
+    {
+      "id": "A5",
+      "angle": "Rodinný večer",
+      "faces": true,
+      "file": "A5-rodinny-vecer.png",
+      "editable": "editable/A5-rodinny-vecer.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2546631,
+      "sha256": "746d3c3c07ea182dbab8777d7c0f85a055f1269be4899378ecf227bf9c6295da",
+      "photograph": "2ff4638fbbd3d8f9a56320809863efe65af8cb6008640194a41b6a137a4b55e6",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "A5",
+        "file": "A5-rodinny-vecer",
+        "angle": 4,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            74,
+            1177
+          ],
+          [
+            664,
+            1136
+          ],
+          [
+            788,
+            1402
+          ],
+          [
+            41,
+            1441
+          ]
+        ],
+        "screen": [
+          [
+            774,
+            1125
+          ],
+          [
+            892,
+            1112
+          ],
+          [
+            1017,
+            1341
+          ],
+          [
+            850,
+            1367
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B1",
+      "angle": "Papier + mobil + rodina",
+      "faces": false,
+      "file": "B1-ponad-plece.png",
+      "editable": "editable/B1-ponad-plece.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2312643,
+      "sha256": "748c4daa995521b8d4d8bd0622b4c2fb5cd04052c133874479d4c1791c183244",
+      "photograph": "610cd9eb9c6523ed35ef5cd392cecfd349b09c27fa35b461568a067e3eb2b2b6",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "B1",
+        "file": "B1-ponad-plece",
+        "angle": 0,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            360,
+            1112
+          ],
+          [
+            724,
+            1046
+          ],
+          [
+            846,
+            1402
+          ],
+          [
+            475,
+            1470
+          ]
+        ],
+        "screen": [
+          [
+            743,
+            930
+          ],
+          [
+            865,
+            917
+          ],
+          [
+            957,
+            1147
+          ],
+          [
+            812,
+            1168
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B2",
+      "angle": "Dobrodružstvo doma",
+      "faces": false,
+      "file": "B2-ruky-a-indicie.png",
+      "editable": "editable/B2-ruky-a-indicie.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2142917,
+      "sha256": "c61cad136bef45109bb0872c8f7ae1bb8f0dcf1eeaea83c48c07d4ee8a91e9b4",
+      "photograph": "4ec9bac783ea041a1ea8b54232e13235a1ee97e61d5804f21c94d4acba6536b9",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "B2",
+        "file": "B2-ruky-a-indicie",
+        "angle": 1,
+        "paperSource": "path",
+        "paper": [
+          [
+            91,
+            981
+          ],
+          [
+            619,
+            924
+          ],
+          [
+            786,
+            1402
+          ],
+          [
+            0,
+            1457
+          ]
+        ],
+        "screen": [
+          [
+            707,
+            888
+          ],
+          [
+            869,
+            853
+          ],
+          [
+            1018,
+            1165
+          ],
+          [
+            830,
+            1203
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B3",
+      "angle": "Jeden mobil pre celý tím",
+      "faces": false,
+      "file": "B3-spolocny-mobil.png",
+      "editable": "editable/B3-spolocny-mobil.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2271036,
+      "sha256": "98829561b3aaf423f5729e3ac90e8a641bffc743a81b745db383659716b30b6d",
+      "photograph": "bd44f80ac11bfac007735528a5341a06e2f93b74c323fcdd7ea349b2b90e351c",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "B3",
+        "file": "B3-spolocny-mobil",
+        "angle": 2,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            338,
+            1115
+          ],
+          [
+            744,
+            1056
+          ],
+          [
+            879,
+            1402
+          ],
+          [
+            323,
+            1482
+          ]
+        ],
+        "screen": [
+          [
+            799,
+            980
+          ],
+          [
+            933,
+            958
+          ],
+          [
+            1021,
+            1205
+          ],
+          [
+            879,
+            1234
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B4",
+      "angle": "Spoločné rozlúštenie",
+      "faces": false,
+      "file": "B4-rodinny-tim.png",
+      "editable": "editable/B4-rodinny-tim.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2576623,
+      "sha256": "f557a8097392c1aea6056e3f2b08934f680c38e244f5f2be2d00b308050d152d",
+      "photograph": "e8bf9b8b21f6bc85de57846824f4f5343cd45e923a8e457e1ba9f435d42de2b7",
+      "paper": {
+        "source": "assets/sales/public-previews/path.webp",
+        "sha256": "63bd09be3da36ab9af2dac20852adaeb0660bd50e159dc80228b8f7cede390c2"
+      },
+      "placement": {
+        "id": "B4",
+        "file": "B4-rodinny-tim",
+        "angle": 3,
+        "paperSource": "path",
+        "paper": [
+          [
+            385,
+            669
+          ],
+          [
+            692,
+            668
+          ],
+          [
+            713,
+            943
+          ],
+          [
+            363,
+            944
+          ]
+        ],
+        "screen": [
+          [
+            737,
+            697
+          ],
+          [
+            837,
+            696
+          ],
+          [
+            865,
+            892
+          ],
+          [
+            756,
+            892
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B5",
+      "angle": "Rodinný večer",
+      "faces": false,
+      "file": "B5-dobrodruzstvo-na-stole.png",
+      "editable": "editable/B5-dobrodruzstvo-na-stole.svg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "bytes": 2193531,
+      "sha256": "bac34bd87d89b41fd7f7524bb0c1ffa3c89feb2e70a63422ed67cf0a1736496f",
+      "photograph": "b2639ebab501f3e26916944b044cc4b399668b7c2aad0e08a93e74dd8fb4977d",
+      "paper": {
+        "source": "assets/sales/public-previews/decoder.webp",
+        "sha256": "a32fe04ecd518355e899337f11146eae82d59e7a325154df41e2add5e044769d"
+      },
+      "placement": {
+        "id": "B5",
+        "file": "B5-dobrodruzstvo-na-stole",
+        "angle": 4,
+        "paperSource": "decoder",
+        "paper": [
+          [
+            96,
+            954
+          ],
+          [
+            613,
+            918
+          ],
+          [
+            761,
+            1402
+          ],
+          [
+            43,
+            1453
+          ]
+        ],
+        "screen": [
+          [
+            694,
+            880
+          ],
+          [
+            835,
+            856
+          ],
+          [
+            968,
+            1152
+          ],
+          [
+            805,
+            1189
+          ]
+        ]
+      }
+    }
+  ]
+}
