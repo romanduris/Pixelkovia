@@ -1,0 +1,9 @@
+{
+  "coordinateSystem": "Physical TL, TR, BR, BL in each generated raw photograph. Original print and game rotate 180 degrees toward the family. Every ratio is separately recomposed with built-in imagegen; only uniform optical finishing frames are used.",
+  "items": [
+    {"id":"4x5","label":"4 : 5 · Feed","W":1080,"H":1350,"file":"koncept_03_4x5","framing":{"scale":0.989010989010989,"x":0,"y":0},"paperQuad":[[434,768],[617,768],[668,942],[385,942]],"screenQuad":[[751,769],[793,769],[811,819],[764,819]],"safeArea":{"left":76,"top":95,"right":1004,"bottom":1053}},
+    {"id":"1x1","label":"1 : 1 · Feed","W":1080,"H":1080,"file":"koncept_03_1x1","framing":{"scale":0.94,"x":-49.38,"y":-98.7},"paperQuad":[[511,854],[679,854],[717,997],[463,997]],"screenQuad":[[797,857],[839,857],[853,895],[809,895]],"safeArea":{"left":76,"top":76,"right":1004,"bottom":842}},
+    {"id":"9x16","label":"9 : 16 · Stories / Reels","W":1080,"H":1920,"file":"koncept_03_9x16","framing":{"scale":1.19,"x":-19.895,"y":-69},"paperQuad":[[350,1030],[548,1030],[596,1217],[291,1217]],"screenQuad":[[683,1032],[730,1032],[748,1082],[696,1082]],"safeArea":{"left":76,"top":288,"right":1004,"bottom":1497}},
+    {"id":"191x1","label":"1,91 : 1 · Landscape","W":1200,"H":628,"file":"koncept_03_191x1","paperQuad":[[1128,499],[1323,499],[1372,673],[1060,673]],"screenQuad":[[1456,500],[1505,500],[1526,546],[1473,546]],"safeArea":{"left":84,"top":44,"right":1116,"bottom":490}}
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-26",
+  "concept": "A2 V4 – Dobrodružstvo doma",
+  "mode": "built-in image_gen",
+  "source": "assets/social/concepts-2026-11-26-room-v4-A/sources/A2-dobrodruzstvo-doma.webp",
+  "copy": {
+    "brand": "Pixelkovia",
+    "kicker": "RODINNÁ HRA NA DOMA",
+    "headline": [
+      "Z obývačky rovno",
+      "do dobrodružstva."
+    ],
+    "support": [
+      "Vytlačené indície, príbeh v mobile",
+      "a jedna spoločná rodinná misia."
+    ],
+    "facts": [
+      "7 hádaniek",
+      "7–13 rokov",
+      "60–90 min"
+    ],
+    "url": "pixelkovia.rodulab.com"
+  },
+  "corrections": [
+    {
+      "id": "4x5",
+      "prompt": "Use case: identity-preserve. Edit image1; image2 is ONLY a geometry guide, not style, labels or colors to copy. Keep image1's mother, children, exact identities/clothes/poses and candid emotion, room, mascots, blank paper/phone, pens and marker identical. Change ONLY the optical scene scale/position. The current scene is TOO LOW: the paper currently reaches y1175 on raw1122x1402. Shrink the ENTIRE image1 uniformly to80% of its pixels, so it occupies approx900x1122 inside a1080x1350 portrait4:5 canvas atx90,y0. Seamlessly OUTPAINT the new left/right boundaries and the bottom with the same real room and wooden tabletop. The entire family scales together: mother's bun near y480, bodies y580..790, blank paper y805..940, phone y805..870. Do not separately stretch or move paper away from their hands. Absolutely keep the physical paper bottom ABOVE y940. Leave y960..1350 as natural continuous wooden table foreground with no game props. Top remains same navy room and lamp/books/window. No type, letters, captions, guide blocks, flat bands, borders, watermarks, buttons or QR. Preserve photoreal skin, wood grain, natural contact shadows, the marker lying partly on paper, blue mascot atphone, yellow mascot behind boy/mom. Main goal: 20% further optical zoom out relative image1, natural outpaint to fullcanvas; do NOT just return the original low scene. Final aspectratio4:5."
+    },
+    {
+      "id": "1x1",
+      "prompt": "Use case: identity-preserve. Edit image1; image2 is ONLY a target layout guide, do NOT copy its words, flat boxes or colors. Preserve image1's exact mother, children, clothes, expressions, gestures, sofa, room, yellow/blue mascots, blank paper, blank phone, pens and coral marker and natural light. Change ONLY optical scene scale and position. The photo scene is too LOW for the square ad. Need uniform optical zoom-out plus upward shift, then seamlessly outpaint room/table all around.\nTarget1080x1080 SQUARE canvas: render the ENTIRE1254x1254 image1 at75% of raw pixels (940x940) positionedx70,y-50. Outpaint left/right edges and especially lower y890..1080 with SAME wood tabletop. This places mother's bun neary370, the family acrossx380..840,y370..640, paper cornersnear(523,649),(650,648),(687,768),(495,769), phone x670..724,y648..705. Absolute paper bottom MUST be above y780. All principalpropsabove y790, leaving y805..1080 natural wood forfooter andCTA. Left x76..285,y670..800 is clear tabletop forlater facts. Uppery0..345 is calmnavywall forlatertext. Paper stays directly underboy'spointingfinger, markerpartlycrossespaperwithcontactshadow; do not separately detach props. No addedpaper, people, type, captions, guideblocks, borders, solidbands, watermarks orbuttons. Keep photographic skin and naturalmaterials. Aspectratio1:1."
+    },
+    {
+      "id": "191x1",
+      "prompt": "Use case: identity-preserve. Edit image1; image2 is ONLY a geometry/layout guide, not its colors/labels/shapes. Keep all people, exact facialidentities, clothes, gestures and facialemotion unchanged. Keep originalroom, mascots, blankpaper+phone, pens andcoralmarker. Uniform optical zoomout with naturaloutpaint, NOT a newconcept. Original1734x907 scene must now be rendered at60% rawpixels =1040x544 and positioned atx120,y0 within1200x628 canvas. Outpaint surroundings seamlessly withnavyroomleft andwoodtablebottom. Entirefamilyandallprops shrinktogether so mother'sbun neary170, groupatx700..1140,y170..386; paper x795..950,y386..480, phone x945..990,y386..435. Essentialpaperbottom strictlybelow y480. Leftx0..625 calmnavyroom/tablefornativecopy. Bottomy490..628 continuouswoodtablewithnocrucialprop. Do not produce bigpaper endingy550again. No text, words, borders,flatpanels, logos,labels,buttons,watermarkorQR. Naturalphotorealskin, shadows, wood and fabrics. Maintain warmamber/blueatmosphere. Finalaspectratio1.91:1."
+    },
+    {
+      "id": "9x16",
+      "prompt": "Use case: identity-preserve. Edit image1; image2 is ONLY a layout guide, never copylabels/colors/blocks. Allpeople, exactfaces,clothes,poses,contactwithgame,room,mascots,blankpaper+phone,markerandpens mustremainidentical. Change ONLY globalframing: the currenttallphoto941x1672 placesfamilyandgame TOOLOW. Scale image1 UNIFORMLY to1080x1920, move thatentirephotograph UP by300pixels, and OUTPAINT thenewbottom300pixelswithsamewoodtable. This is vertical reframing+outpaint; no subjectalterations. Result mother'sbunat y680, faces aroundy800..1000, group'slowerhandsend y1140, blankpaper x375..718,y1135..1345, phonex679..763,y1135..1225. Paperbottom MUSTbeabovey1350. Allpropsabovey1360. y1380..1920naturalwoodtablewithnopropforlaterfooterandCTA. Top0..650mostlynavywallforlatertext. Preserve entirewarmroomfromreference, camera, light, photographictexture and familyemotion. No words,letters,guideblocks,flatbands,watermark,buttonorQR. Finalaspectratio9:16."
+    }
+  ],
+  "finalComposition": "Each source was individually rephotographed/recomposed and outpainted for its format. Native uniform framing then balances group scale and the exact product plane. In compact and portrait variants, the facts and URL occupy the naturally free left tabletop rather than crossing the game sheet.",
+  "safety": "7% sides, 7% top for feed/landscape; 15% top for Stories; lower22% reserved. No drawn CTA buttons. All exact product contents rotate180 degrees toward the family."
+}

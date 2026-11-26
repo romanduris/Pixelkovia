@@ -1,0 +1,211 @@
+{
+  "coordinateSystem": "Physical TL, TR, BR, BL in each raw generated photograph; paper and game rotated 180 degrees toward family; uniform optical framing only.",
+  "items": [
+    {
+      "id": "4x5",
+      "label": "4 : 5 · Feed",
+      "W": 1080,
+      "H": 1350,
+      "file": "koncept_02_4x5",
+      "framing": {
+        "scale": 1.2,
+        "x": -113.2,
+        "y": -224
+      },
+      "paperQuad": [
+        [
+          481,
+          918
+        ],
+        [
+          644,
+          918
+        ],
+        [
+          690,
+          1054
+        ],
+        [
+          444,
+          1054
+        ]
+      ],
+      "screenQuad": [
+        [
+          666,
+          922
+        ],
+        [
+          704,
+          921
+        ],
+        [
+          717,
+          967
+        ],
+        [
+          675,
+          969
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 95,
+        "right": 1004,
+        "bottom": 1053
+      }
+    },
+    {
+      "id": "1x1",
+      "label": "1 : 1 · Feed",
+      "W": 1080,
+      "H": 1080,
+      "file": "koncept_02_1x1",
+      "paperQuad": [
+        [
+          606,
+          824
+        ],
+        [
+          759,
+          823
+        ],
+        [
+          801,
+          964
+        ],
+        [
+          571,
+          964
+        ]
+      ],
+      "screenQuad": [
+        [
+          784,
+          826
+        ],
+        [
+          820,
+          825
+        ],
+        [
+          837,
+          878
+        ],
+        [
+          794,
+          881
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 76,
+        "right": 1004,
+        "bottom": 842
+      }
+    },
+    {
+      "id": "9x16",
+      "label": "9 : 16 · Stories / Reels",
+      "W": 1080,
+      "H": 1920,
+      "file": "koncept_02_9x16",
+      "paperQuad": [
+        [
+          371,
+          1147
+        ],
+        [
+          565,
+          1147
+        ],
+        [
+          625,
+          1325
+        ],
+        [
+          327,
+          1325
+        ]
+      ],
+      "screenQuad": [
+        [
+          595,
+          1152
+        ],
+        [
+          644,
+          1151
+        ],
+        [
+          667,
+          1220
+        ],
+        [
+          610,
+          1223
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 288,
+        "right": 1004,
+        "bottom": 1497
+      },
+      "framing": {
+        "scale": 1.24,
+        "x": -23.42,
+        "y": -153.28
+      }
+    },
+    {
+      "id": "191x1",
+      "label": "1,91 : 1 · Landscape",
+      "W": 1200,
+      "H": 628,
+      "file": "koncept_02_191x1",
+      "paperQuad": [
+        [
+          1223,
+          568
+        ],
+        [
+          1356,
+          568
+        ],
+        [
+          1394,
+          669
+        ],
+        [
+          1194,
+          669
+        ]
+      ],
+      "screenQuad": [
+        [
+          1387,
+          572
+        ],
+        [
+          1421,
+          571
+        ],
+        [
+          1433,
+          610
+        ],
+        [
+          1395,
+          612
+        ]
+      ],
+      "safeArea": {
+        "left": 84,
+        "top": 44,
+        "right": 1116,
+        "bottom": 490
+      }
+    }
+  ]
+}

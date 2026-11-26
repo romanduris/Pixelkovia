@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-26",
+  "mode": "built-in image_gen",
+  "editTarget": "assets/social/concepts-2026-11-26-room-v4-A/sources/A3-jeden-mobil.webp",
+  "useCase": "identity-preserve",
+  "basePrompt": "Use case: identity-preserve. Asset: recompose the approved A3 advertising photograph for a different Meta aspect ratio. INPUT IMAGE 1 is the edit target, the approved photographic scene, NOT a moodboard. Preserve EXACT same mother in muted sage/olive knit on LEFT with chin on hand, same striped-shirt preteen GIRL in middle pointing across table, same grey-haired father dark denim on RIGHT. Preserve candid subtle smiles, realistic skin and hands. Preserve warm amber lamp on RIGHT, navy sofa, blue evening window LEFT, books, plants, globe. Preserve orange shield with teal tie and cyan keyhole peeking behind father's shoulder, tiny tan USB hanging under lamp, blue cloud-headed Piko wearing suit and teal tie inspecting the shared phone. Do not add people or mascots. Keep the existing purple marker crossing a corner of the ivory paper, wood pencil LEFT, black pen RIGHT, real pen shadows and contact. Keep one small BLACK blank smartphone, its SCREEN pointing at the family, lying flat on table near them, not enlarged. Keep the printed sheet plane BLANK warm ivory, same perspective, no drawings, no type; exact approved original game contents will be projected afterward. Screen must remain dark reflective blank, no invented UI. Recompose photograph by optical ZOOM OUT and OUTPAINT the SAME ROOM and SAME TABLE. No stretching, no horizontal-only resizing, no artificial padding, no collage, no rectangular inserted photograph. Continue photographic room naturally to every canvas edge. Family must remain the supporting emotional element, paper and phone naturally integrated. Keep natural lens geometry, no giant faces. Absolutely no typography, labels, logos, watermark, buttons, QR. Preserve exact colors and photoreal atmosphere.",
+  "variants": [
+    {
+      "id": "4x5",
+      "W": 1080,
+      "H": 1350,
+      "instruction": "OUTPUT PORTRAIT 4:5, 1080x1350 composition. Optical zoom out so the entire existing 1122x1402 photograph behaves as if reduced uniformly to about 729x911 positioned x175,y100. Continue surroundings naturally. Family hair begins around y405, faces around y500, ivory paper should span roughly y750..930, smartphone around y755..820. Central family/table arrangement occupies middle, leaving large uninterrupted navy wall top y0..395 for native headline and support; keep bottom y950..1350 photographed wood clean for information and native CTA overlays. Paper and phone MUST end before y945. Avoid adding extra paper/phones."
+    },
+    {
+      "id": "1x1",
+      "W": 1080,
+      "H": 1080,
+      "instruction": "OUTPUT SQUARE 1:1, 1080x1080 composition. Optical zoom out so entire existing 1122x1402 photograph behaves as if reduced uniformly to561x701 positioned x260,y120. Continue surroundings naturally. Family hair around y355, faces around y415, ivory sheet y620..757, small phone y620..657. Generous clear dark navy wall top y0..340 for headline+support. Family and paper concentrated in middle band y355..760. Keep lower wood table beyond y770 clean and uncluttered for typography and Meta CTA. Paper and phone MUST end before y775. No added props or additional papers. Bottom22% is calm photographed wood, not a hard blank panel."
+    },
+    {
+      "id": "9x16",
+      "W": 1080,
+      "H": 1920,
+      "instruction": "OUTPUT VERTICAL STORY 9:16, 1080x1920 composition. Optical zoom out so whole existing1122x1402 photograph behaves as if reduced uniformly to920x1150 positioned x80,y265. Outpaint same room/table to fullcanvas. Family hair begins around y650, faces around y760, ivory paper y1080..1310, small dark phone y1080..1150. Keep uninterrupted navy wall top y0..635 for editable brand/headline/support. Paper and phone MUST end before y1340. Keep same wood tabletop y1340..1920 free of extra props, no hard blank blocks. Bottom22%reserved overlay."
+    },
+    {
+      "id": "191x1",
+      "W": 1200,
+      "H": 628,
+      "instruction": "OUTPUT LANDSCAPE 1.91:1,1200x628composition. Recompose family+table to RIGHT HALF only, all three original people fully intact, same poses, sheet,phone, mascots and pens. Optical zoom out the original photograph uniformly to about471x589 placed x675,y-62; outpaint original living room LEFT and table BOTTOM naturally. Family hair around y135, faces around y200, ivory sheet on right y355..473, phone y355..390. All important gameprops must end before y480. Left x0..630 is dark navy room wall with only subtle furniture/plant hints and no faces, papers, lamps, or bright distractions, so native headline+support and facts/URL fit. Bottom y490..628 is calm continuous wood. Never put family in center or fill leftcopyspace. No panels/collage."
+    }
+  ],
+  "corrections": [
+    {
+      "id": "4x5",
+      "useCase": "identity-preserve",
+      "referenceGuide": "sources/layout-guide_4x5.png",
+      "prompt": "Use case: identity-preserve. Correct ONLY composition of image1. Image2 is an exact POSITIONAL LAYOUT GUIDE, not finished art. Match its composition: same room/family/mascots/paper/phone/pens vertically 200pixels HIGHER in a1080x1350canvas. Top wall now only reaches hair near y410; paper is y755..925, phone y755..815. Precisely preserve image1 people identities, poses, facialexpressions, clothing, original same room and all props/mascots; do not zoom or make family larger/smaller. Use scene geometry from guide2. Lower200pixels of guide is unfinished brownplaceholder: replace with seamlessly continued same photographic wooden table with natural perspective, grain and lighting, no seam or artificial padding. No typography, no logos, no UI, no QR. One blank ivory paper and one dark blank phone with real reflections. Do not move family downward. The current error is too much wall over family and paper too low. Return finished full bleed photoreal4:5photo, no flat guide panel."
+    },
+    {
+      "id": "1x1",
+      "useCase": "identity-preserve",
+      "referenceGuide": "sources/layout-guide_1x1.png",
+      "prompt": "Use case: identity-preserve. Correct ONLY framing. Image1 is exact existing approved family/photo; image2 is precise POSITIONAL LAYOUT GUIDE on1080square. Match image2 subject positions and scale. Uniform optical ZOOM OUT so photo1 becomes878x878 at x101,y0 in1080x1080canvas. No stretching. Hair now starts y360, sheet y625..742, phone y630..665. Fill all guide's flat navy sideplaceholders by seamless continuing same room, windowleft/booksright, and bottom brown placeholder with same wooden table continued in correct perspective and golden/blue lighting. NO visible flat bands, seams, frames or pasted-image edges. Preserve same exact mother-left, striped-shirt girl-middle, father-denim-right, skin, natural hands, subtle smiles, olive knit, Guardybehinddad, Piko cloudhead next tophone, tiny USBbelow lamp. Preserve exact pen/pencil/purplemarker positions, marker partlyover blankpaper. Blank ivory sheet and dark reflective blank phone remain unchanged geometry. Do not move subjects down. Keep top350px largely navy roomwall for nativecopy, bottomafter780px calm continuous tabletop. No typography, logos, QR, addedUI, extra paper or props. Deliver photoreal fullbleed square."
+    },
+    {
+      "id": "9x16",
+      "useCase": "identity-preserve",
+      "referenceGuide": "sources/layout-guide_9x16.png",
+      "prompt": "Use case: identity-preserve. Correct ONLY composition ofimage1. Image2 exact POSITIONAL LAYOUT GUIDE, not finalart: same scene moved vertically300pixels HIGHER on1080x1920canvas, size unchanged. Match guide geometry exactly. Family hair now begins near y640, paper y1075..1290, phone y1075..1145. Keep the same motheroliveknitLEFT, striped-shirtGIRLmiddle pointing, fatherdenimRIGHT, faces, natural hands, clothing, expression and furniture. Preserve same Guardybehinddad, USBhangingunderlamp, bluePikobesidephone, all pensincludingpurplemarkeracrossblankpaper. Keep geometry and photo realism. Bottom300pixels is unfinished brown placeholder: outpaint into seamless original wooden table with matching perspective, grain, amber andblue lighting, no seam or solid block. Top area throughy625 remains mainly navy wall ready for nativecopy. Blank ivory sheet and blank black reflectivephone remain blank. NO typography, logos, QR, UI, extrapeople orprops. Do not move subjects down or increasefamily size. Fullbleed photorealstory9:16."
+    },
+    {
+      "id": "191x1",
+      "useCase": "identity-preserve",
+      "referenceGuide": "sources/layout-guide_191x1.png",
+      "prompt": "Use case: identity-preserve. Correct ONLY framing ofimage1 using image2 as EXACT POSITIONALGUIDE. Image2 has original landscapephoto uniformlyscaled1200x628 and moved100pxHIGHER. Matchguidegeometry: keep familyentirely onRIGHT, hairy90, facesy160, sheetrighty345..465, darkphoney345..385. Preserve same exact motheroliveknitLEFTwithin rightgroup, stripedshirtGIRLmiddle, fatherdenimRIGHT; all faces andhands, sameposesexpressions. Preserve Guardybehindfather, USBbelowlampshade, Pikonexttophone, purplemarker across paperlowerleft, pencilleft andblackpenright. Do not change any propsoridentity. Bottom100pixelsbrownplaceholder must become seamless continued warmwoodtable in photographic perspective andblue/amberlighting. No seam/nohardflatblock/no pasted edges. Left0..630 remains uninterrupted navywall andsubtlefloor/table fornativecopy, nofacesbrightobjects. Ivorypaper andsmallreflectiveblackphone stayBLANK for exactoriginalsinsertionlater. Whole paperandphoneendbeforey480. Fullbleed photoreal1.91:1landscape1200x628. No text/logo/QR/UI/button."
+    },
+    {
+      "id": "191x1",
+      "round": 3,
+      "input": "sources/layout-guide_191x1.png",
+      "prompt": "Use case: precise-object-edit. EDIT THIS PROVIDED IMAGE ONLY. The photograph occupies top528pixels, bottom100pixels is a FLAT BROWN UNFINISHED STRIP. Replace ONLY this unfinished brown strip with a seamless PHOTOREAL CONTINUATION of the SAME wooden coffee table, correct wood grain, perspective, amber/blue reflections, matching lighting. Remove the artificial horizontal seam at y528 by continuing table naturally. Keep all existing image pixels above y490 as close as possible unchanged: exact family faces/positions/sizes, lamp, mascots, phone, blank paper and pens. Do not translate or recenter anyone. Keep heads high at y90 and paper ending at y467, phone ending at y385. Left copy area stays navy wall, family remains RIGHT. Keep canvas landscape1200x628; do not reframe, zoom, change objects or invent text. NO typography, watermarks, added UI or props. ONLY outpaint/fix the brownbottom strip. Full bleed seamlessphotograph."
+    }
+  ],
+  "finalNativeLayoutNotes": [
+    "Every output derives from separately recomposed photograph, preserving identity and family atmosphere. Final uniform finishing frames are defined in layouts.json.",
+    "Square uses a left information column to preserve the entire paper and phone above the CTA zone. URL is raised above the purple marker.",
+    "Headline J has a 2 px optical inset so the measured glyph antialiasing stays inside the 7% side margin."
+  ],
+  "exactCopy": {
+    "headline": [
+      "Jeden mobil.",
+      "Celá rodina v hre."
+    ],
+    "support": [
+      "Papierové stopy vás spoja pri stole.",
+      "Príbeh v mobile vás povedie ďalej."
+    ],
+    "facts": [
+      "7 hádaniek",
+      "7–13 rokov",
+      "60–90 min"
+    ],
+    "url": "pixelkovia.rodulab.com"
+  }
+}

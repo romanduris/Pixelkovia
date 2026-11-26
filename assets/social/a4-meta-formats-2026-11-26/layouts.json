@@ -1,0 +1,222 @@
+{
+  "coordinateSystem": "TL, TR, BR, BL of the printable region on each physical paper and phone glass, with natural blank page margins where needed. Native uniform framing follows imagegen recomposition; both approved originals rotate 180 degrees toward the family.",
+  "items": [
+    {
+      "id": "4x5",
+      "label": "4 : 5 · Feed",
+      "W": 1080,
+      "H": 1350,
+      "file": "koncept_04_4x5",
+      "framing": {
+        "scale": 1.05,
+        "x": -49.05,
+        "y": -122.1
+      },
+      "paperQuad": [
+        [
+          416,
+          830
+        ],
+        [
+          592,
+          830
+        ],
+        [
+          653,
+          994
+        ],
+        [
+          378,
+          994
+        ]
+      ],
+      "screenQuad": [
+        [
+          628,
+          839
+        ],
+        [
+          672,
+          839
+        ],
+        [
+          688,
+          894
+        ],
+        [
+          641,
+          895
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 95,
+        "right": 1004,
+        "bottom": 1053
+      }
+    },
+    {
+      "id": "1x1",
+      "label": "1 : 1 · Feed",
+      "W": 1080,
+      "H": 1080,
+      "file": "koncept_04_1x1",
+      "framing": {
+        "scale": 0.98,
+        "x": -74.46,
+        "y": -148.92
+      },
+      "paperQuad": [
+        [
+          508,
+          813
+        ],
+        [
+          674,
+          813
+        ],
+        [
+          734,
+          971
+        ],
+        [
+          468,
+          971
+        ]
+      ],
+      "screenQuad": [
+        [
+          702,
+          818
+        ],
+        [
+          742,
+          818
+        ],
+        [
+          765,
+          867
+        ],
+        [
+          713,
+          868
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 76,
+        "right": 1004,
+        "bottom": 842
+      }
+    },
+    {
+      "id": "9x16",
+      "label": "9 : 16 · Stories / Reels",
+      "W": 1080,
+      "H": 1920,
+      "file": "koncept_04_9x16",
+      "framing": {
+        "scale": 1.25,
+        "x": -32.5,
+        "y": -226.25
+      },
+      "paperQuad": [
+        [
+          338,
+          1075
+        ],
+        [
+          505,
+          1075
+        ],
+        [
+          578,
+          1238
+        ],
+        [
+          295,
+          1238
+        ]
+      ],
+      "screenQuad": [
+        [
+          552,
+          1080
+        ],
+        [
+          595,
+          1080
+        ],
+        [
+          614,
+          1134
+        ],
+        [
+          567,
+          1136
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 288,
+        "right": 1004,
+        "bottom": 1497
+      }
+    },
+    {
+      "id": "191x1",
+      "label": "1,91 : 1 · Landscape",
+      "W": 1200,
+      "H": 628,
+      "file": "koncept_04_191x1",
+      "paperQuad": [
+        [
+          1116,
+          552
+        ],
+        [
+          1307,
+          552
+        ],
+        [
+          1374,
+          721
+        ],
+        [
+          1078,
+          721
+        ]
+      ],
+      "screenQuad": [
+        [
+          1355,
+          554
+        ],
+        [
+          1402,
+          554
+        ],
+        [
+          1421,
+          618
+        ],
+        [
+          1370,
+          619
+        ]
+      ],
+      "safeArea": {
+        "left": 84,
+        "top": 44,
+        "right": 1116,
+        "bottom": 490
+      },
+      "framing": {
+        "scale": 0.8,
+        "x": -93.6,
+        "y": -97.6
+      },
+      "paperPlacement": "Approved cropped original on the physical paper with a natural blank lower print margin, clear of the CTA reserve."
+    }
+  ]
+}

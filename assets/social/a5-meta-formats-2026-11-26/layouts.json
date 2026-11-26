@@ -1,0 +1,211 @@
+{
+  "coordinateSystem": "Physical TL,TR,BR,BL in raw generated photos; both content planes rotate180degrees toward family. Native optical framing remains uniform.",
+  "items": [
+    {
+      "id": "4x5",
+      "label": "4 : 5 · Feed",
+      "W": 1080,
+      "H": 1350,
+      "file": "koncept_05_4x5",
+      "paperQuad": [
+        [
+          445,
+          879
+        ],
+        [
+          653,
+          879
+        ],
+        [
+          721,
+          1075
+        ],
+        [
+          401,
+          1075
+        ]
+      ],
+      "screenQuad": [
+        [
+          685,
+          881
+        ],
+        [
+          738,
+          881
+        ],
+        [
+          754,
+          936
+        ],
+        [
+          700,
+          940
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 95,
+        "right": 1004,
+        "bottom": 1053
+      }
+    },
+    {
+      "id": "1x1",
+      "label": "1 : 1 · Feed",
+      "W": 1080,
+      "H": 1080,
+      "file": "koncept_05_1x1",
+      "framing": {
+        "scale": 0.92,
+        "x": -36.84,
+        "y": -73.68
+      },
+      "paperQuad": [
+        [
+          520,
+          808
+        ],
+        [
+          756,
+          810
+        ],
+        [
+          815,
+          989
+        ],
+        [
+          475,
+          990
+        ]
+      ],
+      "screenQuad": [
+        [
+          790,
+          813
+        ],
+        [
+          841,
+          813
+        ],
+        [
+          860,
+          867
+        ],
+        [
+          805,
+          870
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 76,
+        "right": 1004,
+        "bottom": 842
+      }
+    },
+    {
+      "id": "9x16",
+      "label": "9 : 16 · Stories / Reels",
+      "W": 1080,
+      "H": 1920,
+      "file": "koncept_05_9x16",
+      "framing": {
+        "scale": 1.36,
+        "x": -99.88,
+        "y": -353.92
+      },
+      "paperQuad": [
+        [
+          352,
+          1121
+        ],
+        [
+          585,
+          1120
+        ],
+        [
+          661,
+          1357
+        ],
+        [
+          291,
+          1357
+        ]
+      ],
+      "screenQuad": [
+        [
+          620,
+          1125
+        ],
+        [
+          674,
+          1125
+        ],
+        [
+          695,
+          1189
+        ],
+        [
+          637,
+          1193
+        ]
+      ],
+      "safeArea": {
+        "left": 76,
+        "top": 288,
+        "right": 1004,
+        "bottom": 1497
+      }
+    },
+    {
+      "id": "191x1",
+      "label": "1,91 : 1 · Landscape",
+      "W": 1200,
+      "H": 628,
+      "file": "koncept_05_191x1",
+      "paperQuad": [
+        [
+          1158,
+          477
+        ],
+        [
+          1340,
+          479
+        ],
+        [
+          1411,
+          642
+        ],
+        [
+          1113,
+          642
+        ]
+      ],
+      "screenQuad": [
+        [
+          1369,
+          484
+        ],
+        [
+          1417,
+          483
+        ],
+        [
+          1437,
+          539
+        ],
+        [
+          1385,
+          540
+        ]
+      ],
+      "safeArea": {
+        "left": 84,
+        "top": 44,
+        "right": 1116,
+        "bottom": 490
+      }
+    }
+  ]
+}
