@@ -14,7 +14,7 @@ export function groupChartDay(day){
 }
 let chartObserver,chartFrame,selectedDate;
 export function paymentLink(d){
- const params=new URLSearchParams({scope:'funnel',period:d.filters.period==='campaign1'?'campaign1':'custom',from:d.filters.from,to:d.filters.to,asOf:String(d.generatedAt)});
+ const params=new URLSearchParams({scope:'funnel',period:['campaign1','campaign2'].includes(d.filters.period)?d.filters.period:'custom',from:d.filters.from,to:d.filters.to,asOf:String(d.generatedAt)});
  for(const key of ['source','campaign','device','product'])if(d.filters[key])params.set(key,d.filters[key]);
  return '#payments?'+params;
 }

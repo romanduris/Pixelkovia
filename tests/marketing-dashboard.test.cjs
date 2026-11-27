@@ -178,7 +178,7 @@ const origin='https://pixelkovia.rodulab.com';
   assert.equal(await page.locator('#marketing-kpi-checkout strong').innerText(),'1');
   await page.locator('#marketing-overview-unique').uncheck();
   assert.equal(await page.locator('#marketing-kpi-checkout strong').innerText(),'2');
-  assert.equal(await page.locator('[data-marketing-period]').count(),5);
+  assert.equal(await page.locator('[data-marketing-period]').count(),6);
   assert.ok(await page.locator('#marketing-charts').evaluate(el=>el.open));
   assert.equal(await page.locator('.marketing-chart-svg').count(),1);
   assert.deepEqual(await page.locator('.marketing-chart-legend li>span').allTextContents(),['Facebook','Instagram','Others']);
@@ -322,7 +322,7 @@ const origin='https://pixelkovia.rodulab.com';
   await page.locator('[name=product]').selectOption('');await page.getByRole('button',{name:'Použiť filtre'}).click();await ready();
   await page.locator('#marketing-summary-attribution').click();await page.locator('#marketing-summary-funnel-details').click();
   await page.locator('#marketing-sort-visits').click();
-  assert.deepEqual(await page.locator('[data-marketing-period]').allTextContents(),['1d','7d','14d','30d','Kamp.1']);
+  assert.deepEqual(await page.locator('[data-marketing-period]').allTextContents(),['1d','7d','14d','30d','Wave1','Wave2']);
   assert.equal(await page.locator('[name=period] option[value="90"]').count(),0);
   await page.locator('[data-marketing-period="campaign1"]').click();await ready();
   assert.match(calls.at(-1),/period=campaign1/);
@@ -340,8 +340,27 @@ const origin='https://pixelkovia.rodulab.com';
   await page.setViewportSize({width:1440,height:900});
   assert.match(await page.locator('.marketing-purchase-link').getAttribute('href'),/period=campaign1/);
   await page.locator('.marketing-purchase-link').click();await page.waitForURL('**/admin#payments?**');await ready();
-  const campaignPayments=await page.locator('.payment-funnel-scope strong').innerText();assert.match(campaignPayments,/Kamp\.1 · 13\. 11\. 2026 – 16\. 11\. 2026/);
+  const campaignPayments=await page.locator('.payment-funnel-scope strong').innerText();assert.match(campaignPayments,/Wave1 · 13\. 11\. 2026 – 16\. 11\. 2026/);
   await page.getByRole('link',{name:'Späť na funnel'}).click();await ready();
+  await page.locator('[data-marketing-period="campaign2"]').click();await ready();
+  assert.match(calls.at(-1),/period=campaign2/);
+  for(const selector of ['.marketing-date-range','.marketing-overview-period'])assert.equal(await page.locator(selector).innerText(),'27. 11. 2026 – 2. 12. 2026');
+  await page.reload();await ready();assert.match(calls.at(-1),/period=campaign2/);
+  assert.equal(await page.locator('[data-marketing-period="campaign2"]').getAttribute('aria-pressed'),'true');
+  assert.match(await page.locator('.marketing-purchase-link').getAttribute('href'),/period=campaign2/);
+  await page.locator('.marketing-purchase-link').click();await page.waitForURL('**/admin#payments?**');await ready();
+  assert.match(await page.locator('.payment-funnel-scope strong').innerText(),/Wave2 · 27\. 11\. 2026 – 2\. 12\. 2026/);
+  await page.getByRole('link',{name:'Späť na funnel'}).click();await ready();
+  await page.locator('[data-marketing-period="campaign2"]').waitFor({state:'visible'});
+  for(const width of [1440,390,320]){
+   await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Wave2 toolbar fits '+width);
+   for(const period of ['30','campaign1','campaign2']){
+    const button=page.locator('[data-marketing-period="'+period+'"]');
+    assert.ok(await button.isVisible(),'period visible '+period+' at '+width);assert.ok(await button.evaluate(el=>el.scrollWidth<=el.clientWidth),'period label fits '+period+' at '+width);
+   }
+   await page.locator('.marketing-dashboard').screenshot({path:'/tmp/pixelkovia-wave2-'+width+'.png'});
+  }
+  await page.setViewportSize({width:1440,height:900});
   for(const period of ['today','7','14','30','14']){await page.locator('[data-marketing-period="'+period+'"]').click();await ready();assert.match(calls.at(-1),new RegExp('period='+period));}
   await page.setViewportSize({width:320,height:900});
   for(const period of ['today','7','14','30']){
@@ -372,10 +391,10 @@ const origin='https://pixelkovia.rodulab.com';
     assert.equal(await page.locator('#marketing-funnel-details').isVisible(),false,'saved open explanation stays hidden on phones');
     await page.locator('#marketing-funnel-details').evaluate(el=>el.open=false);
     const toolbar=await page.locator('.marketing-toolbar').boundingBox(),periods=await page.locator('.marketing-period-buttons').boundingBox(),calendar=await page.locator('.marketing-since-date').boundingBox();
-    const periodButtons=await page.locator('[data-marketing-period]').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,right:r.right,width:r.width,height:r.height};}));
-    for(let i=0;i<periodButtons.length;i++){assert.ok(periodButtons[i].width>=40&&periodButtons[i].height>=40,'period touch target '+width);if(i)assert.ok(periodButtons[i].x>=periodButtons[i-1].right+2,'period buttons have distinct spacing '+width);}
+    const periodButtons=await page.locator('[data-marketing-period]').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}));
+    for(let i=0;i<periodButtons.length;i++){assert.ok(periodButtons[i].width>=40&&periodButtons[i].height>=40,'period touch target '+width);if(i)assert.ok(periodButtons[i].y>=periodButtons[i-1].bottom+2||periodButtons[i].x>=periodButtons[i-1].right+2,'period buttons have distinct spacing '+width);}
     assert.equal(await page.locator('[data-marketing-period][aria-pressed="true"]').count(),1);
-    assert.ok(toolbar.height<130,'compact phone toolbar '+width);assert.ok(Math.abs(periods.y-calendar.y)<4,'calendar shares period row '+width);assert.ok(calendar.x>=periods.x+periods.width,'calendar is at the right of periods');
+    assert.ok(toolbar.height<(width<=400?180:130),'compact phone toolbar '+width);assert.ok(Math.abs(periods.y-calendar.y)<4,'calendar shares period row '+width);assert.ok(calendar.x>=periods.x+periods.width,'calendar is at the right of periods');
     await page.locator('#marketing-since').fill(sinceDate);await page.locator('#marketing-since').blur();await ready();assert.match(calls.at(-1),/period=since/);
     await page.locator('[data-marketing-period="14"]').tap();await ready();assert.match(calls.at(-1),/period=14/);
     await page.locator('#marketing-group-facebook').tap();assert.ok(await page.locator('#marketing-source-facebook').isVisible());assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));

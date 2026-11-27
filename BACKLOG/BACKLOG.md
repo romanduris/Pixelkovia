@@ -20,7 +20,7 @@
 
 - [ ] **RoduLab – preposielanie info@rodulab.com do Gmailu.** Samostatný web Digital Product Studio a formulár používajú existujúci backend/Resend so súkromným `SUPPORT_FORWARD_TO`. Príjem správ poslaných priamo na `info@rodulab.com` zatiaľ zostáva na Websupporte; preposielanie vlastník 13. 11. 2026 dovolil odložiť, ak nestačí existujúci prístup. Cloudflare Email Routing vracia HTTP 403 `Authentication error`, Websupport credentials nie sú dostupné. Zachovať hlavné MX a existujúcu poštu; dokončiť až s príslušným prístupom. [Prevádzkový postup](../rodulab/README.md).
 - [ ] **Možnosť „bumoferu“ – preskúmať, či to chceme.** Pracovný názov podľa poznámky; najprv upresniť význam, prínos pre hráča, náročnosť a rozhodnúť áno/nie. Bez automatickej implementácie.
-- [ ] **Vianočný darčekový nákup / darčekový poukaz.** Preskúmať jednoduché darovanie hry ako vianočného darčeka, prípadne nadväznosť na druhú licenciu.
+- [ ] **Vianočný darčekový nákup / darčekový poukaz — pripomenúť pri každom začiatku práce.** Do checkoutu doplniť bezplatnú voľbu darčekového poukazu: po zaplatení poslať kupujúcemu namiesto prihlasovacích údajov pekný vianočný poukaz A5 s Pixelkovmi a jednorazovým kódom, ktorý pri uplatnení v checkoute vynuluje cenu hry. Zatiaľ iba odložené zadanie v backlogu; implementácia a návrh poukazu čakajú na samostatný pokyn.
 
 ---
 

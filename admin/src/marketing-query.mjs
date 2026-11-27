@@ -16,9 +16,11 @@ export function midnight(date){
 }
 export function marketingFilters(params,at=Date.now()){
   const period=params.get('period')||'14',today=localDate(at);let start,end,window;
-  if(period==='campaign1'){
+  if(['campaign1','campaign2'].includes(period)){
     // Campaign presets include every calendar day, with an exclusive next midnight.
-    window={label:'Kamp.1',start:midnight('2026-11-13'),end:midnight('2026-11-17')};
+    window=period==='campaign1'
+      ?{label:'Wave1',start:midnight('2026-11-13'),end:midnight('2026-11-17')}
+      :{label:'Wave2',start:midnight('2026-11-27'),end:midnight('2026-12-03')};
     start=window.start;end=Math.max(start,Math.min(window.end,at+1));
   }else if(period==='since'){
     start=midnight(params.get('from')||'');end=at+1;

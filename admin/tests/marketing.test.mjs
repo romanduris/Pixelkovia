@@ -209,52 +209,61 @@ test('since-date reports start at Bratislava midnight and keep extending to the 
  for(const from of ['', '2026-02-30','2026-11-11','2025-11-09'])assert.throws(()=>marketingFilters(new URLSearchParams({period:'since',from}),at),e=>e.status===400);
 });
 
-test('Kamp.1 includes Friday through Monday as whole Bratislava calendar days',()=>{
- const start=Date.parse('2026-11-12T23:00:00Z'),end=Date.parse('2026-11-16T23:00:00Z');
- const params=new URLSearchParams({period:'campaign1',from:'2000-01-01',to:'2099-01-01',source:'facebook_ads'});
- const before=marketingFilters(params,start-1);assert.equal(before.start,start);assert.equal(before.end,start);assert.deepEqual(calendarDays(before),[]);
- const during=marketingFilters(params,start+86400000);assert.equal(during.start,start);assert.equal(during.end,start+86400000+1);assert.equal(during.source,'facebook_ads');
- assert.deepEqual(during.window,{label:'Kamp.1',start,end});
- const finished=marketingFilters(params,end+86400000),days=calendarDays(finished);
- assert.equal(finished.end,end);assert.equal(finished.from,'2026-11-13');assert.equal(finished.to,'2026-11-16');
- assert.deepEqual(days.map(d=>d.date),['2026-11-13','2026-11-14','2026-11-15','2026-11-16']);
- assert.equal(days[0].start,start);assert.equal(days[0].end,Date.parse('2026-11-13T23:00:00Z'));assert.equal(days.at(-1).end,end);
- for(let i=1;i<days.length;i++)assert.equal(days[i].start,days[i-1].end);
- assert.equal(days.reduce((sum,d)=>sum+d.end-d.start,0),end-start);
- assert.ok(days.every(d=>d.end-d.start===day));
-});
-
-test('Kamp.1 aligns all four full days across funnel, Meta, studio, audience and payment drill-down',async t=>{
- const {db,env}=await setup(),start=Date.parse('2026-11-12T23:00:00Z'),end=Date.parse('2026-11-16T23:00:00Z'),snapshot=end+60000;
- t.mock.method(Date,'now',()=>snapshot);
- try{
-  await execute(db,'UPDATE marketing_state SET unique_started_at=?',start-day);
-  const included=[];
-  for(const time of [start-1,start,start+8*3600000,start+day+3600000,start+2*day+3600000,end-3*3600000,end-1,end]){
-   const v=input({campaign:'123',browserId:crypto.randomUUID(),os:'android'});await marketingEvent(req(),env,{...v,type:'checkout',checkoutOpenId:crypto.randomUUID()},time);
-   const id=await attempt(db,{visitId:v.visitId,created:time,paid:time,gift:false,total:1499});if(time>=start&&time<end)included.push(id);
-  }
-  const dates=['2026-11-13','2026-11-14','2026-11-15','2026-11-16'];
-  const metaEnv={...env,META_ADS_ACCESS_TOKEN:'test-only',META_ADS_FETCH:async url=>Response.json(url.pathname.endsWith('/insights')?{data:dates.filter(date=>date<=JSON.parse(url.searchParams.get('time_range')).until).map(date=>({account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Campaign',date_start:date,date_stop:date,publisher_platform:'facebook',spend:'0.25',impressions:'10'}))}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'})};
-  const ongoingAt=start+12*3600000;
-  await syncMetaAds(metaEnv,{from:dates[0],to:dates[0]},ongoingAt);
-  const ongoing=await marketingReport(metaEnv,new URLSearchParams({period:'campaign1'}),ongoingAt);
-  assert.equal(ongoing.filters.to,dates[0]);assert.equal(ongoing.filters.window.end,end);assert.equal(ongoing.charts.days.length,1);
-  assert.equal(ongoing.costs,25);assert.equal(ongoing.funnel.impressions.total,10);assert.equal(ongoing.funnel.impressions.partial,true);
-  await syncMetaAds(metaEnv,{from:dates[0],to:dates.at(-1)},snapshot);
-  await execute(db,'UPDATE studio_traffic_state SET started_at=?',start-day);
-  for(const [index,date]of dates.entries())await execute(db,'INSERT INTO studio_traffic_daily VALUES(?,?)',date,index+1);
-  const report=await marketingReport(metaEnv,new URLSearchParams({period:'campaign1'}),snapshot);
-  assert.equal(report.metrics.visits,6);assert.equal(report.periodMetrics.checkouts,6);assert.equal(report.metrics.purchases,6);assert.equal(report.metrics.revenueCents,8994);
-  assert.equal(report.audience.total,6);assert.equal(report.uniqueMetrics.visits,6);assert.deepEqual(report.charts.days.map(d=>d.visits),[2,1,1,2]);
-  assert.equal(report.costs,100);assert.equal(report.cac,100/6);assert.equal(report.funnel.impressions.total,40);
-  assert.equal(report.studioTraffic.total,10);assert.deepEqual(report.studioTraffic.days.map(d=>d.visits),[1,2,3,4]);
-  const link=paymentLink(report),params=new URLSearchParams(link.split('?')[1]);assert.equal(params.get('period'),'campaign1');
-  const payments=await paymentReport(env,params,true);
-  assert.equal(payments.matchingTotal,6);assert.deepEqual(payments.rows.map(a=>a.id).sort(),included.sort());
-  assert.equal(payments.funnel.start,report.filters.start);assert.equal(payments.funnel.end,report.filters.end);
- }finally{db.close();}
-});
+for(const [period,label,dates]of [
+ ['campaign1','Wave1',['2026-11-13','2026-11-14','2026-11-15','2026-11-16']],
+ ['campaign2','Wave2',['2026-11-27','2026-11-28','2026-11-29','2026-11-30','2026-12-01','2026-12-02']]
+]){
+ const start=Date.parse(dates[0]+'T00:00:00+01:00'),end=Date.parse(dates.at(-1)+'T00:00:00+01:00')+day;
+ test(label+' includes every full Bratislava calendar day before, during and after the campaign',()=>{
+  const params=new URLSearchParams({period,from:'2000-01-01',to:'2099-01-01',source:'facebook_ads'});
+  const before=marketingFilters(params,start-1);assert.equal(before.start,start);assert.equal(before.end,start);assert.deepEqual(calendarDays(before),[]);
+  const first=marketingFilters(params,start);assert.equal(first.to,dates[0]);assert.equal(first.end,start+1);
+  const during=marketingFilters(params,start+day);assert.equal(during.start,start);assert.equal(during.end,start+day+1);assert.equal(during.source,'facebook_ads');
+  assert.deepEqual(during.window,{label,start,end});
+  const last=marketingFilters(params,end-1);assert.equal(last.to,dates.at(-1));assert.equal(last.end,end);
+  const finished=marketingFilters(params,end+day),days=calendarDays(finished);
+  assert.equal(finished.end,end);assert.equal(finished.from,dates[0]);assert.equal(finished.to,dates.at(-1));
+  assert.deepEqual(days.map(d=>d.date),dates);
+  assert.equal(days[0].start,start);assert.equal(days[0].end,start+day);assert.equal(days.at(-1).end,end);
+  for(let i=1;i<days.length;i++)assert.equal(days[i].start,days[i-1].end);
+  assert.equal(days.reduce((sum,d)=>sum+d.end-d.start,0),end-start);
+  assert.ok(days.every(d=>d.end-d.start===day));
+ });
+ test(label+' aligns funnel, Meta, studio, audience and payment drill-down at both boundaries',async t=>{
+  const {db,env}=await setup(),snapshot=end+60000;
+  t.mock.method(Date,'now',()=>snapshot);
+  try{
+   await execute(db,'UPDATE marketing_state SET unique_started_at=?',start-day);
+   const included=[],times=[start-1,start,start+8*3600000,...dates.slice(1,-1).map((_,i)=>start+(i+1)*day+3600000),end-3*3600000,end-1,end];
+   for(const time of times){
+    const v=input({campaign:'123',browserId:crypto.randomUUID(),os:'android'});await marketingEvent(req(),env,{...v,type:'checkout',checkoutOpenId:crypto.randomUUID()},time);
+    const id=await attempt(db,{visitId:v.visitId,created:time,paid:time,gift:false,total:1499});if(time>=start&&time<end)included.push(id);
+   }
+   const metaEnv={...env,META_ADS_ACCESS_TOKEN:'test-only',META_ADS_FETCH:async url=>Response.json(url.pathname.endsWith('/insights')?{data:dates.filter(date=>date<=JSON.parse(url.searchParams.get('time_range')).until).map(date=>({account_id:metaAccount,account_currency:'EUR',campaign_id:'123',campaign_name:'Campaign',date_start:date,date_stop:date,publisher_platform:'facebook',spend:'0.25',impressions:'10'}))}:{account_id:metaAccount,currency:'EUR',timezone_name:'Europe/Bratislava'})};
+   const ongoingAt=start+12*3600000;
+   await syncMetaAds(metaEnv,{from:dates[0],to:dates[0]},ongoingAt);
+   const ongoing=await marketingReport(metaEnv,new URLSearchParams({period}),ongoingAt);
+   assert.equal(ongoing.filters.to,dates[0]);assert.equal(ongoing.filters.window.end,end);assert.equal(ongoing.charts.days.length,1);
+   assert.equal(ongoing.costs,25);assert.equal(ongoing.funnel.impressions.total,10);assert.equal(ongoing.funnel.impressions.partial,true);
+   const ongoingParams=new URLSearchParams(paymentLink(ongoing).split('?')[1]);
+   const ongoingPayments=await paymentReport(env,ongoingParams,true);
+   assert.equal(ongoingParams.get('period'),period);assert.equal(ongoingPayments.matchingTotal,2);
+   assert.equal(ongoingPayments.funnel.start,ongoing.filters.start);assert.equal(ongoingPayments.funnel.end,ongoing.filters.end);
+   await syncMetaAds(metaEnv,{from:dates[0],to:dates.at(-1)},snapshot);
+   await execute(db,'UPDATE studio_traffic_state SET started_at=?',start-day);
+   for(const [index,date]of dates.entries())await execute(db,'INSERT INTO studio_traffic_daily VALUES(?,?)',date,index+1);
+   const report=await marketingReport(metaEnv,new URLSearchParams({period}),snapshot),count=dates.length+2;
+   assert.equal(report.metrics.visits,count);assert.equal(report.periodMetrics.checkouts,count);assert.equal(report.metrics.purchases,count);assert.equal(report.metrics.revenueCents,1499*count);
+   assert.equal(report.audience.total,count);assert.equal(report.uniqueMetrics.visits,count);assert.deepEqual(report.charts.days.map(d=>d.visits),[2,...dates.slice(1,-1).map(()=>1),2]);
+   assert.equal(report.costs,25*dates.length);assert.equal(report.cac,25*dates.length/count);assert.equal(report.funnel.impressions.total,10*dates.length);
+   assert.equal(report.studioTraffic.total,dates.length*(dates.length+1)/2);assert.deepEqual(report.studioTraffic.days.map(d=>d.visits),dates.map((_,i)=>i+1));
+   const link=paymentLink(report),params=new URLSearchParams(link.split('?')[1]);assert.equal(params.get('period'),period);
+   const payments=await paymentReport(env,params,true);
+   assert.equal(payments.matchingTotal,count);assert.deepEqual(payments.rows.map(a=>a.id).sort(),included.sort());
+   assert.equal(payments.funnel.start,report.filters.start);assert.equal(payments.funnel.end,report.filters.end);
+  }finally{db.close();}
+ });
+}
 
 test('disabled browser collection rejects even a cached collection request and preserves paid reporting',async()=>{
  const {db,env}=await setup();try{
