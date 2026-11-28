@@ -11,6 +11,7 @@ const origin='https://pixelkovia.rodulab.com';
    page.on('pageerror',error=>errors.push(error.message));
    await context.route('**/*',async route=>{
     const request=route.request(),path=new URL(request.url()).pathname;
+    if(path==='/api/admin/context')return route.fulfill({status:401,json:{error:'Vyžaduje sa heslo do administrácie.'}});
     if(path==='/api/admin/login'){
      submissions++;assert.equal(request.method(),'POST');
      assert.deepEqual(request.postDataJSON(),{password:'local-browser-fixture-password'});

@@ -26,7 +26,7 @@ test('login is same-origin, omits secrets from JSON, issues HttpOnly secure cook
  assert.equal((await worker.fetch(post('/api/admin/login','https://attacker.example.invalid'),env)).status,403);
  const login=await worker.fetch(post('/api/admin/login'),env);assert.equal(login.status,200);
  assert.deepEqual(await login.json(),{authenticated:true});
- const setCookie=login.headers.get('set-cookie');for(const flag of ['__Host-tq-admin=','HttpOnly','Secure','SameSite=Strict','Path=/','Max-Age=2592000'])assert.ok(setCookie.includes(flag));
+ const setCookie=login.headers.get('set-cookie');for(const flag of ['__Host-tq-admin=','HttpOnly','Secure','SameSite=Lax','Path=/','Max-Age=2592000'])assert.ok(setCookie.includes(flag));
  const logout=await worker.fetch(post('/api/admin/logout','https://admin.example.invalid',{cookie:setCookie.split(';')[0]}),env);assert.equal(logout.status,200);assert.ok(logout.headers.get('set-cookie').includes('Max-Age=0'));
  assert.equal((await first(db,'SELECT COUNT(*) count FROM admin_sessions')).count,0);db.close();
 });

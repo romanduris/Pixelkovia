@@ -31,8 +31,9 @@ function configuration(env){
 }
 function equal(a,b){if(a.length!==b.length)return false;let mismatch=0;for(let i=0;i<a.length;i++)mismatch|=a.charCodeAt(i)^b.charCodeAt(i);return mismatch===0;}
 export function cookieToken(request){return request.headers.get('cookie')?.match(/(?:^|;\s*)__Host-tq-admin=([a-f0-9]{64})(?:;|$)/)?.[1]||null;}
-export const sessionCookie=token=>`__Host-tq-admin=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_MS/1000}`;
-export const clearCookie=()=>`__Host-tq-admin=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`;
+// Allow opening admin from another site. Mutations still require an exact Origin.
+export const sessionCookie=token=>`__Host-tq-admin=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSION_MS/1000}`;
+export const clearCookie=()=>`__Host-tq-admin=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`;
 export async function passwordSession(request,env,at=Date.now()){
   const record=configuration(env),token=cookieToken(request);
   if(!record||!env.TQ_DB||!token)return null;

@@ -23,7 +23,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
   assert.equal(await page.locator('#mode-label').textContent(),'Prihlásenie heslom');
   assert.equal(await page.locator('#notice').textContent(),'');
   const cookies=await context.cookies(),session=cookies.find(c=>c.name==='__Host-tq-admin');
-  assert.ok(session?.secure&&session?.httpOnly&&session?.sameSite==='Strict');
+  assert.ok(session?.secure&&session?.httpOnly&&session?.sameSite==='Lax');
   const beforeLogoutCookie=session.name+'='+session.value;
   for(const section of ['orders','analytics','dashboard']){
    await page.locator('[data-page="'+section+'"]').click();

@@ -1,4 +1,9 @@
 const form=document.querySelector('#login-form'),button=document.querySelector('#login-button'),status=document.querySelector('#login-status');
+// Older Strict cookies can be omitted on an external navigation and its redirects.
+// Recheck from this page, where the browser can send its existing session cookie.
+fetch('/api/admin/context',{credentials:'same-origin',cache:'no-store'}).then(response=>{
+  if(response.ok)location.replace('/admin#marketing');
+}).catch(()=>{});
 form.addEventListener('submit',async event=>{
   event.preventDefault();button.disabled=true;status.textContent='Overujem heslo…';
   try{
